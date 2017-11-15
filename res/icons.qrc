@@ -1,0 +1,27 @@
+<RCC>
+    <qresource prefix="/">
+        <file>icons/btnMagnifier.png</file>
+        <file>icons/btnMenu.png</file>
+        <file>icons/btnMode1.png</file>
+        <file>icons/btnMode2.png</file>
+        <file>icons/btnMode3.png</file>
+        <file>icons/btnModeDec.png</file>
+        <file>icons/btnModeInc.png</file>
+        <file>icons/btnOnOff1.png</file>
+        <file>icons/btnOnOff2.png</file>
+        <file>icons/btnOnOff3.png</file>
+        <file>icons/btnOnOff4.png</file>
+        <file>icons/btnOnOff5.png</file>
+        <file>icons/btnOnOff6.png</file>
+        <file>icons/btnRLI1.png</file>
+        <file>icons/btnRLI2.png</file>
+        <file>icons/btnRLI3.png</file>
+        <file>icons/btnRLI4.png</file>
+        <file>icons/btnTrace1.png</file>
+        <file>icons/btnTrace2.png</file>
+        <file>icons/btnTrace3.png</file>
+        <file>icons/btnTrace4.png</file>
+        <file>icons/btnTrace5.png</file>
+        <file>icons/btnTrace6.png</file>
+    </qresource>
+</RCC>
