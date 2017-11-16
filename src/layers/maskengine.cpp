@@ -13,10 +13,7 @@ MaskEngine::MaskEngine(const QSize& sz, QOpenGLContext* context, QObject* parent
   glGenBuffers(ATTR_CNT, _hole_vbo_ids);
   glGenBuffers(ATTR_CNT, _rect_vbo_ids);
 
-  QOpenGLFramebufferObjectFormat format;
-  //format.setInternalTextureFormat(GL_RGBA16);
-
-  _fbo = new QOpenGLFramebufferObject(sz, format);
+  _fbo = new QOpenGLFramebufferObject(QSize(1, 1));
   _program = new QOpenGLShaderProgram();
 
   initShader();
@@ -35,11 +32,8 @@ void MaskEngine::resize(const QSize& sz) {
   if (sz == _fbo->size())
     return;
 
-  QOpenGLFramebufferObjectFormat format;
-  //format.setInternalTextureFormat(GL_RGBA16);
-
   delete _fbo;
-  _fbo = new QOpenGLFramebufferObject(sz, format);
+  _fbo = new QOpenGLFramebufferObject(sz);
 
   initBuffers();
   update();

@@ -1,6 +1,8 @@
 #include "radardatasource.h"
 #include "../mainwindow.h"
 
+#include "../common/properties.h"
+
 #include <QApplication>
 #include <QThread>
 #include <fstream>
@@ -19,8 +21,8 @@ RadarDataSource::RadarDataSource() {
   finish_flag = true;
   _radar_scale = new RadarScale();
 
-  _peleng_size         = qApp->property("PELENG_SIZE").toInt();
-  _bearings_per_cycle  = qApp->property("BEARINGS_PER_CYCLE").toInt();
+  _peleng_size         = qApp->property(PROPERTY_PELENG_SIZE).toInt();
+  _bearings_per_cycle  = qApp->property(PROPERTY_BEARINGS_PER_CYCLE).toInt();
 
   file_amps[0] = new GLfloat[_peleng_size*_bearings_per_cycle];
   file_amps[1] = new GLfloat[_peleng_size*_bearings_per_cycle];
@@ -51,8 +53,8 @@ void RadarDataSource::finish() {
 }
 
 void RadarDataSource::worker() {
-  int delay = qApp->property("DATA_DELAY").toInt();
-  uint BLOCK_TO_SEND = qApp->property("BLOCK_SIZE").toInt();
+  int delay = qApp->property(PROPERTY_DATA_DELAY).toInt();
+  uint BLOCK_TO_SEND = qApp->property(PROPERTY_BLOCK_SIZE).toInt();
   int file = 0;
   int offset = 0;
 

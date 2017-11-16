@@ -5,19 +5,17 @@
 #include <QOpenGLTexture>
 
 // Класс для расчета радарной палитры
-class RadarPalette { /* : public QObject, protected QOpenGLFunctions {
-  Q_OBJECT*/
+class RadarPalette : public QObject, protected QOpenGLFunctions {
+  Q_OBJECT
 
 public:
-  //RadarPalette(QOpenGLContext* context, QObject* parent = nullptr);
-  RadarPalette();
+  RadarPalette(QOpenGLContext* context, QObject* parent = nullptr);
   ~RadarPalette();
 
   void setRgbVar(int var);
   void setBrightness(int br);
 
-  //inline GLuint texture() { return tex->textureId(); }
-  inline float* getPalette() { return &palette[0][0]; }
+  inline GLuint texture() { return tex->textureId(); }
 
 private:
   // Расчёт зависимости RGBкодов цвета от амплитуды входного сигнала
@@ -28,10 +26,7 @@ private:
   int brightnessRLI;      //Яркость РЛИ 0..255
 
   // Текущая палитра
-  float palette[16][3];
-
-  // Текущая палитра
-  // QOpenGLTexture* tex;
+  QOpenGLTexture* tex;
 };
 
 

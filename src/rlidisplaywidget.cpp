@@ -8,6 +8,7 @@
 #include <QApplication>
 
 #include "common/rliconfig.h"
+#include "common/properties.h"
 
 RLIDisplayWidget::RLIDisplayWidget(QWidget *parent) : QOpenGLWidget(parent) {
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "RLIDisplayWidget construction start";
@@ -55,8 +56,8 @@ void RLIDisplayWidget::initializeGL() {
 
   const RLILayout* layout = RLIConfig::instance().currentLayout();
 
-  uint peleng_size         = qApp->property("PELENG_SIZE").toInt();
-  uint bearings_per_cycle  = qApp->property("BEARINGS_PER_CYCLE").toInt();
+  uint peleng_size         = qApp->property(PROPERTY_PELENG_SIZE).toInt();
+  uint bearings_per_cycle  = qApp->property(PROPERTY_BEARINGS_PER_CYCLE).toInt();
 
   uint circle_radius = layout->circle.radius;
 

@@ -492,7 +492,7 @@
       </panels>
     </layout>
 
-    <layout size="1366x768">
+    <layout size="1366x768">    
       <rli-circle x="536" y="384" radius="360" font="F8X8B" />
       <menu x="-4" y="152" width="236" height="262" font="F12X14B" />
       <magnifier x="-10" y="155" width="224" height="224" />

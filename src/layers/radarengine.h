@@ -58,7 +58,7 @@ private:
   QOpenGLShaderProgram* _program;
 
   enum { ATTR_POS = 0, ATTR_AMP = 1, ATTR_CNT = 2 } ;
-  enum { UNIF_MVP = 0, UNIF_TEX = 1, UNIF_THR = 2, UNIF_PLN = 3, UNIF_PCN = 4, UNIF_PAL = 5, UNIF_CNT = 6 } ;
+  enum { UNIF_MVP = 0, UNIF_TEX = 1, UNIF_THR = 2, UNIF_PLN = 3, UNIF_PCN = 4, UNIF_CNT = 5 } ;
 
   GLuint _vbo_ids[ATTR_CNT];
   GLuint _unif_locs[UNIF_CNT];

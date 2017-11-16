@@ -34,7 +34,8 @@ HEADERS     += \
     src/datasources/radarscale.h \
     src/datasources/radardatasource.h \
     src/layers/radarpalette.h \
-    src/layers/maskengine.h
+    src/layers/maskengine.h \
+    src/common/properties.h
 
 FORMS       += \
     forms/mainwindow.ui \

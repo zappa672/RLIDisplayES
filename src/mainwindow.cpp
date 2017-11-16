@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 
 #include "common/rliconfig.h"
+#include "common/properties.h"
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow) {
   ui->setupUi(this);
@@ -27,7 +28,14 @@ void MainWindow::resizeEvent(QResizeEvent* e) {
   wgtButtonPanel->move( width() - wgtButtonPanel->width(), 0 );
 
   QSize s = e->size();
-  QSize availableSize(showButtonPanel ? s.width() - wgtButtonPanel->width() : s.width(), s.height());
+  QSize availableSize;
+
+  if (qApp->property(PROPERTY_RLI_WIDGET_SIZE).isValid()) {
+    QStringList l = qApp->property(PROPERTY_RLI_WIDGET_SIZE).toString().split("x");
+    availableSize = QSize(l[0].toInt(), l[1].toInt());
+  } else {
+    availableSize = QSize(showButtonPanel ? s.width() - wgtButtonPanel->width() : s.width(), s.height());
+  }
 
   RLIConfig::instance().setCurrentSize(availableSize);
   QSize curSize = RLIConfig::instance().currentSize();
@@ -49,6 +57,6 @@ void MainWindow::onRLIWidgetInitialized() {
 
   _radar_ds->start();
 
-  int frame = qApp->property("FRAME_DELAY").toInt();
+  int frame = qApp->property(PROPERTY_FRAME_DELAY).toInt();
   startTimer(frame, Qt::CoarseTimer);
 }

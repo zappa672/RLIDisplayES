@@ -22,8 +22,7 @@ RadarEngine::RadarEngine(uint pel_count, uint pel_len, uint circle_radius, QOpen
   glGenBuffers(1, &_ind_vbo_id);
 
   _program = new QOpenGLShaderProgram();
-  //_palette = new RadarPalette(context, this);
-  _palette = new RadarPalette();
+  _palette = new RadarPalette(context, this);
 
   initShader();
 
@@ -54,11 +53,10 @@ void RadarEngine::initShader() {
   _program->bind();
 
   _unif_locs[UNIF_MVP] = _program->uniformLocation("mvp_matrix");
-  //_unif_locs[UNIF_TEX] = _program->uniformLocation("texture");
+  _unif_locs[UNIF_TEX] = _program->uniformLocation("texture");
   _unif_locs[UNIF_THR] = _program->uniformLocation("threashold");
   _unif_locs[UNIF_PLN] = _program->uniformLocation("peleng_length");
   _unif_locs[UNIF_PCN] = _program->uniformLocation("peleng_count");
-  _unif_locs[UNIF_PAL] = _program->uniformLocation("palette");
 
   _attr_locs[ATTR_POS] = _program->attributeLocation("position");
   _attr_locs[ATTR_AMP] = _program->attributeLocation("amplitude");
@@ -131,13 +129,13 @@ void RadarEngine::resizeTexture(uint radius) {
 void RadarEngine::clearData() {
   glBindBuffer(GL_ARRAY_BUFFER, _vbo_ids[ATTR_POS]);
   //glBufferData(GL_ARRAY_BUFFER, 2*_peleng_count*_peleng_len*sizeof(GLfloat), _positions.data(), GL_DYNAMIC_DRAW);
-  glBufferData(GL_ARRAY_BUFFER, _peleng_count*_peleng_len*sizeof(GLfloat), _positions.data(), GL_DYNAMIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, _peleng_count*_peleng_len*sizeof(GLfloat), _positions.data(), GL_STATIC_DRAW);
 
   glBindBuffer(GL_ARRAY_BUFFER, _vbo_ids[ATTR_AMP]);
   glBufferData(GL_ARRAY_BUFFER, _peleng_count*_peleng_len*sizeof(GLfloat), NULL, GL_DYNAMIC_DRAW);
 
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ind_vbo_id);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, _draw_indices.size()*sizeof(GLuint), _draw_indices.data(), GL_DYNAMIC_DRAW);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, _draw_indices.size()*sizeof(GLuint), _draw_indices.data(), GL_STATIC_DRAW);
 
   _draw_circle       = false;
   _has_data          = false;
@@ -221,16 +219,15 @@ void RadarEngine::updateTexture() {
 
   _program->bind();
 
-  //glActiveTexture(GL_TEXTURE0);
-  //glBindTexture(GL_TEXTURE_2D, _palette->texture());
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, _palette->texture());
 
-  //_program->setUniformValue(_unif_locs[UNIF_TEX], 0);
+  _program->setUniformValue(_unif_locs[UNIF_TEX], 0);
   _program->setUniformValue(_unif_locs[UNIF_MVP], projection*transform);
   _program->setUniformValue(_unif_locs[UNIF_THR], 64.f);
 
   _program->setUniformValue(_unif_locs[UNIF_PLN], static_cast<GLfloat>(_peleng_len));
   _program->setUniformValue(_unif_locs[UNIF_PCN], static_cast<GLfloat>(_peleng_count));
-  glUniform3fv(_unif_locs[UNIF_PAL], 16*3, _palette->getPalette());
 
   if (first_peleng_to_draw <= last_peleng_to_draw) {
     drawPelengs(first_peleng_to_draw, last_peleng_to_draw);

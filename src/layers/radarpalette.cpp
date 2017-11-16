@@ -18,27 +18,24 @@ typedef struct rgbRLI_struct {
 
 
 
-//RadarPalette::RadarPalette(QOpenGLContext* context, QObject* parent)
-//  : QObject(parent), QOpenGLFunctions(context) {
-RadarPalette::RadarPalette() {
-  //initializeOpenGLFunctions();
+RadarPalette::RadarPalette(QOpenGLContext* context, QObject* parent)
+  : QObject(parent), QOpenGLFunctions(context) {
+  initializeOpenGLFunctions();
 
   rgbRLI_Var = 0;
   brightnessRLI = 255;
 
-  /*
   tex = new QOpenGLTexture(QOpenGLTexture::Target2D);
 
   tex->setMinificationFilter(QOpenGLTexture::Nearest);
   tex->setMagnificationFilter(QOpenGLTexture::Nearest);
   tex->setWrapMode(QOpenGLTexture::ClampToEdge);
-  */
 
   updatePalette();
 }
 
 RadarPalette::~RadarPalette() {
-  //delete tex;
+  delete tex;
 }
 
 
@@ -62,6 +59,8 @@ void RadarPalette::setBrightness(int val) {
 
 
 void RadarPalette::updatePalette() {
+  float palette[16][3];
+
   // Палитра РЛИ
   // Первый индекс — день (1) и ночь (0)
   // В текущей реализации ПИКО используются только 0е вторые индексы. Остальные наборы данных прозапас
@@ -122,9 +121,9 @@ void RadarPalette::updatePalette() {
     palette[j][2] = B;
   }
 
-  /*QImage img(1, 16, QImage::Format_RGB888);
+  QImage img(1, 16, QImage::Format_RGB888);
   for (int i = 0; i < 16; i++)
     img.setPixel(0, i, qRgb(palette[i][0], palette[i][1], palette[i][2]));
 
-  tex->setData(img);*/
+  tex->setData(img);
 }
