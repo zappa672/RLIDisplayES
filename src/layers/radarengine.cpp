@@ -6,9 +6,7 @@
 
 static double const PI = acos(-1);
 
-
-
-RadarEngine::RadarEngine(uint pel_count, uint pel_len, uint circle_radius, QOpenGLContext* context, QObject* parent)
+RadarEngine::RadarEngine(uint pel_count, uint pel_len, uint tex_radius, QOpenGLContext* context, QObject* parent)
   : QObject(parent), QOpenGLFunctions(context) {
   _has_data = false;
   _fbo = NULL;
@@ -20,14 +18,16 @@ RadarEngine::RadarEngine(uint pel_count, uint pel_len, uint circle_radius, QOpen
 
   glGenBuffers(ATTR_CNT, _vbo_ids);
   glGenBuffers(1, &_ind_vbo_id);
+  vao.create();
 
   _program = new QOpenGLShaderProgram();
   _palette = new RadarPalette(context, this);
 
   initShader();
+  initVAO();
 
   resizeData(pel_count, pel_len);
-  resizeTexture(circle_radius);
+  resizeTexture(tex_radius);
 }
 
 RadarEngine::~RadarEngine() {
@@ -36,6 +36,7 @@ RadarEngine::~RadarEngine() {
 
   glDeleteBuffers(ATTR_CNT, _vbo_ids);
   glDeleteBuffers(1, &_ind_vbo_id);
+  vao.destroy();
 
   delete _palette;
 }
@@ -44,6 +45,23 @@ void RadarEngine::onBrightnessChanged(int br) {
   _palette->setBrightness(br);
 }
 
+
+void RadarEngine::initVAO() {
+  vao.bind();
+
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ind_vbo_id);
+
+  glBindBuffer(GL_ARRAY_BUFFER, _vbo_ids[ATTR_POS]);
+  //glVertexAttribPointer( _attr_locs[ATTR_POS], 2, GL_FLOAT, GL_FALSE, 0, (void*) (0 * sizeof(GLfloat)));
+  glVertexAttribPointer(_attr_locs[ATTR_POS], 1, GL_FLOAT, GL_FALSE, 0, (void*) (0 * sizeof(GLfloat)));
+  glEnableVertexAttribArray(_attr_locs[ATTR_POS]);
+
+  glBindBuffer(GL_ARRAY_BUFFER, _vbo_ids[ATTR_AMP]);
+  glVertexAttribPointer( _attr_locs[ATTR_AMP], 1, GL_FLOAT, GL_FALSE, 0, (void*) (0 * sizeof(GLfloat)));
+  glEnableVertexAttribArray(_attr_locs[ATTR_AMP]);
+
+  vao.release();
+}
 
 
 void RadarEngine::initShader() {
@@ -85,20 +103,12 @@ void RadarEngine::fillCoordTable() {
 
   for (uint index = 0; index < _peleng_count; index++) {
     for (uint radius = 0; radius < _peleng_len; radius++) {
-      //double angle = (2 * PI * static_cast<double>(index)) / _peleng_count;
-
       uint curr_index = index*_peleng_len + radius;
-      uint prev_index = ((index-1)*_peleng_len + radius +total) % total;
+      uint prev_index = ((index-1)*_peleng_len + radius + total) % total;
 
       _draw_indices.push_back(curr_index);
       _draw_indices.push_back(prev_index);
-
-      //GLfloat x = static_cast<double>(radius) * sin(angle);
-      //GLfloat y = -static_cast<double>(radius) * cos(angle);
-
       _positions.push_back(curr_index);
-      //_positions.push_back(x);
-      //_positions.push_back(y);
     }
 
     GLuint last = _draw_indices[_draw_indices.size()-1];
@@ -108,16 +118,17 @@ void RadarEngine::fillCoordTable() {
 }
 
 void RadarEngine::resizeTexture(uint radius) {
-  if (_radius == radius)
-    return;
+  if (_fbo != NULL) {
+    if (_fbo->size().width() == 2*radius+1) {
+      return;
+    }
 
-  if (_fbo != NULL)
     delete _fbo;
+  }
 
   _radius = radius;
 
   QOpenGLFramebufferObjectFormat format;
-  //format.setInternalTextureFormat(GL_RGBA16);
   format.setAttachment(QOpenGLFramebufferObject::Depth);
 
   _fbo = new QOpenGLFramebufferObject(2*_radius+1, 2*_radius+1, format);
@@ -145,6 +156,7 @@ void RadarEngine::clearData() {
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
+
 
 void RadarEngine::updateData(uint offset, uint count, GLfloat* amps) {
   glBindBuffer(GL_ARRAY_BUFFER, _vbo_ids[ATTR_AMP]);
@@ -236,7 +248,7 @@ void RadarEngine::updateTexture() {
     drawPelengs(0, last_peleng_to_draw);
   }
 
-  //glBindTexture(GL_TEXTURE_2D, 0);
+  glBindTexture(GL_TEXTURE_2D, 0);
   _program->release();
 
   _fbo->release();
@@ -249,21 +261,13 @@ void RadarEngine::updateTexture() {
 }
 
 void RadarEngine::drawPelengs(uint first, uint last) {
+  // Clear depth when the new cycle begins to avoid the previous circle data
   if (first == 0) {
     glClearDepthf(0.f);
     glClear(GL_DEPTH_BUFFER_BIT);
   }
 
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ind_vbo_id);
-
-  glBindBuffer(GL_ARRAY_BUFFER, _vbo_ids[ATTR_POS]);
-  //glVertexAttribPointer( _attr_locs[ATTR_POS], 2, GL_FLOAT, GL_FALSE, 0, (void*) (0 * sizeof(GLfloat)));
-  glVertexAttribPointer( _attr_locs[ATTR_POS], 1, GL_FLOAT, GL_FALSE, 0, (void*) (0 * sizeof(GLfloat)));
-  glEnableVertexAttribArray(_attr_locs[ATTR_POS]);
-
-  glBindBuffer(GL_ARRAY_BUFFER, _vbo_ids[ATTR_AMP]);
-  glVertexAttribPointer( _attr_locs[ATTR_AMP], 1, GL_FLOAT, GL_FALSE, 0, (void*) (0 * sizeof(GLfloat)));
-  glEnableVertexAttribArray(_attr_locs[ATTR_AMP]);
+  vao.bind();
 
   glDepthFunc(GL_GREATER);
   glDrawElements( GL_TRIANGLE_STRIP
@@ -271,7 +275,5 @@ void RadarEngine::drawPelengs(uint first, uint last) {
                 , GL_UNSIGNED_INT
                 , (const GLvoid*)(first*(2*_peleng_len+2) * sizeof(GLuint)));
 
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+  vao.release();
 }
-

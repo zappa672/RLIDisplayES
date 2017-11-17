@@ -8,6 +8,7 @@
 #include <QOpenGLFunctions>
 #include <QOpenGLFramebufferObject>
 #include <QOpenGLShaderProgram>
+#include <QOpenGLVertexArrayObject>
 
 #include "radarpalette.h"
 
@@ -15,29 +16,30 @@
 class RadarEngine : public QObject, protected QOpenGLFunctions {
   Q_OBJECT
 public:
-  explicit RadarEngine  (uint pel_count, uint pel_len, uint circle_radius, QOpenGLContext* context, QObject* parent = nullptr);
+  explicit RadarEngine  (uint pel_count, uint pel_len, uint tex_radius, QOpenGLContext* context, QObject* parent = nullptr);
   virtual ~RadarEngine  ();
+
+  inline QSize size() const      { return _fbo->size(); }
+  inline uint  textureId() const { return _fbo->texture(); }
+
+public slots:
+  void onBrightnessChanged(int br);
 
   void resizeData     (uint pel_count, uint pel_len);
   void resizeTexture  (uint radius);
 
-  inline QSize size() const          { return _fbo->size(); }
-  inline uint  textureId() const     { return _fbo->texture(); }
-
-public slots:
   void clearTexture();
   void clearData();
-
-  void onBrightnessChanged(int br);
 
   void updateTexture();
   void updateData(uint offset, uint count, GLfloat* amps);
 
 private:
   void initShader();
+  void initVAO();
+
   void fillCoordTable();
 
-  void drawPelengsShifted(uint first_pos, uint first_amp, uint count);
   void drawPelengs(uint first, uint last);
 
   bool _has_data;
@@ -54,16 +56,19 @@ private:
 
   // OpenGL vars
   QOpenGLFramebufferObject* _fbo;
-
   QOpenGLShaderProgram* _program;
+  QOpenGLVertexArrayObject vao;
 
+  // OpenGL program attributres enum
   enum { ATTR_POS = 0, ATTR_AMP = 1, ATTR_CNT = 2 } ;
+  // OpenGL program uniforms enum
   enum { UNIF_MVP = 0, UNIF_TEX = 1, UNIF_THR = 2, UNIF_PLN = 3, UNIF_PCN = 4, UNIF_CNT = 5 } ;
 
   GLuint _vbo_ids[ATTR_CNT];
+  // OpenGL program uniforms locations
   GLuint _unif_locs[UNIF_CNT];
+  // OpenGL program attributres locations
   GLuint _attr_locs[ATTR_CNT];
-
   GLuint _ind_vbo_id;
 
   // Palette
