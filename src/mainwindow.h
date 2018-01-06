@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QSet>
 
 #include "rlicontrolwidget.h"
 #include "rlidisplaywidget.h"
@@ -24,10 +25,15 @@ protected slots:
   void resizeEvent(QResizeEvent* e);
   void timerEvent(QTimerEvent* e);
 
+  void keyReleaseEvent(QKeyEvent *event);
+  void keyPressEvent(QKeyEvent *event);
+
   void onRLIWidgetInitialized();
 
 private:
   Ui::MainWindow *ui;
+
+  QSet<int> pressedKeys;
 
   RadarDataSource* _radar_ds;
 

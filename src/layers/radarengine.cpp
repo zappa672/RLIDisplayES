@@ -119,7 +119,7 @@ void RadarEngine::fillCoordTable() {
 
 void RadarEngine::resizeTexture(uint radius) {
   if (_fbo != NULL) {
-    if (_fbo->size().width() == 2*radius+1) {
+    if (_fbo->size().width() == static_cast<int>(2*radius+1)) {
       return;
     }
 
