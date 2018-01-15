@@ -9,9 +9,6 @@
 #include "common/rliconfig.h"
 #include "common/properties.h"
 
-#include "s52/s52references.h"
-#include "s52/s52chart.h"
-
 #define RLI_THREADS_NUM 6 // Required number of threads in global QThreadPool
 
 
@@ -20,15 +17,6 @@ int main(int argc, char *argv[]) {
   QApplication a(argc, argv);
 
   QStringList args = a.arguments();
-
-
-  S52References _s52_refs("data//s52data//chartsymbols.xml");
-  _s52_refs.setColorScheme("DAY_BRIGHT");
-  qDebug() << "Color schemes count" <<  _s52_refs.getColorSchemeNames().size();
-
-  S52Chart chart("data//charts//CO200008.000", &_s52_refs);
-  qDebug() << "Areas in chart" << chart.getAreaLayerNames().size();
-
 
   if (args.contains("--help")) {
     qDebug() << "-p to setup peleng size (default: 800)";

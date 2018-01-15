@@ -13,7 +13,13 @@
 #include <QRectF>
 
 
-S52Assets::S52Assets() : _initialized(false) {
+S52Assets::S52Assets(QOpenGLContext* context, S52References* ref) : QOpenGLFunctions(context) {
+  initializeOpenGLFunctions();
+
+  initGlyphTexture();
+  initPatternTextures(ref);
+  initLineTextures(ref);
+  initSymbolTextures(ref);
 }
 
 S52Assets::~S52Assets() {
@@ -29,14 +35,6 @@ S52Assets::~S52Assets() {
     glDeleteTextures(1, &symbol_tex_ids[symbol_tex_ids.keys()[i]]);
 }
 
-void S52Assets::init(const QGLContext* context, S52References* ref) {
-  initializeGLFunctions(context);
-
-  initGlyphTexture();
-  initPatternTextures(ref);
-  initLineTextures(ref);
-  initSymbolTextures(ref);
-}
 
 void S52Assets::initGlyphTexture() {
   if (glyph_tex_id == 0)
@@ -59,7 +57,7 @@ void S52Assets::initGlyphTexture() {
   painter.setRenderHint(QPainter::TextAntialiasing);
   QRectF bound(0.f, 0.f, 32.f, 32.f);
 
-  int id = QFontDatabase::addApplicationFont("res//fonts//Helvetica.ttf");
+  int id = QFontDatabase::addApplicationFont(":/fonts/Helvetica.ttf");
   QString family = QFontDatabase::applicationFontFamilies(id).at(0);
   painter.setFont(QFont(family, 14, 14));
 
@@ -107,11 +105,11 @@ void S52Assets::initPatternTextures(S52References* ref) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    QDir simple_tex_dir("res//textures//patterns//simple");
+    QDir simple_tex_dir("textures/charts/patterns/simple");
     simple_tex_dir.setNameFilters(QStringList() << "*.png");
     QStringList simple_tex_list = simple_tex_dir.entryList();
 
-    QDir color_tex_dir("res//textures//patterns//" + color_schemes[k].toLower());
+    QDir color_tex_dir("textures/charts/patterns/" + color_schemes[k].toLower());
     color_tex_dir.setNameFilters(QStringList() << "*.png");
     QStringList color_tex_list = color_tex_dir.entryList();
 
@@ -177,11 +175,11 @@ void S52Assets::initLineTextures(S52References* ref) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-    QDir simple_tex_dir("res//textures//lines//simple");
+    QDir simple_tex_dir("textures/charts/lines/simple");
     simple_tex_dir.setNameFilters(QStringList() << "*.png");
     QStringList simple_tex_list = simple_tex_dir.entryList();
 
-    QDir color_tex_dir("res//textures//lines//" + color_schemes[k].toLower());
+    QDir color_tex_dir("textures/charts/lines/" + color_schemes[k].toLower());
     color_tex_dir.setNameFilters(QStringList() << "*.png");
     QStringList color_tex_list = color_tex_dir.entryList();
 
@@ -248,7 +246,7 @@ void S52Assets::initSymbolTextures(S52References* ref) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    QImage img("res//textures//symbols//" + file_name);
+    QImage img("textures/charts/symbols/" + file_name);
     img = QGLWidget::convertToGLFormat(img);
     symbol_tex_dims.insert(file_name, QVector2D(img.width(), img.height()));
 

@@ -1,79 +1,23 @@
 #include "chartshaders.h"
 
-ChartShaders::ChartShaders()
-{
-  is_initialized = false;
+ChartShaders::ChartShaders(QOpenGLContext* context) : QOpenGLFunctions(context) {
+  initializeOpenGLFunctions();
 
-  chart_area_program = NULL;
-  chart_line_program = NULL;
-  chart_text_program = NULL;
-  chart_mark_program = NULL;
-  chart_sndg_program = NULL;
+  initChartAreaProgram();
+  initChartLineProgram();
+  initChartMarkProgram();
+  initChartTextProgram();
+  initChartSndgProgram();
 }
 
-ChartShaders::~ChartShaders()
-{
-  if (chart_area_program != NULL)
-    delete chart_area_program;
-  if (chart_line_program != NULL)
-    delete chart_line_program;
-  if (chart_text_program != NULL)
-    delete chart_text_program;
-  if (chart_mark_program != NULL)
-    delete chart_mark_program;
-  if (chart_sndg_program != NULL)
-    delete chart_sndg_program;
+ChartShaders::~ChartShaders() {
+  delete chart_area_program;
+  delete chart_line_program;
+  delete chart_text_program;
+  delete chart_mark_program;
+  delete chart_sndg_program;
 }
 
-void ChartShaders::init(const QGLContext* context) {
-  is_initialized = false;
-  initializeGLFunctions(context);
-
-  if (!initChartAreaProgram() ||
-      !initChartLineProgram() ||
-      !initChartMarkProgram() ||
-      !initChartTextProgram() ||
-      !initChartSndgProgram())
-    return;
-
-  is_initialized = true;
-}
-
-
-QGLShaderProgram* ChartShaders::getChartAreaProgram() {
-  if (!is_initialized)
-    return NULL;
-
-  return chart_area_program;
-}
-
-QGLShaderProgram* ChartShaders::getChartLineProgram() {
-  if (!is_initialized)
-    return NULL;
-
-  return chart_line_program;
-}
-
-QGLShaderProgram* ChartShaders::getChartTextProgram() {
-  if (!is_initialized)
-    return NULL;
-
-  return chart_text_program;
-}
-
-QGLShaderProgram* ChartShaders::getChartMarkProgram() {
-  if (!is_initialized)
-    return NULL;
-
-  return chart_mark_program;
-}
-
-QGLShaderProgram* ChartShaders::getChartSndgProgram() {
-  if (!is_initialized)
-    return NULL;
-
-  return chart_sndg_program;
-}
 
 
 
@@ -148,21 +92,13 @@ GLuint ChartShaders::getSndgAttributeLoc(unsigned int index) {
 }
 
 
+void ChartShaders::initChartAreaProgram() {
+  chart_area_program = new QOpenGLShaderProgram();
 
-bool ChartShaders::initChartAreaProgram() {
-  if (chart_area_program != NULL) {
-    chart_area_program->release();
-    delete chart_area_program;
-  }
-
-  chart_area_program = new QGLShaderProgram();
-  setlocale(LC_NUMERIC, "C");     // Overriding system locale until shaders are compiled
-
-  if (!chart_area_program->addShaderFromSourceFile(QGLShader::Vertex, ":/res/shaders/chart_area.vert.glsl")
-   || !chart_area_program->addShaderFromSourceFile(QGLShader::Fragment, ":/res/shaders/chart_area.frag.glsl")
-   || !chart_area_program->link()
-   || !chart_area_program->bind())
-      return false;
+  chart_area_program->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/chart_area.vert.glsl");
+  chart_area_program->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/chart_area.frag.glsl");
+  chart_area_program->link();
+  chart_area_program->bind();
 
   area_uniform_locs[COMMON_UNIFORMS_NORTH]            = chart_area_program->uniformLocation("north");
   area_uniform_locs[COMMON_UNIFORMS_CENTER]           = chart_area_program->uniformLocation("center");
@@ -175,31 +111,22 @@ bool ChartShaders::initChartAreaProgram() {
   area_uniform_locs[AREA_UNIFORMS_PATTERN_DIM]        = chart_area_program->uniformLocation("u_tex_dim");
   area_uniform_locs[AREA_UNIFORMS_COLOR_TABLE]        = chart_area_program->uniformLocation("u_color_table");
 
-
   area_attribute_locs[AREA_ATTRIBUTES_COORDS]         = chart_area_program->attributeLocation("coords");
   area_attribute_locs[AREA_ATTRIBUTES_COLOR_INDEX]    = chart_area_program->attributeLocation("color_index");
   area_attribute_locs[AREA_ATTRIBUTES_PATTERN_INDEX]  = chart_area_program->attributeLocation("tex_origin");
   area_attribute_locs[AREA_ATTRIBUTES_PATTERN_DIM]    = chart_area_program->attributeLocation("tex_dim");
 
   chart_area_program->release();
-  setlocale(LC_ALL, "");          // Restore system locale
-  return true;
 }
 
-bool ChartShaders::initChartLineProgram() {
-  if (chart_line_program != NULL) {
-    chart_line_program->release();
-    delete chart_line_program;
-  }
 
-  chart_line_program = new QGLShaderProgram();
-  setlocale(LC_NUMERIC, "C");     // Overriding system locale until shaders are compiled
+void ChartShaders::initChartLineProgram() {
+  chart_line_program = new QOpenGLShaderProgram();
 
-  if (!chart_line_program->addShaderFromSourceFile(QGLShader::Vertex, ":/res/shaders/chart_line.vert.glsl")
-   || !chart_line_program->addShaderFromSourceFile(QGLShader::Fragment, ":/res/shaders/chart_line.frag.glsl")
-   || !chart_line_program->link()
-   || !chart_line_program->bind())
-      return false;
+  chart_line_program->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/chart_line.vert.glsl");
+  chart_line_program->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/chart_line.frag.glsl");
+  chart_line_program->link();
+  chart_line_program->bind();
 
   line_uniform_locs[COMMON_UNIFORMS_NORTH]            = chart_line_program->uniformLocation("north");
   line_uniform_locs[COMMON_UNIFORMS_CENTER]           = chart_line_program->uniformLocation("center");
@@ -221,25 +148,15 @@ bool ChartShaders::initChartLineProgram() {
   line_attribute_locs[LINE_ATTRIBUTES_COLOR_INDEX]    = chart_line_program->attributeLocation("color_index");
 
   chart_line_program->release();
-  setlocale(LC_ALL, "");      // Restore system locale
-  return true;
 }
 
-bool ChartShaders::initChartTextProgram() {
-  if (chart_text_program != NULL) {
-    chart_text_program->release();
-    delete chart_text_program;
-  }
+void ChartShaders::initChartTextProgram() {
+  chart_text_program = new QOpenGLShaderProgram();
 
-  chart_text_program = new QGLShaderProgram();
-  setlocale(LC_NUMERIC, "C");     // Overriding system locale until shaders are compiled
-
-  //qDebug() << "Linking chart_mark shader";
-  if (!chart_text_program->addShaderFromSourceFile(QGLShader::Vertex, ":/res/shaders/chart_text.vert.glsl")
-   || !chart_text_program->addShaderFromSourceFile(QGLShader::Fragment, ":/res/shaders/chart_text.frag.glsl")
-   || !chart_text_program->link()
-   || !chart_text_program->bind())
-      return false;
+  chart_text_program->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/chart_text.vert.glsl");
+  chart_text_program->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/chart_text.frag.glsl");
+  chart_text_program->link();
+  chart_text_program->bind();
 
   text_uniform_locs[COMMON_UNIFORMS_NORTH]            = chart_text_program->uniformLocation("north");
   text_uniform_locs[COMMON_UNIFORMS_CENTER]           = chart_text_program->uniformLocation("center");
@@ -254,25 +171,15 @@ bool ChartShaders::initChartTextProgram() {
   text_attribute_locs[TEXT_ATTRIBUTES_CHAR_VALUE]     = chart_text_program->attributeLocation("char_val");
 
   chart_text_program->release();
-  setlocale(LC_ALL, "");      // Restore system locale
-  return true;
 }
 
-bool ChartShaders::initChartMarkProgram() {
-  if (chart_mark_program != NULL) {
-    chart_mark_program->release();
-    delete chart_mark_program;
-  }
+void ChartShaders::initChartMarkProgram() {
+  chart_mark_program = new QOpenGLShaderProgram();
 
-  chart_mark_program = new QGLShaderProgram();
-  setlocale(LC_NUMERIC, "C");     // Overriding system locale until shaders are compiled
-
-  //qDebug() << "Linking chart_mark shader";
-  if (!chart_mark_program->addShaderFromSourceFile(QGLShader::Vertex, ":/res/shaders/chart_mark.vert.glsl")
-   || !chart_mark_program->addShaderFromSourceFile(QGLShader::Fragment, ":/res/shaders/chart_mark.frag.glsl")
-   || !chart_mark_program->link()
-   || !chart_mark_program->bind())
-      return false;
+  chart_mark_program->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/chart_mark.vert.glsl");
+  chart_mark_program->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/chart_mark.frag.glsl");
+  chart_mark_program->link();
+  chart_mark_program->bind();
 
   mark_uniform_locs[COMMON_UNIFORMS_NORTH]            = chart_mark_program->uniformLocation("north");
   mark_uniform_locs[COMMON_UNIFORMS_CENTER]           = chart_mark_program->uniformLocation("center");
@@ -291,25 +198,15 @@ bool ChartShaders::initChartMarkProgram() {
   mark_attribute_locs[MARK_ATTRIBUTES_SYMBOL_PIVOT]   = chart_mark_program->attributeLocation("symbol_pivot");
 
   chart_mark_program->release();
-  setlocale(LC_ALL, "");      // Restore system locale
-  return true;
 }
 
-bool ChartShaders::initChartSndgProgram() {
-  if (chart_sndg_program != NULL) {
-    chart_sndg_program->release();
-    delete chart_sndg_program;
-  }
+void ChartShaders::initChartSndgProgram() {
+  chart_sndg_program = new QOpenGLShaderProgram();
 
-  chart_sndg_program = new QGLShaderProgram();
-  setlocale(LC_NUMERIC, "C");     // Overriding system locale until shaders are compiled
-
-  //qDebug() << "Linking chart_mark shader";
-  if (!chart_sndg_program->addShaderFromSourceFile(QGLShader::Vertex, ":/res/shaders/chart_sndg.vert.glsl")
-   || !chart_sndg_program->addShaderFromSourceFile(QGLShader::Fragment, ":/res/shaders/chart_sndg.frag.glsl")
-   || !chart_sndg_program->link()
-   || !chart_sndg_program->bind())
-      return false;
+  chart_sndg_program->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/chart_sndg.vert.glsl");
+  chart_sndg_program->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/chart_sndg.frag.glsl");
+  chart_sndg_program->link();
+  chart_sndg_program->bind();
 
   sndg_uniform_locs[COMMON_UNIFORMS_NORTH]            = chart_sndg_program->uniformLocation("north");
   sndg_uniform_locs[COMMON_UNIFORMS_CENTER]           = chart_sndg_program->uniformLocation("center");
@@ -327,6 +224,4 @@ bool ChartShaders::initChartSndgProgram() {
   sndg_attribute_locs[SNDG_ATTRIBUTES_SYMBOL_PIVOT]   = chart_sndg_program->attributeLocation("symbol_pivot");
 
   chart_sndg_program->release();
-  setlocale(LC_ALL, "");      // Restore system locale
-  return true;
 }

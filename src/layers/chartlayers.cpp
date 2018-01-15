@@ -1,28 +1,20 @@
 #include "chartlayers.h"
 
-ChartAreaEngine::ChartAreaEngine() {
-  initialized = false;
+ChartAreaEngine::ChartAreaEngine(QOpenGLContext* context) : QOpenGLFunctions(context) {
+  initializeOpenGLFunctions();
+
   pattern_tex_id = -1;
   point_count = 0;
 
   is_color_uniform = false;
   is_pattern_uniform = false;
   vbo_ids = new GLuint[AREA_ATTRIBUTES_COUNT];
+  glGenBuffers(AREA_ATTRIBUTES_COUNT, vbo_ids);
 }
 
 ChartAreaEngine::~ChartAreaEngine() {
-  if (initialized)
-    glDeleteBuffers(AREA_ATTRIBUTES_COUNT, vbo_ids);
+  glDeleteBuffers(AREA_ATTRIBUTES_COUNT, vbo_ids);
   delete[] vbo_ids;
-}
-
-void ChartAreaEngine::init(const QGLContext* context) {
-  if (initialized)
-    return;
-
-  initializeGLFunctions(context);
-  glGenBuffers(AREA_ATTRIBUTES_COUNT, vbo_ids);
-  initialized = true;
 }
 
 void ChartAreaEngine::clearData() {
@@ -126,9 +118,7 @@ void ChartAreaEngine::setData(S52AreaLayer* layer, S52Assets* assets, S52Referen
 }
 
 void ChartAreaEngine::draw(ChartShaders* shaders, QVector2D cur_coords, float scale, float angle) {
-  if (!initialized
-   || pattern_tex_id == -1
-   || point_count <= 0)
+  if (pattern_tex_id == -1 || point_count <= 0)
     return;
 
   glUniform2f(shaders->getAreaUniformLoc(COMMON_UNIFORMS_CENTER), cur_coords.x(), cur_coords.y());
@@ -186,18 +176,21 @@ void ChartAreaEngine::draw(ChartShaders* shaders, QVector2D cur_coords, float sc
 
 
 
-ChartLineEngine::ChartLineEngine() {
-  initialized = false;
+ChartLineEngine::ChartLineEngine(QOpenGLContext* context) : QOpenGLFunctions(context) {
+  initializeOpenGLFunctions();
+
   point_count = 0;
   pattern_tex_id = -1;
+
   is_pattern_uniform = false;
   is_color_uniform = false;
+
   vbo_ids = new GLuint[LINE_ATTRIBUTES_COUNT];
+  glGenBuffers(LINE_ATTRIBUTES_COUNT, vbo_ids);
 }
 
 ChartLineEngine::~ChartLineEngine() {
-  if (initialized)
-    glDeleteBuffers(LINE_ATTRIBUTES_COUNT, vbo_ids);
+  glDeleteBuffers(LINE_ATTRIBUTES_COUNT, vbo_ids);
   delete[] vbo_ids;
 }
 
@@ -233,24 +226,12 @@ void ChartLineEngine::clearData() {
   }
 }
 
-void ChartLineEngine::init(const QGLContext* context) {
-  if (initialized)
-    return;
-
-  initializeGLFunctions(context);
-  glGenBuffers(LINE_ATTRIBUTES_COUNT, vbo_ids);
-  initialized = true;
-}
-
 void ChartLineEngine::setPatternTexture(GLuint tex_id, QVector2D dim) {
   pattern_tex_id = tex_id;
   pattern_tex_dim = dim;
 }
 
 void ChartLineEngine::setData(S52LineLayer* layer, S52Assets* assets, S52References* ref) {
-  if (!initialized)
-    return;
-
   std::vector<GLfloat> coords1;
   std::vector<GLfloat> coords2;
   std::vector<GLfloat> point_ords;
@@ -341,9 +322,7 @@ void ChartLineEngine::setData(S52LineLayer* layer, S52Assets* assets, S52Referen
 }
 
 void ChartLineEngine::draw(ChartShaders* shaders, QVector2D cur_coords, float scale, float angle) {
-  if (!initialized
-   || pattern_tex_id == -1
-   || point_count <= 0)
+  if (pattern_tex_id == -1 || point_count <= 0)
     return;
 
   glUniform2f(shaders->getLineUniformLoc(COMMON_UNIFORMS_CENTER), cur_coords.x(), cur_coords.y());
@@ -415,27 +394,21 @@ void ChartLineEngine::draw(ChartShaders* shaders, QVector2D cur_coords, float sc
 
 
 
-ChartTextEngine::ChartTextEngine() {
-  initialized = false;
+ChartTextEngine::ChartTextEngine(QOpenGLContext* context) : QOpenGLFunctions(context) {
+  initializeOpenGLFunctions();
+
   glyph_tex_id = -1;
   point_count = 0;
+
   vbo_ids = new GLuint[TEXT_ATTRIBUTES_COUNT];
+  glGenBuffers(TEXT_ATTRIBUTES_COUNT, vbo_ids);
 }
 
 ChartTextEngine::~ChartTextEngine() {
-  if (initialized)
-    glDeleteBuffers(TEXT_ATTRIBUTES_COUNT, vbo_ids);
+  glDeleteBuffers(TEXT_ATTRIBUTES_COUNT, vbo_ids);
   delete[] vbo_ids;
 }
 
-void ChartTextEngine::init(const QGLContext* context) {
-  if (initialized)
-    return;
-
-  initializeGLFunctions(context);
-  glGenBuffers(TEXT_ATTRIBUTES_COUNT, vbo_ids);
-  initialized = true;
-}
 
 void ChartTextEngine::clearData() {
   if (point_count == 0)
@@ -487,9 +460,7 @@ void ChartTextEngine::setData(S52TextLayer* layer) {
 }
 
 void ChartTextEngine::draw(ChartShaders* shaders, QVector2D cur_coords, float scale, float angle) {
-  if (!initialized
-   || glyph_tex_id == -1
-   || point_count <= 0)
+  if (glyph_tex_id == -1 || point_count <= 0)
     return;
 
   glUniform2f(shaders->getTextUniformLoc(COMMON_UNIFORMS_CENTER), cur_coords.x(), cur_coords.y());
@@ -526,27 +497,20 @@ void ChartTextEngine::draw(ChartShaders* shaders, QVector2D cur_coords, float sc
 
 
 
-ChartMarkEngine::ChartMarkEngine() {
-  initialized = false;
+ChartMarkEngine::ChartMarkEngine(QOpenGLContext* context) : QOpenGLFunctions(context) {
+  initializeOpenGLFunctions();
+
   point_count = 0;
   is_pattern_uniform = false;
   pattern_tex_id = -1;
+
   vbo_ids = new GLuint[MARK_ATTRIBUTES_COUNT];
+  glGenBuffers(MARK_ATTRIBUTES_COUNT, vbo_ids);
 }
 
 ChartMarkEngine::~ChartMarkEngine() {
-  if (initialized)
-    glDeleteBuffers(MARK_ATTRIBUTES_COUNT, vbo_ids);
+  glDeleteBuffers(MARK_ATTRIBUTES_COUNT, vbo_ids);
   delete[] vbo_ids;
-}
-
-void ChartMarkEngine::init(const QGLContext* context) {
-  if (initialized)
-    return;
-
-  initializeGLFunctions(context);
-  glGenBuffers(MARK_ATTRIBUTES_COUNT, vbo_ids);
-  initialized = true;
 }
 
 void ChartMarkEngine::clearData() {
@@ -578,7 +542,7 @@ void ChartMarkEngine::setPatternTexture(GLuint tex_id, QVector2D size) {
   pattern_tex_size = size;
 }
 
-void ChartMarkEngine::setData(S52MarkLayer* layer, S52Assets* /*assets*/, S52References* ref) {
+void ChartMarkEngine::setData(S52MarkLayer* layer, S52Assets* assets, S52References* ref) {
   std::vector<GLfloat> world_coords;
   std::vector<GLfloat> vertex_orders;
   std::vector<GLfloat> symbol_origins;
@@ -638,9 +602,7 @@ void ChartMarkEngine::setData(S52MarkLayer* layer, S52Assets* /*assets*/, S52Ref
 }
 
 void ChartMarkEngine::draw(ChartShaders* shaders, QVector2D cur_coords, float scale, float angle) {
-  if (!initialized
-   || pattern_tex_id == -1
-   || point_count <= 0)
+  if (pattern_tex_id == -1 || point_count <= 0)
     return;
 
   glUniform2f(shaders->getMarkUniformLoc(COMMON_UNIFORMS_CENTER), cur_coords.x(), cur_coords.y());
@@ -697,50 +659,40 @@ void ChartMarkEngine::draw(ChartShaders* shaders, QVector2D cur_coords, float sc
 
 
 
-ChartSndgEngine::ChartSndgEngine() {
-  initialized = false;
+ChartSndgEngine::ChartSndgEngine(QOpenGLContext* context) : QOpenGLFunctions(context) {
+  initializeOpenGLFunctions();
+
   point_count = 0;
   pattern_tex_id = -1;
+
   vbo_ids = new GLuint[SNDG_ATTRIBUTES_COUNT];
+  glGenBuffers(SNDG_ATTRIBUTES_COUNT, vbo_ids);
 }
 
 ChartSndgEngine::~ChartSndgEngine() {
-  if (initialized)
-    glDeleteBuffers(SNDG_ATTRIBUTES_COUNT, vbo_ids);
+  glDeleteBuffers(SNDG_ATTRIBUTES_COUNT, vbo_ids);
   delete[] vbo_ids;
 }
 
-void ChartSndgEngine::init(const QGLContext* context) {
-  if (initialized)
-    return;
-
-  initializeGLFunctions(context);
-  glGenBuffers(SNDG_ATTRIBUTES_COUNT, vbo_ids);
-  initialized = true;
-}
-
 void ChartSndgEngine::clearData() {
-  if (!initialized)
-    return;
-
   point_count = 0;
 
-  /*glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[SNDG_ATTRIBUTES_WORLD_COORDS]);
-  glBufferData(GL_ARRAY_BUFFER, 0, NULL, GL_STATIC_DRAW);
-  glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[SNDG_ATTRIBUTES_VERTEX_ORDER]);
-  glBufferData(GL_ARRAY_BUFFER, 0, NULL, GL_STATIC_DRAW);
-  glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[SNDG_ATTRIBUTES_SYMBOL_ORDER]);
-  glBufferData(GL_ARRAY_BUFFER, 0, NULL, GL_STATIC_DRAW);
-  glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[SNDG_ATTRIBUTES_SYMBOL_FRAC]);
-  glBufferData(GL_ARRAY_BUFFER, 0, NULL, GL_STATIC_DRAW);
-  glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[SNDG_ATTRIBUTES_SYMBOL_COUNT]);
-  glBufferData(GL_ARRAY_BUFFER, 0, NULL, GL_STATIC_DRAW);
-  glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[SNDG_ATTRIBUTES_SYMBOL_ORIGIN]);
-  glBufferData(GL_ARRAY_BUFFER, 0, NULL, GL_STATIC_DRAW);
-  glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[SNDG_ATTRIBUTES_SYMBOL_SIZE]);
-  glBufferData(GL_ARRAY_BUFFER, 0, NULL, GL_STATIC_DRAW);
-  glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[SNDG_ATTRIBUTES_SYMBOL_PIVOT]);
-  glBufferData(GL_ARRAY_BUFFER, 0, NULL, GL_STATIC_DRAW);*/
+  //glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[SNDG_ATTRIBUTES_WORLD_COORDS]);
+  //glBufferData(GL_ARRAY_BUFFER, 0, NULL, GL_STATIC_DRAW);
+  //glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[SNDG_ATTRIBUTES_VERTEX_ORDER]);
+  //glBufferData(GL_ARRAY_BUFFER, 0, NULL, GL_STATIC_DRAW);
+  //glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[SNDG_ATTRIBUTES_SYMBOL_ORDER]);
+  //glBufferData(GL_ARRAY_BUFFER, 0, NULL, GL_STATIC_DRAW);
+  //glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[SNDG_ATTRIBUTES_SYMBOL_FRAC]);
+  //glBufferData(GL_ARRAY_BUFFER, 0, NULL, GL_STATIC_DRAW);
+  //glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[SNDG_ATTRIBUTES_SYMBOL_COUNT]);
+  //glBufferData(GL_ARRAY_BUFFER, 0, NULL, GL_STATIC_DRAW);
+  //glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[SNDG_ATTRIBUTES_SYMBOL_ORIGIN]);
+  //glBufferData(GL_ARRAY_BUFFER, 0, NULL, GL_STATIC_DRAW);
+  //glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[SNDG_ATTRIBUTES_SYMBOL_SIZE]);
+  //glBufferData(GL_ARRAY_BUFFER, 0, NULL, GL_STATIC_DRAW);
+  //glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[SNDG_ATTRIBUTES_SYMBOL_PIVOT]);
+  //glBufferData(GL_ARRAY_BUFFER, 0, NULL, GL_STATIC_DRAW);
 }
 
 void ChartSndgEngine::setPatternTexture(GLuint tex_id, QVector2D size) {
@@ -748,7 +700,7 @@ void ChartSndgEngine::setPatternTexture(GLuint tex_id, QVector2D size) {
   pattern_tex_size = size;
 }
 
-void ChartSndgEngine::setData(S52SndgLayer* layer, S52Assets* /*assets*/, S52References* ref) {
+void ChartSndgEngine::setData(S52SndgLayer* layer, S52Assets* assets, S52References* ref) {
   std::vector<GLfloat> world_coords;
   std::vector<GLfloat> vertex_orders;
   std::vector<GLfloat> symbol_orders;
@@ -833,7 +785,7 @@ void ChartSndgEngine::setData(S52SndgLayer* layer, S52Assets* /*assets*/, S52Ref
 }
 
 void ChartSndgEngine::draw(ChartShaders* shaders, QVector2D cur_coords, float scale, float angle) {
-  if (!initialized || pattern_tex_id == -1 || point_count <= 0)
+  if (pattern_tex_id == -1 || point_count <= 0)
     return;
 
   glUniform2f(shaders->getSndgUniformLoc(COMMON_UNIFORMS_CENTER), cur_coords.x(), cur_coords.y());

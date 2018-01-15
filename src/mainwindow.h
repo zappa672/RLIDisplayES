@@ -8,6 +8,7 @@
 #include "rlidisplaywidget.h"
 
 #include "datasources/radardatasource.h"
+#include "datasources/shipdatasource.h"
 
 namespace Ui {
 class MainWindow;
@@ -36,6 +37,7 @@ private:
   QSet<int> pressedKeys;
 
   RadarDataSource* _radar_ds;
+  ShipDataSource* _ship_ds;
 
   RLIDisplayWidget* wgtRLI;
   RLIControlWidget* wgtButtonPanel;

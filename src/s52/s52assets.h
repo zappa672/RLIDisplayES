@@ -1,19 +1,18 @@
 #ifndef S52ASSETS_H
 #define S52ASSETS_H
 
-#include <QGLFunctions>
+#include <QOpenGLFunctions>
+
 #include <QVector2D>
 #include <QMap>
 
 #include "s52references.h"
 
-class S52Assets : protected QGLFunctions
+class S52Assets : protected QOpenGLFunctions
 {
 public:
-  explicit S52Assets                     ();
+  explicit S52Assets                     (QOpenGLContext* context, S52References* ref);
   virtual ~S52Assets                     ();
-
-  void             init                  (const QGLContext* context, S52References* ref);
 
   inline GLuint    getGlyphTextureId     () { return glyph_tex_id; }
 
@@ -35,8 +34,6 @@ private:
   void initPatternTextures               (S52References* ref);
   void initLineTextures                  (S52References* ref);
   void initSymbolTextures                (S52References* ref);
-
-  bool                                      _initialized;
 
   GLuint                                    glyph_tex_id;
 

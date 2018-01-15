@@ -7,12 +7,13 @@
 #include <QtConcurrentRun>
 
 ChartManager::ChartManager(QObject *parent) : QObject(parent) {
-  _s52_refs = new S52References("res//s52data//chartsymbols.xml");
+  _s52_refs = new S52References(":/s52/chartsymbols.xml");
   _s52_refs->setColorScheme("DAY_BRIGHT");
 }
 
 ChartManager::~ChartManager() {
-  qDeleteAll(_charts);
+  for (S52Chart* chart : _charts)
+    delete chart;
 }
 
 void ChartManager::loadCharts() {
@@ -23,7 +24,7 @@ void ChartManager::loadCharts() {
 void ChartManager::chartLoadingWorker() {
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Charts loading started";
 
-  QDir dir("res/charts");
+  QDir dir("data/charts");
   dir.setNameFilters(QStringList("*.000"));
   dir.setFilter(QDir::Files | QDir::NoDotAndDotDot | QDir::NoSymLinks);
 

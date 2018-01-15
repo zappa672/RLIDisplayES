@@ -10,14 +10,11 @@
 #include "../s52/s52assets.h"
 #include "../s52/s52references.h"
 
-class ChartAreaEngine : protected QGLFunctions
-{
+class ChartAreaEngine : protected QOpenGLFunctions {
 public:
-
-  explicit ChartAreaEngine();
+  explicit ChartAreaEngine(QOpenGLContext* context);
   virtual ~ChartAreaEngine();
 
-  void init(const QGLContext* context);
   void clearData();
 
   void setPatternTexture(GLuint tex_id, QVector2D dim);
@@ -28,7 +25,6 @@ public:
 private:
   GLuint*   vbo_ids;
 
-  bool initialized;
   int point_count;
 
   bool is_pattern_uniform;
@@ -45,13 +41,11 @@ private:
 };
 
 
-class ChartLineEngine : protected QGLFunctions
-{
+class ChartLineEngine : protected QOpenGLFunctions {
 public:
-  explicit ChartLineEngine();
+  explicit ChartLineEngine(QOpenGLContext* context);
   virtual ~ChartLineEngine();
 
-  void init(const QGLContext* context);
   void clearData();
 
   void setPatternTexture(GLuint tex_id, QVector2D dim);
@@ -60,7 +54,6 @@ public:
   void draw(ChartShaders* shaders, QVector2D cur_coords, float scale, float angle);
 
 private:
-  bool initialized;
   int point_count;
 
   bool is_pattern_uniform;
@@ -79,13 +72,11 @@ private:
 };
 
 
-class ChartMarkEngine : protected QGLFunctions
-{
+class ChartMarkEngine : protected QOpenGLFunctions {
 public:
-  explicit ChartMarkEngine();
+  explicit ChartMarkEngine(QOpenGLContext* context);
   virtual ~ChartMarkEngine();
 
-  void init(const QGLContext* context);
   void clearData();
 
   void setPatternTexture(GLuint tex_id, QVector2D size);
@@ -94,7 +85,6 @@ public:
   void draw(ChartShaders* shaders, QVector2D cur_coords, float scale, float angle);
 
 private:
-  bool      initialized;
   int       point_count;
 
   bool      is_pattern_uniform;
@@ -108,13 +98,11 @@ private:
 };
 
 
-class ChartSndgEngine : protected QGLFunctions
-{
+class ChartSndgEngine : protected QOpenGLFunctions {
 public:
-  explicit ChartSndgEngine();
+  explicit ChartSndgEngine(QOpenGLContext* context);
   virtual ~ChartSndgEngine();
 
-  void init(const QGLContext* context);
   void clearData();
 
   void setPatternTexture(GLuint tex_id, QVector2D size);
@@ -123,7 +111,6 @@ public:
   void draw(ChartShaders* shaders, QVector2D cur_coords, float scale, float angle);
 
 private:
-  bool      initialized;
   int       point_count;
 
   GLuint*   vbo_ids;
@@ -133,13 +120,11 @@ private:
 };
 
 
-class ChartTextEngine : protected QGLFunctions
-{
+class ChartTextEngine : protected QOpenGLFunctions {
 public:
-  explicit ChartTextEngine();
+  explicit ChartTextEngine(QOpenGLContext* context);
   virtual ~ChartTextEngine();
 
-  void init(const QGLContext* context);
   void clearData();
 
   void setGlyphTexture(GLuint tex_id);
@@ -148,12 +133,10 @@ public:
   void draw(ChartShaders* shaders, QVector2D cur_coords, float scale, float angle);
 
 private:
-  bool initialized;
   int point_count;
 
   GLuint* vbo_ids;
   GLint   glyph_tex_id;
 };
-
 
 #endif // CHARTLAYERENGINES_H

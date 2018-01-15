@@ -8,10 +8,13 @@
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions>
 
+#include "s52/chartmanager.h"
+
 #include "datasources/radarscale.h"
 
 #include "layers/radarengine.h"
 #include "layers/maskengine.h"
+#include "layers/chartengine.h"
 
 
 class RLIDisplayWidget : public QOpenGLWidget, protected QOpenGLFunctions
@@ -22,7 +25,7 @@ public:
   ~RLIDisplayWidget();
 
   inline RadarEngine* radarEngine() { return _radarEngine; }
-  inline RadarEngine* radarEngine2() { return _radarEngine2; }
+  inline RadarEngine* tailsEngine() { return _tailsEngine; }
 
 signals:
   void initialized();
@@ -31,6 +34,9 @@ protected slots:
   void initializeGL();
   void resizeGL(int w, int h);
   void paintGL();
+
+private slots:
+  void onNewChartAvailable(const QString& name);
 
 private:
   bool _initialized;
@@ -43,9 +49,13 @@ private:
 
   void fillRectWithTexture(const QRectF& rect, GLuint textureId);
 
+  ChartManager* _chart_mngr;
+
   MaskEngine* _maskEngine;
+
   RadarEngine* _radarEngine;
-  RadarEngine* _radarEngine2;
+  RadarEngine* _tailsEngine;
+  ChartEngine* _chartEngine;
 
   QOpenGLShaderProgram* _program;
 

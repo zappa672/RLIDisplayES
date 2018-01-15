@@ -54,7 +54,7 @@ struct RLILayout {
 class RLIConfig {
 public:
   static RLIConfig& instance() {
-    static RLIConfig config(":/config.xml");
+    static RLIConfig config("config.xml");
     return config;
   }
 

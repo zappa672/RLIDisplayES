@@ -28,7 +28,6 @@ SOURCES     += \
     src/rlidisplaywidget.cpp \
     \
     src/common/rliconfig.cpp \
-    src/common/rlistate.cpp \
     src/common/triangulate.cpp \
     src/common/rlimath.cpp \
     \
@@ -46,7 +45,9 @@ SOURCES     += \
     src/layers/chartengine.cpp \
     src/layers/chartlayers.cpp \
     src/layers/chartshaders.cpp \
-    src/layers/maskengine.cpp
+    src/layers/maskengine.cpp \
+    src/common/properties.cpp \
+    src/layers/chartsettingsmodel.cpp
 
 HEADERS     += \
     src/mainwindow.h \
@@ -55,7 +56,6 @@ HEADERS     += \
     \
     src/common/properties.h \
     src/common/rliconfig.h \
-    src/common/rlistate.h \
     src/common/triangulate.h \
     src/common/rlimath.h \
     src/common/rlistrings.h \
@@ -74,7 +74,8 @@ HEADERS     += \
     src/layers/chartengine.h \
     src/layers/chartlayers.h \
     src/layers/chartshaders.h \
-    src/layers/maskengine.h
+    src/layers/maskengine.h \
+    src/layers/chartsettingsmodel.h
 
 FORMS       += \
     forms/mainwindow.ui \
@@ -83,8 +84,11 @@ FORMS       += \
 RESOURCES   += \
     res/icons.qrc \
     res/shaders.qrc \
-    res/config.qrc
+    res/fonts.qrc \
+    res/chartsymbols.qrc
 
-OTHER_FILES +=
+OTHER_FILES += \
 
-DISTFILES +=
+DISTFILES += \
+    config.xml \
+    chart_disp_conf.xml

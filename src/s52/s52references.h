@@ -1,11 +1,13 @@
 #ifndef S52REFERENCES_H
 #define S52REFERENCES_H
 
-#include <QVector>
+#include <vector>
+
+#include <QObject>
 #include <QMap>
 #include <QList>
-#include <QVector2D>
 #include <QColor>
+#include <QVector2D>
 #include <QString>
 #include <QStringList>
 
@@ -77,8 +79,8 @@ struct Symbol {
   QString definition;
   QString color_ref;
 
-  VectorSymbol vector;
-  BitmapSymbol bitmap;
+	VectorSymbol vector;
+	BitmapSymbol bitmap;
 };
 
 
@@ -97,7 +99,7 @@ public:
   const QColor getColor(const QString& color_ref);
 
   int getColorIndex(const QString& color_ref);
-  QVector<float> getColorTable();
+  std::vector<float> getColorTable();
 
   const QVector2D getSymbolIndex(const QString& symbol_ref);
   const QVector2D getSymbolDim(const QString& symbol_ref);
@@ -116,7 +118,7 @@ private:
   void readSymbols(QXmlStreamReader* xml);
 
   QMap<QString, int> color_indices;
-  QMap<QString, QVector<float> > color_tables2;
+  QMap<QString, std::vector<float> > color_tables2;
 
   QMap<QString, ColorTable*> color_tables;
   QMap<int, LookUp*> lookups;

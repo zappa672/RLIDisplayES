@@ -1,8 +1,8 @@
 #ifndef CHARTSHADERFACTORY_H
 #define CHARTSHADERFACTORY_H
 
-#include <QtOpenGL/QGLFunctions>
-#include <QtOpenGL/QGLShaderProgram>
+#include <QOpenGLFunctions>
+#include <QOpenGLShaderProgram>
 
 typedef enum CHART_SHADER_COMMON_UNIFORMS
 { COMMON_UNIFORMS_NORTH           = 0
@@ -104,18 +104,16 @@ typedef enum CHART_SHADER_SNDG_ATTRIBUTES
 
 
 
-class ChartShaders : protected QGLFunctions {
+class ChartShaders : protected QOpenGLFunctions {
 public:
-  ChartShaders();
+  ChartShaders(QOpenGLContext* context);
   ~ChartShaders();
 
-  void init(const QGLContext* context);
-
-  QGLShaderProgram* getChartAreaProgram();
-  QGLShaderProgram* getChartLineProgram();
-  QGLShaderProgram* getChartTextProgram();
-  QGLShaderProgram* getChartMarkProgram();
-  QGLShaderProgram* getChartSndgProgram();
+  inline QOpenGLShaderProgram* getChartAreaProgram() { return chart_area_program; }
+  inline QOpenGLShaderProgram* getChartLineProgram() { return chart_line_program; }
+  inline QOpenGLShaderProgram* getChartTextProgram() { return chart_text_program; }
+  inline QOpenGLShaderProgram* getChartMarkProgram() { return chart_mark_program; }
+  inline QOpenGLShaderProgram* getChartSndgProgram() { return chart_sndg_program; }
 
   GLuint getAreaUniformLoc(unsigned int index);
   GLuint getAreaAttributeLoc(unsigned int index);
@@ -133,13 +131,11 @@ public:
   GLuint getSndgAttributeLoc(unsigned int index);
 
 private:
-  bool is_initialized;
-
-  bool initChartAreaProgram();
-  bool initChartLineProgram();
-  bool initChartTextProgram();
-  bool initChartMarkProgram();
-  bool initChartSndgProgram();
+  void initChartAreaProgram();
+  void initChartLineProgram();
+  void initChartTextProgram();
+  void initChartMarkProgram();
+  void initChartSndgProgram();
 
   int area_uniform_locs[AREA_UNIFORMS_COUNT];
   int area_attribute_locs[AREA_ATTRIBUTES_COUNT];
@@ -156,11 +152,11 @@ private:
   int sndg_uniform_locs[SNDG_UNIFORMS_COUNT];
   int sndg_attribute_locs[SNDG_ATTRIBUTES_COUNT];
 
-  QGLShaderProgram* chart_area_program;
-  QGLShaderProgram* chart_line_program;
-  QGLShaderProgram* chart_text_program;
-  QGLShaderProgram* chart_mark_program;
-  QGLShaderProgram* chart_sndg_program;
+  QOpenGLShaderProgram* chart_area_program;
+  QOpenGLShaderProgram* chart_line_program;
+  QOpenGLShaderProgram* chart_text_program;
+  QOpenGLShaderProgram* chart_mark_program;
+  QOpenGLShaderProgram* chart_sndg_program;
 };
 
 #endif // CHARTSHADERFACTORY_H

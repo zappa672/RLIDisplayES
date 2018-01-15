@@ -48,7 +48,7 @@ int S52References::getColorIndex(const QString& color_ref) {
   return -1;
 }
 
-QVector<float> S52References::getColorTable() {
+std::vector<float> S52References::getColorTable() {
   return color_tables2[color_scheme];
 }
 
@@ -71,7 +71,7 @@ void S52References::fillColorTables2() {
   for (int i = 0; i < table_names.size(); i++) {
     QString table_ref = table_names[i];
     ColorTable* tbl = color_tables[table_ref];
-    QVector<float> color_vec(3*color_indices.size());
+    std::vector<float> color_vec(3*color_indices.size());
 
     for (int j = 0; j < color_names.size(); j++) {
       int index = color_indices[color_names[j]];
@@ -536,7 +536,7 @@ void S52References::readSymbols(QXmlStreamReader* xml) {
           sb->bitmap.distance = QVector2D(xml->attributes().value("min").toString().toInt()
                                         , xml->attributes().value("max").toString().toInt());
       }
-      
+
       if (xml->name() == "pivot") {
         if (vector_part_flag)
           sb->vector.pivot = QVector2D(xml->attributes().value("x").toString().toInt()
@@ -579,6 +579,3 @@ void S52References::readSymbols(QXmlStreamReader* xml) {
     }
   }
 }
-
-
-

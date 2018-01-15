@@ -1,7 +1,7 @@
 #ifndef SHIPDATASOURCE_H
 #define SHIPDATASOURCE_H
 
-#include <QVector2D>
+#include <QObject>
 #include <QDateTime>
 #include <QTimerEvent>
 
@@ -12,8 +12,10 @@ public:
   explicit ShipDataSource(QObject *parent = 0);
   virtual ~ShipDataSource();
 
+  inline std::pair<float, float> getPosition() { return position; }
+
 signals:
-  void coordsUpdated(QVector2D coords);
+  void positionChanged(std::pair<float, float> position);
 
 protected slots:
   void timerEvent(QTimerEvent* e);
@@ -25,6 +27,8 @@ public slots:
 private:
   int _timerId;
   QDateTime _startTime;
+
+  std::pair<float, float> position;
 };
 
 #endif // SHIPDATASOURCE_H

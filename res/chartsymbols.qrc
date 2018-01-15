@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/">
+        <file>s52/chartsymbols.xml</file>
+    </qresource>
+</RCC>
