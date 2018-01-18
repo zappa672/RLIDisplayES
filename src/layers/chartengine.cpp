@@ -35,8 +35,8 @@ ChartEngine::~ChartEngine() {
     delete line_engines[layer_names[i]];
   for (int i = 0; i < (layer_names = mark_engines.keys()).size(); i++)
     delete mark_engines[layer_names[i]];
-  for (int i = 0; i < (layer_names = text_engines.keys()).size(); i++)
-    delete text_engines[layer_names[i]];
+  //for (int i = 0; i < (layer_names = text_engines.keys()).size(); i++)
+  //  delete text_engines[layer_names[i]];
 
   delete _fbo;
   delete shaders;
@@ -69,7 +69,7 @@ void ChartEngine::setChart(S52Chart* chrt, S52References* ref) {
   setAreaLayers(chrt, ref);
   setLineLayers(chrt, ref);
   setMarkLayers(chrt, ref);
-  setTextLayers(chrt, ref);
+  //setTextLayers(chrt, ref);
 
   setSndgLayer(chrt, ref);
 
@@ -103,23 +103,7 @@ void ChartEngine::draw() {
 
   glViewport(0, 0, _fbo->width(), _fbo->height());
 
-  glMatrixMode( GL_PROJECTION );
-  glPushMatrix();
-  glLoadIdentity();
-  glOrtho(0, _fbo->width(), _fbo->height(), 0, -1, 1 );
-
-  glMatrixMode( GL_MODELVIEW );
-  glPushMatrix();
-  glLoadIdentity();
-  glTranslatef(_center_shift.x() + _fbo->width()/2.f, _center_shift.y() + _fbo->height()/2.f, 0);
-
   drawLayers();
-
-  glMatrixMode( GL_MODELVIEW );
-  glPopMatrix();
-
-  glMatrixMode( GL_PROJECTION );
-  glPopMatrix();
 
   _fbo->release();
 }
@@ -135,13 +119,24 @@ void ChartEngine::clearChartData() {
     line_engines[layer_names[i]]->clearData();
   for (int i = 0; i < (layer_names = mark_engines.keys()).size(); i++)
     mark_engines[layer_names[i]]->clearData();
-  for (int i = 0; i < (layer_names = text_engines.keys()).size(); i++)
-    text_engines[layer_names[i]]->clearData();
+  //for (int i = 0; i < (layer_names = text_engines.keys()).size(); i++)
+  //  text_engines[layer_names[i]]->clearData();
 }
 
 
 
 void ChartEngine::drawLayers() {
+  QMatrix4x4 projection;
+  projection.setToIdentity();
+  projection.ortho(0, _fbo->width(), 0, _fbo->height(), -1, 1);
+
+  QMatrix4x4 transform;
+  transform.setToIdentity();
+  transform.translate(_center_shift.x() + _fbo->width()/2.f, _center_shift.y() + _fbo->height()/2.f, 0.f);
+
+  QMatrix4x4 mvp = projection*transform;
+
+
   QStringList displayOrder = settings->getLayersDisplayOrder();
   for (int i = displayOrder.size() - 1; i >= 0; i--)
     if (!settings->isLayerVisible(displayOrder[i]))
@@ -152,7 +147,7 @@ void ChartEngine::drawLayers() {
   for (int i = 0; i < displayOrder.size(); i++) {
     QString s = displayOrder[i];
     if (area_engines.contains(s) && area_engines[s] != NULL)
-      area_engines[s]->draw(shaders, _center, _scale, _angle);
+      area_engines[s]->draw(shaders, _center, _scale, _angle, mvp);
   }
   shaders->getChartAreaProgram()->release();
 
@@ -161,7 +156,7 @@ void ChartEngine::drawLayers() {
   for (int i = 0; i < displayOrder.size(); i++) {
     QString s = displayOrder[i];
     if (line_engines.contains(s) && line_engines[s] != NULL)
-      line_engines[s]->draw(shaders, _center, _scale, _angle);
+      line_engines[s]->draw(shaders, _center, _scale, _angle, mvp);
   }
   shaders->getChartLineProgram()->release();
 
@@ -170,23 +165,25 @@ void ChartEngine::drawLayers() {
   for (int i = 0; i < displayOrder.size(); i++) {
     QString s = displayOrder[i];
     if (mark_engines.contains(s) && mark_engines[s] != NULL)
-      mark_engines[s]->draw(shaders, _center, _scale, _angle);
+      mark_engines[s]->draw(shaders, _center, _scale, _angle, mvp);
   }
   shaders->getChartMarkProgram()->release();
 
 
+  /*
   shaders->getChartTextProgram()->bind();
   for (int i = 0; i < displayOrder.size(); i++) {
     QString s = displayOrder[i];
     if (text_engines.contains(s) && text_engines[s] != NULL)
-      text_engines[s]->draw(shaders, _center, _scale, _angle);
+      text_engines[s]->draw(shaders, _center, _scale, _angle, mvp);
   }
   shaders->getChartTextProgram()->release();
+  */
 
 
   if (settings->areSoundingsVisible()) {
     shaders->getChartSndgProgram()->bind();
-    sndg_engine->draw(shaders, _center, _scale, _angle);
+    sndg_engine->draw(shaders, _center, _scale, _angle, mvp);
     shaders->getChartSndgProgram()->release();
   }
 }
@@ -207,7 +204,6 @@ void ChartEngine::setAreaLayers(S52Chart* chrt, S52References* ref) {
     area_engines[layer_name]->setData(layer, assets, ref);
   }
 }
-
 
 void ChartEngine::setLineLayers(S52Chart* chrt, S52References* ref) {
   QList<QString> layer_names = chrt->getLineLayerNames();
@@ -241,6 +237,7 @@ void ChartEngine::setMarkLayers(S52Chart* chrt, S52References* ref) {
   }
 }
 
+/*
 void ChartEngine::setTextLayers(S52Chart* chrt, S52References* ref) {
   Q_UNUSED(ref);
 
@@ -257,6 +254,7 @@ void ChartEngine::setTextLayers(S52Chart* chrt, S52References* ref) {
     text_engines[layer_name]->setData(layer);
   }
 }
+*/
 
 void ChartEngine::setSndgLayer(S52Chart* chrt, S52References* ref) {
   S52SndgLayer* layer = chrt->getSndgLayer();

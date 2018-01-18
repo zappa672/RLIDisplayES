@@ -1,4 +1,4 @@
-#version 120
+uniform mat4 mvp_matrix;
 
 // World position lat/lon in degrees
 attribute vec2	world_coords;
@@ -24,15 +24,16 @@ varying float  v_char_val;
 void main() {
   float lat_rads = radians(center.x);
 
-  float y_m = -6378137*radians(world_coords.x - center.x);
-  float x_m = 6378137*cos(lat_rads)*radians(world_coords.y - center.y);
+  float y_m = 6378137.0*radians(world_coords.x - center.x);
+  float x_m = 6378137.0*cos(lat_rads)*radians(world_coords.y - center.y);
 
   // screen position
   vec2 pos_pix = vec2(x_m, y_m) / scale;
 
 
-  gl_Position = gl_ProjectionMatrix * gl_ModelViewMatrix  * vec4(pos_pix.x + char_order * 12.0, pos_pix.y, 0, 1);
+  gl_Position = mvp_matrix * vec4(pos_pix.x + char_order * 12.0, pos_pix.y, 0.0, 1.0);
   v_char_val = char_val;
   //v_color = color;
-  v_color = vec3(0, 0, 0);
+  v_color = vec3(0.0, 0.0, 0.0);
+  gl_PointSize = 32.0;
 }

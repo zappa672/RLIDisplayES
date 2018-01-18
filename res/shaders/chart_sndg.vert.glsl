@@ -1,4 +1,4 @@
-#version 120
+uniform mat4 mvp_matrix;
 
 // World position lat/lon in degrees
 attribute vec2	world_coords;
@@ -29,12 +29,12 @@ varying vec2	v_texcoords;
 void main() {
   float lat_rads = radians(center.x);
 
-  float y_m = -6378137*radians(world_coords.x - center.x);
-  float x_m = 6378137*cos(lat_rads)*radians(world_coords.y - center.y);
+  float y_m = 6378137.0*radians(world_coords.x - center.x);
+  float x_m = 6378137.0*cos(lat_rads)*radians(world_coords.y - center.y);
 
   // screen position
   vec2 pos_pix = vec2(x_m, y_m) / scale;
-  pos_pix = pos_pix + vec2(symbol_order * 8 - symbol_count * 4, symbol_frac * -4);
+  pos_pix = pos_pix + vec2(symbol_order * 8.0 - symbol_count * 4.0, symbol_frac * -4.0);
 
   // Variables to store symbol parameters
   vec2 origin, size, pivot;
@@ -46,17 +46,17 @@ void main() {
   vec2 vert_pos_pix;
 
   // Quad vertex coordinates in pixels
-  if (vertex_order == 0) {
-    gl_Position = gl_ProjectionMatrix * gl_ModelViewMatrix  * vec4(pos_pix + vec2(-pivot.x, pivot.y), 0, 1);
-    v_texcoords = (pattern_tex_size*vec2(0, 1) + origin*vec2(1, -1) + size*vec2(0,-1)) / pattern_tex_size;
-  } else if (vertex_order == 1) {
-    gl_Position = gl_ProjectionMatrix * gl_ModelViewMatrix  * vec4(pos_pix + vec2(-pivot.x, -(size.y-pivot.y)), 0, 1);
-    v_texcoords = (pattern_tex_size*vec2(0, 1) + origin*vec2(1, -1) + size*vec2(0,0)) / pattern_tex_size;
-  } else if (vertex_order == 2) {
-    gl_Position = gl_ProjectionMatrix * gl_ModelViewMatrix  * vec4(pos_pix + vec2(size.x-pivot.x, -(size.y-pivot.y)), 0, 1);
-    v_texcoords = (pattern_tex_size*vec2(0, 1) + origin*vec2(1, -1) + size*vec2(1,0)) / pattern_tex_size;
-  } else if (vertex_order == 3) {
-    gl_Position = gl_ProjectionMatrix * gl_ModelViewMatrix  * vec4(pos_pix + vec2(size.x-pivot.x, pivot.y), 0, 1);
-    v_texcoords = (pattern_tex_size*vec2(0, 1) + origin*vec2(1, -1) + size*vec2(1,-1)) / pattern_tex_size;
+  if (vertex_order == 0.0) {
+    gl_Position = mvp_matrix * vec4(pos_pix + vec2(-pivot.x, pivot.y), 0.0, 1.0);
+    v_texcoords = (pattern_tex_size*vec2(0.0, 1.0) + origin*vec2(1.0, -1.0) + size*vec2(0.0, -1.0)) / pattern_tex_size;
+  } else if (vertex_order == 1.0) {
+    gl_Position = mvp_matrix * vec4(pos_pix + vec2(-pivot.x, -(size.y-pivot.y)), 0.0, 1.0);
+    v_texcoords = (pattern_tex_size*vec2(0.0, 1.0) + origin*vec2(1.0, -1.0) + size*vec2(0.0, 0.0)) / pattern_tex_size;
+  } else if (vertex_order == 2.0) {
+    gl_Position = mvp_matrix * vec4(pos_pix + vec2(size.x-pivot.x, -(size.y-pivot.y)), 0.0, 1.0);
+    v_texcoords = (pattern_tex_size*vec2(0.0, 1.0) + origin*vec2(1.0, -1.0) + size*vec2(1.0, 0.0)) / pattern_tex_size;
+  } else if (vertex_order == 3.0) {
+    gl_Position = mvp_matrix * vec4(pos_pix + vec2(size.x-pivot.x, pivot.y), 0.0, 1.0);
+    v_texcoords = (pattern_tex_size*vec2(0.0, 1.0) + origin*vec2(1.0, -1.0) + size*vec2(1.0, -1.0)) / pattern_tex_size;
   }
 }

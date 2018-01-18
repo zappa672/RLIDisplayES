@@ -59,6 +59,7 @@ void S52Assets::initGlyphTexture() {
 
   int id = QFontDatabase::addApplicationFont(":/fonts/Helvetica.ttf");
   QString family = QFontDatabase::applicationFontFamilies(id).at(0);
+
   painter.setFont(QFont(family, 14, 14));
 
   painter.setPen(Qt::black);

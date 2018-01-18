@@ -20,7 +20,7 @@ public:
   void setPatternTexture(GLuint tex_id, QVector2D dim);
   void setData(S52AreaLayer* layer, S52Assets* assets, S52References* ref);
 
-  void draw(ChartShaders* shaders, QVector2D cur_coords, float scale, float angle);
+  void draw(ChartShaders* shaders, QVector2D cur_coords, float scale, float angle, const QMatrix4x4& mvp);
 
 private:
   GLuint*   vbo_ids;
@@ -41,6 +41,7 @@ private:
 };
 
 
+
 class ChartLineEngine : protected QOpenGLFunctions {
 public:
   explicit ChartLineEngine(QOpenGLContext* context);
@@ -51,7 +52,7 @@ public:
   void setPatternTexture(GLuint tex_id, QVector2D dim);
   void setData(S52LineLayer* layer, S52Assets* assets, S52References* ref);
 
-  void draw(ChartShaders* shaders, QVector2D cur_coords, float scale, float angle);
+  void draw(ChartShaders* shaders, QVector2D cur_coords, float scale, float angle, const QMatrix4x4& mvp);
 
 private:
   int point_count;
@@ -82,7 +83,7 @@ public:
   void setPatternTexture(GLuint tex_id, QVector2D size);
   void setData(S52MarkLayer* layer, S52Assets* assets, S52References* ref);
 
-  void draw(ChartShaders* shaders, QVector2D cur_coords, float scale, float angle);
+  void draw(ChartShaders* shaders, QVector2D cur_coords, float scale, float angle, const QMatrix4x4& mvp);
 
 private:
   int       point_count;
@@ -108,7 +109,7 @@ public:
   void setPatternTexture(GLuint tex_id, QVector2D size);
   void setData(S52SndgLayer* layer, S52Assets* assets, S52References* ref);
 
-  void draw(ChartShaders* shaders, QVector2D cur_coords, float scale, float angle);
+  void draw(ChartShaders* shaders, QVector2D cur_coords, float scale, float angle, const QMatrix4x4& mvp);
 
 private:
   int       point_count;
@@ -119,7 +120,7 @@ private:
   QVector2D pattern_tex_size;
 };
 
-
+/*
 class ChartTextEngine : protected QOpenGLFunctions {
 public:
   explicit ChartTextEngine(QOpenGLContext* context);
@@ -130,7 +131,7 @@ public:
   void setGlyphTexture(GLuint tex_id);
   void setData(S52TextLayer* layer);
 
-  void draw(ChartShaders* shaders, QVector2D cur_coords, float scale, float angle);
+  void draw(ChartShaders* shaders, QVector2D cur_coords, float scale, float angle, const QMatrix4x4& mvp);
 
 private:
   int point_count;
@@ -138,5 +139,6 @@ private:
   GLuint* vbo_ids;
   GLint   glyph_tex_id;
 };
+*/
 
 #endif // CHARTLAYERENGINES_H

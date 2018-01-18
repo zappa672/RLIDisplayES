@@ -1,4 +1,4 @@
-#version 120
+uniform mat4 mvp_matrix;
 
 attribute vec2	coords;
 attribute float color_index;
@@ -24,14 +24,14 @@ varying float v_use_tex_color;
 void main() {
   float lat_rads = radians(center.x);
 
-  float y_m = -6378137*radians(coords.x - center.x);
-  float x_m = 6378137*cos(lat_rads)*radians(coords.y - center.y);
+  float y_m = 6378137.0 * radians(coords.x - center.x);
+  float x_m = 6378137.0 * cos(lat_rads) * radians(coords.y - center.y);
 
   // screen position
   vec2 pix_pos = vec2(x_m, y_m) / scale;
-  gl_Position = gl_ProjectionMatrix * gl_ModelViewMatrix  * vec4(pix_pos, 0, 1);
+  gl_Position = mvp_matrix  * vec4(pix_pos, 0.0, 1.0);
 
-  if (u_tex_dim.r == -1) {
+  if (u_tex_dim.r == -1.0) {
     //0 - 1
     v_inner_texcoords = pix_pos / tex_dim;
     v_tex_dim = tex_dim / assetdim;
@@ -43,16 +43,16 @@ void main() {
     v_tex_orig = u_tex_origin / assetdim;
   }
 
-  int color_ind = 0;
-  if (u_color_index == -1)
-    color_ind = int(color_index);
+  float color_ind = 0.0;
+  if (u_color_index == -1.0)
+    color_ind = color_index;
   else
-    color_ind = int(u_color_index);
-  v_color = vec3(u_color_table[3*color_ind+0], u_color_table[3*color_ind+1], u_color_table[3*color_ind+2]);
+    color_ind = u_color_index;
+  v_color = vec3(u_color_table[int(3.0*color_ind+0.0)], u_color_table[int(3.0*color_ind+1.0)], u_color_table[int(3.0*color_ind+2.0)]);
 
   // !!!! check to SOLID pattern - to replace!!!!
-  if (v_tex_orig != vec2(0,0))
-    v_use_tex_color = 1;
+  if (v_tex_orig != vec2(0.0, 0.0))
+    v_use_tex_color = 1.0;
   else
-    v_use_tex_color = 0;
+    v_use_tex_color = 0.0;
 }

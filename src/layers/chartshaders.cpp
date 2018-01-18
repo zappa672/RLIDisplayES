@@ -105,6 +105,7 @@ void ChartShaders::initChartAreaProgram() {
   area_uniform_locs[COMMON_UNIFORMS_SCALE]            = chart_area_program->uniformLocation("scale");
   area_uniform_locs[COMMON_UNIFORMS_PATTERN_TEX_ID]   = chart_area_program->uniformLocation("pattern_tex");
   area_uniform_locs[COMMON_UNIFORMS_PATTERN_TEX_DIM]  = chart_area_program->uniformLocation("assetdim");
+  area_uniform_locs[COMMON_UNIFORMS_MVP_MATRIX]       = chart_area_program->uniformLocation("mvp_matrix");
 
   area_uniform_locs[AREA_UNIFORMS_COLOR_INDEX]        = chart_area_program->uniformLocation("u_color_index");
   area_uniform_locs[AREA_UNIFORMS_PATTERN_INDEX]      = chart_area_program->uniformLocation("u_tex_origin");
@@ -133,6 +134,7 @@ void ChartShaders::initChartLineProgram() {
   line_uniform_locs[COMMON_UNIFORMS_SCALE]            = chart_line_program->uniformLocation("scale");
   line_uniform_locs[COMMON_UNIFORMS_PATTERN_TEX_ID]   = chart_line_program->uniformLocation("pattern_tex");
   line_uniform_locs[COMMON_UNIFORMS_PATTERN_TEX_DIM]  = chart_line_program->uniformLocation("assetdim");
+  line_uniform_locs[COMMON_UNIFORMS_MVP_MATRIX]       = chart_line_program->uniformLocation("mvp_matrix");
 
   line_uniform_locs[LINE_UNIFORMS_COLOR_INDEX]        = chart_line_program->uniformLocation("u_color_index");
   line_uniform_locs[LINE_UNIFORMS_PATTERN_INDEX]      = chart_line_program->uniformLocation("u_tex_origin");
@@ -163,6 +165,7 @@ void ChartShaders::initChartTextProgram() {
   text_uniform_locs[COMMON_UNIFORMS_SCALE]            = chart_text_program->uniformLocation("scale");
   text_uniform_locs[COMMON_UNIFORMS_PATTERN_TEX_ID]   = chart_text_program->uniformLocation("glyph_tex");
   text_uniform_locs[COMMON_UNIFORMS_PATTERN_TEX_DIM]  = chart_text_program->uniformLocation("pattern_tex_size");
+  text_uniform_locs[COMMON_UNIFORMS_MVP_MATRIX]       = chart_text_program->uniformLocation("mvp_matrix");
 
   text_uniform_locs[TEXT_UNIFORMS_COLOR]              = chart_text_program->uniformLocation("color");
 
@@ -186,6 +189,7 @@ void ChartShaders::initChartMarkProgram() {
   mark_uniform_locs[COMMON_UNIFORMS_SCALE]            = chart_mark_program->uniformLocation("scale");
   mark_uniform_locs[COMMON_UNIFORMS_PATTERN_TEX_ID]   = chart_mark_program->uniformLocation("pattern_tex_id");
   mark_uniform_locs[COMMON_UNIFORMS_PATTERN_TEX_DIM]  = chart_mark_program->uniformLocation("pattern_tex_size");
+  mark_uniform_locs[COMMON_UNIFORMS_MVP_MATRIX]       = chart_mark_program->uniformLocation("mvp_matrix");
 
   mark_uniform_locs[MARK_UNIFORMS_SYMBOL_ORIGIN]      = chart_mark_program->uniformLocation("u_symbol_origin");
   mark_uniform_locs[MARK_UNIFORMS_SYMBOL_SIZE]        = chart_mark_program->uniformLocation("u_symbol_size");
@@ -213,6 +217,7 @@ void ChartShaders::initChartSndgProgram() {
   sndg_uniform_locs[COMMON_UNIFORMS_SCALE]            = chart_sndg_program->uniformLocation("scale");
   sndg_uniform_locs[COMMON_UNIFORMS_PATTERN_TEX_ID]   = chart_sndg_program->uniformLocation("pattern_tex_id");
   sndg_uniform_locs[COMMON_UNIFORMS_PATTERN_TEX_DIM]  = chart_sndg_program->uniformLocation("pattern_tex_size");
+  sndg_uniform_locs[COMMON_UNIFORMS_MVP_MATRIX]       = chart_sndg_program->uniformLocation("mvp_matrix");
 
   sndg_attribute_locs[SNDG_ATTRIBUTES_WORLD_COORDS]   = chart_sndg_program->attributeLocation("world_coords");
   sndg_attribute_locs[SNDG_ATTRIBUTES_VERTEX_ORDER]   = chart_sndg_program->attributeLocation("vertex_order");

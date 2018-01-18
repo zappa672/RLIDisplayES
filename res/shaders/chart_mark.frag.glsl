@@ -1,5 +1,3 @@
-#version 120
-
 varying vec2	v_texcoords;
 
 uniform sampler2D pattern_tex_id;
