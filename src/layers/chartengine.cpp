@@ -8,33 +8,37 @@ ChartEngine::ChartEngine(uint tex_radius, S52References* ref, QOpenGLContext* co
 
   initializeOpenGLFunctions();
 
+  _ready = false;
+  _force_update = false;
+
   _context = context;
 
   _center_shift = QPoint(0, 0);
-  _center = QVector2D(0, 0);
+  _center = std::pair<float, float>(0, 0);
   _scale = 10;
   _angle = 0;
 
+  _fbo = nullptr;
   settings = new ChartSettingsModel("chart_disp_conf.xml");
   assets = new S52Assets(context, ref);
   shaders = new ChartShaders(context);
 
-  sndg_engine = new ChartSndgEngine(context);
+  //sndg_engine = new ChartSndgEngine(context);
 
   resize(tex_radius);
 }
 
 ChartEngine::~ChartEngine() {
-  delete sndg_engine;
+  //delete sndg_engine;
 
   QList<QString> layer_names;
 
   for (int i = 0; i < (layer_names = area_engines.keys()).size(); i++)
     delete area_engines[layer_names[i]];
-  for (int i = 0; i < (layer_names = line_engines.keys()).size(); i++)
-    delete line_engines[layer_names[i]];
-  for (int i = 0; i < (layer_names = mark_engines.keys()).size(); i++)
-    delete mark_engines[layer_names[i]];
+  //for (int i = 0; i < (layer_names = line_engines.keys()).size(); i++)
+  //  delete line_engines[layer_names[i]];
+  //for (int i = 0; i < (layer_names = mark_engines.keys()).size(); i++)
+  //  delete mark_engines[layer_names[i]];
   //for (int i = 0; i < (layer_names = text_engines.keys()).size(); i++)
   //  delete text_engines[layer_names[i]];
 
@@ -45,44 +49,42 @@ ChartEngine::~ChartEngine() {
 
 
 void ChartEngine::resize(uint radius) {
-  if (_fbo != nullptr) {
-    if (_fbo->width() == static_cast<int>(2*radius+1))
-      return;
-
-    delete _fbo;
-  }
+  if (_fbo != nullptr && _fbo->width() == static_cast<int>(2*radius+1))
+    return;
 
   _radius = radius;
 
-  QOpenGLFramebufferObjectFormat format;
-  format.setMipmap(true);
-  format.setSamples(0);
+  delete _fbo;
+  _fbo = new QOpenGLFramebufferObject(QSize(2*_radius+1, 2*_radius+1));
 
-  _fbo = new QOpenGLFramebufferObject(2*_radius+1, 2*_radius+1, format);
   draw();
 }
 
 
 void ChartEngine::setChart(S52Chart* chrt, S52References* ref) {
+  _ready = false;
+
   clearChartData();
 
   setAreaLayers(chrt, ref);
-  setLineLayers(chrt, ref);
-  setMarkLayers(chrt, ref);
+  //setLineLayers(chrt, ref);
+  //setMarkLayers(chrt, ref);
   //setTextLayers(chrt, ref);
+  //setSndgLayer(chrt, ref);
 
-  setSndgLayer(chrt, ref);
-
-  draw();
+  _ready = true;
+  _force_update = true;
 }
 
-void ChartEngine::update(QVector2D center, float scale, float angle, QPoint center_shift) {
-  bool need_update = (abs(_center.x() - center.x()) > 0.0005
-                    || abs(_center.y() - center.y()) > 0.0005
-                    || abs(_scale - scale) > 0.005
-                    || abs(_angle - angle) > 0.005
-                    || abs(_center_shift.x() - center_shift.x()) > 0.005
-                    || abs(_center_shift.y() - center_shift.y()) > 0.005);
+void ChartEngine::update(std::pair<float, float> center, float scale, float angle, QPoint center_shift) {
+  bool need_update = ( _force_update
+                    || fabs(_center.first - center.first) > 0.00005
+                    || fabs(_center.second - center.second) > 0.00005
+                    || fabs(_scale - scale) > 0.005
+                    || fabs(_angle - angle) > 0.005
+                    || fabs(_center_shift.x() - center_shift.x()) > 0.005
+                    || fabs(_center_shift.y() - center_shift.y()) > 0.005
+                     );
 
   if (need_update) {
     _center = center;
@@ -95,48 +97,48 @@ void ChartEngine::update(QVector2D center, float scale, float angle, QPoint cent
 
 void ChartEngine::draw() {
   glEnable(GL_BLEND);
+  glDisable(GL_DEPTH);
 
   _fbo->bind();
 
-  glClearColor(0.17f, 0.23f, 0.22f, 1.f);
+  glClearColor(0.37f, 0.23f, 0.22f, 1.f);
   glClear(GL_COLOR_BUFFER_BIT);
 
   glViewport(0, 0, _fbo->width(), _fbo->height());
 
-  drawLayers();
+  if (_ready) {
+    QMatrix4x4 projection;
+    projection.setToIdentity();
+    projection.ortho(0, _fbo->width(), _fbo->height(), 0, -1, 1);
+
+    QMatrix4x4 transform;
+    transform.setToIdentity();
+    transform.translate(_center_shift.x() + _fbo->width()/2.f, _center_shift.y() + _fbo->height()/2.f, 0.f);
+
+    drawLayers(projection*transform);
+  }
 
   _fbo->release();
 }
 
 
 void ChartEngine::clearChartData() {
-  sndg_engine->clearData();
+  //sndg_engine->clearData();
   QList<QString> layer_names;
 
   for (int i = 0; i < (layer_names = area_engines.keys()).size(); i++)
     area_engines[layer_names[i]]->clearData();
-  for (int i = 0; i < (layer_names = line_engines.keys()).size(); i++)
-    line_engines[layer_names[i]]->clearData();
-  for (int i = 0; i < (layer_names = mark_engines.keys()).size(); i++)
-    mark_engines[layer_names[i]]->clearData();
+  //for (int i = 0; i < (layer_names = line_engines.keys()).size(); i++)
+  //  line_engines[layer_names[i]]->clearData();
+  //for (int i = 0; i < (layer_names = mark_engines.keys()).size(); i++)
+  //  mark_engines[layer_names[i]]->clearData();
   //for (int i = 0; i < (layer_names = text_engines.keys()).size(); i++)
   //  text_engines[layer_names[i]]->clearData();
 }
 
 
 
-void ChartEngine::drawLayers() {
-  QMatrix4x4 projection;
-  projection.setToIdentity();
-  projection.ortho(0, _fbo->width(), 0, _fbo->height(), -1, 1);
-
-  QMatrix4x4 transform;
-  transform.setToIdentity();
-  transform.translate(_center_shift.x() + _fbo->width()/2.f, _center_shift.y() + _fbo->height()/2.f, 0.f);
-
-  QMatrix4x4 mvp = projection*transform;
-
-
+void ChartEngine::drawLayers(const QMatrix4x4& mvp_matrix) {
   QStringList displayOrder = settings->getLayersDisplayOrder();
   for (int i = displayOrder.size() - 1; i >= 0; i--)
     if (!settings->isLayerVisible(displayOrder[i]))
@@ -146,17 +148,17 @@ void ChartEngine::drawLayers() {
   shaders->getChartAreaProgram()->bind();
   for (int i = 0; i < displayOrder.size(); i++) {
     QString s = displayOrder[i];
-    if (area_engines.contains(s) && area_engines[s] != NULL)
-      area_engines[s]->draw(shaders, _center, _scale, _angle, mvp);
+    if (area_engines.contains(s) && area_engines[s] != nullptr)
+      area_engines[s]->draw(shaders, _center, _scale, _angle, mvp_matrix);
   }
   shaders->getChartAreaProgram()->release();
 
-
+  /*
   shaders->getChartLineProgram()->bind();
   for (int i = 0; i < displayOrder.size(); i++) {
     QString s = displayOrder[i];
     if (line_engines.contains(s) && line_engines[s] != NULL)
-      line_engines[s]->draw(shaders, _center, _scale, _angle, mvp);
+      line_engines[s]->draw(shaders, _center, _scale, _angle, mvp_matrix);
   }
   shaders->getChartLineProgram()->release();
 
@@ -165,27 +167,26 @@ void ChartEngine::drawLayers() {
   for (int i = 0; i < displayOrder.size(); i++) {
     QString s = displayOrder[i];
     if (mark_engines.contains(s) && mark_engines[s] != NULL)
-      mark_engines[s]->draw(shaders, _center, _scale, _angle, mvp);
+      mark_engines[s]->draw(shaders, _center, _scale, _angle, mvp_matrix);
   }
   shaders->getChartMarkProgram()->release();
 
 
-  /*
   shaders->getChartTextProgram()->bind();
   for (int i = 0; i < displayOrder.size(); i++) {
     QString s = displayOrder[i];
     if (text_engines.contains(s) && text_engines[s] != NULL)
-      text_engines[s]->draw(shaders, _center, _scale, _angle, mvp);
+      text_engines[s]->draw(shaders, _center, _scale, _angle, mvp_matrix);
   }
   shaders->getChartTextProgram()->release();
-  */
 
 
   if (settings->areSoundingsVisible()) {
     shaders->getChartSndgProgram()->bind();
-    sndg_engine->draw(shaders, _center, _scale, _angle, mvp);
+    sndg_engine->draw(shaders, _center, _scale, _angle, mvp_matrix);
     shaders->getChartSndgProgram()->release();
   }
+  */
 }
 
 
@@ -205,6 +206,7 @@ void ChartEngine::setAreaLayers(S52Chart* chrt, S52References* ref) {
   }
 }
 
+/*
 void ChartEngine::setLineLayers(S52Chart* chrt, S52References* ref) {
   QList<QString> layer_names = chrt->getLineLayerNames();
 
@@ -237,7 +239,6 @@ void ChartEngine::setMarkLayers(S52Chart* chrt, S52References* ref) {
   }
 }
 
-/*
 void ChartEngine::setTextLayers(S52Chart* chrt, S52References* ref) {
   Q_UNUSED(ref);
 
@@ -254,7 +255,6 @@ void ChartEngine::setTextLayers(S52Chart* chrt, S52References* ref) {
     text_engines[layer_name]->setData(layer);
   }
 }
-*/
 
 void ChartEngine::setSndgLayer(S52Chart* chrt, S52References* ref) {
   S52SndgLayer* layer = chrt->getSndgLayer();
@@ -265,3 +265,4 @@ void ChartEngine::setSndgLayer(S52Chart* chrt, S52References* ref) {
                                , assets->getSymbolTextureDim(ref->getColorScheme()));
   sndg_engine->setData(layer, assets, ref);
 }
+*/

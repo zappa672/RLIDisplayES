@@ -17,6 +17,7 @@ S52Assets::S52Assets(QOpenGLContext* context, S52References* ref) : QOpenGLFunct
   initializeOpenGLFunctions();
 
   initGlyphTexture();
+  initPatternPalette(ref);
   initPatternTextures(ref);
   initLineTextures(ref);
   initSymbolTextures(ref);
@@ -84,11 +85,21 @@ void S52Assets::initGlyphTexture() {
     glTexSubImage2D(GL_TEXTURE_2D, 0, 32*xoffset, 32*yoffset, 32, 32, GL_RGBA, GL_UNSIGNED_BYTE, img.bits());
   }
 
-  glGenerateMipmap(GL_TEXTURE_2D);
   glBindTexture(GL_TEXTURE_2D, 0);
 }
 
+void S52Assets::initPatternPalette(S52References* ref) {
+  QStringList color_schemes = ref->getColorSchemeNames();
 
+  for (QString scheme : color_schemes) {
+    //qDebug() << scheme;
+
+    std::vector<float> color_table = ref->getColorTable();
+    for (float val : color_table) {
+        //qDebug() << val;
+      }
+  }
+}
 
 void S52Assets::initPatternTextures(S52References* ref) {
   QStringList color_schemes = ref->getColorSchemeNames();

@@ -28,12 +28,15 @@ public:
   inline QSize size() { return _fbo->size(); }
 
   void setChart(S52Chart* chrt, S52References* ref);
-  void update(QVector2D center, float scale, float angle, QPoint center_shift);
+  void update(std::pair<float, float> center, float scale, float angle, QPoint center_shift);
 
   inline GLuint textureId() { return _fbo->texture(); }
 
 private:
   void clearChartData();
+
+  bool _ready;
+  bool _force_update;
 
   QOpenGLContext* _context;
 
@@ -43,7 +46,7 @@ private:
   uint    _radius;
 
   QPoint _center_shift;
-  QVector2D _center;
+  std::pair<float, float> _center;
 
   float _scale;
   float _angle;
@@ -53,19 +56,19 @@ private:
   QOpenGLFramebufferObject* _fbo = nullptr;
 
   void draw();
-  void drawLayers();
+  void drawLayers(const QMatrix4x4& mvp_matrix);
 
   void setAreaLayers(S52Chart* chrt, S52References* ref);
-  void setLineLayers(S52Chart* chrt, S52References* ref);
-  void setMarkLayers(S52Chart* chrt, S52References* ref);
+  //void setLineLayers(S52Chart* chrt, S52References* ref);
+  //void setMarkLayers(S52Chart* chrt, S52References* ref);
   //void setTextLayers(S52Chart* chrt, S52References* ref);
-  void setSndgLayer(S52Chart* chrt, S52References* ref);
+  //void setSndgLayer(S52Chart* chrt, S52References* ref);
 
   QMap<QString, ChartAreaEngine*>  area_engines;
-  QMap<QString, ChartLineEngine*>  line_engines;
-  QMap<QString, ChartMarkEngine*>  mark_engines;
+  //QMap<QString, ChartLineEngine*>  line_engines;
+  //QMap<QString, ChartMarkEngine*>  mark_engines;
   //QMap<QString, ChartTextEngine*>  text_engines;
-  ChartSndgEngine* sndg_engine;
+  //ChartSndgEngine* sndg_engine;
 };
 
 #endif // CHARTENGINE_H

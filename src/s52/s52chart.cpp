@@ -22,9 +22,8 @@ S52Chart::S52Chart(char* file_name, S52References* ref) {
   OGRDataSource* poDS = OGRSFDriverRegistrar::Open( file_name, FALSE, NULL );
 
   // Failed to open chart
-  if (poDS == NULL) {
+  if (poDS == NULL)
     return;
-  }
 
   // iterate through
   for( int iLayer = 0; iLayer < poDS->GetLayerCount(); iLayer++ ) {

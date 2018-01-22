@@ -8,18 +8,20 @@ static double const PI = acos(-1);
 
 RadarEngine::RadarEngine(uint pel_count, uint pel_len, uint tex_radius, QOpenGLContext* context, QObject* parent)
   : QObject(parent), QOpenGLFunctions(context) {
-  _has_data = false;
-  _fbo = NULL;
+
 
   initializeOpenGLFunctions();
 
   _peleng_count = 0;
   _peleng_len = 0;
 
+  _has_data = false;
+
   glGenBuffers(ATTR_CNT, _vbo_ids);
   glGenBuffers(1, &_ind_vbo_id);
   vao.create();
 
+  _fbo = nullptr;
   _program = new QOpenGLShaderProgram();
   _palette = new RadarPalette(context, this);
 
@@ -118,15 +120,12 @@ void RadarEngine::fillCoordTable() {
 }
 
 void RadarEngine::resizeTexture(uint radius) {
-  if (_fbo != NULL) {
-    if (_fbo->width() == static_cast<int>(2*radius+1)) {
-      return;
-    }
-
-    delete _fbo;
-  }
+  if (_fbo != NULL && _fbo->width() == static_cast<int>(2*radius+1))
+    return;
 
   _radius = radius;
+
+  delete _fbo;
 
   QOpenGLFramebufferObjectFormat format;
   format.setAttachment(QOpenGLFramebufferObject::Depth);
@@ -178,6 +177,9 @@ void RadarEngine::updateData(uint offset, uint count, GLfloat* amps) {
 
 
 void RadarEngine::clearTexture() {
+  glDisable(GL_BLEND);
+  glEnable(GL_DEPTH);
+  glEnable(GL_DEPTH_TEST);
   glDepthFunc(GL_ALWAYS);
 
   _fbo->bind();
@@ -185,7 +187,7 @@ void RadarEngine::clearTexture() {
   glClearColor(0.f, 0.f, 0.f, 0.f);
   glClear(GL_COLOR_BUFFER_BIT);
 
-  glClearDepthf(0.f);
+  glClearDepthf(-1.f);
   glClear(GL_DEPTH_BUFFER_BIT);
 
   _fbo->release();
@@ -236,7 +238,7 @@ void RadarEngine::updateTexture() {
 
   _program->setUniformValue(_unif_locs[UNIF_TEX], 0);
   _program->setUniformValue(_unif_locs[UNIF_MVP], projection*transform);
-  _program->setUniformValue(_unif_locs[UNIF_THR], 64.f);
+  _program->setUniformValue(_unif_locs[UNIF_THR], 1.f);
 
   _program->setUniformValue(_unif_locs[UNIF_PLN], static_cast<GLfloat>(_peleng_len));
   _program->setUniformValue(_unif_locs[UNIF_PCN], static_cast<GLfloat>(_peleng_count));
@@ -263,7 +265,7 @@ void RadarEngine::updateTexture() {
 void RadarEngine::drawPelengs(uint first, uint last) {
   // Clear depth when the new cycle begins to avoid the previous circle data
   if (first == 0) {
-    glClearDepthf(0.f);
+    glClearDepthf(-1.f);
     glClear(GL_DEPTH_BUFFER_BIT);
   }
 

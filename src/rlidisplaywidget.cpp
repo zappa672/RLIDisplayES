@@ -26,18 +26,16 @@ RLIDisplayWidget::~RLIDisplayWidget() {
   if (_initialized) {
     delete _radarEngine;
     delete _tailsEngine;
-
     delete _maskEngine;
-
-    delete _chartEngine;
+    //delete _chartEngine;
 
     delete _program;
   }
 }
 
 void RLIDisplayWidget::onNewChartAvailable(const QString& name) {
-  if (name == "CO200008.000")
-    _chartEngine->setChart(_chart_mngr->getChart(name), _chart_mngr->refs());
+  //if (name == "US2SP01M.000")
+  //  _chartEngine->setChart(_chart_mngr->getChart(name), _chart_mngr->refs());
 }
 
 void RLIDisplayWidget::debugInfo() {
@@ -87,7 +85,7 @@ void RLIDisplayWidget::initializeGL() {
 
 
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Chart engine init start";
-  _chartEngine = new ChartEngine(circle_radius, _chart_mngr->refs(), context(), this);
+  //_chartEngine = new ChartEngine(circle_radius, _chart_mngr->refs(), context(), this);
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Chart engine init finish";
 
   //-------------------------------------------------------------
@@ -135,6 +133,7 @@ void RLIDisplayWidget::resizeGL(int w, int h) {
   const RLILayout* layout = RLIConfig::instance().currentLayout();
   _radarEngine->resizeTexture(layout->circle.radius);
   _tailsEngine->resizeTexture(layout->circle.radius);
+  //_chartEngine->resize(layout->circle.radius);
 
   _maskEngine->resize(QSize(w, h));
 }
@@ -162,13 +161,13 @@ void RLIDisplayWidget::paintLayers() {
   glClearColor(0.f, 0.f, 0.f, 1.f);
   glClear(GL_COLOR_BUFFER_BIT);
 
-  fillRectWithTexture( QRect(layout->circle.boundRect.topLeft().toPoint(), _chartEngine->size())
-                     , _chartEngine->textureId());
+  //fillRectWithTexture( QRect(layout->circle.boundRect.topLeft().toPoint(), _chartEngine->size())
+  //                   , _chartEngine->textureId());
 
-  fillRectWithTexture( QRect(layout->circle.boundRect.topLeft().toPoint() - QPoint(456, 456), _radarEngine->size())
+  fillRectWithTexture( QRect(layout->circle.boundRect.topLeft().toPoint(), _radarEngine->size())
                      , _radarEngine->textureId());
 
-  fillRectWithTexture( QRect(layout->circle.boundRect.topLeft().toPoint() + QPoint(456, 456), _tailsEngine->size())
+  fillRectWithTexture( QRect(layout->circle.boundRect.topLeft().toPoint(), _tailsEngine->size())
                      , _tailsEngine->textureId());
 
   fillRectWithTexture( rect(), _maskEngine->textureId());
@@ -180,7 +179,10 @@ void RLIDisplayWidget::updateLayers() {
   _radarEngine->updateTexture();
   _tailsEngine->updateTexture();
 
-  _chartEngine->update(QVector2D(12.6443f, -81.6405f), 50.f , 0.f,  QPoint(0.f, 0.f));
+  std::pair<float, float> shipPosition = RLIState::instance().shipPosition();
+  float chartScale = RLIState::instance().chartScale();
+
+  //_chartEngine->update(shipPosition, chartScale , 0.f,  QPoint(0.f, 0.f));
 }
 
 void RLIDisplayWidget::fillRectWithTexture(const QRectF& rect, GLuint textureId) {

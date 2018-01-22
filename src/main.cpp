@@ -14,6 +14,10 @@
 
 
 int main(int argc, char *argv[]) {
+  if (QThreadPool::globalInstance()->maxThreadCount() < RLI_THREADS_NUM)
+    QThreadPool::globalInstance()->setMaxThreadCount(RLI_THREADS_NUM);
+  qDebug() << "Max number of threads: " << QThreadPool::globalInstance()->maxThreadCount();
+
   QApplication a(argc, argv);
 
   QStringList args = a.arguments();
@@ -63,10 +67,6 @@ int main(int argc, char *argv[]) {
   format.setSampleBuffers(false);
   format.setSamples(1);
   QGLFormat::setDefaultFormat(format);
-
-
-  if (QThreadPool::globalInstance()->maxThreadCount() < RLI_THREADS_NUM)
-    QThreadPool::globalInstance()->setMaxThreadCount(RLI_THREADS_NUM);
 
 
   MainWindow w;

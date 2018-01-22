@@ -4,18 +4,18 @@ ChartShaders::ChartShaders(QOpenGLContext* context) : QOpenGLFunctions(context) 
   initializeOpenGLFunctions();
 
   initChartAreaProgram();
-  initChartLineProgram();
-  initChartMarkProgram();
-  initChartTextProgram();
-  initChartSndgProgram();
+  //initChartLineProgram();
+  //initChartMarkProgram();
+  //initChartTextProgram();
+  //initChartSndgProgram();
 }
 
 ChartShaders::~ChartShaders() {
   delete chart_area_program;
-  delete chart_line_program;
-  delete chart_text_program;
-  delete chart_mark_program;
-  delete chart_sndg_program;
+  //delete chart_line_program;
+  //delete chart_text_program;
+  //delete chart_mark_program;
+  //delete chart_sndg_program;
 }
 
 

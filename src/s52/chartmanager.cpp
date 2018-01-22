@@ -17,7 +17,6 @@ ChartManager::~ChartManager() {
 }
 
 void ChartManager::loadCharts() {
-  qDebug() << "Max number of threads: " << QThreadPool::globalInstance()->maxThreadCount();
   QtConcurrent::run(this, &ChartManager::chartLoadingWorker);
 }
 
@@ -38,7 +37,8 @@ void ChartManager::chartLoadingWorker() {
       c_chart_path[j] = chart_path[j].toLatin1();
     c_chart_path[chart_path.size()] = '\0';
 
-    _charts.insert(fileList[i], new S52Chart(c_chart_path, _s52_refs));
+    S52Chart* chart = new S52Chart(c_chart_path, _s52_refs);
+    _charts.insert(fileList[i], chart);
     delete[] c_chart_path;
 
     qDebug()  << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": "<< "Loaded: " << fileList[i];

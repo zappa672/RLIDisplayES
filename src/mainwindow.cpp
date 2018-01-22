@@ -21,8 +21,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
   RLIState::instance().onShipPositionChanged(_ship_ds->getPosition());
 
-  connect(_ship_ds, SIGNAL(positionChanged(std::pair<float,float>))
-         ,&RLIState::instance(), SLOT(onShipPositionChanged(std::pair<float,float>)));
+  //connect(_ship_ds, SIGNAL(positionChanged(std::pair<float,float>))
+  //       ,&RLIState::instance(), SLOT(onShipPositionChanged(std::pair<float,float>)));
 }
 
 MainWindow::~MainWindow() {
@@ -77,6 +77,9 @@ void MainWindow::keyReleaseEvent(QKeyEvent *event) {
 }
 
 void MainWindow::keyPressEvent(QKeyEvent *event) {
+  std::pair<float, float> shipPos;
+  float chartScale;
+
   switch(event->key()) {
   //Под. имп. Помех
   case Qt::Key_S:
@@ -86,9 +89,15 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
     break;
   //Шкала +
   case Qt::Key_Plus:
+    chartScale = RLIState::instance().chartScale();
+    chartScale *= 0.95;
+    RLIState::instance().onChartScaleChanged(chartScale);
     break;
   //Шкала -
   case Qt::Key_Minus:
+    chartScale = RLIState::instance().chartScale();
+    chartScale *= 1.05;
+    RLIState::instance().onChartScaleChanged(chartScale);
     break;
   //Вынос центра
   case Qt::Key_C:
@@ -101,9 +110,25 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
     break;
   //Выбор цели
   case Qt::Key_Up:
+    shipPos = RLIState::instance().shipPosition();
+    shipPos.first += 0.005;
+    RLIState::instance().onShipPositionChanged(shipPos);
     break;
   //ЛИД / ЛОД
   case Qt::Key_Down:
+    shipPos = RLIState::instance().shipPosition();
+    shipPos.first -= 0.005;
+    RLIState::instance().onShipPositionChanged(shipPos);
+    break;
+  case Qt::Key_Left:
+    shipPos = RLIState::instance().shipPosition();
+    shipPos.second -= 0.005;
+    RLIState::instance().onShipPositionChanged(shipPos);
+    break;
+  case Qt::Key_Right:
+    shipPos = RLIState::instance().shipPosition();
+    shipPos.second += 0.005;
+    RLIState::instance().onShipPositionChanged(shipPos);
     break;
   //Захват
   case Qt::Key_Enter:

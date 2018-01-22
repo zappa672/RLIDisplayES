@@ -10,7 +10,7 @@ uniform vec2	center;
 uniform float	scale;
 uniform vec2  assetdim;
 
-uniform float	u_color_table[256];
+uniform float	u_color_table[189];
 uniform float u_color_index;
 uniform vec2  u_tex_origin;
 uniform vec2  u_tex_dim;

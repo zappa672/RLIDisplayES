@@ -28,9 +28,12 @@ private:
   bool loadData();
   bool initWithDummy1(float* amps);
   bool initWithDummy2(float* amps);
+  bool initWithDummy3(float* amps);
+  bool initWithDummy4(float* amps);
 
   bool finish_flag;
-  GLfloat* file_amps[2];
+  GLfloat* file_amps1[2];
+  GLfloat* file_amps2[2];
   uint  file_curr;
 
   RadarScale* _radar_scale;

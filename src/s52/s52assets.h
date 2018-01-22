@@ -31,6 +31,7 @@ public:
 
 private:
   void initGlyphTexture                  ();
+  void initPatternPalette                (S52References* ref);
   void initPatternTextures               (S52References* ref);
   void initLineTextures                  (S52References* ref);
   void initSymbolTextures                (S52References* ref);

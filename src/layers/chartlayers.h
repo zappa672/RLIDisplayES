@@ -20,7 +20,7 @@ public:
   void setPatternTexture(GLuint tex_id, QVector2D dim);
   void setData(S52AreaLayer* layer, S52Assets* assets, S52References* ref);
 
-  void draw(ChartShaders* shaders, QVector2D cur_coords, float scale, float angle, const QMatrix4x4& mvp);
+  void draw(ChartShaders* shaders, std::pair<float, float> cur_coords, float scale, float angle, const QMatrix4x4& mvp);
 
 private:
   GLuint*   vbo_ids;
@@ -52,10 +52,10 @@ public:
   void setPatternTexture(GLuint tex_id, QVector2D dim);
   void setData(S52LineLayer* layer, S52Assets* assets, S52References* ref);
 
-  void draw(ChartShaders* shaders, QVector2D cur_coords, float scale, float angle, const QMatrix4x4& mvp);
+  void draw(ChartShaders* shaders, std::pair<float, float> cur_coords, float scale, float angle, const QMatrix4x4& mvp);
 
 private:
-  int point_count;
+  GLuint point_count;
 
   bool is_pattern_uniform;
   QVector2D patternIdx;
@@ -65,6 +65,7 @@ private:
   int color_ind;
 
   GLuint*  vbo_ids;
+  GLuint _ind_vbo_id;
 
   std::vector<float> color_table;
 
@@ -83,16 +84,18 @@ public:
   void setPatternTexture(GLuint tex_id, QVector2D size);
   void setData(S52MarkLayer* layer, S52Assets* assets, S52References* ref);
 
-  void draw(ChartShaders* shaders, QVector2D cur_coords, float scale, float angle, const QMatrix4x4& mvp);
+  void draw(ChartShaders* shaders, std::pair<float, float> cur_coords, float scale, float angle, const QMatrix4x4& mvp);
 
 private:
-  int       point_count;
+  GLuint    point_count;
 
   bool      is_pattern_uniform;
   QVector2D patternOrigin;
   QVector2D patternSize;
   QVector2D patternPivot;
-  GLuint*   vbo_ids;
+
+  GLuint* vbo_ids;
+  GLuint _ind_vbo_id;
 
   GLint     pattern_tex_id;
   QVector2D pattern_tex_size;
@@ -109,12 +112,13 @@ public:
   void setPatternTexture(GLuint tex_id, QVector2D size);
   void setData(S52SndgLayer* layer, S52Assets* assets, S52References* ref);
 
-  void draw(ChartShaders* shaders, QVector2D cur_coords, float scale, float angle, const QMatrix4x4& mvp);
+  void draw(ChartShaders* shaders, std::pair<float, float> cur_coords, float scale, float angle, const QMatrix4x4& mvp);
 
 private:
-  int       point_count;
+  GLuint point_count;
 
-  GLuint*   vbo_ids;
+  GLuint* vbo_ids;
+  GLuint _ind_vbo_id;
 
   GLint     pattern_tex_id;
   QVector2D pattern_tex_size;
@@ -131,7 +135,7 @@ public:
   void setGlyphTexture(GLuint tex_id);
   void setData(S52TextLayer* layer);
 
-  void draw(ChartShaders* shaders, QVector2D cur_coords, float scale, float angle, const QMatrix4x4& mvp);
+  void draw(ChartShaders* shaders, std::pair<float, float> cur_coords, float scale, float angle, const QMatrix4x4& mvp);
 
 private:
   int point_count;
