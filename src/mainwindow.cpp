@@ -14,12 +14,13 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
   connect(wgtRLI, SIGNAL(initialized()), SLOT(onRLIWidgetInitialized()));
 
   _radar_ds = new RadarDataSource();
-  _ship_ds = new ShipDataSource();
+  //_ship_ds = new ShipDataSource();
 
   _radar_ds->start();
-  _ship_ds->start();
+  //_ship_ds->start();
 
-  RLIState::instance().onShipPositionChanged(_ship_ds->getPosition());
+  //RLIState::instance().onShipPositionChanged(_ship_ds->getPosition());
+  RLIState::instance().onShipPositionChanged(std::pair<float, float>(15.3642f, 145.9451f));
 
   //connect(_ship_ds, SIGNAL(positionChanged(std::pair<float,float>))
   //       ,&RLIState::instance(), SLOT(onShipPositionChanged(std::pair<float,float>)));
@@ -27,10 +28,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
 MainWindow::~MainWindow() {
   _radar_ds->finish();
-  _ship_ds->finish();
+  //_ship_ds->finish();
 
   delete _radar_ds;
-  delete _ship_ds;
+  //delete _ship_ds;
 
   delete ui;
 }

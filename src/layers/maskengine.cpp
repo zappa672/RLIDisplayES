@@ -6,8 +6,6 @@ static double const PI = acos(-1);
 
 MaskEngine::MaskEngine(const QSize& sz, QOpenGLContext* context, QObject* parent)
   : QObject(parent), QOpenGLFunctions(context) {
-  _fbo = NULL;
-
   initializeOpenGLFunctions();
 
   glGenBuffers(ATTR_CNT, _hole_vbo_ids);

@@ -176,7 +176,7 @@ void ChartAreaEngine::draw(ChartShaders* shaders, std::pair<float, float> cur_co
   glDrawArrays(GL_TRIANGLES, 0, point_count);
   glBindTexture(GL_TEXTURE_2D, 0);
 
-  glFlush();
+  //glFlush();
 }
 
 
@@ -433,7 +433,7 @@ void ChartLineEngine::draw(ChartShaders* shaders, std::pair<float, float> cur_co
 
   glBindTexture(GL_TEXTURE_2D, 0);
 
-  glFlush();
+  //glFlush();
 }
 
 
@@ -636,7 +636,7 @@ void ChartMarkEngine::draw(ChartShaders* shaders, std::pair<float, float> cur_co
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
   glBindTexture(GL_TEXTURE_2D, 0);
 
-  glFlush();
+  //glFlush();
 }
 
 
@@ -744,7 +744,7 @@ void ChartTextEngine::draw(ChartShaders* shaders, QVector2D cur_coords, float sc
   glDrawArrays(GL_POINTS, 0, point_count);
   glBindTexture(GL_TEXTURE_2D, 0);
 
-  glFlush();
+  //glFlush();
 }
 */
 
@@ -965,5 +965,5 @@ void ChartSndgEngine::draw(ChartShaders* shaders, std::pair<float, float> cur_co
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
   glBindTexture(GL_TEXTURE_2D, 0);
 
-  glFlush();
+  //glFlush();
 }

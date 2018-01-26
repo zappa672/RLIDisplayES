@@ -120,7 +120,7 @@ void RadarEngine::fillCoordTable() {
 }
 
 void RadarEngine::resizeTexture(uint radius) {
-  if (_fbo != NULL && _fbo->width() == static_cast<int>(2*radius+1))
+  if (_fbo != nullptr && _fbo->width() == static_cast<int>(2*radius+1))
     return;
 
   _radius = radius;
@@ -184,10 +184,10 @@ void RadarEngine::clearTexture() {
 
   _fbo->bind();
 
-  glClearColor(0.f, 0.f, 0.f, 0.f);
+  glClearColor(1.f, 1.f, 1.f, 0.f);
   glClear(GL_COLOR_BUFFER_BIT);
 
-  glClearDepthf(-1.f);
+  glClearDepthf(0.f);
   glClear(GL_DEPTH_BUFFER_BIT);
 
   _fbo->release();
