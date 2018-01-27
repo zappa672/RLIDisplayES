@@ -14,6 +14,7 @@ RLIDisplayWidget::RLIDisplayWidget(QWidget *parent) : QOpenGLWidget(parent) {
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "RLIDisplayWidget construction start";
 
   _initialized = false;
+  _debug_radar_tails_shift = 0;
 
   setMouseTracking(true);
 
@@ -31,6 +32,13 @@ RLIDisplayWidget::~RLIDisplayWidget() {
 
     delete _program;
   }
+}
+
+void RLIDisplayWidget::toggleRadarTailsShift() {
+  if (_debug_radar_tails_shift == 0)
+    _debug_radar_tails_shift = 320;
+  else
+    _debug_radar_tails_shift = 0;
 }
 
 void RLIDisplayWidget::onNewChartAvailable(const QString& name) {
@@ -161,13 +169,15 @@ void RLIDisplayWidget::paintLayers() {
   glClearColor(0.f, 0.f, 0.f, 1.f);
   glClear(GL_COLOR_BUFFER_BIT);
 
+  QPoint shift(_debug_radar_tails_shift, _debug_radar_tails_shift);
+
   fillRectWithTexture( QRect(layout->circle.boundRect.topLeft().toPoint(), _chartEngine->size())
                      , _chartEngine->textureId());
 
-  fillRectWithTexture( QRect(layout->circle.boundRect.topLeft().toPoint(), _radarEngine->size())
+  fillRectWithTexture( QRect(layout->circle.boundRect.topLeft().toPoint() + shift, _radarEngine->size())
                      , _radarEngine->textureId());
 
-  fillRectWithTexture( QRect(layout->circle.boundRect.topLeft().toPoint(), _tailsEngine->size())
+  fillRectWithTexture( QRect(layout->circle.boundRect.topLeft().toPoint() - shift, _tailsEngine->size())
                      , _tailsEngine->textureId());
 
   fillRectWithTexture( rect(), _maskEngine->textureId());

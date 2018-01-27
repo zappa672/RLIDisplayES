@@ -98,6 +98,7 @@ void ChartEngine::update(std::pair<float, float> center, float scale, float angl
 void ChartEngine::draw() {
   glEnable(GL_BLEND);
   glDisable(GL_DEPTH);
+  glDisable(GL_DEPTH_TEST);
 
   _fbo->bind();
 

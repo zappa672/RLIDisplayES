@@ -27,6 +27,8 @@ public:
   inline RadarEngine* radarEngine() { return _radarEngine; }
   inline RadarEngine* tailsEngine() { return _tailsEngine; }
 
+  void toggleRadarTailsShift();
+
 signals:
   void initialized();
 
@@ -40,6 +42,8 @@ private slots:
 
 private:
   bool _initialized;
+
+  int _debug_radar_tails_shift;
 
   void debugInfo();
   void initShaders();

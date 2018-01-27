@@ -16,12 +16,12 @@ RadarEngine::RadarEngine(uint pel_count, uint pel_len, uint tex_radius, QOpenGLC
   _peleng_len = 0;
 
   _has_data = false;
+  _fbo = nullptr;
 
   glGenBuffers(ATTR_CNT, _vbo_ids);
   glGenBuffers(1, &_ind_vbo_id);
   vao.create();
 
-  _fbo = nullptr;
   _program = new QOpenGLShaderProgram();
   _palette = new RadarPalette(context, this);
 
@@ -214,18 +214,19 @@ void RadarEngine::updateTexture() {
 
 
   // --------------------------------------
+
   glDisable(GL_BLEND);
   glEnable(GL_DEPTH);
   glEnable(GL_DEPTH_TEST);
-  glDepthFunc(GL_GREATER);
+  glDepthFunc(GL_LESS);
 
-  glViewport(0, 0, _fbo->width(), _fbo->height());
+  glViewport(0.f, 0.f, _fbo->width(), _fbo->height());
 
-  _fbo->bind();  
+  _fbo->bind();
 
   QMatrix4x4 projection;
   projection.setToIdentity();
-  projection.ortho(0, _fbo->width(), 0, _fbo->height(), -2, 2);
+  projection.ortho(0.f, _fbo->width(), 0.f, _fbo->height(), -255.f, 255.f);
 
   QMatrix4x4 transform;
   transform.setToIdentity();
@@ -265,7 +266,7 @@ void RadarEngine::updateTexture() {
 void RadarEngine::drawPelengs(uint first, uint last) {
   // Clear depth when the new cycle begins to avoid the previous circle data
   if (first == 0) {
-    glClearDepthf(-1.f);
+    glClearDepthf(0.f);
     glClear(GL_DEPTH_BUFFER_BIT);
   }
 

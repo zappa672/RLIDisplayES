@@ -66,7 +66,7 @@ void RadarDataSource::worker() {
     qSleep(delay);
 
     emit updateData(offset, BLOCK_TO_SEND, &file_amps1[file][offset * _peleng_size]);
-    emit updateData2(offset, BLOCK_TO_SEND, &file_amps2[1 - file][offset * _peleng_size]);
+    emit updateData2(offset, BLOCK_TO_SEND, &file_amps2[file][offset * _peleng_size]);
 
     offset = (offset + BLOCK_TO_SEND) % _bearings_per_cycle;
     if (offset == 0) file = 1 - file;
@@ -81,10 +81,10 @@ bool RadarDataSource::loadData() {
   if (!initWithDummy2(file_amps1[1]))
     return false;
 
-  if (!initWithDummy3(file_amps2[0]))
+  if (!initWithDummy3(file_amps2[1]))
     return false;
 
-  if (!initWithDummy4(file_amps2[1]))
+  if (!initWithDummy4(file_amps2[0]))
     return false;
 
   return true;
@@ -94,7 +94,7 @@ bool RadarDataSource::loadData() {
 bool RadarDataSource::initWithDummy1(GLfloat* amps) {
   for (uint i = 0; i < _bearings_per_cycle; i++)
     for (uint j = 0; j < _peleng_size; j++)
-      if (i % 256 < 16 || i % 256 > 239)
+      if (i % 256 < 9 || i % 256 > 247)
         amps[i*_peleng_size+j] = (255.f * j) / _peleng_size;
       else
         amps[i*_peleng_size+j] = 0.f;
@@ -105,7 +105,7 @@ bool RadarDataSource::initWithDummy1(GLfloat* amps) {
 bool RadarDataSource::initWithDummy2(GLfloat* amps) {
   for (uint i = 0; i < _bearings_per_cycle; i++)
     for (uint j = 0; j < _peleng_size; j++)
-      if (j > 247 && j < 280)
+      if (j > 259 && j < 268)
         amps[i*_peleng_size+j] = 255.f - (255.f * i) / _bearings_per_cycle;
       else
         amps[i*_peleng_size+j] = 0.f;
@@ -116,7 +116,7 @@ bool RadarDataSource::initWithDummy2(GLfloat* amps) {
 bool RadarDataSource::initWithDummy3(GLfloat* amps) {
   for (uint i = 0; i < _bearings_per_cycle; i++)
     for (uint j = 0; j < _peleng_size; j++)
-      if (i % 256 < 8 || i % 256 > 231)
+      if (i % 256 < 137 && i % 256 > 121)
         amps[i*_peleng_size+j] = (255.f * j) / _peleng_size;
       else
         amps[i*_peleng_size+j] = 0.f;
@@ -127,7 +127,7 @@ bool RadarDataSource::initWithDummy3(GLfloat* amps) {
 bool RadarDataSource::initWithDummy4(GLfloat* amps) {
   for (uint i = 0; i < _bearings_per_cycle; i++)
     for (uint j = 0; j < _peleng_size; j++)
-      if (j > 119 && j < 152)
+      if (j > 131 && j < 140)
         amps[i*_peleng_size+j] = 255.f - (255.f * i) / _bearings_per_cycle;
       else
         amps[i*_peleng_size+j] = 0.f;

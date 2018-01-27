@@ -20,7 +20,7 @@ void main() {
   float x = radius * sin(angle);
   float y = -radius * cos(angle);
 
-  gl_Position = mvp_matrix * vec4(x, y, amplitude/256.0, 1.0);
+  gl_Position = mvp_matrix * vec4(x, y, -amplitude, 1.0);
 
   v_amp = amplitude;
 }
