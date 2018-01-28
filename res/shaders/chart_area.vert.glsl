@@ -10,16 +10,16 @@ uniform vec2	center;
 uniform float	scale;
 uniform vec2  assetdim;
 
-uniform float	u_color_table[189];
 uniform float u_color_index;
 uniform vec2  u_tex_origin;
 uniform vec2  u_tex_dim;
 
-varying vec3	v_color;
+
+varying float v_color_index;
 varying vec2	v_tex_dim;
 varying vec2	v_tex_orig;
 varying vec2	v_inner_texcoords;
-varying float v_use_tex_color;
+varying float v_use_tex;
 
 void main() {
   float lat_rads = radians(center.x);
@@ -48,11 +48,12 @@ void main() {
     color_ind = color_index;
   else
     color_ind = u_color_index;
-  v_color = vec3(u_color_table[int(3.0*color_ind+0.0)], u_color_table[int(3.0*color_ind+1.0)], u_color_table[int(3.0*color_ind+2.0)]);
 
   // !!!! check to SOLID pattern - to replace!!!!
   if (v_tex_orig != vec2(0.0, 0.0))
-    v_use_tex_color = 1.0;
+    v_use_tex = 1.0;
   else
-    v_use_tex_color = 0.0;
+    v_use_tex = 0.0;
+
+  v_color_index = color_ind;
 }

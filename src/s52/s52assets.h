@@ -2,6 +2,7 @@
 #define S52ASSETS_H
 
 #include <QOpenGLFunctions>
+#include <QOpenGLTexture>
 
 #include <QVector2D>
 #include <QMap>
@@ -15,6 +16,8 @@ public:
   virtual ~S52Assets                     ();
 
   inline GLuint    getGlyphTextureId     () { return glyph_tex_id; }
+
+  inline GLuint    getColorSchemeTexture (const QString& scheme)                      { return color_schemes[scheme]->textureId(); }
 
   inline GLuint    getPatternTextureId   (const QString& scheme)                      { return pattern_tex_ids[scheme]; }
   inline QVector2D getPatternTextureDim  (const QString& scheme)                      { return pattern_tex_dims[scheme]; }
@@ -31,12 +34,15 @@ public:
 
 private:
   void initGlyphTexture                  ();
-  void initPatternPalette                (S52References* ref);
   void initPatternTextures               (S52References* ref);
   void initLineTextures                  (S52References* ref);
   void initSymbolTextures                (S52References* ref);
 
+  void initColorSchemeTextures           (S52References* ref);
+
   GLuint                                    glyph_tex_id;
+
+  QMap< QString, QOpenGLTexture* >          color_schemes;
 
   QMap< QString, GLuint >                   pattern_tex_ids;
   QMap< QString, QVector2D >                pattern_tex_dims;

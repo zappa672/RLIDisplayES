@@ -99,6 +99,8 @@ public:
   const QColor getColor(const QString& color_ref);
 
   int getColorIndex(const QString& color_ref);
+  int getColorsCount() { return color_indices.size(); }
+  ColorTable* getColorTable(const QString& color_scheme) { return color_tables[color_scheme]; }
   std::vector<float> getColorTable();
 
   const QVector2D getSymbolIndex(const QString& symbol_ref);

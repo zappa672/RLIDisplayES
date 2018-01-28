@@ -18,6 +18,7 @@ public:
   void clearData();
 
   void setPatternTexture(GLuint tex_id, QVector2D dim);
+  void setColorSchemeTexture(GLuint tex_id);
   void setData(S52AreaLayer* layer, S52Assets* assets, S52References* ref);
 
   void draw(ChartShaders* shaders, std::pair<float, float> cur_coords, float scale, float angle, const QMatrix4x4& mvp);
@@ -34,9 +35,9 @@ private:
   bool is_color_uniform;
   int color_ind;
 
-  std::vector<float> color_table;
-
   GLint  pattern_tex_id;
+  GLint  color_scheme_tex_id;
+
   QVector2D pattern_tex_dim;
 };
 

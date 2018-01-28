@@ -4,6 +4,7 @@
 ChartAreaEngine::ChartAreaEngine(QOpenGLContext* context) : QOpenGLFunctions(context) {
   initializeOpenGLFunctions();
 
+  color_scheme_tex_id = -1;
   pattern_tex_id = -1;
   point_count = 0;
 
@@ -45,6 +46,10 @@ void ChartAreaEngine::clearData() {
 void ChartAreaEngine::setPatternTexture(GLuint tex_id, QVector2D dim) {
   pattern_tex_id = tex_id;
   pattern_tex_dim = dim;
+}
+
+void ChartAreaEngine::setColorSchemeTexture(GLuint tex_id) {
+  color_scheme_tex_id = tex_id;
 }
 
 void ChartAreaEngine::setData(S52AreaLayer* layer, S52Assets* assets, S52References* ref) {
@@ -100,7 +105,6 @@ void ChartAreaEngine::setData(S52AreaLayer* layer, S52Assets* assets, S52Referen
   }
 
   point_count = layer->triangles.size() / 2;
-  color_table = ref->getColorTable();
 
   glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[AREA_ATTRIBUTES_COORDS]);
   glBufferData(GL_ARRAY_BUFFER, layer->triangles.size() * sizeof(GLfloat), &(layer->triangles[0]), GL_STATIC_DRAW);
@@ -120,7 +124,7 @@ void ChartAreaEngine::setData(S52AreaLayer* layer, S52Assets* assets, S52Referen
 }
 
 void ChartAreaEngine::draw(ChartShaders* shaders, std::pair<float, float> cur_coords, float scale, float angle, const QMatrix4x4& mvp) {
-  if (pattern_tex_id == -1 || point_count <= 0)
+  if (pattern_tex_id == -1 || color_scheme_tex_id == -1 || point_count <= 0)
     return;
 
   QOpenGLShaderProgram* prog = shaders->getChartAreaProgram();
@@ -167,16 +171,23 @@ void ChartAreaEngine::draw(ChartShaders* shaders, std::pair<float, float> cur_co
     glUniform2f(shaders->getAreaUniformLoc(AREA_UNIFORMS_PATTERN_DIM), patternDim.x(), patternDim.y());
   }
 
-  glUniform1f(shaders->getAreaUniformLoc(COMMON_UNIFORMS_PATTERN_TEX_ID), 0);
-  glUniform1fv(shaders->getAreaUniformLoc(AREA_UNIFORMS_COLOR_TABLE), color_table.size(), &color_table[0]);
+  glUniform1f(shaders->getAreaUniformLoc(COMMON_UNIFORMS_PATTERN_TEX_ID), 1);
+  glUniform1f(shaders->getAreaUniformLoc(AREA_UNIFORMS_COLOR_TABLE_TEX), 0);
 
-  glActiveTexture(GL_TEXTURE0);
+
+  glActiveTexture(GL_TEXTURE1);
   glBindTexture(GL_TEXTURE_2D, pattern_tex_id);
 
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, color_scheme_tex_id);
+
   glDrawArrays(GL_TRIANGLES, 0, point_count);
+
+  glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, 0);
 
-  //glFlush();
+  glActiveTexture(GL_TEXTURE1);
+  glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 

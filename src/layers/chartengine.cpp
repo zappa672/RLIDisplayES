@@ -193,6 +193,7 @@ void ChartEngine::drawLayers(const QMatrix4x4& mvp_matrix) {
 
 void ChartEngine::setAreaLayers(S52Chart* chrt, S52References* ref) {
   QList<QString> layer_names = chrt->getAreaLayerNames();
+  QString color_scheme_name = ref->getColorScheme();
 
   for (int i = 0; i < layer_names.size(); i++) {
     QString layer_name = layer_names[i];
@@ -201,8 +202,10 @@ void ChartEngine::setAreaLayers(S52Chart* chrt, S52References* ref) {
     if (!area_engines.contains(layer_name))
       area_engines[layer_name] = new ChartAreaEngine(_context);
 
-    area_engines[layer_name]->setPatternTexture(assets->getPatternTextureId(ref->getColorScheme())
-                                              , assets->getPatternTextureDim(ref->getColorScheme()));
+    area_engines[layer_name]->setPatternTexture( assets->getPatternTextureId(color_scheme_name)
+                                               , assets->getPatternTextureDim(color_scheme_name) );
+    area_engines[layer_name]->setColorSchemeTexture(assets->getColorSchemeTexture(color_scheme_name));
+
     area_engines[layer_name]->setData(layer, assets, ref);
   }
 }

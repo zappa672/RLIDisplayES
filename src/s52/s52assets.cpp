@@ -17,7 +17,9 @@ S52Assets::S52Assets(QOpenGLContext* context, S52References* ref) : QOpenGLFunct
   initializeOpenGLFunctions();
 
   initGlyphTexture();
-  initPatternPalette(ref);
+
+  initColorSchemeTextures(ref);
+
   initPatternTextures(ref);
   initLineTextures(ref);
   initSymbolTextures(ref);
@@ -34,6 +36,9 @@ S52Assets::~S52Assets() {
 
   for (int i = 0; i < symbol_tex_ids.keys().size(); i++)
     glDeleteTextures(1, &symbol_tex_ids[symbol_tex_ids.keys()[i]]);
+
+  for (QOpenGLTexture* tex : color_schemes)
+    tex->destroy();
 }
 
 
@@ -88,16 +93,27 @@ void S52Assets::initGlyphTexture() {
   glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void S52Assets::initPatternPalette(S52References* ref) {
-  QStringList color_schemes = ref->getColorSchemeNames();
 
-  for (QString scheme : color_schemes) {
-    //qDebug() << scheme;
+void S52Assets::initColorSchemeTextures(S52References* ref) {
+  QStringList color_scheme_names = ref->getColorSchemeNames();
+  int colors_count = ref->getColorsCount();
 
-    std::vector<float> color_table = ref->getColorTable();
-    for (float val : color_table) {
-        //qDebug() << val;
-      }
+  for (QString scheme : color_scheme_names) {
+    ColorTable* c_tbl = ref->getColorTable(scheme);
+
+    QImage img(1, colors_count, QImage::Format_RGB888);
+    for (QString color_tag : c_tbl->colors.keys())
+      img.setPixel(0, ref->getColorIndex(color_tag), c_tbl->colors[color_tag].rgb());
+
+    QOpenGLTexture* tex = new QOpenGLTexture(QOpenGLTexture::Target2D);
+
+    tex->setMinificationFilter(QOpenGLTexture::Nearest);
+    tex->setMagnificationFilter(QOpenGLTexture::Nearest);
+    tex->setWrapMode(QOpenGLTexture::ClampToEdge);
+
+    tex->setData(img);
+
+    color_schemes.insert(scheme, tex);
   }
 }
 
