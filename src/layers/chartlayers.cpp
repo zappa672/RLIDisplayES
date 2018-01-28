@@ -171,15 +171,13 @@ void ChartAreaEngine::draw(ChartShaders* shaders, std::pair<float, float> cur_co
     glUniform2f(shaders->getAreaUniformLoc(AREA_UNIFORMS_PATTERN_DIM), patternDim.x(), patternDim.y());
   }
 
-  glUniform1f(shaders->getAreaUniformLoc(COMMON_UNIFORMS_PATTERN_TEX_ID), 1);
-  glUniform1f(shaders->getAreaUniformLoc(AREA_UNIFORMS_COLOR_TABLE_TEX), 0);
-
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, pattern_tex_id);
+  glUniform1i(shaders->getAreaUniformLoc(COMMON_UNIFORMS_PATTERN_TEX_ID), 0);
 
   glActiveTexture(GL_TEXTURE1);
-  glBindTexture(GL_TEXTURE_2D, pattern_tex_id);
-
-  glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, color_scheme_tex_id);
+  glUniform1i(shaders->getAreaUniformLoc(AREA_UNIFORMS_COLOR_TABLE_TEX), 1);
 
   glDrawArrays(GL_TRIANGLES, 0, point_count);
 

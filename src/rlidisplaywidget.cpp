@@ -47,11 +47,23 @@ void RLIDisplayWidget::onNewChartAvailable(const QString& name) {
 }
 
 void RLIDisplayWidget::debugInfo() {
+  qDebug() << "";
   qDebug() << "Vendor: " << (const char*) glGetString(GL_VENDOR);
   qDebug() << "Renderer: " << (const char*) glGetString(GL_RENDERER);
   qDebug() << "OpenGL: " << (const char*) glGetString(GL_VERSION);
   qDebug() << "Shaders: " << (const char*) glGetString(GL_SHADING_LANGUAGE_VERSION);
-  //qDebug() << "Extensions: " << (const char*) glGetString(GL_EXTENSIONS);
+  /*
+  qDebug() << "";
+  qDebug() << "Extensions: ";
+  QString exts((const char*) glGetString(GL_EXTENSIONS));
+  for (QString ext : exts.split(" "))
+     qDebug() << "\t" << ext;
+  qDebug() << "";
+  */
+  int val;
+  glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &val);
+  qDebug() << "Max texture image units: " << val;
+  qDebug() << "";
 }
 
 void RLIDisplayWidget::initializeGL() {
