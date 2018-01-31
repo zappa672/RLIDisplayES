@@ -57,7 +57,14 @@ void ChartEngine::resize(uint radius) {
   delete _fbo;
   _fbo = new QOpenGLFramebufferObject(QSize(2*_radius+1, 2*_radius+1));
 
-  draw();
+  _fbo->bind();
+
+  glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+  glClear(GL_COLOR_BUFFER_BIT);
+
+  _fbo->release();
+
+  _force_update = true;
 }
 
 
@@ -76,7 +83,7 @@ void ChartEngine::setChart(S52Chart* chrt, S52References* ref) {
   _force_update = true;
 }
 
-void ChartEngine::update(std::pair<float, float> center, float scale, float angle, QPoint center_shift) {
+void ChartEngine::update(std::pair<float, float> center, float scale, float angle, QPoint center_shift, const QString& color_scheme) {
   bool need_update = ( _force_update
                     || fabs(_center.first - center.first) > 0.00005
                     || fabs(_center.second - center.second) > 0.00005
@@ -91,18 +98,20 @@ void ChartEngine::update(std::pair<float, float> center, float scale, float angl
     _scale = scale;
     _angle = angle;
     _center_shift = center_shift;
-    draw();
+    draw(color_scheme);
   }
 }
 
-void ChartEngine::draw() {
+void ChartEngine::draw(const QString& color_scheme) {
   glEnable(GL_BLEND);
-  glDisable(GL_DEPTH);
-  glDisable(GL_DEPTH_TEST);
+  glEnable(GL_DEPTH);
+  glEnable(GL_DEPTH_TEST);
+  glDepthFunc(GL_ALWAYS);
+
 
   _fbo->bind();
 
-  glClearColor(0.37f, 0.23f, 0.22f, 1.f);
+  glClearColor(0.0f, 0.0f, 0.0f, 1.f);
   glClear(GL_COLOR_BUFFER_BIT);
 
   glViewport(0, 0, _fbo->width(), _fbo->height());
@@ -116,10 +125,12 @@ void ChartEngine::draw() {
     transform.setToIdentity();
     transform.translate(_center_shift.x() + _fbo->width()/2.f, _center_shift.y() + _fbo->height()/2.f, 0.f);
 
-    drawLayers(projection*transform);
+    drawLayers(projection*transform, color_scheme);
   }
 
   _fbo->release();
+
+  _force_update = false;
 }
 
 
@@ -135,24 +146,19 @@ void ChartEngine::clearChartData() {
   //  mark_engines[layer_names[i]]->clearData();
   //for (int i = 0; i < (layer_names = text_engines.keys()).size(); i++)
   //  text_engines[layer_names[i]]->clearData();
+
+  _force_update = true;
 }
 
 
 
-void ChartEngine::drawLayers(const QMatrix4x4& mvp_matrix) {
+void ChartEngine::drawLayers(const QMatrix4x4& mvp_matrix, const QString& color_scheme) {
   QStringList displayOrder = settings->getLayersDisplayOrder();
   for (int i = displayOrder.size() - 1; i >= 0; i--)
     if (!settings->isLayerVisible(displayOrder[i]))
       displayOrder.removeAt(i);
 
-
-  shaders->getChartAreaProgram()->bind();
-  for (int i = 0; i < displayOrder.size(); i++) {
-    QString s = displayOrder[i];
-    if (area_engines.contains(s) && area_engines[s] != nullptr)
-      area_engines[s]->draw(shaders, _center, _scale, _angle, mvp_matrix);
-  }
-  shaders->getChartAreaProgram()->release();
+  drawAreaLayers(displayOrder, mvp_matrix, color_scheme);
 
   /*
   shaders->getChartLineProgram()->bind();
@@ -190,25 +196,58 @@ void ChartEngine::drawLayers(const QMatrix4x4& mvp_matrix) {
   */
 }
 
+void ChartEngine::drawAreaLayers(const QStringList& displayOrder, const QMatrix4x4& mvp_matrix, const QString& color_scheme) {
+  QOpenGLShaderProgram* prog = shaders->getChartAreaProgram();
+  prog->bind();
+
+  GLuint pattern_tex_id = assets->getPatternTexId(color_scheme);
+  QSize pattern_tex_size = assets->getPatternTexSize(color_scheme);
+  GLuint color_scheme_tex_id = assets->getColorSchemeTexId(color_scheme);
+
+  glUniform2f(shaders->getAreaUniformLoc(COMMON_UNIFORMS_CENTER), _center.first, _center.second);
+  glUniform1f(shaders->getAreaUniformLoc(COMMON_UNIFORMS_SCALE), _scale);
+  glUniform1f(shaders->getAreaUniformLoc(COMMON_UNIFORMS_NORTH), _angle);
+  glUniform2f(shaders->getAreaUniformLoc(COMMON_UNIFORMS_PATTERN_TEX_DIM), pattern_tex_size.width(), pattern_tex_size.height());
+  prog->setUniformValue(shaders->getAreaUniformLoc(COMMON_UNIFORMS_MVP_MATRIX), mvp_matrix);
+
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, pattern_tex_id);
+  glUniform1i(shaders->getAreaUniformLoc(COMMON_UNIFORMS_PATTERN_TEX_ID), 0);
+
+  glActiveTexture(GL_TEXTURE1);
+  glBindTexture(GL_TEXTURE_2D, color_scheme_tex_id);
+  glUniform1i(shaders->getAreaUniformLoc(AREA_UNIFORMS_COLOR_TABLE_TEX), 1);
+
+  for (QString layer : displayOrder)
+    if (area_engines.contains(layer) && area_engines[layer] != nullptr)
+      area_engines[layer]->draw(shaders);
+
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, 0);
+
+  glActiveTexture(GL_TEXTURE1);
+  glBindTexture(GL_TEXTURE_2D, 0);
+
+  prog->release();
+}
+
+
+
+
 
 void ChartEngine::setAreaLayers(S52Chart* chrt, S52References* ref) {
-  QList<QString> layer_names = chrt->getAreaLayerNames();
   QString color_scheme_name = ref->getColorScheme();
 
-  for (int i = 0; i < layer_names.size(); i++) {
-    QString layer_name = layer_names[i];
+  for (QString layer_name : chrt->getAreaLayerNames()) {
     S52AreaLayer* layer = chrt->getAreaLayer(layer_name);
 
     if (!area_engines.contains(layer_name))
-      area_engines[layer_name] = new ChartAreaEngine(_context);
-
-    area_engines[layer_name]->setPatternTexture( assets->getPatternTextureId(color_scheme_name)
-                                               , assets->getPatternTextureDim(color_scheme_name) );
-    area_engines[layer_name]->setColorSchemeTexture(assets->getColorSchemeTexture(color_scheme_name));
+      area_engines[layer_name] = new ChartAreaEngine(_context, shaders);
 
     area_engines[layer_name]->setData(layer, assets, ref);
   }
 }
+
 
 /*
 void ChartEngine::setLineLayers(S52Chart* chrt, S52References* ref) {

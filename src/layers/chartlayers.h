@@ -3,6 +3,7 @@
 
 #include <QColor>
 #include <QVector2D>
+#include <QOpenGLVertexArrayObject>
 
 #include "chartshaders.h"
 
@@ -12,33 +13,25 @@
 
 class ChartAreaEngine : protected QOpenGLFunctions {
 public:
-  explicit ChartAreaEngine(QOpenGLContext* context);
+  explicit ChartAreaEngine(QOpenGLContext* context, ChartShaders* shaders);
   virtual ~ChartAreaEngine();
 
   void clearData();
-
-  void setPatternTexture(GLuint tex_id, QVector2D dim);
-  void setColorSchemeTexture(GLuint tex_id);
   void setData(S52AreaLayer* layer, S52Assets* assets, S52References* ref);
 
-  void draw(ChartShaders* shaders, std::pair<float, float> cur_coords, float scale, float angle, const QMatrix4x4& mvp);
+  void draw(ChartShaders* shaders);
 
 private:
-  GLuint*   vbo_ids;
+  GLuint vbo_ids[AREA_ATTRIBUTES_COUNT];
 
   int point_count;
 
   bool is_pattern_uniform;
-  QVector2D patternIdx;
-  QVector2D patternDim;
+  QPointF patternLocation;
+  QSizeF patternSize;
 
   bool is_color_uniform;
-  int color_ind;
-
-  GLint  pattern_tex_id;
-  GLint  color_scheme_tex_id;
-
-  QVector2D pattern_tex_dim;
+  GLfloat color_ind;
 };
 
 

@@ -42,7 +42,8 @@ void RLIDisplayWidget::toggleRadarTailsShift() {
 }
 
 void RLIDisplayWidget::onNewChartAvailable(const QString& name) {
-  if (name == "US2SP01M.000")
+  //if (name == "US2SP01M.000")
+  if (name == "CO200008.000")
     _chartEngine->setChart(_chart_mngr->getChart(name), _chart_mngr->refs());
 }
 
@@ -204,7 +205,8 @@ void RLIDisplayWidget::updateLayers() {
   std::pair<float, float> shipPosition = RLIState::instance().shipPosition();
   float chartScale = RLIState::instance().chartScale();
 
-  _chartEngine->update(shipPosition, chartScale , 0.f,  QPoint(0.f, 0.f));
+  QString colorScheme = _chart_mngr->refs()->getColorScheme();
+  _chartEngine->update(shipPosition, chartScale , 0.f,  QPoint(0.f, 0.f), colorScheme);
 }
 
 void RLIDisplayWidget::fillRectWithTexture(const QRectF& rect, GLuint textureId) {

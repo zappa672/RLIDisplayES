@@ -15,14 +15,23 @@ public:
   explicit S52Assets                     (QOpenGLContext* context, S52References* ref);
   virtual ~S52Assets                     ();
 
-  inline GLuint    getGlyphTextureId     () { return glyph_tex_id; }
+  inline GLuint    getFontTexId          ()                                           { return font_texture->textureId(); }
 
-  inline GLuint    getColorSchemeTexture (const QString& scheme)                      { return color_schemes[scheme]->textureId(); }
+  inline GLuint    getColorSchemeTexId   (const QString& scheme)                      { return color_scheme_textures[scheme]->textureId(); }
 
-  inline GLuint    getPatternTextureId   (const QString& scheme)                      { return pattern_tex_ids[scheme]; }
-  inline QVector2D getPatternTextureDim  (const QString& scheme)                      { return pattern_tex_dims[scheme]; }
-  inline QVector2D getPatternIndex       (const QString& scheme, const QString& name) { return pattern_ind_maps[scheme][name]; }
-  inline QVector2D getPatternDim         (const QString& scheme, const QString& name) { return pattern_dim_maps[scheme][name]; }
+  // Returns patterns texture id for the color scheme
+  inline GLuint    getPatternTexId       (const QString& scheme)                      { return pattern_textures[scheme]->textureId(); }
+  // Returns patterns texture size for the color scheme
+  inline QSize     getPatternTexSize     (const QString& scheme)                      { return pattern_tex_sizes[scheme]; }
+  // Returns pattern's left-top pixel location in patterns texture
+  inline QPoint    getPatternLocation    (const QString& scheme, const QString& name) { return (pattern_locations[scheme].contains(name))
+                                                                                              ? pattern_locations[scheme][name]
+                                                                                              : QPoint(-1, -1); }
+  // Returns size of the pattern
+  inline QSize     getPatternSize        (const QString& scheme, const QString& name) { return (pattern_sizes[scheme].contains(name))
+                                                                                              ? pattern_sizes[scheme][name]
+                                                                                              : QSize(0, 0); }
+
 
   inline GLuint    getLineTextureId      (const QString& scheme)                      { return line_tex_ids[scheme]; }
   inline QVector2D getLineTextureDim     (const QString& scheme)                      { return line_tex_dims[scheme]; }
@@ -34,20 +43,19 @@ public:
 
 private:
   void initGlyphTexture                  ();
+  void initColorSchemeTextures           (S52References* ref);
   void initPatternTextures               (S52References* ref);
   void initLineTextures                  (S52References* ref);
   void initSymbolTextures                (S52References* ref);
 
-  void initColorSchemeTextures           (S52References* ref);
+  QOpenGLTexture*                       font_texture;
 
-  GLuint                                    glyph_tex_id;
+  QMap<QString, QOpenGLTexture*>        color_scheme_textures;
 
-  QMap< QString, QOpenGLTexture* >          color_schemes;
-
-  QMap< QString, GLuint >                   pattern_tex_ids;
-  QMap< QString, QVector2D >                pattern_tex_dims;
-  QMap< QString, QMap<QString, QVector2D> > pattern_ind_maps;
-  QMap< QString, QMap<QString, QVector2D> > pattern_dim_maps;
+  QMap<QString, QOpenGLTexture*>        pattern_textures;
+  QMap<QString, QSize>                  pattern_tex_sizes;
+  QMap<QString, QMap<QString, QPoint>>  pattern_locations;
+  QMap<QString, QMap<QString, QSize>>   pattern_sizes;
 
   QMap< QString, GLuint >                   line_tex_ids;
   QMap< QString, QVector2D >                line_tex_dims;

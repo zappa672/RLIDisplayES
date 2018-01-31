@@ -107,9 +107,6 @@ void ChartShaders::initChartAreaProgram() {
   area_uniform_locs[COMMON_UNIFORMS_PATTERN_TEX_DIM]  = chart_area_program->uniformLocation("assetdim");
   area_uniform_locs[COMMON_UNIFORMS_MVP_MATRIX]       = chart_area_program->uniformLocation("mvp_matrix");
 
-  area_uniform_locs[AREA_UNIFORMS_COLOR_INDEX]        = chart_area_program->uniformLocation("u_color_index");
-  area_uniform_locs[AREA_UNIFORMS_PATTERN_INDEX]      = chart_area_program->uniformLocation("u_tex_origin");
-  area_uniform_locs[AREA_UNIFORMS_PATTERN_DIM]        = chart_area_program->uniformLocation("u_tex_dim");  
   area_uniform_locs[AREA_UNIFORMS_COLOR_TABLE_TEX]    = chart_area_program->uniformLocation("color_table_tex");
 
   area_attribute_locs[AREA_ATTRIBUTES_COORDS]         = chart_area_program->attributeLocation("coords");

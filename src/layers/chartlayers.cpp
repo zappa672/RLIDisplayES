@@ -1,23 +1,21 @@
 #include "chartlayers.h"
 
 
-ChartAreaEngine::ChartAreaEngine(QOpenGLContext* context) : QOpenGLFunctions(context) {
+ChartAreaEngine::ChartAreaEngine(QOpenGLContext* context, ChartShaders* shaders) : QOpenGLFunctions(context) {
   initializeOpenGLFunctions();
 
-  color_scheme_tex_id = -1;
-  pattern_tex_id = -1;
+  shaders = shaders;
+
   point_count = 0;
 
   is_color_uniform = false;
   is_pattern_uniform = false;
 
-  vbo_ids = new GLuint[AREA_ATTRIBUTES_COUNT];
   glGenBuffers(AREA_ATTRIBUTES_COUNT, vbo_ids);
 }
 
 ChartAreaEngine::~ChartAreaEngine() {
   glDeleteBuffers(AREA_ATTRIBUTES_COUNT, vbo_ids);
-  delete[] vbo_ids;
 }
 
 void ChartAreaEngine::clearData() {
@@ -43,33 +41,20 @@ void ChartAreaEngine::clearData() {
   }
 }
 
-void ChartAreaEngine::setPatternTexture(GLuint tex_id, QVector2D dim) {
-  pattern_tex_id = tex_id;
-  pattern_tex_dim = dim;
-}
-
-void ChartAreaEngine::setColorSchemeTexture(GLuint tex_id) {
-  color_scheme_tex_id = tex_id;
-}
-
 void ChartAreaEngine::setData(S52AreaLayer* layer, S52Assets* assets, S52References* ref) {
   std::vector<GLfloat> color_inds;
   std::vector<GLfloat> tex_inds;
   std::vector<GLfloat> tex_dims;
 
-  if (layer->is_pattern_uniform) {
-    is_pattern_uniform = true;
-    patternIdx = assets->getPatternIndex(ref->getColorScheme(), layer->pattern_ref);
-    patternDim = assets->getPatternDim(ref->getColorScheme(), layer->pattern_ref);
-  }
+  is_pattern_uniform = layer->is_pattern_uniform;
+  patternLocation = assets->getPatternLocation(ref->getColorScheme(), layer->pattern_ref);
+  patternSize = assets->getPatternSize(ref->getColorScheme(), layer->pattern_ref);
 
-  if (layer->is_color_uniform) {
-    is_color_uniform = true;
-    color_ind = layer->color_ind;
-  }
+  is_color_uniform = layer->is_color_uniform;
+  color_ind = layer->color_ind;
 
   if ((!is_color_uniform) || (!is_pattern_uniform)) {
-    for (unsigned int i = 0; i < layer->start_inds.size(); i++) {
+    for (uint i = 0; i < layer->start_inds.size(); i++) {
       int fst_idx = layer->start_inds[i];
       int lst_idx = 0;
 
@@ -81,12 +66,12 @@ void ChartAreaEngine::setData(S52AreaLayer* layer, S52Assets* assets, S52Referen
       if (lst_idx <= fst_idx)
         continue;
 
-      QVector2D tex_ind;
-      QVector2D tex_dim;
+      QPoint tex_ind;
+      QSize tex_dim;
 
       if (!is_pattern_uniform) {
-        tex_ind = assets->getPatternIndex(ref->getColorScheme(), layer->pattern_refs[i]);
-        tex_dim = assets->getPatternDim(ref->getColorScheme(), layer->pattern_refs[i]);
+        tex_ind = assets->getPatternLocation(ref->getColorScheme(), layer->pattern_refs[i]);
+        tex_dim = assets->getPatternSize(ref->getColorScheme(), layer->pattern_refs[i]);
       }
 
       for (int j = fst_idx; j < lst_idx; j += 2) {
@@ -97,8 +82,8 @@ void ChartAreaEngine::setData(S52AreaLayer* layer, S52Assets* assets, S52Referen
         if (!is_pattern_uniform) {
           tex_inds.push_back(tex_ind.x());
           tex_inds.push_back(tex_ind.y());
-          tex_dims.push_back(tex_dim.x());
-          tex_dims.push_back(tex_dim.y());
+          tex_dims.push_back(tex_dim.width());
+          tex_dims.push_back(tex_dim.height());
         }
       }
     }
@@ -123,18 +108,9 @@ void ChartAreaEngine::setData(S52AreaLayer* layer, S52Assets* assets, S52Referen
   }
 }
 
-void ChartAreaEngine::draw(ChartShaders* shaders, std::pair<float, float> cur_coords, float scale, float angle, const QMatrix4x4& mvp) {
-  if (pattern_tex_id == -1 || color_scheme_tex_id == -1 || point_count <= 0)
+void ChartAreaEngine::draw(ChartShaders* shaders) {
+  if (point_count <= 0)
     return;
-
-  QOpenGLShaderProgram* prog = shaders->getChartAreaProgram();
-
-  glUniform2f(shaders->getAreaUniformLoc(COMMON_UNIFORMS_CENTER), cur_coords.first, cur_coords.second);
-  glUniform1f(shaders->getAreaUniformLoc(COMMON_UNIFORMS_SCALE), scale);
-  glUniform1f(shaders->getAreaUniformLoc(COMMON_UNIFORMS_NORTH), angle);
-  glUniform2f(shaders->getAreaUniformLoc(COMMON_UNIFORMS_PATTERN_TEX_DIM), pattern_tex_dim.x(), pattern_tex_dim.y());
-  prog->setUniformValue(shaders->getAreaUniformLoc(COMMON_UNIFORMS_MVP_MATRIX), mvp);
-
 
   glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[AREA_ATTRIBUTES_COORDS]);
   glVertexAttribPointer(shaders->getAreaAttributeLoc(AREA_ATTRIBUTES_COORDS), 2, GL_FLOAT, GL_FALSE, 0, (void *) 0);
@@ -144,12 +120,9 @@ void ChartAreaEngine::draw(ChartShaders* shaders, std::pair<float, float> cur_co
     glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[AREA_ATTRIBUTES_COLOR_INDEX]);
     glVertexAttribPointer(shaders->getAreaAttributeLoc(AREA_ATTRIBUTES_COLOR_INDEX), 1, GL_FLOAT, GL_FALSE, 0, (void *) 0);
     glEnableVertexAttribArray(shaders->getAreaAttributeLoc(AREA_ATTRIBUTES_COLOR_INDEX));
-
-    glUniform1f(shaders->getAreaUniformLoc(AREA_UNIFORMS_COLOR_INDEX), -1);
   } else {
+    glVertexAttrib1f(shaders->getAreaAttributeLoc(AREA_ATTRIBUTES_COLOR_INDEX), static_cast<GLfloat>(color_ind));
     glDisableVertexAttribArray(shaders->getAreaAttributeLoc(AREA_ATTRIBUTES_COLOR_INDEX));
-
-    glUniform1f(shaders->getAreaUniformLoc(AREA_UNIFORMS_COLOR_INDEX), color_ind);
   }
 
   if (!is_pattern_uniform) {
@@ -160,32 +133,15 @@ void ChartAreaEngine::draw(ChartShaders* shaders, std::pair<float, float> cur_co
     glBindBuffer(GL_ARRAY_BUFFER, AREA_ATTRIBUTES_PATTERN_DIM);
     glVertexAttribPointer(shaders->getAreaAttributeLoc(AREA_ATTRIBUTES_PATTERN_DIM), 2, GL_FLOAT, GL_FALSE, 0, (void *) 0);
     glEnableVertexAttribArray(shaders->getAreaAttributeLoc(AREA_ATTRIBUTES_PATTERN_DIM));
-
-    glUniform2f(shaders->getAreaUniformLoc(AREA_UNIFORMS_PATTERN_INDEX), -1, -1);
-    glUniform2f(shaders->getAreaUniformLoc(AREA_UNIFORMS_PATTERN_DIM), -1, -1);
   } else {
+    glVertexAttrib2f(shaders->getAreaAttributeLoc(AREA_ATTRIBUTES_PATTERN_INDEX), patternLocation.x(), patternLocation.y());
     glDisableVertexAttribArray(shaders->getAreaAttributeLoc(AREA_ATTRIBUTES_PATTERN_INDEX));
-    glDisableVertexAttribArray(shaders->getAreaAttributeLoc(AREA_ATTRIBUTES_PATTERN_DIM));
 
-    glUniform2f(shaders->getAreaUniformLoc(AREA_UNIFORMS_PATTERN_INDEX), patternIdx.x(), patternIdx.y());
-    glUniform2f(shaders->getAreaUniformLoc(AREA_UNIFORMS_PATTERN_DIM), patternDim.x(), patternDim.y());
+    glVertexAttrib2f(shaders->getAreaAttributeLoc(AREA_ATTRIBUTES_PATTERN_DIM), patternSize.width(), patternSize.height());
+    glDisableVertexAttribArray(shaders->getAreaAttributeLoc(AREA_ATTRIBUTES_PATTERN_INDEX));
   }
 
-  glActiveTexture(GL_TEXTURE0);
-  glBindTexture(GL_TEXTURE_2D, pattern_tex_id);
-  glUniform1i(shaders->getAreaUniformLoc(COMMON_UNIFORMS_PATTERN_TEX_ID), 0);
-
-  glActiveTexture(GL_TEXTURE1);
-  glBindTexture(GL_TEXTURE_2D, color_scheme_tex_id);
-  glUniform1i(shaders->getAreaUniformLoc(AREA_UNIFORMS_COLOR_TABLE_TEX), 1);
-
   glDrawArrays(GL_TRIANGLES, 0, point_count);
-
-  glActiveTexture(GL_TEXTURE0);
-  glBindTexture(GL_TEXTURE_2D, 0);
-
-  glActiveTexture(GL_TEXTURE1);
-  glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 

@@ -46,17 +46,17 @@ int main(int argc, char *argv[]) {
   if (args.contains("-f"))
     a.setProperty(PROPERTY_FRAME_DELAY, args[args.indexOf("-f") + 1].toInt());
   else
-    a.setProperty(PROPERTY_FRAME_DELAY, 25);
+    a.setProperty(PROPERTY_FRAME_DELAY, 33);
 
   if (args.contains("-d"))
     a.setProperty(PROPERTY_DATA_DELAY, args[args.indexOf("-d") + 1].toInt());
   else
-    a.setProperty(PROPERTY_DATA_DELAY, 15);
+    a.setProperty(PROPERTY_DATA_DELAY, 30);
 
   if (args.contains("-s"))
     a.setProperty(PROPERTY_BLOCK_SIZE, args[args.indexOf("-s") + 1].toInt());
   else
-    a.setProperty(PROPERTY_BLOCK_SIZE, 64);
+    a.setProperty(PROPERTY_BLOCK_SIZE, 128);
 
   if (args.contains("-w"))
     a.setProperty(PROPERTY_RLI_WIDGET_SIZE, args[args.indexOf("-w") + 1]);

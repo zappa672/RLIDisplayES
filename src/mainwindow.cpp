@@ -20,7 +20,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
   _ship_ds->start();
 
   RLIState::instance().onShipPositionChanged(_ship_ds->getPosition());
-  RLIState::instance().onShipPositionChanged(std::pair<float, float>(15.3642f, 145.9451f));
+  //RLIState::instance().onShipPositionChanged(std::pair<float, float>(15.3642f, 145.9451f));
 
   /*
   connect(_ship_ds, SIGNAL(positionChanged(std::pair<float,float>))

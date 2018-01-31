@@ -569,18 +569,18 @@ QString S52Chart::getAreaColorRef(QString& layer_name, OGRFeature* poFeature) {
 }
 
 QString S52Chart::getAreaPatternRef(QString& layer_name, OGRFeature* /*poFeature*/) {
-  if (layer_name == "LNDARE" ||
-      layer_name == "DEPARE" ||
+  /*
+  if (layer_name == "DEPARE" ||
       layer_name == "RIVERS" ||
       layer_name == "LAKARE")
-    return "SOLID";
+    return "";
+  */
 
-  if (layer_name == "BUAARE") {
+  if (layer_name == "BUAARE")
     return "RCKLDG01";
-  }
 
   //Default
-  return "SOLID";
+  return "";
 }
 
 

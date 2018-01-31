@@ -28,7 +28,7 @@ public:
   inline QSize size() { return _fbo->size(); }
 
   void setChart(S52Chart* chrt, S52References* ref);
-  void update(std::pair<float, float> center, float scale, float angle, QPoint center_shift);
+  void update(std::pair<float, float> center, float scale, float angle, QPoint center_shift, const QString& color_scheme);
 
   inline GLuint textureId() { return _fbo->texture(); }
 
@@ -55,8 +55,10 @@ private:
   S52Assets* assets;  
   QOpenGLFramebufferObject* _fbo = nullptr;
 
-  void draw();
-  void drawLayers(const QMatrix4x4& mvp_matrix);
+  void draw(const QString& color_scheme);
+  void drawLayers(const QMatrix4x4& mvp_matrix, const QString& color_scheme);
+
+  void drawAreaLayers(const QStringList& displayOrder, const QMatrix4x4& mvp_matrix, const QString& color_scheme);
 
   void setAreaLayers(S52Chart* chrt, S52References* ref);
   //void setLineLayers(S52Chart* chrt, S52References* ref);
