@@ -104,10 +104,8 @@ void ChartEngine::update(std::pair<float, float> center, float scale, float angl
 
 void ChartEngine::draw(const QString& color_scheme) {
   glEnable(GL_BLEND);
-  glEnable(GL_DEPTH);
-  glEnable(GL_DEPTH_TEST);
-  glDepthFunc(GL_ALWAYS);
-
+  glDisable(GL_DEPTH);
+  glDisable(GL_DEPTH_TEST);
 
   _fbo->bind();
 
@@ -125,7 +123,12 @@ void ChartEngine::draw(const QString& color_scheme) {
     transform.setToIdentity();
     transform.translate(_center_shift.x() + _fbo->width()/2.f, _center_shift.y() + _fbo->height()/2.f, 0.f);
 
-    drawLayers(projection*transform, color_scheme);
+    QStringList displayOrder = settings->getLayersDisplayOrder();
+    for (int i = displayOrder.size() - 1; i >= 0; i--)
+      if (!settings->isLayerVisible(displayOrder[i]))
+        displayOrder.removeAt(i);
+
+    drawAreaLayers(displayOrder, projection*transform, color_scheme);
   }
 
   _fbo->release();
@@ -151,82 +154,31 @@ void ChartEngine::clearChartData() {
 }
 
 
-
-void ChartEngine::drawLayers(const QMatrix4x4& mvp_matrix, const QString& color_scheme) {
-  QStringList displayOrder = settings->getLayersDisplayOrder();
-  for (int i = displayOrder.size() - 1; i >= 0; i--)
-    if (!settings->isLayerVisible(displayOrder[i]))
-      displayOrder.removeAt(i);
-
-  drawAreaLayers(displayOrder, mvp_matrix, color_scheme);
-
-  /*
-  shaders->getChartLineProgram()->bind();
-  for (int i = 0; i < displayOrder.size(); i++) {
-    QString s = displayOrder[i];
-    if (line_engines.contains(s) && line_engines[s] != NULL)
-      line_engines[s]->draw(shaders, _center, _scale, _angle, mvp_matrix);
-  }
-  shaders->getChartLineProgram()->release();
-
-
-  shaders->getChartMarkProgram()->bind();
-  for (int i = 0; i < displayOrder.size(); i++) {
-    QString s = displayOrder[i];
-    if (mark_engines.contains(s) && mark_engines[s] != NULL)
-      mark_engines[s]->draw(shaders, _center, _scale, _angle, mvp_matrix);
-  }
-  shaders->getChartMarkProgram()->release();
-
-
-  shaders->getChartTextProgram()->bind();
-  for (int i = 0; i < displayOrder.size(); i++) {
-    QString s = displayOrder[i];
-    if (text_engines.contains(s) && text_engines[s] != NULL)
-      text_engines[s]->draw(shaders, _center, _scale, _angle, mvp_matrix);
-  }
-  shaders->getChartTextProgram()->release();
-
-
-  if (settings->areSoundingsVisible()) {
-    shaders->getChartSndgProgram()->bind();
-    sndg_engine->draw(shaders, _center, _scale, _angle, mvp_matrix);
-    shaders->getChartSndgProgram()->release();
-  }
-  */
-}
-
 void ChartEngine::drawAreaLayers(const QStringList& displayOrder, const QMatrix4x4& mvp_matrix, const QString& color_scheme) {
   QOpenGLShaderProgram* prog = shaders->getChartAreaProgram();
   prog->bind();
 
-  GLuint pattern_tex_id = assets->getPatternTexId(color_scheme);
-  QSize pattern_tex_size = assets->getPatternTexSize(color_scheme);
-  GLuint color_scheme_tex_id = assets->getColorSchemeTexId(color_scheme);
+  QOpenGLTexture* pattern_tex = assets->getPatternTex(color_scheme);
+  QOpenGLTexture* color_scheme_tex = assets->getColorSchemeTex(color_scheme);
 
   glUniform2f(shaders->getAreaUniformLoc(COMMON_UNIFORMS_CENTER), _center.first, _center.second);
   glUniform1f(shaders->getAreaUniformLoc(COMMON_UNIFORMS_SCALE), _scale);
   glUniform1f(shaders->getAreaUniformLoc(COMMON_UNIFORMS_NORTH), _angle);
-  glUniform2f(shaders->getAreaUniformLoc(COMMON_UNIFORMS_PATTERN_TEX_DIM), pattern_tex_size.width(), pattern_tex_size.height());
+  glUniform2f(shaders->getAreaUniformLoc(COMMON_UNIFORMS_PATTERN_TEX_DIM), pattern_tex->width(), pattern_tex->height());
   prog->setUniformValue(shaders->getAreaUniformLoc(COMMON_UNIFORMS_MVP_MATRIX), mvp_matrix);
 
-  glActiveTexture(GL_TEXTURE0);
-  glBindTexture(GL_TEXTURE_2D, pattern_tex_id);
+  pattern_tex->bind(0);
   glUniform1i(shaders->getAreaUniformLoc(COMMON_UNIFORMS_PATTERN_TEX_ID), 0);
 
-  glActiveTexture(GL_TEXTURE1);
-  glBindTexture(GL_TEXTURE_2D, color_scheme_tex_id);
+  color_scheme_tex->bind(1);
   glUniform1i(shaders->getAreaUniformLoc(AREA_UNIFORMS_COLOR_TABLE_TEX), 1);
 
   for (QString layer : displayOrder)
     if (area_engines.contains(layer) && area_engines[layer] != nullptr)
       area_engines[layer]->draw(shaders);
 
-  glActiveTexture(GL_TEXTURE0);
-  glBindTexture(GL_TEXTURE_2D, 0);
-
-  glActiveTexture(GL_TEXTURE1);
-  glBindTexture(GL_TEXTURE_2D, 0);
+  pattern_tex->release(0);
+  color_scheme_tex->release(1);
 
   prog->release();
 }

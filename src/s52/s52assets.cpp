@@ -142,7 +142,6 @@ void S52Assets::initPatternTextures(S52References* ref) {
 
     tex->setData(img);
     pattern_textures.insert(scheme_name, tex);
-    pattern_tex_sizes.insert(scheme_name, img.size());
     pattern_locations.insert(scheme_name, locations);
     pattern_sizes.insert(scheme_name, sizes);
   }

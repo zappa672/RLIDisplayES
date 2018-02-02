@@ -259,8 +259,6 @@ void RadarEngine::updateTexture() {
 
   _last_drawn_peleng = last_peleng_to_draw;
   _draw_circle = false;
-
-  glFlush();
 }
 
 void RadarEngine::drawPelengs(uint first, uint last) {

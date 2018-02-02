@@ -29,7 +29,6 @@ S52Chart::S52Chart(char* file_name, S52References* ref) {
   for( int iLayer = 0; iLayer < poDS->GetLayerCount(); iLayer++ ) {
     OGRLayer* poLayer = poDS->GetLayer(iLayer);
     QString layer_name = poLayer->GetName();
-    //qDebug() << layer_name;
 
     if (layer_name == "M_COVR") {
       OGREnvelope oExt;
@@ -520,6 +519,8 @@ bool S52Chart::readOGRLine(OGRLineString* poGeom, std::vector<float> &points, st
   return true;
 }
 
+
+
 QString S52Chart::getAreaColorRef(QString& layer_name, OGRFeature* poFeature) {
   if (layer_name == "LNDARE"
    || layer_name == "LNDRGN"
@@ -568,7 +569,9 @@ QString S52Chart::getAreaColorRef(QString& layer_name, OGRFeature* poFeature) {
   return "CHBLK";
 }
 
-QString S52Chart::getAreaPatternRef(QString& layer_name, OGRFeature* /*poFeature*/) {
+QString S52Chart::getAreaPatternRef(QString& layer_name, OGRFeature* poFeature) {
+  Q_UNUSED(poFeature);
+
   /*
   if (layer_name == "DEPARE" ||
       layer_name == "RIVERS" ||
@@ -584,7 +587,9 @@ QString S52Chart::getAreaPatternRef(QString& layer_name, OGRFeature* /*poFeature
 }
 
 
-QString S52Chart::getLineColorRef(QString& layer_name, OGRFeature* /*poFeature*/) {
+QString S52Chart::getLineColorRef(QString& layer_name, OGRFeature* poFeature) {
+  Q_UNUSED(poFeature);
+
   if (layer_name == "DEPARE" || layer_name == "DEPCNT")
     return "DEPSC";
 
@@ -598,7 +603,9 @@ QString S52Chart::getLineColorRef(QString& layer_name, OGRFeature* /*poFeature*/
   return "CHBLK";
 }
 
-QString S52Chart::getLinePatternRef(QString& layer_name, OGRFeature* /*poFeature*/) {
+QString S52Chart::getLinePatternRef(QString& layer_name, OGRFeature* poFeature) {
+  Q_UNUSED(poFeature);
+
   if (layer_name == "RIVERS"
    || layer_name == "LAKARE")
     return "DOTTED";
@@ -615,7 +622,9 @@ QString S52Chart::getLinePatternRef(QString& layer_name, OGRFeature* /*poFeature
   return "SOLID";
 }
 
-QString S52Chart::getMarkSymbolRef(QString& layer_name, OGRFeature* /*poFeature*/) {
+QString S52Chart::getMarkSymbolRef(QString& layer_name, OGRFeature* poFeature) {
+  Q_UNUSED(poFeature);
+
   if (layer_name == "WATTUR")
     return "WATTUR02";
 
@@ -651,22 +660,30 @@ bool S52Chart::isAreaColorUniform(QString& layer_name) {
   return true;
 }
 
-bool S52Chart::isLineColorUniform(QString& /*layer_name*/) {
+bool S52Chart::isLineColorUniform(QString& layer_name) {
+  Q_UNUSED(layer_name);
+
   //Default
   return true;
 }
 
-bool S52Chart::isAreaPatternUniform(QString& /*layer_name*/) {
+bool S52Chart::isAreaPatternUniform(QString& layer_name) {
+  Q_UNUSED(layer_name);
+
   //Default
   return true;
 }
 
-bool S52Chart::isLinePatternUniform(QString& /*layer_name*/) {
+bool S52Chart::isLinePatternUniform(QString& layer_name) {
+  Q_UNUSED(layer_name);
+
   //Default
   return true;
 }
 
-bool S52Chart::isMarkSymbolUniform(QString& /*layer_name*/) {
+bool S52Chart::isMarkSymbolUniform(QString& layer_name) {
+  Q_UNUSED(layer_name);
+
   //Default
   return true;
 }

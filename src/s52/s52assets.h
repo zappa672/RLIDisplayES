@@ -17,12 +17,10 @@ public:
 
   inline GLuint    getFontTexId          ()                                           { return font_texture->textureId(); }
 
-  inline GLuint    getColorSchemeTexId   (const QString& scheme)                      { return color_scheme_textures[scheme]->textureId(); }
+  inline QOpenGLTexture* getColorSchemeTex (const QString& scheme)                  { return color_scheme_textures[scheme]; }
 
   // Returns patterns texture id for the color scheme
-  inline GLuint    getPatternTexId       (const QString& scheme)                      { return pattern_textures[scheme]->textureId(); }
-  // Returns patterns texture size for the color scheme
-  inline QSize     getPatternTexSize     (const QString& scheme)                      { return pattern_tex_sizes[scheme]; }
+  inline QOpenGLTexture* getPatternTex   (const QString& scheme)                      { return pattern_textures[scheme]; }
   // Returns pattern's left-top pixel location in patterns texture
   inline QPoint    getPatternLocation    (const QString& scheme, const QString& name) { return (pattern_locations[scheme].contains(name))
                                                                                               ? pattern_locations[scheme][name]
@@ -53,7 +51,6 @@ private:
   QMap<QString, QOpenGLTexture*>        color_scheme_textures;
 
   QMap<QString, QOpenGLTexture*>        pattern_textures;
-  QMap<QString, QSize>                  pattern_tex_sizes;
   QMap<QString, QMap<QString, QPoint>>  pattern_locations;
   QMap<QString, QMap<QString, QSize>>   pattern_sizes;
 

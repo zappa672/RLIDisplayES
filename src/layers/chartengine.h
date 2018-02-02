@@ -56,8 +56,6 @@ private:
   QOpenGLFramebufferObject* _fbo = nullptr;
 
   void draw(const QString& color_scheme);
-  void drawLayers(const QMatrix4x4& mvp_matrix, const QString& color_scheme);
-
   void drawAreaLayers(const QStringList& displayOrder, const QMatrix4x4& mvp_matrix, const QString& color_scheme);
 
   void setAreaLayers(S52Chart* chrt, S52References* ref);

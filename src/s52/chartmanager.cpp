@@ -38,6 +38,7 @@ void ChartManager::chartLoadingWorker() {
     c_chart_path[chart_path.size()] = '\0';
 
     S52Chart* chart = new S52Chart(c_chart_path, _s52_refs);
+
     _charts.insert(fileList[i], chart);
     delete[] c_chart_path;
 
