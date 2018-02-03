@@ -47,8 +47,8 @@ void ChartAreaEngine::setData(S52AreaLayer* layer, S52Assets* assets, S52Referen
   std::vector<GLfloat> tex_dims;
 
   is_pattern_uniform = layer->is_pattern_uniform;
-  patternLocation = assets->getPatternLocation(ref->getColorScheme(), layer->pattern_ref);
-  patternSize = assets->getPatternSize(ref->getColorScheme(), layer->pattern_ref);
+  patternLocation = assets->getAreaPatternLocation(ref->getColorScheme(), layer->pattern_ref);
+  patternSize = assets->getAreaPatternSize(ref->getColorScheme(), layer->pattern_ref);
 
   is_color_uniform = layer->is_color_uniform;
   color_ind = layer->color_ind;
@@ -70,8 +70,8 @@ void ChartAreaEngine::setData(S52AreaLayer* layer, S52Assets* assets, S52Referen
       QSize tex_dim;
 
       if (!is_pattern_uniform) {
-        tex_ind = assets->getPatternLocation(ref->getColorScheme(), layer->pattern_refs[i]);
-        tex_dim = assets->getPatternSize(ref->getColorScheme(), layer->pattern_refs[i]);
+        tex_ind = assets->getAreaPatternLocation(ref->getColorScheme(), layer->pattern_refs[i]);
+        tex_dim = assets->getAreaPatternSize(ref->getColorScheme(), layer->pattern_refs[i]);
       }
 
       for (int j = fst_idx; j < lst_idx; j += 2) {
@@ -148,7 +148,7 @@ void ChartAreaEngine::draw(ChartShaders* shaders) {
 
 
 
-
+/*
 ChartLineEngine::ChartLineEngine(QOpenGLContext* context) : QOpenGLFunctions(context) {
   initializeOpenGLFunctions();
 
@@ -225,8 +225,8 @@ void ChartLineEngine::setData(S52LineLayer* layer, S52Assets* assets, S52Referen
 
   if (layer->is_pattern_uniform) {
     is_pattern_uniform = true;
-    patternIdx = assets->getLineIndex(ref->getColorScheme(), layer->pattern_ref);
-    patternDim = assets->getLineDim(ref->getColorScheme(), layer->pattern_ref);
+    patternIdx = assets->getLinePatternLocation(ref->getColorScheme(), layer->pattern_ref);
+    patternDim = assets->getLinePatternSize(ref->getColorScheme(), layer->pattern_ref);
   }
 
   if (layer->is_color_uniform) {
@@ -715,7 +715,7 @@ void ChartTextEngine::draw(ChartShaders* shaders, QVector2D cur_coords, float sc
 
 
 
-
+/*
 ChartSndgEngine::ChartSndgEngine(QOpenGLContext* context) : QOpenGLFunctions(context) {
   initializeOpenGLFunctions();
 
@@ -932,3 +932,4 @@ void ChartSndgEngine::draw(ChartShaders* shaders, std::pair<float, float> cur_co
 
   //glFlush();
 }
+*/

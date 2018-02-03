@@ -158,7 +158,7 @@ void ChartEngine::drawAreaLayers(const QStringList& displayOrder, const QMatrix4
   QOpenGLShaderProgram* prog = shaders->getChartAreaProgram();
   prog->bind();
 
-  QOpenGLTexture* pattern_tex = assets->getPatternTex(color_scheme);
+  QOpenGLTexture* pattern_tex = assets->getAreaPatternTex(color_scheme);
   QOpenGLTexture* color_scheme_tex = assets->getColorSchemeTex(color_scheme);
 
   glUniform2f(shaders->getAreaUniformLoc(COMMON_UNIFORMS_CENTER), _center.first, _center.second);

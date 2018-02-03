@@ -15,9 +15,9 @@
 
 
 S52Assets::S52Assets(QOpenGLContext* context, S52References* ref) : QOpenGLFunctions(context) {
-  initializeOpenGLFunctions();
+  initializeOpenGLFunctions();    
 
-  initGlyphTexture();
+  initFontTexture();
 
   initColorSchemeTextures(ref);
 
@@ -32,18 +32,18 @@ S52Assets::~S52Assets() {
   for (QOpenGLTexture* tex : pattern_textures)
     tex->destroy();
 
-  for (int i = 0; i < line_tex_ids.keys().size(); i++)
-    glDeleteTextures(1, &line_tex_ids[line_tex_ids.keys()[i]]);
+  for (QOpenGLTexture* tex : line_textures)
+    tex->destroy();
 
-  for (int i = 0; i < symbol_tex_ids.keys().size(); i++)
-    glDeleteTextures(1, &symbol_tex_ids[symbol_tex_ids.keys()[i]]);
+  for (QOpenGLTexture* tex : symbol_textures)
+    tex->destroy();
 
   for (QOpenGLTexture* tex : color_scheme_textures)
     tex->destroy();
 }
 
 
-void S52Assets::initGlyphTexture() {
+void S52Assets::initFontTexture() {
   QImage img(32*16, 32*16, QImage::Format_ARGB32);
 
   int id = QFontDatabase::addApplicationFont(":/fonts/Helvetica.ttf");
@@ -70,6 +70,7 @@ void S52Assets::initGlyphTexture() {
 
   font_texture = new QOpenGLTexture(QOpenGLTexture::Target2D);
 
+  font_texture->setMipLevels(0);
   font_texture->setMinificationFilter(QOpenGLTexture::Nearest);
   font_texture->setMagnificationFilter(QOpenGLTexture::Nearest);
   font_texture->setWrapMode(QOpenGLTexture::ClampToEdge);
@@ -91,6 +92,7 @@ void S52Assets::initColorSchemeTextures(S52References* ref) {
 
     QOpenGLTexture* tex = new QOpenGLTexture(QOpenGLTexture::Target2D);
 
+    tex->setMipLevels(0);
     tex->setMinificationFilter(QOpenGLTexture::Nearest);
     tex->setMagnificationFilter(QOpenGLTexture::Nearest);
     tex->setWrapMode(QOpenGLTexture::ClampToEdge);
@@ -101,147 +103,95 @@ void S52Assets::initColorSchemeTextures(S52References* ref) {
   }
 }
 
+QOpenGLTexture* S52Assets::dirToPatternTex(const QString& path, QMap<QString, QPoint>& locations, QMap<QString, QSize>& sizes) {
+  QDir png_dir(path);
+  QMap<QString, QImage> patterns;
+
+  int total_width = 0;
+  int max_height  = 0;
+
+  // Load images from files to patterns map, fill locations and sizes
+  for (QString file_name : png_dir.entryList(QStringList() << "*.png")) {
+    QString pat_name = file_name.replace(".png", "");
+    QImage pattern = QImage(png_dir.filePath(file_name));
+
+    locations.insert(pat_name, QPoint(total_width, 0));
+    sizes.insert(pat_name, pattern.size());
+
+    total_width += pattern.width();
+    if (pattern.height() > max_height)
+      max_height = pattern.height();
+
+    patterns.insert(pat_name, pattern);
+  }
+
+  // Combine patterns to a single image according to locations
+  QImage img(total_width, max_height, QImage::Format_ARGB32);
+  QPainter painter(&img);
+  painter.setCompositionMode(QPainter::CompositionMode_Source);
+  painter.fillRect(img.rect(), Qt::transparent);
+
+  for (QString pat_name : patterns.keys())
+    painter.drawImage(QRect(locations[pat_name], sizes[pat_name]), patterns[pat_name]);
+
+  // Create OpenGL texture using combined image
+  QOpenGLTexture* tex = new QOpenGLTexture(QOpenGLTexture::Target2D);
+
+  tex->setMipLevels(0);
+  tex->setMinificationFilter(QOpenGLTexture::Nearest);
+  tex->setMagnificationFilter(QOpenGLTexture::Nearest);
+  tex->setWrapMode(QOpenGLTexture::Repeat);
+
+  tex->setData(img);
+  return tex;
+}
+
 void S52Assets::initPatternTextures(S52References* ref) {
-  QStringList color_schemes = ref->getColorSchemeNames();
-
-  for (QString scheme_name : color_schemes) {
-    QOpenGLTexture* tex = new QOpenGLTexture(QOpenGLTexture::Target2D);
-
-    tex->setMinificationFilter(QOpenGLTexture::Nearest);
-    tex->setMagnificationFilter(QOpenGLTexture::Nearest);
-    tex->setWrapMode(QOpenGLTexture::Repeat);
-
-    QDir png_dir("data/textures/charts/patterns/" + scheme_name.toLower());
-    png_dir.setNameFilters(QStringList() << "*.png");
-    QStringList png_list = png_dir.entryList();
-
-    // Templates are 128x128
-    int cols = 4;
-    int rows = (png_list.count() - 1) / cols + 1;
-
-    QImage img(128*cols, 128*rows, QImage::Format_ARGB32);
-    QPainter painter(&img);
-
-    painter.setCompositionMode(QPainter::CompositionMode_Source);
-    painter.fillRect(img.rect(), Qt::transparent);
-
+  for (QString scheme : ref->getColorSchemeNames()) {
     QMap<QString, QPoint> locations;
     QMap<QString, QSize> sizes;
 
-    for (int i = 0; i < png_list.count(); i++) {
-      QString file_name = png_list[i];
-      QString pattern_name = file_name.replace(".png", "");
-      QImage pattern = QImage(png_dir.filePath(file_name));
+    QString dir_path = "data/textures/charts/patterns/" + scheme.toLower();
+    QOpenGLTexture* tex = dirToPatternTex(dir_path, locations, sizes);
 
-      QPoint location(128*(i % cols), 128*(i / cols));
-      locations.insert(pattern_name, location);
-      sizes.insert(pattern_name, pattern.size());
-
-      painter.drawImage(QRect(location, pattern.size()), pattern);
-    }
-
-    tex->setData(img);
-    pattern_textures.insert(scheme_name, tex);
-    pattern_locations.insert(scheme_name, locations);
-    pattern_sizes.insert(scheme_name, sizes);
+    pattern_textures.insert(scheme, tex);
+    pat_lc.insert(scheme, locations);
+    pat_sz.insert(scheme, sizes);
   }
 }
 
 void S52Assets::initLineTextures(S52References* ref) {
-  QStringList color_schemes = ref->getColorSchemeNames();
+  for (QString scheme : ref->getColorSchemeNames()) {
+    QMap<QString, QPoint> locations;
+    QMap<QString, QSize> sizes;
 
-  GLuint* tex_ids = new GLuint[color_schemes.size()];
-  glGenTextures(color_schemes.size(), tex_ids);
+    QString dir_path = "data/textures/charts/lines/" + scheme.toLower();
+    QOpenGLTexture* tex = dirToPatternTex(dir_path, locations, sizes);
 
-  for (int k = 0; k < color_schemes.size(); k++) {
-    line_tex_ids.insert(color_schemes[k], tex_ids[k]);
-
-    glBindTexture(GL_TEXTURE_2D, tex_ids[k]);
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-    QDir simple_tex_dir("data/textures/charts/lines/simple");
-    simple_tex_dir.setNameFilters(QStringList() << "*.png");
-    QStringList simple_tex_list = simple_tex_dir.entryList();
-
-    QDir color_tex_dir("data/textures/charts/lines/" + color_schemes[k].toLower());
-    color_tex_dir.setNameFilters(QStringList() << "*.png");
-    QStringList color_tex_list = color_tex_dir.entryList();
-
-    int line_tex_count = simple_tex_list.size() + color_tex_list.size();
-
-    QVector2D line_tex_dim;
-    line_tex_dim.setX(128);
-    line_tex_dim.setY(32*line_tex_count);
-    line_tex_dims.insert(color_schemes[k], line_tex_dim);
-
-
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, line_tex_dim.x(), line_tex_dim.y()
-               , 0, GL_RGBA, GL_UNSIGNED_BYTE, (void*)0);
-
-    QString tex_file_name;
-    QImage img_tex;
-    QMap<QString, QVector2D> line_ind_map;
-    QMap<QString, QVector2D> line_dim_map;
-
-    for (int i = 0; i < line_tex_count; i++) {
-      if (i < simple_tex_list.size()) {
-        tex_file_name = simple_tex_list[i];
-        img_tex = QImage(simple_tex_dir.filePath(tex_file_name));
-      } else {
-        tex_file_name = color_tex_list[i - simple_tex_list.size()];
-        img_tex = QImage(color_tex_dir.filePath(tex_file_name));
-      }
-
-      img_tex = QGLWidget::convertToGLFormat(img_tex);
-      line_ind_map.insert(tex_file_name.replace(".png", ""), QVector2D(0, 32*i));
-      line_dim_map.insert(tex_file_name.replace(".png", ""), QVector2D(img_tex.width(), img_tex.height()));
-
-      glTexSubImage2D(GL_TEXTURE_2D, 0, 0, i*32, img_tex.width(), img_tex.height()
-                    , GL_RGBA, GL_UNSIGNED_BYTE, img_tex.bits());
-    }
-
-    line_ind_maps.insert(color_schemes[k], line_ind_map);
-    line_dim_maps.insert(color_schemes[k], line_dim_map);
-
-    glGenerateMipmap(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, 0);
+    line_textures.insert(scheme, tex);
+    line_lc.insert(scheme, locations);
+    line_sz.insert(scheme, sizes);
   }
 }
 
 
 void S52Assets::initSymbolTextures(S52References* ref) {
-  QStringList color_schemes = ref->getColorSchemeNames();
+  for (QString scheme : ref->getColorSchemeNames()) {
+    QString file_name = ref->getGraphicsFileName(scheme);
 
-  GLuint symbol_tex_id;
-  for (int k = 0; k < color_schemes.size(); k++) {
-    QString file_name = ref->getGraphicsFileName(color_schemes[k]);
-    graphic_files.insert(color_schemes[k], file_name);
+    graphic_files.insert(scheme, file_name);
 
-    if (symbol_tex_ids.contains(file_name))
+    if (symbol_textures.contains(file_name))
       continue;
 
-    glGenTextures(1, &symbol_tex_id);
-    symbol_tex_ids.insert(file_name, symbol_tex_id);
+    QOpenGLTexture* tex = new QOpenGLTexture(QOpenGLTexture::Target2D);
 
-    glBindTexture(GL_TEXTURE_2D, symbol_tex_id);
+    tex->setMipLevels(0);
+    tex->setMinificationFilter(QOpenGLTexture::Nearest);
+    tex->setMagnificationFilter(QOpenGLTexture::Nearest);
+    tex->setWrapMode(QOpenGLTexture::Repeat);
 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    QImage img("data/textures/charts/symbols/" + file_name);
-    img = QGLWidget::convertToGLFormat(img);
-    symbol_tex_dims.insert(file_name, QVector2D(img.width(), img.height()));
-
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, img.width(), img.height()
-                 , 0, GL_RGBA, GL_UNSIGNED_BYTE, img.bits());
-
-    glGenerateMipmap(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, 0);
+    tex->setData(QImage("data/textures/charts/symbols/" + file_name));
+    symbol_textures.insert(file_name, tex);
   }
 }

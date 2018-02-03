@@ -35,7 +35,7 @@ private:
 };
 
 
-
+/*
 class ChartLineEngine : protected QOpenGLFunctions {
 public:
   explicit ChartLineEngine(QOpenGLContext* context);
@@ -52,8 +52,8 @@ private:
   GLuint point_count;
 
   bool is_pattern_uniform;
-  QVector2D patternIdx;
-  QVector2D patternDim;
+  QPoint patternIdx;
+  QSize  patternDim;
 
   bool is_color_uniform;
   int color_ind;
@@ -63,7 +63,7 @@ private:
 
   std::vector<float> color_table;
 
-  GLint    pattern_tex_id;
+  GLint     pattern_tex_id;
   QVector2D pattern_tex_dim;
 };
 
@@ -118,7 +118,6 @@ private:
   QVector2D pattern_tex_size;
 };
 
-/*
 class ChartTextEngine : protected QOpenGLFunctions {
 public:
   explicit ChartTextEngine(QOpenGLContext* context);
