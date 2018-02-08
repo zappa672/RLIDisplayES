@@ -9,7 +9,6 @@
 ChartManager::ChartManager(QObject *parent) : QObject(parent) {
   _s52_refs = new S52References(":/s52/chartsymbols.xml");
  // _s52_refs->print();
-
   _s52_refs->setColorScheme("DAY_BRIGHT");
 }
 

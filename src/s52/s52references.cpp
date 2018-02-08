@@ -497,8 +497,7 @@ void S52References::readSymbols(QXmlStreamReader* xml) {
     case QXmlStreamReader::StartElement:
       if (xml->name() == "symbol") {
         sb = new Symbol();
-        sb->rcid = xml->attributes().value("RCID").toInt();
-        break;
+        sb->rcid = xml->attributes().value("RCID").toInt();break;
       }
 
       if (sb != NULL && xml->name() == "name")
@@ -520,28 +519,29 @@ void S52References::readSymbols(QXmlStreamReader* xml) {
       }
 
       if (xml->name() == "bitmap") {
-        sb->bitmap.size = QSize(xml->attributes().value("width").toInt()
-                                    , xml->attributes().value("height").toInt());
+        sb->bitmap.size = QSize( xml->attributes().value("width").toInt()
+                               , xml->attributes().value("height").toInt());
         vector_part_flag = false;
       }
 
 
       if (xml->name() == "distance") {
         if (vector_part_flag)
-          sb->vector.distance = QVector2D(xml->attributes().value("min").toInt()
-                                        , xml->attributes().value("max").toInt());
+          sb->vector.distance = QVector2D( xml->attributes().value("min").toInt()
+                                         , xml->attributes().value("max").toInt());
         else
-          sb->bitmap.distance = QVector2D(xml->attributes().value("min").toInt()
-                                        , xml->attributes().value("max").toInt());
+          sb->bitmap.distance = QVector2D( xml->attributes().value("min").toInt()
+                                         , xml->attributes().value("max").toInt());
       }
 
       if (xml->name() == "pivot") {
         if (vector_part_flag)
-          sb->vector.pivot = QVector2D(xml->attributes().value("x").toInt()
-                                     , xml->attributes().value("y").toInt());
-        else
+          sb->vector.pivot = QVector2D( xml->attributes().value("x").toInt()
+                                      , xml->attributes().value("y").toInt());
+        else {
           sb->bitmap.pivot = QPoint( xml->attributes().value("x").toInt()
-                                    , xml->attributes().value("y").toInt());
+                                   , xml->attributes().value("y").toInt());
+        }
       }
 
       if (xml->name() == "origin") {
@@ -550,7 +550,7 @@ void S52References::readSymbols(QXmlStreamReader* xml) {
                                        , xml->attributes().value("y").toInt());
         else
           sb->bitmap.origin = QPoint( xml->attributes().value("x").toInt()
-                                     , xml->attributes().value("y").toInt());
+                                    , xml->attributes().value("y").toInt());
       }
 
       if (xml->name() == "HPGL")
@@ -558,14 +558,13 @@ void S52References::readSymbols(QXmlStreamReader* xml) {
 
       if (xml->name() == "graphics-location")
         sb->bitmap.graphics_location = QPoint( xml->attributes().value("x").toInt()
-                                              , xml->attributes().value("y").toInt());
+                                             , xml->attributes().value("y").toInt());
 
       break;
     case QXmlStreamReader::EndElement:
       if (sb != NULL && xml->name() == "symbol") {
-        sb->bitmap.pivot.setY(sb->bitmap.size.width() - sb->bitmap.pivot.y());
         symbols.insert(sb->name, sb);
-
+        break;
       }
 
       if (xml->name() == "symbols")

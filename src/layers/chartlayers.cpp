@@ -176,15 +176,12 @@ void ChartMarkEngine::setData(S52MarkLayer* layer, S52References* ref) {
   std::vector<GLfloat> symbol_sizes;
   std::vector<GLfloat> symbol_pivots;
 
-  qDebug() << "set layer" << layer->symbol_ref;
   if (layer->is_symbol_uniform) {
     is_pattern_uniform = true;
 
     patternOrigin = ref->getSymbolIndex(layer->symbol_ref);
     patternSize = ref->getSymbolDim(layer->symbol_ref);
     patternPivot = ref->getSymbolPivot(layer->symbol_ref);
-
-    qDebug() << patternOrigin << patternSize << patternPivot;
   }
 
   for (unsigned int i = 0; i < (layer->points.size() / 2); i ++) {
@@ -291,7 +288,9 @@ void ChartMarkEngine::draw(ChartShaders* shaders) {
   }
 
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ind_vbo_id);
+
   glDrawElements( GL_TRIANGLES, 3*(point_count/2), GL_UNSIGNED_INT, (const GLvoid*)(0 * sizeof(GLuint)));
+
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 

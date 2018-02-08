@@ -172,8 +172,6 @@ void S52Assets::initLineTextures(S52References* ref) {
   }
 }
 
-#include <QDebug>
-
 void S52Assets::initSymbolTextures(S52References* ref) {
   for (QString scheme : ref->getColorSchemeNames()) {
     QString file_name = ref->getGraphicsFileName(scheme);
@@ -185,7 +183,6 @@ void S52Assets::initSymbolTextures(S52References* ref) {
 
     QOpenGLTexture* tex = new QOpenGLTexture(QOpenGLTexture::Target2D);
     QImage img("data/textures/charts/symbols/" + file_name);
-    qDebug() << "data/textures/charts/symbols/" + file_name << img.size();
 
     tex->setMipLevels(1);
     tex->setMinificationFilter(QOpenGLTexture::Nearest);
@@ -193,8 +190,6 @@ void S52Assets::initSymbolTextures(S52References* ref) {
     tex->setWrapMode(QOpenGLTexture::ClampToEdge);
 
     tex->setData(img);
-    qDebug() << tex->width();
-    qDebug() << tex->height();
     symbol_textures.insert(file_name, tex);
   }
 }

@@ -213,9 +213,6 @@ void ChartEngine::drawMarkLayers(const QStringList& displayOrder, const QMatrix4
 
   QOpenGLTexture* pattern_tex = assets->getSymbolTex(color_scheme);
 
-  qDebug() << pattern_tex->width() << pattern_tex->height();
-
-
   glUniform2f(shaders->getMarkUniformLoc(COMMON_UNIFORMS_CENTER), _center.first, _center.second);
   glUniform1f(shaders->getMarkUniformLoc(COMMON_UNIFORMS_SCALE), _scale);
   glUniform1f(shaders->getMarkUniformLoc(COMMON_UNIFORMS_NORTH), _angle);
