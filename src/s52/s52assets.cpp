@@ -1,7 +1,5 @@
 #include "s52assets.h"
 
-#include <QDebug>
-
 #include <QDir>
 #include <QGLWidget>
 #include <QStringList>
@@ -174,6 +172,7 @@ void S52Assets::initLineTextures(S52References* ref) {
   }
 }
 
+#include <QDebug>
 
 void S52Assets::initSymbolTextures(S52References* ref) {
   for (QString scheme : ref->getColorSchemeNames()) {
@@ -185,13 +184,17 @@ void S52Assets::initSymbolTextures(S52References* ref) {
       continue;
 
     QOpenGLTexture* tex = new QOpenGLTexture(QOpenGLTexture::Target2D);
+    QImage img("data/textures/charts/symbols/" + file_name);
+    qDebug() << "data/textures/charts/symbols/" + file_name << img.size();
 
-    tex->setMipLevels(0);
+    tex->setMipLevels(1);
     tex->setMinificationFilter(QOpenGLTexture::Nearest);
     tex->setMagnificationFilter(QOpenGLTexture::Nearest);
-    tex->setWrapMode(QOpenGLTexture::Repeat);
+    tex->setWrapMode(QOpenGLTexture::ClampToEdge);
 
-    tex->setData(QImage("data/textures/charts/symbols/" + file_name));
+    tex->setData(img);
+    qDebug() << tex->width();
+    qDebug() << tex->height();
     symbol_textures.insert(file_name, tex);
   }
 }

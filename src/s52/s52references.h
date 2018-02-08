@@ -8,6 +8,8 @@
 #include <QList>
 #include <QColor>
 #include <QVector2D>
+#include <QPoint>
+#include <QSize>
 #include <QString>
 #include <QStringList>
 
@@ -65,11 +67,11 @@ struct Pattern {
 };
 
 struct BitmapSymbol {
-  QVector2D size;
+  QSize size;
   QVector2D distance;
-  QVector2D pivot;
-  QVector2D origin;
-  QVector2D graphics_location;
+  QPoint pivot;
+  QPoint origin;
+  QPoint graphics_location;
 };
 
 struct Symbol {
@@ -79,8 +81,8 @@ struct Symbol {
   QString definition;
   QString color_ref;
 
-	VectorSymbol vector;
-	BitmapSymbol bitmap;
+  VectorSymbol vector;
+  BitmapSymbol bitmap;
 };
 
 
@@ -103,9 +105,9 @@ public:
   ColorTable* getColorTable(const QString& color_scheme) { return color_tables[color_scheme]; }
   std::vector<float> getColorTable();
 
-  const QVector2D getSymbolIndex(const QString& symbol_ref);
-  const QVector2D getSymbolDim(const QString& symbol_ref);
-  const QVector2D getSymbolPivot(const QString& symbol_ref);
+  const QPoint getSymbolIndex(const QString& symbol_ref);
+  const QSize getSymbolDim(const QString& symbol_ref);
+  const QPoint getSymbolPivot(const QString& symbol_ref);
 
 private:
   void print(void);

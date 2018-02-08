@@ -78,6 +78,7 @@ void RLIDisplayWidget::initializeGL() {
   debugInfo();
 
   glDisable(GL_STENCIL);
+  glDisable(GL_CULL_FACE);
   glEnable(GL_TEXTURE_2D);
 
   _program = new QOpenGLShaderProgram(this);

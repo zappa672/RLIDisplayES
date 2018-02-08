@@ -5,7 +5,7 @@ ChartShaders::ChartShaders(QOpenGLContext* context) : QOpenGLFunctions(context) 
 
   initChartAreaProgram();
   //initChartLineProgram();
-  //initChartMarkProgram();
+  initChartMarkProgram();
   //initChartTextProgram();
   //initChartSndgProgram();
 }
@@ -14,7 +14,7 @@ ChartShaders::~ChartShaders() {
   delete chart_area_program;
   //delete chart_line_program;
   //delete chart_text_program;
-  //delete chart_mark_program;
+  delete chart_mark_program;
   //delete chart_sndg_program;
 }
 
@@ -184,19 +184,15 @@ void ChartShaders::initChartMarkProgram() {
   mark_uniform_locs[COMMON_UNIFORMS_NORTH]            = chart_mark_program->uniformLocation("north");
   mark_uniform_locs[COMMON_UNIFORMS_CENTER]           = chart_mark_program->uniformLocation("center");
   mark_uniform_locs[COMMON_UNIFORMS_SCALE]            = chart_mark_program->uniformLocation("scale");
-  mark_uniform_locs[COMMON_UNIFORMS_PATTERN_TEX_ID]   = chart_mark_program->uniformLocation("pattern_tex_id");
-  mark_uniform_locs[COMMON_UNIFORMS_PATTERN_TEX_DIM]  = chart_mark_program->uniformLocation("pattern_tex_size");
+  mark_uniform_locs[COMMON_UNIFORMS_PATTERN_TEX_ID]   = chart_mark_program->uniformLocation("pattern_tex");
+  mark_uniform_locs[COMMON_UNIFORMS_PATTERN_TEX_DIM]  = chart_mark_program->uniformLocation("assetdim");
   mark_uniform_locs[COMMON_UNIFORMS_MVP_MATRIX]       = chart_mark_program->uniformLocation("mvp_matrix");
 
-  mark_uniform_locs[MARK_UNIFORMS_SYMBOL_ORIGIN]      = chart_mark_program->uniformLocation("u_symbol_origin");
-  mark_uniform_locs[MARK_UNIFORMS_SYMBOL_SIZE]        = chart_mark_program->uniformLocation("u_symbol_size");
-  mark_uniform_locs[MARK_UNIFORMS_SYMBOL_PIVOT]       = chart_mark_program->uniformLocation("u_symbol_pivot");
-
-  mark_attribute_locs[MARK_ATTRIBUTES_WORLD_COORDS]   = chart_mark_program->attributeLocation("world_coords");
+  mark_attribute_locs[MARK_ATTRIBUTES_WORLD_COORDS]   = chart_mark_program->attributeLocation("coords");
   mark_attribute_locs[MARK_ATTRIBUTES_VERTEX_ORDER]   = chart_mark_program->attributeLocation("vertex_order");
-  mark_attribute_locs[MARK_ATTRIBUTES_SYMBOL_ORIGIN]  = chart_mark_program->attributeLocation("symbol_origin");
-  mark_attribute_locs[MARK_ATTRIBUTES_SYMBOL_SIZE]    = chart_mark_program->attributeLocation("symbol_size");
-  mark_attribute_locs[MARK_ATTRIBUTES_SYMBOL_PIVOT]   = chart_mark_program->attributeLocation("symbol_pivot");
+  mark_attribute_locs[MARK_ATTRIBUTES_SYMBOL_ORIGIN]  = chart_mark_program->attributeLocation("origin");
+  mark_attribute_locs[MARK_ATTRIBUTES_SYMBOL_SIZE]    = chart_mark_program->attributeLocation("size");
+  mark_attribute_locs[MARK_ATTRIBUTES_SYMBOL_PIVOT]   = chart_mark_program->attributeLocation("pivot");
 
   chart_mark_program->release();
 }
