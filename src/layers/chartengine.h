@@ -50,23 +50,23 @@ private:
   float _scale;
   float _angle;
 
-
   S52Assets* assets;  
   QOpenGLFramebufferObject* _fbo = nullptr;
 
   void draw(const QString& color_scheme);
 
   void drawAreaLayers(const QStringList& displayOrder, const QMatrix4x4& mvp_matrix, const QString& color_scheme);
+  void drawLineLayers(const QStringList& displayOrder, const QMatrix4x4& mvp_matrix, const QString& color_scheme);
   void drawMarkLayers(const QStringList& displayOrder, const QMatrix4x4& mvp_matrix, const QString& color_scheme);
 
   void setAreaLayers(S52Chart* chrt, S52References* ref);
-  //void setLineLayers(S52Chart* chrt, S52References* ref);
+  void setLineLayers(S52Chart* chrt, S52References* ref);
   void setMarkLayers(S52Chart* chrt, S52References* ref);
   //void setTextLayers(S52Chart* chrt, S52References* ref);
   //void setSndgLayer(S52Chart* chrt, S52References* ref);
 
   QMap<QString, ChartAreaEngine*>  area_engines;
-  //QMap<QString, ChartLineEngine*>  line_engines;
+  QMap<QString, ChartLineEngine*>  line_engines;
   QMap<QString, ChartMarkEngine*>  mark_engines;
   //QMap<QString, ChartTextEngine*>  text_engines;
   //ChartSndgEngine* sndg_engine;

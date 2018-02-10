@@ -40,7 +40,7 @@ private:
   void initLineTextures(S52References* ref);
   void initSymbolTextures(S52References* ref);
 
-  QOpenGLTexture* dirToPatternTex(const QString& path, QMap<QString, QPoint>& locations,  QMap<QString, QSize>& sizes);
+  QOpenGLTexture* dirToPatternTex(const QString& path, const QString& ex_path, QMap<QString, QPoint>& locations,  QMap<QString, QSize>& sizes);
 
   QOpenGLTexture*                         font_texture;
 

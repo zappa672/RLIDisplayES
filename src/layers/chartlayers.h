@@ -35,6 +35,31 @@ private:
 };
 
 
+class ChartLineEngine : protected QOpenGLFunctions {
+public:
+  explicit ChartLineEngine(QOpenGLContext* context);
+  virtual ~ChartLineEngine();
+
+  void clearData();
+  void setData(S52LineLayer* layer, S52Assets* assets, S52References* ref);
+
+  void draw(ChartShaders* shaders);
+
+private:
+  GLuint point_count;
+
+  bool is_pattern_uniform;
+  QPoint patternIdx;
+  QSize  patternDim;
+
+  bool is_color_uniform;
+  GLfloat color_ind;
+
+  GLuint  vbo_ids[LINE_ATTRIBUTES_COUNT];
+  GLuint _ind_vbo_id;
+};
+
+
 class ChartMarkEngine : protected QOpenGLFunctions {
 public:
   explicit ChartMarkEngine(QOpenGLContext* context);
@@ -58,38 +83,11 @@ private:
 };
 
 
+
+
+
+
 /*
-class ChartLineEngine : protected QOpenGLFunctions {
-public:
-  explicit ChartLineEngine(QOpenGLContext* context);
-  virtual ~ChartLineEngine();
-
-  void clearData();
-
-  void setPatternTexture(GLuint tex_id, QVector2D dim);
-  void setData(S52LineLayer* layer, S52Assets* assets, S52References* ref);
-
-  void draw(ChartShaders* shaders, std::pair<float, float> cur_coords, float scale, float angle, const QMatrix4x4& mvp);
-
-private:
-  GLuint point_count;
-
-  bool is_pattern_uniform;
-  QPoint patternIdx;
-  QSize  patternDim;
-
-  bool is_color_uniform;
-  int color_ind;
-
-  GLuint*  vbo_ids;
-  GLuint _ind_vbo_id;
-
-  std::vector<float> color_table;
-
-  GLint     pattern_tex_id;
-  QVector2D pattern_tex_dim;
-};
-
 class ChartSndgEngine : protected QOpenGLFunctions {
 public:
   explicit ChartSndgEngine(QOpenGLContext* context);

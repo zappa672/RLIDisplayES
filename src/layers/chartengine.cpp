@@ -111,6 +111,17 @@ void ChartEngine::setAreaLayers(S52Chart* chrt, S52References* ref) {
   }
 }
 
+void ChartEngine::setLineLayers(S52Chart* chrt, S52References* ref) {
+  for (QString layer_name : chrt->getLineLayerNames()) {
+    S52LineLayer* layer = chrt->getLineLayer(layer_name);
+
+    if (!line_engines.contains(layer_name))
+      line_engines[layer_name] = new ChartLineEngine(_context);
+
+    line_engines[layer_name]->setData(layer, assets, ref);
+  }
+}
+
 void ChartEngine::setMarkLayers(S52Chart* chrt, S52References* ref) {
   for (QString layer_name : chrt->getMarkLayerNames()) {
     S52MarkLayer* layer = chrt->getMarkLayer(layer_name);
@@ -170,6 +181,7 @@ void ChartEngine::draw(const QString& color_scheme) {
         displayOrder.removeAt(i);
 
     drawAreaLayers(displayOrder, projection*transform, color_scheme);
+    drawLineLayers(displayOrder, projection*transform, color_scheme);
     drawMarkLayers(displayOrder, projection*transform, color_scheme);
   }
 
@@ -200,6 +212,35 @@ void ChartEngine::drawAreaLayers(const QStringList& displayOrder, const QMatrix4
   for (QString layer : displayOrder)
     if (area_engines.contains(layer) && area_engines[layer] != nullptr)
       area_engines[layer]->draw(shaders);
+
+  pattern_tex->release(0);
+  color_scheme_tex->release(1);
+
+  prog->release();
+}
+
+void ChartEngine::drawLineLayers(const QStringList& displayOrder, const QMatrix4x4& mvp_matrix, const QString& color_scheme) {
+  QOpenGLShaderProgram* prog = shaders->getChartLineProgram();
+  prog->bind();
+
+  QOpenGLTexture* pattern_tex = assets->getLinePatternTex(color_scheme);
+  QOpenGLTexture* color_scheme_tex = assets->getColorSchemeTex(color_scheme);
+
+  prog->setUniformValue(shaders->getLineUniformLoc(COMMON_UNIFORMS_CENTER), _center.first, _center.second);
+  prog->setUniformValue(shaders->getLineUniformLoc(COMMON_UNIFORMS_SCALE), _scale);
+  prog->setUniformValue(shaders->getLineUniformLoc(COMMON_UNIFORMS_NORTH), _angle);
+  prog->setUniformValue(shaders->getLineUniformLoc(COMMON_UNIFORMS_PATTERN_TEX_DIM), pattern_tex->width(), pattern_tex->height());
+  prog->setUniformValue(shaders->getLineUniformLoc(COMMON_UNIFORMS_MVP_MATRIX), mvp_matrix);
+
+  pattern_tex->bind(0);
+  glUniform1i(shaders->getLineUniformLoc(COMMON_UNIFORMS_PATTERN_TEX_ID), 0);
+
+  color_scheme_tex->bind(1);
+  glUniform1i(shaders->getLineUniformLoc(LINE_UNIFORMS_COLOR_TABLE_TEX), 1);
+
+  for (QString layer : displayOrder)
+    if (line_engines.contains(layer) && line_engines[layer] != nullptr)
+      line_engines[layer]->draw(shaders);
 
   pattern_tex->release(0);
   color_scheme_tex->release(1);
@@ -239,21 +280,7 @@ void ChartEngine::drawMarkLayers(const QStringList& displayOrder, const QMatrix4
 
 
 /*
-void ChartEngine::setLineLayers(S52Chart* chrt, S52References* ref) {
-  QList<QString> layer_names = chrt->getLineLayerNames();
 
-  for (int i = 0; i < layer_names.size(); i++) {
-    QString layer_name = layer_names[i];
-    S52LineLayer* layer = chrt->getLineLayer(layer_name);
-
-    if (!line_engines.contains(layer_name))
-      line_engines[layer_name] = new ChartLineEngine(_context);
-
-    line_engines[layer_name]->setPatternTexture(assets->getLineTextureId(ref->getColorScheme())
-                                              , assets->getLineTextureDim(ref->getColorScheme()));
-    line_engines[layer_name]->setData(layer, assets, ref);
-  }
-}
 
 
 

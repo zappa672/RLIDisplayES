@@ -13,13 +13,7 @@ uniform vec2	center;
 uniform float	scale;
 uniform vec2  assetdim;
 
-uniform float	u_color_table[256];
-
-uniform float u_color_index;
-uniform vec2  u_tex_origin;
-uniform vec2  u_tex_dim;
-
-varying vec3	v_color;
+varying float	v_color_index;
 varying vec2	v_tex_dim;
 varying vec2	v_tex_orig;
 varying vec2	v_texcoords;
@@ -45,22 +39,14 @@ void main() {
   float len_pix = sqrt(tan_pix.x * tan_pix.x + tan_pix.y * tan_pix.y);
   vec2 unit_tan_pix = normalize(tan_pix);
 
-  if (u_tex_dim.r == -1.0) {
-    v_tex_dim = tex_dim;
-    v_tex_orig = tex_orig;
-  } else {
-    v_tex_dim = u_tex_dim;
-    v_tex_orig = u_tex_origin;
-  }
+  v_tex_dim = tex_dim;
+  v_tex_orig = tex_orig;
 
   vec2 norm_pix = (v_tex_dim.y / 2.0) * vec2(unit_tan_pix.y, -unit_tan_pix.x);
 
-  float color_ind = 0.0;
-  if (u_color_index == -1.0)
-    color_ind = color_index;
-  else
-    color_ind = u_color_index;
-  v_color = vec3(u_color_table[int(3.0*color_ind+0.0)], u_color_table[int(3.0*color_ind+1.0)], u_color_table[int(3.0*color_ind+2.0)]);
+  v_color_index = color_index;
+  v_use_tex_color = 0.f;
+  //v_color = vec3(u_color_table[int(3.0*c_ind+0.0)], u_color_table[int(3.0*c_ind+1.0)], u_color_table[int(3.0*c_ind+2.0)]);
 
   v_texcoords = assetdim;
   float dist_pix = dist * pix_per_meter;
@@ -78,9 +64,4 @@ void main() {
     gl_Position = mvp_matrix * vec4(pos1_pix + norm_pix, 0.0, 1.0);
     v_inner_texcoords = vec2(dist_pix/v_tex_dim.x, 1.0);
   }
-
-  if (tex_orig.y < 96.0)
-    v_use_tex_color = 1.0;
-  else
-    v_use_tex_color = 0.0;
 }

@@ -4,7 +4,7 @@ ChartShaders::ChartShaders(QOpenGLContext* context) : QOpenGLFunctions(context) 
   initializeOpenGLFunctions();
 
   initChartAreaProgram();
-  //initChartLineProgram();
+  initChartLineProgram();
   initChartMarkProgram();
   //initChartTextProgram();
   //initChartSndgProgram();
@@ -133,10 +133,7 @@ void ChartShaders::initChartLineProgram() {
   line_uniform_locs[COMMON_UNIFORMS_PATTERN_TEX_DIM]  = chart_line_program->uniformLocation("assetdim");
   line_uniform_locs[COMMON_UNIFORMS_MVP_MATRIX]       = chart_line_program->uniformLocation("mvp_matrix");
 
-  line_uniform_locs[LINE_UNIFORMS_COLOR_INDEX]        = chart_line_program->uniformLocation("u_color_index");
-  line_uniform_locs[LINE_UNIFORMS_PATTERN_INDEX]      = chart_line_program->uniformLocation("u_tex_origin");
-  line_uniform_locs[LINE_UNIFORMS_PATTERN_DIM]        = chart_line_program->uniformLocation("u_tex_dim");
-  line_uniform_locs[LINE_UNIFORMS_COLOR_TABLE]        = chart_line_program->uniformLocation("u_color_table");
+  line_uniform_locs[LINE_UNIFORMS_COLOR_TABLE_TEX]    = chart_line_program->uniformLocation("color_table_tex");
 
   line_attribute_locs[LINE_ATTRIBUTES_COORDS1]        = chart_line_program->attributeLocation("coords1");
   line_attribute_locs[LINE_ATTRIBUTES_COORDS2]        = chart_line_program->attributeLocation("coords2");

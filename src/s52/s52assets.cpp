@@ -10,6 +10,7 @@
 #include <QPixmap>
 #include <QPainter>
 #include <QRectF>
+#include <QDateTime>
 
 
 S52Assets::S52Assets(QOpenGLContext* context, S52References* ref) : QOpenGLFunctions(context) {
@@ -101,17 +102,28 @@ void S52Assets::initColorSchemeTextures(S52References* ref) {
   }
 }
 
-QOpenGLTexture* S52Assets::dirToPatternTex(const QString& path, QMap<QString, QPoint>& locations, QMap<QString, QSize>& sizes) {
+#include <QDebug>
+
+QOpenGLTexture* S52Assets::dirToPatternTex(const QString& path, const QString& ex_path, QMap<QString, QPoint>& locations, QMap<QString, QSize>& sizes) {
   QDir png_dir(path);
+  QDir ex_png_dir(ex_path);
   QMap<QString, QImage> patterns;
 
   int total_width = 0;
   int max_height  = 0;
 
+  QStringList files;
+  for (QString fileName : png_dir.entryList(QStringList() << "*.png"))
+    files << png_dir.absoluteFilePath(fileName);
+
+  if (ex_path != "")
+    for (QString fileName : ex_png_dir.entryList(QStringList() << "*.png"))
+      files << ex_png_dir.absoluteFilePath(fileName);
+
   // Load images from files to patterns map, fill locations and sizes
-  for (QString file_name : png_dir.entryList(QStringList() << "*.png")) {
-    QString pat_name = file_name.replace(".png", "");
-    QImage pattern = QImage(png_dir.filePath(file_name));
+  for (QString fName : files) {
+    QString pat_name = fName.right(fName.length() - fName.lastIndexOf("/") - 1).replace(".png", "");
+    QImage pattern = QImage(fName);
 
     locations.insert(pat_name, QPoint(total_width, 0));
     sizes.insert(pat_name, pattern.size());
@@ -150,7 +162,7 @@ void S52Assets::initPatternTextures(S52References* ref) {
     QMap<QString, QSize> sizes;
 
     QString dir_path = "data/textures/charts/patterns/" + scheme.toLower();
-    QOpenGLTexture* tex = dirToPatternTex(dir_path, locations, sizes);
+    QOpenGLTexture* tex = dirToPatternTex(dir_path, "", locations, sizes);
 
     pattern_textures.insert(scheme, tex);
     pat_lc.insert(scheme, locations);
@@ -164,7 +176,8 @@ void S52Assets::initLineTextures(S52References* ref) {
     QMap<QString, QSize> sizes;
 
     QString dir_path = "data/textures/charts/lines/" + scheme.toLower();
-    QOpenGLTexture* tex = dirToPatternTex(dir_path, locations, sizes);
+    QString ex_dir_path = "data/textures/charts/lines/simple";
+    QOpenGLTexture* tex = dirToPatternTex(dir_path, ex_dir_path, locations, sizes);
 
     line_textures.insert(scheme, tex);
     line_lc.insert(scheme, locations);

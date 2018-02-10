@@ -494,7 +494,7 @@ bool S52Chart::readOGRPolygon(OGRPolygon* poGeom, std::vector<float> &points, st
   return true;
 }
 
-bool S52Chart::readOGRLine(OGRLineString* poGeom, std::vector<float> &points, std::vector<float> &distances) {
+bool S52Chart::readOGRLine(OGRLineString* poGeom, std::vector<float> &ps, std::vector<float> &distances) {
   int point_count = poGeom->getNumPoints();
 
   if(point_count < 2)
@@ -504,16 +504,13 @@ bool S52Chart::readOGRLine(OGRLineString* poGeom, std::vector<float> &points, st
   for( int i = 0; i < point_count; i++ ) {
     poGeom->getPoint(i, &p);
 
-    points.push_back(static_cast<float>(p.getY()));
-    points.push_back(static_cast<float>(p.getX()));
+    ps.push_back(static_cast<float>(p.getY()));
+    ps.push_back(static_cast<float>(p.getX()));
 
-    if (i != 0) {
-      distances.push_back(geo_distance(points[points.size() - 4], points[points.size() - 3]
-                                      ,points[points.size() - 2], points[points.size() - 1]));
-    }
-    else {
+    if (i != 0)
+      distances.push_back(geo_distance(ps[ps.size() - 4], ps[ps.size() - 3], ps[ps.size() - 2], ps[ps.size() - 1]));
+    else
       distances.push_back(0);
-    }
   }
 
   return true;
