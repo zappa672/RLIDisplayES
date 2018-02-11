@@ -83,11 +83,6 @@ private:
 };
 
 
-
-
-
-
-/*
 class ChartSndgEngine : protected QOpenGLFunctions {
 public:
   explicit ChartSndgEngine(QOpenGLContext* context);
@@ -98,17 +93,20 @@ public:
   void setPatternTexture(GLuint tex_id, QVector2D size);
   void setData(S52SndgLayer* layer, S52Assets* assets, S52References* ref);
 
-  void draw(ChartShaders* shaders, std::pair<float, float> cur_coords, float scale, float angle, const QMatrix4x4& mvp);
+  void draw(ChartShaders* shaders);
 
 private:
   GLuint point_count;
 
-  GLuint* vbo_ids;
+  GLuint vbo_ids[SNDG_ATTRIBUTES_COUNT];
   GLuint _ind_vbo_id;
-
-  GLint     pattern_tex_id;
-  QVector2D pattern_tex_size;
 };
+
+
+
+
+/*
+
 
 
 class ChartTextEngine : protected QOpenGLFunctions {

@@ -499,14 +499,196 @@ void ChartMarkEngine::draw(ChartShaders* shaders) {
 
 
 
+
+
+
+
+
+
+ChartSndgEngine::ChartSndgEngine(QOpenGLContext* context) : QOpenGLFunctions(context) {
+  initializeOpenGLFunctions();
+
+  point_count = 0;
+
+  glGenBuffers(SNDG_ATTRIBUTES_COUNT, vbo_ids);
+  glGenBuffers(1, &_ind_vbo_id);
+}
+
+ChartSndgEngine::~ChartSndgEngine() {
+  glDeleteBuffers(SNDG_ATTRIBUTES_COUNT, vbo_ids);
+  glDeleteBuffers(1, &_ind_vbo_id);
+}
+
+void ChartSndgEngine::clearData() {
+  point_count = 0;
+
+  for (int i = 0; i < SNDG_ATTRIBUTES_COUNT; i++) {
+    glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[i]);
+    glBufferData(GL_ARRAY_BUFFER, 0, NULL, GL_STATIC_DRAW);
+  }
+
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ind_vbo_id);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, 0, NULL, GL_STATIC_DRAW);
+
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+}
+
+void ChartSndgEngine::setData(S52SndgLayer* layer, S52Assets* assets, S52References* ref) {
+  Q_UNUSED(assets);
+
+  std::vector<GLfloat> world_coords;
+  std::vector<GLfloat> vertex_orders;
+  std::vector<GLfloat> symbol_orders;
+  std::vector<GLfloat> symbol_fracs;
+  std::vector<GLfloat> symbol_counts;
+  std::vector<GLfloat> symbol_origins;
+  std::vector<GLfloat> symbol_sizes;
+  std::vector<GLfloat> symbol_pivots;
+
+  for (unsigned int i = 0; i < (layer->points.size() / 2); i++) {
+    QPoint tex_orig, tex_pivt;
+    QSize tex_size;
+    QString depth = QString::number(layer->depths[i], 'f', 1);
+
+    bool frac = false;
+    for (int j = 0; j < depth.length(); j++) {
+      if (depth[j] == '.') {
+        frac = true;
+        continue;
+      }
+
+      if (frac && depth[j] == '0')
+        continue;
+
+      QString symbol_ref = "SOUNDS0" + depth[j];
+      tex_orig = ref->getSymbolIndex(symbol_ref);
+      tex_size = ref->getSymbolDim(symbol_ref);
+      tex_pivt = ref->getSymbolPivot(symbol_ref);
+
+      for (int k = 0; k < 4; k++) {
+        world_coords.push_back(layer->points[2*i+0]);
+        world_coords.push_back(layer->points[2*i+1]);
+
+        vertex_orders.push_back(k);
+
+        if (!frac) {
+          symbol_orders.push_back(j);
+          symbol_fracs.push_back(0);
+        } else {
+          symbol_orders.push_back(j-1);
+          symbol_fracs.push_back(1);
+        }
+
+        symbol_counts.push_back(depth.length() - 2);
+
+        symbol_origins.push_back(tex_orig.x());
+        symbol_origins.push_back(tex_orig.y());
+
+        symbol_sizes.push_back(tex_size.width());
+        symbol_sizes.push_back(tex_size.height());
+
+        symbol_pivots.push_back(tex_pivt.x());
+        symbol_pivots.push_back(tex_pivt.y());
+      }
+    }
+  }
+
+  point_count = vertex_orders.size();
+
+  glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[SNDG_ATTRIBUTES_WORLD_COORDS]);
+  glBufferData(GL_ARRAY_BUFFER, world_coords.size() * sizeof(GLfloat), &world_coords[0], GL_STATIC_DRAW);
+
+  glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[SNDG_ATTRIBUTES_VERTEX_ORDER]);
+  glBufferData(GL_ARRAY_BUFFER, vertex_orders.size() * sizeof(GLfloat), &vertex_orders[0], GL_STATIC_DRAW);
+
+  glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[SNDG_ATTRIBUTES_SYMBOL_ORDER]);
+  glBufferData(GL_ARRAY_BUFFER, symbol_orders.size() * sizeof(GLfloat), &symbol_orders[0], GL_STATIC_DRAW);
+
+  glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[SNDG_ATTRIBUTES_SYMBOL_FRAC]);
+  glBufferData(GL_ARRAY_BUFFER, symbol_fracs.size() * sizeof(GLfloat), &symbol_fracs[0], GL_STATIC_DRAW);
+
+  glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[SNDG_ATTRIBUTES_SYMBOL_COUNT]);
+  glBufferData(GL_ARRAY_BUFFER, symbol_counts.size() * sizeof(GLfloat), &symbol_counts[0], GL_STATIC_DRAW);
+
+  glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[SNDG_ATTRIBUTES_SYMBOL_ORIGIN]);
+  glBufferData(GL_ARRAY_BUFFER, symbol_origins.size() * sizeof(GLfloat), &symbol_origins[0], GL_STATIC_DRAW);
+
+  glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[SNDG_ATTRIBUTES_SYMBOL_SIZE]);
+  glBufferData(GL_ARRAY_BUFFER, symbol_sizes.size() * sizeof(GLfloat), &symbol_sizes[0], GL_STATIC_DRAW);
+
+  glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[SNDG_ATTRIBUTES_SYMBOL_PIVOT]);
+  glBufferData(GL_ARRAY_BUFFER, symbol_pivots.size() * sizeof(GLfloat), &symbol_pivots[0], GL_STATIC_DRAW);
+
+
+  std::vector<GLuint> draw_indices;
+
+  for (GLuint i = 0; i < point_count; i += 4) {
+    draw_indices.push_back(i);
+    draw_indices.push_back(i+1);
+    draw_indices.push_back(i+2);
+    draw_indices.push_back(i);
+    draw_indices.push_back(i+2);
+    draw_indices.push_back(i+3);
+  }
+
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ind_vbo_id);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, draw_indices.size()*sizeof(GLuint), draw_indices.data(), GL_STATIC_DRAW);
+
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+}
+
+void ChartSndgEngine::draw(ChartShaders* shaders) {
+  glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[SNDG_ATTRIBUTES_WORLD_COORDS]);
+  glVertexAttribPointer(shaders->getSndgAttributeLoc(SNDG_ATTRIBUTES_WORLD_COORDS), 2, GL_FLOAT, GL_FALSE, 0, (void *) 0);
+  glEnableVertexAttribArray(shaders->getSndgAttributeLoc(SNDG_ATTRIBUTES_WORLD_COORDS));
+
+  glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[SNDG_ATTRIBUTES_VERTEX_ORDER]);
+  glVertexAttribPointer(shaders->getSndgAttributeLoc(SNDG_ATTRIBUTES_VERTEX_ORDER), 1, GL_FLOAT, GL_FALSE, 0, (void *) 0);
+  glEnableVertexAttribArray(shaders->getSndgAttributeLoc(SNDG_ATTRIBUTES_VERTEX_ORDER));
+
+  glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[SNDG_ATTRIBUTES_SYMBOL_ORDER]);
+  glVertexAttribPointer(shaders->getSndgAttributeLoc(SNDG_ATTRIBUTES_SYMBOL_ORDER), 1, GL_FLOAT, GL_FALSE, 0, (void *) 0);
+  glEnableVertexAttribArray(shaders->getSndgAttributeLoc(SNDG_ATTRIBUTES_SYMBOL_ORDER));
+
+  glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[SNDG_ATTRIBUTES_SYMBOL_FRAC]);
+  glVertexAttribPointer(shaders->getSndgAttributeLoc(SNDG_ATTRIBUTES_SYMBOL_FRAC), 1, GL_FLOAT, GL_FALSE, 0, (void *) 0);
+  glEnableVertexAttribArray(shaders->getSndgAttributeLoc(SNDG_ATTRIBUTES_SYMBOL_FRAC));
+
+  glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[SNDG_ATTRIBUTES_SYMBOL_COUNT]);
+  glVertexAttribPointer(shaders->getSndgAttributeLoc(SNDG_ATTRIBUTES_SYMBOL_COUNT), 1, GL_FLOAT, GL_FALSE, 0, (void *) 0);
+  glEnableVertexAttribArray(shaders->getSndgAttributeLoc(SNDG_ATTRIBUTES_SYMBOL_COUNT));
+
+  glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[SNDG_ATTRIBUTES_SYMBOL_ORIGIN]);
+  glVertexAttribPointer(shaders->getSndgAttributeLoc(SNDG_ATTRIBUTES_SYMBOL_ORIGIN), 2, GL_FLOAT, GL_FALSE, 0, (void *) 0);
+  glEnableVertexAttribArray(shaders->getSndgAttributeLoc(SNDG_ATTRIBUTES_SYMBOL_ORIGIN));
+
+  glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[SNDG_ATTRIBUTES_SYMBOL_SIZE]);
+  glVertexAttribPointer(shaders->getSndgAttributeLoc(SNDG_ATTRIBUTES_SYMBOL_SIZE), 2, GL_FLOAT, GL_FALSE, 0, (void *) 0);
+  glEnableVertexAttribArray(shaders->getSndgAttributeLoc(SNDG_ATTRIBUTES_SYMBOL_SIZE));
+
+  glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[SNDG_ATTRIBUTES_SYMBOL_PIVOT]);
+  glVertexAttribPointer(shaders->getSndgAttributeLoc(SNDG_ATTRIBUTES_SYMBOL_PIVOT), 2, GL_FLOAT, GL_FALSE, 0, (void *) 0);
+  glEnableVertexAttribArray(shaders->getSndgAttributeLoc(SNDG_ATTRIBUTES_SYMBOL_PIVOT));
+
+
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ind_vbo_id);
+
+  glDrawElements(GL_TRIANGLES, 3*(point_count/2), GL_UNSIGNED_INT, (const GLvoid*)(0 * sizeof(GLuint)));
+
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+  glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+
+
+
+
+
+
 /*
-
-
-
-
-
-
-
 
 ChartTextEngine::ChartTextEngine(QOpenGLContext* context) : QOpenGLFunctions(context) {
   initializeOpenGLFunctions();
@@ -612,223 +794,3 @@ void ChartTextEngine::draw(ChartShaders* shaders, QVector2D cur_coords, float sc
 }
 */
 
-
-
-/*
-ChartSndgEngine::ChartSndgEngine(QOpenGLContext* context) : QOpenGLFunctions(context) {
-  initializeOpenGLFunctions();
-
-  point_count = 0;
-  pattern_tex_id = -1;
-
-  vbo_ids = new GLuint[SNDG_ATTRIBUTES_COUNT];
-  glGenBuffers(SNDG_ATTRIBUTES_COUNT, vbo_ids);
-  glGenBuffers(1, &_ind_vbo_id);
-}
-
-ChartSndgEngine::~ChartSndgEngine() {
-  glDeleteBuffers(SNDG_ATTRIBUTES_COUNT, vbo_ids);
-  glDeleteBuffers(1, &_ind_vbo_id);
-  delete[] vbo_ids;
-}
-
-void ChartSndgEngine::clearData() {
-  point_count = 0;
-
-  glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[SNDG_ATTRIBUTES_WORLD_COORDS]);
-  glBufferData(GL_ARRAY_BUFFER, 0, NULL, GL_STATIC_DRAW);
-  glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[SNDG_ATTRIBUTES_VERTEX_ORDER]);
-  glBufferData(GL_ARRAY_BUFFER, 0, NULL, GL_STATIC_DRAW);
-  glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[SNDG_ATTRIBUTES_SYMBOL_ORDER]);
-  glBufferData(GL_ARRAY_BUFFER, 0, NULL, GL_STATIC_DRAW);
-  glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[SNDG_ATTRIBUTES_SYMBOL_FRAC]);
-  glBufferData(GL_ARRAY_BUFFER, 0, NULL, GL_STATIC_DRAW);
-  glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[SNDG_ATTRIBUTES_SYMBOL_COUNT]);
-  glBufferData(GL_ARRAY_BUFFER, 0, NULL, GL_STATIC_DRAW);
-  glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[SNDG_ATTRIBUTES_SYMBOL_ORIGIN]);
-  glBufferData(GL_ARRAY_BUFFER, 0, NULL, GL_STATIC_DRAW);
-  glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[SNDG_ATTRIBUTES_SYMBOL_SIZE]);
-  glBufferData(GL_ARRAY_BUFFER, 0, NULL, GL_STATIC_DRAW);
-  glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[SNDG_ATTRIBUTES_SYMBOL_PIVOT]);
-  glBufferData(GL_ARRAY_BUFFER, 0, NULL, GL_STATIC_DRAW);
-
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ind_vbo_id);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, 0, NULL, GL_STATIC_DRAW);
-
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-}
-
-void ChartSndgEngine::setPatternTexture(GLuint tex_id, QVector2D size) {
-  pattern_tex_id = tex_id;
-  pattern_tex_size = size;
-}
-
-void ChartSndgEngine::setData(S52SndgLayer* layer, S52Assets* assets, S52References* ref) {
-  Q_UNUSED(assets);
-
-  std::vector<GLfloat> world_coords;
-  std::vector<GLfloat> vertex_orders;
-  std::vector<GLfloat> symbol_orders;
-  std::vector<GLfloat> symbol_fracs;
-  std::vector<GLfloat> symbol_counts;
-  std::vector<GLfloat> symbol_origins;
-  std::vector<GLfloat> symbol_sizes;
-  std::vector<GLfloat> symbol_pivots;
-
-  for (unsigned int i = 0; i < (layer->points.size() / 2); i++) {
-    QVector2D tex_orig, tex_size, tex_pivt;
-    QString depth = QString::number(layer->depths[i], 'f', 1);
-
-    bool frac = false;
-    for (int j = 0; j < depth.length(); j++) {
-      if (depth[j] == '.') {
-        frac = true;
-        continue;
-      }
-
-      if (frac && depth[j] == '0')
-        continue;
-
-      QString symbol_ref = "SOUNDS0" + depth[j];
-      tex_orig = ref->getSymbolIndex(symbol_ref);
-      tex_size = ref->getSymbolDim(symbol_ref);
-      tex_pivt = ref->getSymbolPivot(symbol_ref);
-
-      for (int k = 0; k < 4; k++) {
-        world_coords.push_back(layer->points[2*i+0]);
-        world_coords.push_back(layer->points[2*i+1]);
-
-        vertex_orders.push_back(k);
-
-        if (!frac) {
-          symbol_orders.push_back(j);
-          symbol_fracs.push_back(0);
-        } else {
-          symbol_orders.push_back(j-1);
-          symbol_fracs.push_back(1);
-        }
-
-        symbol_counts.push_back(depth.length() - 2);
-
-        symbol_origins.push_back(tex_orig.x());
-        symbol_origins.push_back(tex_orig.y());
-
-        symbol_sizes.push_back(tex_size.x());
-        symbol_sizes.push_back(tex_size.y());
-
-        symbol_pivots.push_back(tex_pivt.x());
-        symbol_pivots.push_back(tex_pivt.y());
-      }
-    }
-  }
-
-  point_count = vertex_orders.size();
-
-  glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[SNDG_ATTRIBUTES_WORLD_COORDS]);
-  glBufferData(GL_ARRAY_BUFFER, world_coords.size() * sizeof(GLfloat), &world_coords[0], GL_STATIC_DRAW);
-
-  glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[SNDG_ATTRIBUTES_VERTEX_ORDER]);
-  glBufferData(GL_ARRAY_BUFFER, vertex_orders.size() * sizeof(GLfloat), &vertex_orders[0], GL_STATIC_DRAW);
-
-  glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[SNDG_ATTRIBUTES_SYMBOL_ORDER]);
-  glBufferData(GL_ARRAY_BUFFER, symbol_orders.size() * sizeof(GLfloat), &symbol_orders[0], GL_STATIC_DRAW);
-
-  glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[SNDG_ATTRIBUTES_SYMBOL_FRAC]);
-  glBufferData(GL_ARRAY_BUFFER, symbol_fracs.size() * sizeof(GLfloat), &symbol_fracs[0], GL_STATIC_DRAW);
-
-  glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[SNDG_ATTRIBUTES_SYMBOL_COUNT]);
-  glBufferData(GL_ARRAY_BUFFER, symbol_counts.size() * sizeof(GLfloat), &symbol_counts[0], GL_STATIC_DRAW);
-
-  glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[SNDG_ATTRIBUTES_SYMBOL_ORIGIN]);
-  glBufferData(GL_ARRAY_BUFFER, symbol_origins.size() * sizeof(GLfloat), &symbol_origins[0], GL_STATIC_DRAW);
-
-  glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[SNDG_ATTRIBUTES_SYMBOL_SIZE]);
-  glBufferData(GL_ARRAY_BUFFER, symbol_sizes.size() * sizeof(GLfloat), &symbol_sizes[0], GL_STATIC_DRAW);
-
-  glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[SNDG_ATTRIBUTES_SYMBOL_PIVOT]);
-  glBufferData(GL_ARRAY_BUFFER, symbol_pivots.size() * sizeof(GLfloat), &symbol_pivots[0], GL_STATIC_DRAW);
-
-
-  std::vector<GLuint> draw_indices;
-
-  for (GLuint i = 0; i < point_count; i += 4) {
-    draw_indices.push_back(i);
-    draw_indices.push_back(i+1);
-    draw_indices.push_back(i+2);
-    draw_indices.push_back(i);
-    draw_indices.push_back(i+2);
-    draw_indices.push_back(i+3);
-  }
-
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ind_vbo_id);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, draw_indices.size()*sizeof(GLuint), draw_indices.data(), GL_STATIC_DRAW);
-
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-}
-
-void ChartSndgEngine::draw(ChartShaders* shaders, std::pair<float, float> cur_coords, float scale, float angle, const QMatrix4x4& mvp) {
-  if (pattern_tex_id == -1 || point_count <= 0)
-    return;
-
-  QOpenGLShaderProgram* prog = shaders->getChartSndgProgram();
-  glUniform2f(shaders->getSndgUniformLoc(COMMON_UNIFORMS_CENTER), cur_coords.first, cur_coords.second);
-  glUniform1f(shaders->getSndgUniformLoc(COMMON_UNIFORMS_SCALE), scale);
-  glUniform1f(shaders->getSndgUniformLoc(COMMON_UNIFORMS_NORTH),  angle);
-  glUniform2f(shaders->getSndgUniformLoc(COMMON_UNIFORMS_PATTERN_TEX_DIM), pattern_tex_size.x(), pattern_tex_size.y());
-  prog->setUniformValue(shaders->getSndgUniformLoc(COMMON_UNIFORMS_MVP_MATRIX), mvp);
-
-  glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[SNDG_ATTRIBUTES_WORLD_COORDS]);
-  glVertexAttribPointer(shaders->getSndgAttributeLoc(SNDG_ATTRIBUTES_WORLD_COORDS), 2, GL_FLOAT, GL_FALSE, 0, (void *) 0);
-  glEnableVertexAttribArray(shaders->getSndgAttributeLoc(SNDG_ATTRIBUTES_WORLD_COORDS));
-
-  glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[SNDG_ATTRIBUTES_VERTEX_ORDER]);
-  glVertexAttribPointer(shaders->getSndgAttributeLoc(SNDG_ATTRIBUTES_VERTEX_ORDER), 1, GL_FLOAT, GL_FALSE, 0, (void *) 0);
-  glEnableVertexAttribArray(shaders->getSndgAttributeLoc(SNDG_ATTRIBUTES_VERTEX_ORDER));
-
-  glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[SNDG_ATTRIBUTES_SYMBOL_ORDER]);
-  glVertexAttribPointer(shaders->getSndgAttributeLoc(SNDG_ATTRIBUTES_SYMBOL_ORDER), 1, GL_FLOAT, GL_FALSE, 0, (void *) 0);
-  glEnableVertexAttribArray(shaders->getSndgAttributeLoc(SNDG_ATTRIBUTES_SYMBOL_ORDER));
-
-  glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[SNDG_ATTRIBUTES_SYMBOL_FRAC]);
-  glVertexAttribPointer(shaders->getSndgAttributeLoc(SNDG_ATTRIBUTES_SYMBOL_FRAC), 1, GL_FLOAT, GL_FALSE, 0, (void *) 0);
-  glEnableVertexAttribArray(shaders->getSndgAttributeLoc(SNDG_ATTRIBUTES_SYMBOL_FRAC));
-
-  glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[SNDG_ATTRIBUTES_SYMBOL_COUNT]);
-  glVertexAttribPointer(shaders->getSndgAttributeLoc(SNDG_ATTRIBUTES_SYMBOL_COUNT), 1, GL_FLOAT, GL_FALSE, 0, (void *) 0);
-  glEnableVertexAttribArray(shaders->getSndgAttributeLoc(SNDG_ATTRIBUTES_SYMBOL_COUNT));
-
-  glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[SNDG_ATTRIBUTES_SYMBOL_ORIGIN]);
-  glVertexAttribPointer(shaders->getSndgAttributeLoc(SNDG_ATTRIBUTES_SYMBOL_ORIGIN), 2, GL_FLOAT, GL_FALSE, 0, (void *) 0);
-  glEnableVertexAttribArray(shaders->getSndgAttributeLoc(SNDG_ATTRIBUTES_SYMBOL_ORIGIN));
-
-  glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[SNDG_ATTRIBUTES_SYMBOL_SIZE]);
-  glVertexAttribPointer(shaders->getSndgAttributeLoc(SNDG_ATTRIBUTES_SYMBOL_SIZE), 2, GL_FLOAT, GL_FALSE, 0, (void *) 0);
-  glEnableVertexAttribArray(shaders->getSndgAttributeLoc(SNDG_ATTRIBUTES_SYMBOL_SIZE));
-
-  glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[SNDG_ATTRIBUTES_SYMBOL_PIVOT]);
-  glVertexAttribPointer(shaders->getSndgAttributeLoc(SNDG_ATTRIBUTES_SYMBOL_PIVOT), 2, GL_FLOAT, GL_FALSE, 0, (void *) 0);
-  glEnableVertexAttribArray(shaders->getSndgAttributeLoc(SNDG_ATTRIBUTES_SYMBOL_PIVOT));
-
-  glUniform1f(shaders->getSndgUniformLoc(COMMON_UNIFORMS_PATTERN_TEX_ID), 0);
-
-  glActiveTexture(GL_TEXTURE0);
-  glBindTexture(GL_TEXTURE_2D, pattern_tex_id);
-
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ind_vbo_id);
-
-  //glDrawArrays(GL_QUADS, 0, point_count);
-
-  glDrawElements( GL_TRIANGLES
-                , 3*(point_count/2)
-                , GL_UNSIGNED_INT
-                , (const GLvoid*)(0 * sizeof(GLuint)));
-
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-  glBindTexture(GL_TEXTURE_2D, 0);
-
-  //glFlush();
-}
-*/
