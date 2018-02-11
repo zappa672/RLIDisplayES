@@ -18,38 +18,30 @@ varying vec2	v_tex_dim;
 varying vec2	v_tex_orig;
 varying vec2	v_texcoords;
 varying vec2	v_inner_texcoords;
-varying float v_use_tex_color;
 
 void main() {
   float lat_rads = radians(center.x);
 
-  float y1_m = 6378137.0 * radians(coords1.x - center.x);
-  float y2_m = 6378137.0 * radians(coords2.x - center.x);
+  float y1_m = -(6378137.0 / scale) * radians(coords1.x - center.x);
+  float y2_m = -(6378137.0 / scale) * radians(coords2.x - center.x);
 
-  float x1_m = 6378137.0 * cos(lat_rads)*radians(coords1.y - center.y);
-  float x2_m = 6378137.0 * cos(lat_rads)*radians(coords2.y - center.y);
+  float x1_m =  (6378137.0 / scale) * cos(lat_rads)*radians(coords1.y - center.y);
+  float x2_m =  (6378137.0 / scale) * cos(lat_rads)*radians(coords2.y - center.y);
 
   // screen position
-  float pix_per_meter = 1.0 / scale;
-  vec2 pos1_pix = vec2(x1_m, y1_m) / scale;
-  vec2 pos2_pix = vec2(x2_m, y2_m) / scale;
+  vec2 pos1_pix = vec2(x1_m, y1_m);
+  vec2 pos2_pix = vec2(x2_m, y2_m);
 
+  v_tex_dim = tex_dim;
+  v_tex_orig = tex_orig;
+  v_color_index = color_index;
+  v_texcoords = assetdim;
+  float dist_pix = dist / scale;
 
   vec2 tan_pix = pos2_pix - pos1_pix;
   float len_pix = sqrt(tan_pix.x * tan_pix.x + tan_pix.y * tan_pix.y);
   vec2 unit_tan_pix = normalize(tan_pix);
-
-  v_tex_dim = tex_dim;
-  v_tex_orig = tex_orig;
-
   vec2 norm_pix = (v_tex_dim.y / 2.0) * vec2(unit_tan_pix.y, -unit_tan_pix.x);
-
-  v_color_index = color_index;
-  v_use_tex_color = 0.f;
-  //v_color = vec3(u_color_table[int(3.0*c_ind+0.0)], u_color_table[int(3.0*c_ind+1.0)], u_color_table[int(3.0*c_ind+2.0)]);
-
-  v_texcoords = assetdim;
-  float dist_pix = dist * pix_per_meter;
 
   if (order == 0.0) {
     gl_Position = mvp_matrix * vec4(pos1_pix - norm_pix, 0.0, 1.0);

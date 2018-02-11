@@ -8,18 +8,13 @@ uniform sampler2D pattern_tex;
 uniform sampler2D color_table_tex;
 
 void main() {
-  gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
-  /*
   vec2 texcoords = (v_tex_orig + (fract(v_inner_texcoords) * v_tex_dim)) / v_texcoords;
   vec4 tex_color = texture2D(pattern_tex, texcoords);
-  vec4 color = texture2D(color_table_tex, vec2(0.0, (v_color_index + 0.5) / 63.0));
 
-  if (tex_color.a > 0.5 && v_use_tex_color < 0.5)
-    gl_FragColor = color;
-  else
+  if (v_color_index >= 0.0) {
+    vec4 color = texture2D(color_table_tex, vec2(0.0, (v_color_index + 0.5) / 63.0));
+    gl_FragColor = tex_color * color;
+  } else {
     gl_FragColor = tex_color;
-
-  if (v_inner_texcoords.y < 0.05 || v_inner_texcoords.y > 0.95)
-    gl_FragColor = vec4(1.0, 1.0, 1.0, 0.0);
-  */
+  }
 }

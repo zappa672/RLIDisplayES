@@ -614,7 +614,7 @@ QString S52Chart::getLinePatternRef(QString& layer_name, OGRFeature* poFeature) 
   if (layer_name == "DEPCNT" ||
       layer_name == "DEPARE" ||
       layer_name == "WATTUR")
-    return "SOLID";
+    return "DASHED";
 
   //Default
   return "SOLID";

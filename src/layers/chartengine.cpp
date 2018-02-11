@@ -75,7 +75,7 @@ void ChartEngine::setChart(S52Chart* chrt, S52References* ref) {
   clearChartData();
 
   setAreaLayers(chrt, ref);
-  //setLineLayers(chrt, ref);
+  setLineLayers(chrt, ref);
   setMarkLayers(chrt, ref);
   //setTextLayers(chrt, ref);
   //setSndgLayer(chrt, ref);
@@ -90,8 +90,8 @@ void ChartEngine::clearChartData() {
 
   for (int i = 0; i < (layer_names = area_engines.keys()).size(); i++)
     area_engines[layer_names[i]]->clearData();
-  //for (int i = 0; i < (layer_names = line_engines.keys()).size(); i++)
-  //  line_engines[layer_names[i]]->clearData();
+  for (int i = 0; i < (layer_names = line_engines.keys()).size(); i++)
+    line_engines[layer_names[i]]->clearData();
   for (int i = 0; i < (layer_names = mark_engines.keys()).size(); i++)
     mark_engines[layer_names[i]]->clearData();
   //for (int i = 0; i < (layer_names = text_engines.keys()).size(); i++)
