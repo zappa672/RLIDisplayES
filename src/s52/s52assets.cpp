@@ -43,7 +43,7 @@ S52Assets::~S52Assets() {
 
 
 void S52Assets::initFontTexture() {
-  QImage img(32*16, 32*16, QImage::Format_ARGB32);
+  QImage img(16*16, 16*16, QImage::Format_ARGB32);
 
   int id = QFontDatabase::addApplicationFont(":/fonts/Helvetica.ttf");
   QString family = QFontDatabase::applicationFontFamilies(id).at(0);
@@ -53,7 +53,7 @@ void S52Assets::initFontTexture() {
   painter.setCompositionMode(QPainter::CompositionMode_Source);
   painter.setPen(Qt::black);
   painter.setBrush(Qt::NoBrush);
-  painter.setFont(QFont(family, 16, QFont::Normal));
+  painter.setFont(QFont(family, 10, QFont::Normal));
 
   painter.fillRect(img.rect(), Qt::transparent);
 
@@ -64,7 +64,7 @@ void S52Assets::initFontTexture() {
   QString uchars = dec->toUnicode(char_table, 256);
 
   for (int i = 0; i < 256; i++)
-    painter.drawText(QRect(32 * (i % 16), 32 * (i / 16), 32.f, 32.f), Qt::AlignCenter, uchars.at(i));
+    painter.drawText(QRect(16 * (i % 16), 16 * (i / 16), 16.f, 16.f), Qt::AlignCenter, uchars.at(i));
 
 
   font_texture = new QOpenGLTexture(QOpenGLTexture::Target2D);

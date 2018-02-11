@@ -1,9 +1,11 @@
 uniform mat4 mvp_matrix;
 
 // World position lat/lon in degrees
-attribute vec2	world_coords;
+attribute vec2	coords;
+attribute float	point_order;
 // Character int value and order in text line
 attribute float	char_order;
+attribute float	char_count;
 attribute float	char_val;
 
 // Angle to north
@@ -13,27 +15,29 @@ uniform vec2    center;
 // meters / pixel
 uniform float   scale;
 
-// Pattern texture full size in pixels
-uniform vec2  pattern_tex_size;
-uniform vec3  color;
-
-varying vec3   v_color;
-varying float  v_char_val;
+varying vec2 v_texcoord;
 
 
 void main() {
   float lat_rads = radians(center.x);
 
-  float y_m = 6378137.0*radians(world_coords.x - center.x);
-  float x_m = 6378137.0*cos(lat_rads)*radians(world_coords.y - center.y);
+  float y = -(6378137.0 / scale) * radians(coords.x - center.x);
+  float x =  (6378137.0 / scale) * cos(lat_rads)*radians(coords.y - center.y);
+  x = x + char_order * 8.0 - char_count * 4.0;
 
-  // screen position
-  vec2 pos_pix = vec2(x_m, y_m) / scale;
+  vec2 texcoord = vec2(mod(char_val, 16.0), floor(char_val / 16.0)) / 16.0;
 
-
-  gl_Position = mvp_matrix * vec4(pos_pix.x + char_order * 12.0, pos_pix.y, 0.0, 1.0);
-  v_char_val = char_val;
-  //v_color = color;
-  v_color = vec3(0.0, 0.0, 0.0);
-  gl_PointSize = 32.0;
+  if (point_order == 0.0) {
+    gl_Position = mvp_matrix * vec4(x - 8.0, y - 8.0, 0.0, 1.0);
+    v_texcoord = texcoord;
+  } else if (point_order == 1.0) {
+    gl_Position = mvp_matrix * vec4(x - 8.0, y + 8.0, 0.0, 1.0);
+    v_texcoord = texcoord + vec2(0.0, 1.0/16.0);
+  } else if (point_order == 2.0) {
+    gl_Position = mvp_matrix * vec4(x + 8.0, y + 8.0, 0.0, 1.0);
+    v_texcoord = texcoord + vec2(1.0/16.0, 1.0/16.0);
+  } else if (point_order == 3.0) {
+    gl_Position = mvp_matrix * vec4(x + 8.0, y - 8.0, 0.0, 1.0);
+    v_texcoord = texcoord + vec2(1.0/16.0, 0.0);
+  }
 }

@@ -688,109 +688,120 @@ void ChartSndgEngine::draw(ChartShaders* shaders) {
 
 
 
-/*
 
 ChartTextEngine::ChartTextEngine(QOpenGLContext* context) : QOpenGLFunctions(context) {
   initializeOpenGLFunctions();
 
-  glyph_tex_id = -1;
   point_count = 0;
 
-  vbo_ids = new GLuint[TEXT_ATTRIBUTES_COUNT];
   glGenBuffers(TEXT_ATTRIBUTES_COUNT, vbo_ids);
+  glGenBuffers(1, &_ind_vbo_id);
 }
 
 ChartTextEngine::~ChartTextEngine() {
   glDeleteBuffers(TEXT_ATTRIBUTES_COUNT, vbo_ids);
-  delete[] vbo_ids;
+  glDeleteBuffers(1, &_ind_vbo_id);
 }
-
 
 void ChartTextEngine::clearData() {
-  if (point_count == 0)
-    return;
-
   point_count = 0;
 
-  glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[TEXT_ATTRIBUTES_COORDS]);
-  glBufferData(GL_ARRAY_BUFFER, 0, NULL, GL_STATIC_DRAW);
+  for (int i = 0; i < TEXT_ATTRIBUTES_COUNT; i++) {
+    glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[i]);
+    glBufferData(GL_ARRAY_BUFFER, 0, NULL, GL_STATIC_DRAW);
+  }
 
-  glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[TEXT_ATTRIBUTES_CHAR_ORDER]);
-  glBufferData(GL_ARRAY_BUFFER, 0, NULL, GL_STATIC_DRAW);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ind_vbo_id);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, 0, NULL, GL_STATIC_DRAW);
 
-  glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[TEXT_ATTRIBUTES_CHAR_VALUE]);
-  glBufferData(GL_ARRAY_BUFFER, 0, NULL, GL_STATIC_DRAW);
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
-void ChartTextEngine::setGlyphTexture(GLuint tex_id) {
-  glyph_tex_id = tex_id;
-}
 
 void ChartTextEngine::setData(S52TextLayer* layer) {
-  std::vector<GLfloat> world_coords;
+  std::vector<GLfloat> coords;
+  std::vector<GLfloat> point_orders;
   std::vector<GLfloat> char_orders;
+  std::vector<GLfloat> char_counts;
   std::vector<GLfloat> char_values;
 
   for (unsigned int i = 0; i < (layer->points.size() / 2); i ++) {
     QString txt = layer->texts[i];
 
     for (int j = 0; j < txt.size(); j++) {
-      world_coords.push_back(layer->points[2*i+0]);
-      world_coords.push_back(layer->points[2*i+1]);
+      for (int k = 0; k < 4; k++) {
+        coords.push_back(layer->points[2*i+0]);
+        coords.push_back(layer->points[2*i+1]);
 
-      char_orders.push_back(j);
-      char_values.push_back(static_cast<int>(txt.at(j).toLatin1()));
+        point_orders.push_back(k);
+        char_orders.push_back(j);
+        char_counts.push_back(txt.length());
+        char_values.push_back(static_cast<int>(txt.at(j).toLatin1()));
+      }
     }
   }
 
   point_count = char_orders.size();
 
   glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[TEXT_ATTRIBUTES_COORDS]);
-  glBufferData(GL_ARRAY_BUFFER, world_coords.size() * sizeof(GLfloat), &world_coords[0], GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, coords.size() * sizeof(GLfloat), &coords[0], GL_STATIC_DRAW);
+
+  glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[TEXT_ATTRIBUTES_POINT_ORDER]);
+  glBufferData(GL_ARRAY_BUFFER, point_orders.size() * sizeof(GLfloat), &point_orders[0], GL_STATIC_DRAW);
 
   glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[TEXT_ATTRIBUTES_CHAR_ORDER]);
   glBufferData(GL_ARRAY_BUFFER, char_orders.size() * sizeof(GLfloat), &char_orders[0], GL_STATIC_DRAW);
 
+  glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[TEXT_ATTRIBUTES_CHAR_COUNT]);
+  glBufferData(GL_ARRAY_BUFFER, char_counts.size() * sizeof(GLfloat), &char_counts[0], GL_STATIC_DRAW);
+
   glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[TEXT_ATTRIBUTES_CHAR_VALUE]);
   glBufferData(GL_ARRAY_BUFFER, char_values.size() * sizeof(GLfloat), &char_values[0], GL_STATIC_DRAW);
+
+
+  std::vector<GLuint> draw_indices;
+
+  for (GLuint i = 0; i < point_count; i += 4) {
+    draw_indices.push_back(i);
+    draw_indices.push_back(i+1);
+    draw_indices.push_back(i+2);
+    draw_indices.push_back(i);
+    draw_indices.push_back(i+2);
+    draw_indices.push_back(i+3);
+  }
+
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ind_vbo_id);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, draw_indices.size()*sizeof(GLuint), draw_indices.data(), GL_STATIC_DRAW);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
-void ChartTextEngine::draw(ChartShaders* shaders, QVector2D cur_coords, float scale, float angle, const QMatrix4x4& mvp) {
-  if (glyph_tex_id == -1 || point_count <= 0)
+void ChartTextEngine::draw(ChartShaders* shaders) {
+  if (point_count <= 0)
     return;
-
-  QOpenGLShaderProgram* prog = shaders->getChartTextProgram();
-
-  glUniform2f(shaders->getTextUniformLoc(COMMON_UNIFORMS_CENTER), cur_coords.x(), cur_coords.y());
-  glUniform1f(shaders->getTextUniformLoc(COMMON_UNIFORMS_SCALE), scale);
-  glUniform1f(shaders->getTextUniformLoc(COMMON_UNIFORMS_NORTH),  angle);
-  glUniform2f(shaders->getTextUniformLoc(COMMON_UNIFORMS_PATTERN_TEX_DIM), 32*16, 32*16);
-  prog->setUniformValue(shaders->getTextUniformLoc(COMMON_UNIFORMS_MVP_MATRIX), mvp);
-
 
   glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[TEXT_ATTRIBUTES_COORDS]);
   glVertexAttribPointer(shaders->getTextAttributeLoc(TEXT_ATTRIBUTES_COORDS), 2, GL_FLOAT, GL_FALSE, 0, (void *) 0);
   glEnableVertexAttribArray(shaders->getTextAttributeLoc(TEXT_ATTRIBUTES_COORDS));
 
+  glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[TEXT_ATTRIBUTES_POINT_ORDER]);
+  glVertexAttribPointer(shaders->getTextAttributeLoc(TEXT_ATTRIBUTES_POINT_ORDER), 1, GL_FLOAT, GL_FALSE, 0, (void *) 0);
+  glEnableVertexAttribArray(shaders->getTextAttributeLoc(TEXT_ATTRIBUTES_POINT_ORDER));
+
   glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[TEXT_ATTRIBUTES_CHAR_ORDER]);
   glVertexAttribPointer(shaders->getTextAttributeLoc(TEXT_ATTRIBUTES_CHAR_ORDER), 1, GL_FLOAT, GL_FALSE, 0, (void *) 0);
   glEnableVertexAttribArray(shaders->getTextAttributeLoc(TEXT_ATTRIBUTES_CHAR_ORDER));
+
+  glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[TEXT_ATTRIBUTES_CHAR_COUNT]);
+  glVertexAttribPointer(shaders->getTextAttributeLoc(TEXT_ATTRIBUTES_CHAR_COUNT), 1, GL_FLOAT, GL_FALSE, 0, (void *) 0);
+  glEnableVertexAttribArray(shaders->getTextAttributeLoc(TEXT_ATTRIBUTES_CHAR_COUNT));
 
   glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[TEXT_ATTRIBUTES_CHAR_VALUE]);
   glVertexAttribPointer(shaders->getTextAttributeLoc(TEXT_ATTRIBUTES_CHAR_VALUE), 1, GL_FLOAT, GL_FALSE, 0, (void *) 0);
   glEnableVertexAttribArray(shaders->getTextAttributeLoc(TEXT_ATTRIBUTES_CHAR_VALUE));
 
-  glUniform1f(shaders->getLineUniformLoc(COMMON_UNIFORMS_PATTERN_TEX_ID), 0);
 
-  glActiveTexture(GL_TEXTURE0);
-  glBindTexture(GL_TEXTURE_2D, glyph_tex_id);
-
-  glPointSize(32);
-
-  glDrawArrays(GL_POINTS, 0, point_count);
-  glBindTexture(GL_TEXTURE_2D, 0);
-
-  //glFlush();
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ind_vbo_id);
+  glDrawElements(GL_TRIANGLES, 3*(point_count/2), GL_UNSIGNED_INT, (const GLvoid*)(0 * sizeof(GLuint)));
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
-*/
-

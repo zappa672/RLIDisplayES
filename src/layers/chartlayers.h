@@ -1,6 +1,7 @@
 #ifndef CHARTLAYERENGINES_H
 #define CHARTLAYERENGINES_H
 
+
 #include <QColor>
 #include <QVector2D>
 #include <QOpenGLVertexArrayObject>
@@ -10,6 +11,7 @@
 #include "../s52/s52chart.h"
 #include "../s52/s52assets.h"
 #include "../s52/s52references.h"
+
 
 class ChartAreaEngine : protected QOpenGLFunctions {
 public:
@@ -60,6 +62,24 @@ private:
 };
 
 
+class ChartTextEngine : protected QOpenGLFunctions {
+public:
+  explicit ChartTextEngine(QOpenGLContext* context);
+  virtual ~ChartTextEngine();
+
+  void clearData();
+  void setData(S52TextLayer* layer);
+
+  void draw(ChartShaders* shaders);
+
+private:
+  GLuint point_count;
+
+  GLuint _ind_vbo_id;
+  GLuint vbo_ids[TEXT_ATTRIBUTES_COUNT];
+};
+
+
 class ChartMarkEngine : protected QOpenGLFunctions {
 public:
   explicit ChartMarkEngine(QOpenGLContext* context);
@@ -102,31 +122,5 @@ private:
   GLuint _ind_vbo_id;
 };
 
-
-
-
-/*
-
-
-
-class ChartTextEngine : protected QOpenGLFunctions {
-public:
-  explicit ChartTextEngine(QOpenGLContext* context);
-  virtual ~ChartTextEngine();
-
-  void clearData();
-
-  void setGlyphTexture(GLuint tex_id);
-  void setData(S52TextLayer* layer);
-
-  void draw(ChartShaders* shaders, std::pair<float, float> cur_coords, float scale, float angle, const QMatrix4x4& mvp);
-
-private:
-  int point_count;
-
-  GLuint* vbo_ids;
-  GLint   glyph_tex_id;
-};
-*/
 
 #endif // CHARTLAYERENGINES_H

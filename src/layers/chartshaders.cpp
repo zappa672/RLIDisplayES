@@ -6,14 +6,14 @@ ChartShaders::ChartShaders(QOpenGLContext* context) : QOpenGLFunctions(context) 
   initChartAreaProgram();
   initChartLineProgram();
   initChartMarkProgram();
-  //initChartTextProgram();
+  initChartTextProgram();
   initChartSndgProgram();
 }
 
 ChartShaders::~ChartShaders() {
   delete chart_area_program;
   delete chart_line_program;
-  //delete chart_text_program;
+  delete chart_text_program;
   delete chart_mark_program;
   delete chart_sndg_program;
 }
@@ -158,13 +158,12 @@ void ChartShaders::initChartTextProgram() {
   text_uniform_locs[COMMON_UNIFORMS_CENTER]           = chart_text_program->uniformLocation("center");
   text_uniform_locs[COMMON_UNIFORMS_SCALE]            = chart_text_program->uniformLocation("scale");
   text_uniform_locs[COMMON_UNIFORMS_PATTERN_TEX_ID]   = chart_text_program->uniformLocation("glyph_tex");
-  text_uniform_locs[COMMON_UNIFORMS_PATTERN_TEX_DIM]  = chart_text_program->uniformLocation("pattern_tex_size");
   text_uniform_locs[COMMON_UNIFORMS_MVP_MATRIX]       = chart_text_program->uniformLocation("mvp_matrix");
 
-  text_uniform_locs[TEXT_UNIFORMS_COLOR]              = chart_text_program->uniformLocation("color");
-
-  text_attribute_locs[TEXT_ATTRIBUTES_COORDS]         = chart_text_program->attributeLocation("world_coords");
+  text_attribute_locs[TEXT_ATTRIBUTES_COORDS]         = chart_text_program->attributeLocation("coords");
+  text_attribute_locs[TEXT_ATTRIBUTES_POINT_ORDER]    = chart_text_program->attributeLocation("point_order");
   text_attribute_locs[TEXT_ATTRIBUTES_CHAR_ORDER]     = chart_text_program->attributeLocation("char_order");
+  text_attribute_locs[TEXT_ATTRIBUTES_CHAR_COUNT]     = chart_text_program->attributeLocation("char_count");
   text_attribute_locs[TEXT_ATTRIBUTES_CHAR_VALUE]     = chart_text_program->attributeLocation("char_val");
 
   chart_text_program->release();
