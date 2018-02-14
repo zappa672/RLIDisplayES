@@ -27,6 +27,7 @@ SOURCES     += \
     src/rlicontrolwidget.cpp \
     src/rlidisplaywidget.cpp \
     \
+    src/common/properties.cpp \
     src/common/rliconfig.cpp \
     src/common/triangulate.cpp \
     src/common/rlimath.cpp \
@@ -34,20 +35,25 @@ SOURCES     += \
     src/datasources/radarscale.cpp \
     src/datasources/radardatasource.cpp \
     src/datasources/shipdatasource.cpp \
+    src/datasources/infocontrollers.cpp \
     \
     src/s52/chartmanager.cpp \
     src/s52/s52chart.cpp \
     src/s52/s52assets.cpp \
     src/s52/s52references.cpp \
     \
+    src/layers/infoengine.cpp \
+    src/layers/menuengine.cpp \
     src/layers/radarengine.cpp \
     src/layers/radarpalette.cpp \
     src/layers/chartengine.cpp \
     src/layers/chartlayers.cpp \
     src/layers/chartshaders.cpp \
-    src/layers/maskengine.cpp \
-    src/common/properties.cpp \
-    src/layers/chartsettingsmodel.cpp
+    src/layers/maskengine.cpp \    
+    src/layers/chartsettingsmodel.cpp \
+    src/layers/routeengine.cpp \
+    src/layers/targetengine.cpp \
+    src/layers/infofonts.cpp
 
 HEADERS     += \
     src/mainwindow.h \
@@ -60,6 +66,7 @@ HEADERS     += \
     src/common/rlimath.h \
     src/common/rlistrings.h \
     \
+    src/datasources/infocontrollers.h \
     src/datasources/radarscale.h \
     src/datasources/radardatasource.h \
     src/datasources/shipdatasource.h \
@@ -69,13 +76,18 @@ HEADERS     += \
     src/s52/s52assets.h \
     src/s52/s52references.h \
     \
+    src/layers/infoengine.h \
+    src/layers/menuengine.h \
     src/layers/radarengine.h \
     src/layers/radarpalette.h \
     src/layers/chartengine.h \
     src/layers/chartlayers.h \
     src/layers/chartshaders.h \
     src/layers/maskengine.h \
-    src/layers/chartsettingsmodel.h
+    src/layers/chartsettingsmodel.h \
+    src/layers/routeengine.h \
+    src/layers/targetengine.h \
+    src/layers/infofonts.h
 
 FORMS       += \
     forms/mainwindow.ui \

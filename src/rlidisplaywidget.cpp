@@ -25,6 +25,7 @@ RLIDisplayWidget::~RLIDisplayWidget() {
   delete _chart_mngr;
 
   if (_initialized) {
+    delete _infoFonts;
     delete _radarEngine;
     delete _tailsEngine;
     delete _maskEngine;
@@ -42,8 +43,8 @@ void RLIDisplayWidget::toggleRadarTailsShift() {
 }
 
 void RLIDisplayWidget::onNewChartAvailable(const QString& name) {
-  //if (name == "US2SP01M.000")
-  if (name == "CO200008.000")
+  if (name == "US2SP01M.000")
+  //if (name == "CO200008.000")
     _chartEngine->setChart(_chart_mngr->getChart(name), _chart_mngr->refs());
 }
 
@@ -95,20 +96,29 @@ void RLIDisplayWidget::initializeGL() {
   // Layers initialization
   //-------------------------------------------------------------
 
+  qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Fonts init start";
+  _infoFonts = new InfoFonts(context(), "data/textures/fonts");
+  qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Fonts init finish";
+
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Radar engine init start";
-  _radarEngine = new RadarEngine(bearings_per_cycle, peleng_size, circle_radius, context(), this);
-  _tailsEngine = new RadarEngine(bearings_per_cycle, peleng_size, circle_radius, context(), this);
+  _radarEngine = new RadarEngine(bearings_per_cycle, peleng_size, circle_radius, context(), this);  
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Radar engine init finish";
 
+  qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Tails engine init start";
+  _tailsEngine = new RadarEngine(bearings_per_cycle, peleng_size, circle_radius, context(), this);
+  qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Tails engine init finish";
 
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Mask engine init start";
   _maskEngine = new MaskEngine(size(), context(), this);
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Mask engine init finish";
 
-
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Chart engine init start";
   _chartEngine = new ChartEngine(circle_radius, _chart_mngr->refs(), context(), this);
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Chart engine init finish";
+
+  qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Info engine init start";
+  _infoEngine = new InfoEngine(context(), this);
+  qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Info engine init finish";
 
   //-------------------------------------------------------------
 
@@ -185,16 +195,12 @@ void RLIDisplayWidget::paintLayers() {
 
   QPoint shift(_debug_radar_tails_shift, _debug_radar_tails_shift);
 
-  fillRectWithTexture( QRect(layout->circle.boundRect.topLeft().toPoint(), _chartEngine->size())
-                     , _chartEngine->textureId());
+  drawRect(QRect(layout->circle.boundRect.topLeft().toPoint(), _chartEngine->size()), _chartEngine->textureId());
 
-  fillRectWithTexture( QRect(layout->circle.boundRect.topLeft().toPoint() + shift, _radarEngine->size())
-                     , _radarEngine->textureId());
+  drawRect(QRect(layout->circle.boundRect.topLeft().toPoint() + shift, _radarEngine->size()), _radarEngine->textureId());
+  drawRect(QRect(layout->circle.boundRect.topLeft().toPoint() - shift, _tailsEngine->size()), _tailsEngine->textureId());
 
-  fillRectWithTexture( QRect(layout->circle.boundRect.topLeft().toPoint() - shift, _tailsEngine->size())
-                     , _tailsEngine->textureId());
-
-  fillRectWithTexture( rect(), _maskEngine->textureId());
+  drawRect(rect(), _maskEngine->textureId());
 
   glFlush();
 }
@@ -210,20 +216,16 @@ void RLIDisplayWidget::updateLayers() {
   _chartEngine->update(shipPosition, chartScale , 0.f,  QPoint(0.f, 0.f), colorScheme);
 }
 
-void RLIDisplayWidget::fillRectWithTexture(const QRectF& rect, GLuint textureId) {
+void RLIDisplayWidget::drawRect(const QRectF& rect, GLuint textureId) {
   GLfloat vertices[] =  { static_cast<float>(rect.left()),  static_cast<float>(rect.bottom())
                         , static_cast<float>(rect.left()),  static_cast<float>(rect.top())
-                        , static_cast<float>(rect.right()), static_cast<float>(rect.top())
-                        , static_cast<float>(rect.right()), static_cast<float>(rect.bottom()) };
+                        , static_cast<float>(rect.right()), static_cast<float>(rect.bottom())
+                        , static_cast<float>(rect.right()), static_cast<float>(rect.top()) };
 
   GLfloat texcoords[] = { 0.0f, 1.0f
                         , 0.0f, 0.0f
-                        , 1.0f, 0.0f
-                        , 1.0f, 1.0f };
-
-  GLubyte indices[] =   { 0, 1, 2     // first triangle (bottom left - top left - top right)
-                        , 0, 2, 3 };  // second triangle (bottom left - top right - bottom right)
-
+                        , 1.0f, 1.0f
+                        , 1.0f, 0.0f };
 
   _program->bind();
 
@@ -243,7 +245,7 @@ void RLIDisplayWidget::fillRectWithTexture(const QRectF& rect, GLuint textureId)
   glVertexAttribPointer( _attr_locs[ATTR_TEXCOORD], 2, GL_FLOAT, GL_FALSE, 0, (void*) (0 * sizeof(GLfloat)));
   glEnableVertexAttribArray(_attr_locs[ATTR_TEXCOORD]);
 
-  glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, indices);
+  glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
   glBindTexture(GL_TEXTURE_2D, 0);
   glBindBuffer(GL_ARRAY_BUFFER, 0);

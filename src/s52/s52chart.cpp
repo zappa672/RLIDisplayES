@@ -39,6 +39,9 @@ S52Chart::S52Chart(char* file_name, S52References* ref) {
       max_lat = static_cast<float>(oExt.MaxY);
       min_lon = static_cast<float>(oExt.MinX);
       max_lon = static_cast<float>(oExt.MaxX);
+
+      //qDebug() << min_lat << "-" << max_lat;
+      //qDebug() << min_lon << "-" << max_lon;
     }
 
     poLayer->ResetReading();
@@ -576,6 +579,9 @@ QString S52Chart::getAreaPatternRef(QString& layer_name, OGRFeature* poFeature) 
 
 //  if (layer_name == "DEPARE")
 //    return "RCKLDG01";
+
+  if (layer_name == "SBDARE")
+    return "RCKLDG01";
 
   if (layer_name == "BUAARE")
     return "RCKLDG01";

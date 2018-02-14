@@ -22,13 +22,13 @@ public:
   // Returns patterns texture id for the color scheme
   inline QOpenGLTexture* getAreaPatternTex  (const QString& s)                    { return pattern_textures[s]; }
   // Returns pattern's left-top pixel location in patterns texture, s - color scheme, n - pattern tag
-  inline QPoint getAreaPatternLocation      (const QString& s, const QString& n)  { return (pat_lc[s].contains(n)) ? pat_lc[s][n] : QPoint(-1, -1); }
+  inline QPoint getAreaPatternLocation      (const QString& s, const QString& n)  { return pat_lc[s].value(n, QPoint(-1, -1)); }
   // Returns size of the pattern
-  inline QSize getAreaPatternSize           (const QString& s, const QString& n)  { return (pat_sz[s].contains(n)) ? pat_sz[s][n] : QSize(0, 0); }
+  inline QSize getAreaPatternSize           (const QString& s, const QString& n)  { return pat_sz[s].value(n, QSize(0, 0)); }
 
   inline QOpenGLTexture* getLinePatternTex  (const QString& s)                    { return line_textures[s]; }
-  inline QPoint getLinePatternLocation      (const QString& s, const QString& n)  { return (line_lc[s].contains(n)) ? line_lc[s][n] : QPoint(-1, -1); }
-  inline QSize getLinePatternSize           (const QString& s, const QString& n)  { return (line_sz[s].contains(n)) ? line_sz[s][n] : QSize(0, 0); }
+  inline QPoint getLinePatternLocation      (const QString& s, const QString& n)  { return line_lc[s].value(n, QPoint(-1, -1)); }
+  inline QSize getLinePatternSize           (const QString& s, const QString& n)  { return line_sz[s].value(n, QSize(0, 0)); }
 
   inline QOpenGLTexture* getSymbolTex       (const QString& s)                    { return symbol_textures[graphic_files[s]]; }
 
@@ -56,9 +56,6 @@ private:
 
   QMap<QString, QString>                  graphic_files;
   QMap<QString, QOpenGLTexture*>          symbol_textures;
-//  QMap<QString, QMap<QString, QPoint>>    symb_lc;
-//  QMap<QString, QMap<QString, QPoint>>    symb_sz;
-//  QMap<QString, QMap<QString, QPoint>>    symb_pv;
 };
 
 #endif // S52ASSETS_H

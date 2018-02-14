@@ -15,6 +15,7 @@
 #include "layers/radarengine.h"
 #include "layers/maskengine.h"
 #include "layers/chartengine.h"
+#include "layers/infoengine.h"
 
 
 class RLIDisplayWidget : public QOpenGLWidget, protected QOpenGLFunctions
@@ -26,6 +27,7 @@ public:
 
   inline RadarEngine* radarEngine() { return _radarEngine; }
   inline RadarEngine* tailsEngine() { return _tailsEngine; }
+  inline InfoEngine* infoEngine() { return _infoEngine; }
 
   void toggleRadarTailsShift();
 
@@ -51,15 +53,17 @@ private:
   void paintLayers();
   void updateLayers();
 
-  void fillRectWithTexture(const QRectF& rect, GLuint textureId);
+  void drawRect(const QRectF& rect, GLuint textureId);
 
   ChartManager* _chart_mngr;
 
-  MaskEngine* _maskEngine;
+  InfoFonts* _infoFonts;
 
+  MaskEngine* _maskEngine;
   RadarEngine* _radarEngine;
   RadarEngine* _tailsEngine;
   ChartEngine* _chartEngine;
+  InfoEngine*  _infoEngine;
 
   QOpenGLShaderProgram* _program;
 
