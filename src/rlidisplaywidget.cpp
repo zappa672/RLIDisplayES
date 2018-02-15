@@ -202,6 +202,10 @@ void RLIDisplayWidget::paintLayers() {
 
   drawRect(rect(), _maskEngine->textureId());
 
+  for (int i = 0; i < _infoEngine->getBlockCount(); i++)
+    drawRect(_infoEngine->getBlockGeometry(i), _infoEngine->getBlockTextId(i));
+
+
   glFlush();
 }
 
@@ -214,6 +218,8 @@ void RLIDisplayWidget::updateLayers() {
 
   QString colorScheme = _chart_mngr->refs()->getColorScheme();
   _chartEngine->update(shipPosition, chartScale , 0.f,  QPoint(0.f, 0.f), colorScheme);
+
+  _infoEngine->update(_infoFonts);
 }
 
 void RLIDisplayWidget::drawRect(const QRectF& rect, GLuint textureId) {

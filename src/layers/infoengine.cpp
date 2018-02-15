@@ -127,7 +127,6 @@ void InfoEngine::update(InfoFonts* fonts) {
   }
 
   _full_update = false;
-  glFlush();
 }
 
 void InfoEngine::updateBlock(InfoBlock* b, InfoFonts* fonts) {

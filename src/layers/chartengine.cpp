@@ -148,8 +148,8 @@ void ChartEngine::setSndgLayer(S52Chart* chrt, S52References* ref) {
 
 void ChartEngine::update(std::pair<float, float> center, float scale, float angle, QPoint center_shift, const QString& color_scheme) {
   bool need_update = ( _force_update
-                    || fabs(_center.first - center.first) > 0.00005
-                    || fabs(_center.second - center.second) > 0.00005
+                    || fabs(_center.first - center.first) > 0.000005
+                    || fabs(_center.second - center.second) > 0.000005
                     || fabs(_scale - scale) > 0.005
                     || fabs(_angle - angle) > 0.005
                     || fabs(_center_shift.x() - center_shift.x()) > 0.005
