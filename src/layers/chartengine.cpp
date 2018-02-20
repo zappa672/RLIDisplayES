@@ -168,6 +168,7 @@ void ChartEngine::update(std::pair<float, float> center, float scale, float angl
 
 void ChartEngine::draw(const QString& color_scheme) {
   glEnable(GL_BLEND);
+  glEnable(GL_TEXTURE_2D);
   glDisable(GL_DEPTH);
   glDisable(GL_DEPTH_TEST);
 
@@ -196,7 +197,6 @@ void ChartEngine::draw(const QString& color_scheme) {
     drawLineLayers(displayOrder, projection*transform, color_scheme);
     drawTextLayers(displayOrder, projection*transform);
     drawMarkLayers(displayOrder, projection*transform, color_scheme);
-
     drawSndgLayer(projection*transform, color_scheme);
   }
 
@@ -229,9 +229,6 @@ void ChartEngine::drawAreaLayers(const QStringList& displayOrder, const QMatrix4
     if (area_engines.contains(layer) && area_engines[layer] != nullptr)
       area_engines[layer]->draw(shaders);
 
-  pattern_tex->release(0);
-  color_scheme_tex->release(1);
-
   prog->release();
 }
 
@@ -258,9 +255,6 @@ void ChartEngine::drawLineLayers(const QStringList& displayOrder, const QMatrix4
     if (line_engines.contains(layer) && line_engines[layer] != nullptr)
       line_engines[layer]->draw(shaders);
 
-  pattern_tex->release(0);
-  color_scheme_tex->release(1);
-
   prog->release();
 }
 
@@ -273,16 +267,14 @@ void ChartEngine::drawTextLayers(const QStringList& displayOrder, const QMatrix4
   glUniform1f(shaders->getTextUniformLoc(COMMON_UNIFORMS_NORTH), _angle);
   prog->setUniformValue(shaders->getTextUniformLoc(COMMON_UNIFORMS_MVP_MATRIX), mvp_matrix);
 
-  QOpenGLTexture* glyph_tex = assets->getFontTexId();
+  QOpenGLTexture* fontTex = assets->getFontTexId();
 
-  glyph_tex->bind(0);
+  fontTex->bind(0);
   glUniform1i(shaders->getTextUniformLoc(COMMON_UNIFORMS_PATTERN_TEX_ID), 0);
 
   for (QString layer : displayOrder)
     if (text_engines.contains(layer) && text_engines[layer] != nullptr)
       text_engines[layer]->draw(shaders);
-
-  glyph_tex->release(0);
 
   prog->release();
 }
@@ -306,8 +298,6 @@ void ChartEngine::drawMarkLayers(const QStringList& displayOrder, const QMatrix4
     if (mark_engines.contains(layer) && mark_engines[layer] != nullptr)
       mark_engines[layer]->draw(shaders);
 
-  pattern_tex->release(0);
-
   prog->release();
 }
 
@@ -327,8 +317,6 @@ void ChartEngine::drawSndgLayer(const QMatrix4x4& mvp_matrix, const QString& col
   glUniform1i(shaders->getSndgUniformLoc(COMMON_UNIFORMS_PATTERN_TEX_ID), 0);
 
   sndg_engine->draw(shaders);
-
-  pattern_tex->release(0);
 
   prog->release();
 }

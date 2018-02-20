@@ -1,3 +1,4 @@
+/*
 #include "routeengine.h"
 
 RouteEngine::RouteEngine(QObject* parent) : QObject(parent), QGLFunctions(), _routes(200) {
@@ -166,3 +167,4 @@ int RouteEngine::loadBuffers() {
 
   return curr_points.size() / 2;
 }
+*/

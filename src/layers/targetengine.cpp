@@ -1,3 +1,4 @@
+/*
 #include "targetengine.h"
 
 #include "../common/rlimath.h"
@@ -191,44 +192,43 @@ void TargetEngine::draw(QVector2D world_coords, float scale) {
 
   // Transform feedback part
   // Start
-  /*glBindBuffer(GL_TRANSFORM_FEEDBACK_BUFFER , _tbo_id);
-  glBufferData(GL_TRANSFORM_FEEDBACK_BUFFER , _targets.size()*4*2*sizeof(GLfloat), nullptr, GL_DYNAMIC_READ);
-  glEnable(GL_RASTERIZER_DISCARD);
-  glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, _tbo_id);
-  glBeginTransformFeedback(GL_POINTS);
-  glDrawArrays(GL_POINTS, 0,  _targets.size()*4);
-  glEndTransformFeedback();
-  glFlush();
+//  glBindBuffer(GL_TRANSFORM_FEEDBACK_BUFFER , _tbo_id);
+//  glBufferData(GL_TRANSFORM_FEEDBACK_BUFFER , _targets.size()*4*2*sizeof(GLfloat), nullptr, GL_DYNAMIC_READ);
+//  glEnable(GL_RASTERIZER_DISCARD);
+//  glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, _tbo_id);
+//  glBeginTransformFeedback(GL_POINTS);
+//  glDrawArrays(GL_POINTS, 0,  _targets.size()*4);
+//  glEndTransformFeedback();
 
-  GLfloat* feedback = new GLfloat[_targets.size()*4*2];
-  glGetBufferSubData(GL_TRANSFORM_FEEDBACK_BUFFER, 0, _targets.size()*4*2*sizeof(GLfloat), feedback);
+//  GLfloat* feedback = new GLfloat[_targets.size()*4*2];
+//  glGetBufferSubData(GL_TRANSFORM_FEEDBACK_BUFFER, 0, _targets.size()*4*2*sizeof(GLfloat), feedback);
 
-  qDebug() << "feedback";
-  qDebug() << world_coords;
-  qDebug() << scale;
-  for (int i = 0; i < _targets.size(); i++) {
-    QVector2D center(_targets[_targets.keys()[i]].Latitude, _targets[_targets.keys()[i]].Longtitude);
-    qDebug() << center;
+//  qDebug() << "feedback";
+//  qDebug() << world_coords;
+//  qDebug() << scale;
+//  for (int i = 0; i < _targets.size(); i++) {
+//    QVector2D center(_targets[_targets.keys()[i]].Latitude, _targets[_targets.keys()[i]].Longtitude);
+//    qDebug() << center;
 
-    float lat_rads = radians(world_coords.x());
+//    float lat_rads = radians(world_coords.x());
 
-    float y_m = -6378137*radians(center.x() - world_coords.x());
-    float x_m = 6378137*cos(lat_rads)*radians(center.y() - world_coords.y());
+//    float y_m = -6378137*radians(center.x() - world_coords.x());
+//    float x_m = 6378137*cos(lat_rads)*radians(center.y() - world_coords.y());
 
-    // screen position
-    QVector2D pix_pos = QVector2D(x_m, y_m) / scale;
-    qDebug() << pix_pos;
+//    // screen position
+//    QVector2D pix_pos = QVector2D(x_m, y_m) / scale;
+//    qDebug() << pix_pos;
 
-    qDebug() << feedback[8*i+0] << ": " << feedback[8*i+1];
-    qDebug() << feedback[8*i+2] << ": " << feedback[8*i+3];
-    qDebug() << feedback[8*i+4] << ": " << feedback[8*i+5];
-    qDebug() << feedback[8*i+6] << ": " << feedback[8*i+7];
-  }
+//    qDebug() << feedback[8*i+0] << ": " << feedback[8*i+1];
+//    qDebug() << feedback[8*i+2] << ": " << feedback[8*i+3];
+//    qDebug() << feedback[8*i+4] << ": " << feedback[8*i+5];
+//    qDebug() << feedback[8*i+6] << ": " << feedback[8*i+7];
+//  }
 
-  glDisable(GL_RASTERIZER_DISCARD);
+//  glDisable(GL_RASTERIZER_DISCARD);
   // End
   // Transform feedback part
-  */
+
 
 
   // Draw target marks
@@ -415,3 +415,4 @@ void TargetEngine::initTexture(QString path, GLuint* tex_id) {
 int TargetEngine::getTailsTime(void) {
     return _tailsTime;
 }
+*/

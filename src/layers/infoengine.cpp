@@ -59,9 +59,8 @@ InfoEngine::InfoEngine(QOpenGLContext* context, QObject* parent) : QObject(paren
 
   _lang = RLI_LANG_RUSSIAN;
 
-  enc = QTextCodec::codecForName("cp866")->makeEncoder();
-  dec = QTextCodec::codecForName("UTF8")->makeDecoder();
-  dec1 = QTextCodec::codecForName("cp866")->makeDecoder();
+  decUTF8 = QTextCodec::codecForName("UTF8")->makeDecoder();
+  decCP866 = QTextCodec::codecForName("cp866")->makeDecoder();
 
   _full_update = true;
 
@@ -83,48 +82,42 @@ InfoBlock* InfoEngine::addInfoBlock() {
 }
 
 void InfoEngine::onLanguageChanged(const QByteArray& lang) {
-  QString lang_str = dec1->toUnicode(lang);
+  QString lang_str = decCP866->toUnicode(lang);
 
-  if (_lang == RLI_LANG_RUSSIAN && (lang_str == dec->toUnicode(RLIStrings::nEng[RLI_LANG_RUSSIAN])
-                             || lang_str == dec->toUnicode(RLIStrings::nEng[RLI_LANG_ENGLISH]))) {
+  if (_lang == RLI_LANG_RUSSIAN && (lang_str == decUTF8->toUnicode(RLIStrings::nEng[RLI_LANG_RUSSIAN])
+                                 || lang_str == decUTF8->toUnicode(RLIStrings::nEng[RLI_LANG_ENGLISH]))) {
       _lang = RLI_LANG_ENGLISH;
       _full_update = true;
   }
 
-  if (_lang == RLI_LANG_ENGLISH && (lang_str == dec->toUnicode(RLIStrings::nRus[RLI_LANG_ENGLISH])
-                             || lang_str == dec->toUnicode(RLIStrings::nRus[RLI_LANG_RUSSIAN]))) {
+  if (_lang == RLI_LANG_ENGLISH && (lang_str == decUTF8->toUnicode(RLIStrings::nRus[RLI_LANG_ENGLISH])
+                                 || lang_str == decUTF8->toUnicode(RLIStrings::nRus[RLI_LANG_RUSSIAN]))) {
       _lang = RLI_LANG_RUSSIAN;
       _full_update = true;
   }
 }
 
 void InfoEngine::update(InfoFonts* fonts) {
-  QVector<InfoBlock*>::const_iterator iter;
-  for (iter = _blocks.begin(); iter != _blocks.end(); iter++) {
-    InfoBlock* block = (*iter);
+  for (InfoBlock* block : _blocks)
     if (_full_update || block->needUpdate()) {
       block->fbo()->bind();
-
-      glDisable(GL_BLEND);
-      glDisable(GL_DEPTH);
+      _prog->bind();
 
       QRect geom = block->getGeometry();
 
       glViewport(0, 0, geom.width(), geom.height());
 
-      glMatrixMode( GL_PROJECTION );
-      glPushMatrix();
-      glLoadIdentity();
-      glOrtho(0, geom.width(), geom.height(), 0, -1, 1 );
+      QMatrix4x4 projection;
+      projection.setToIdentity();
+      projection.ortho(0.f, geom.width(), 0.f, geom.height(), -1.f, 1.f);
+
+      _prog->setUniformValue(_uniform_locs[INFO_UNIF_MVP], projection);
 
       updateBlock(block, fonts);
 
-      glMatrixMode( GL_PROJECTION );
-      glPopMatrix();
-
+      _prog->release();
       block->fbo()->release();
     }
-  }
 
   _full_update = false;
 }
@@ -135,29 +128,21 @@ void InfoEngine::updateBlock(InfoBlock* b, InfoFonts* fonts) {
   int    brdWid = b->getBorderWidth();
   QRect  geom   = QRect(0, 0, b->getGeometry().width(), b->getGeometry().height());
 
-  glShadeModel( GL_FLAT );
-
-  // Draw background and border
+  glClearColor(bckCol.redF(), bckCol.greenF(), bckCol.blueF(), bckCol.alphaF());
+  glClear(GL_COLOR_BUFFER_BIT);
 
   if (brdWid >= 1) {
-    drawRect(geom, brdCol);
-    QRect back(geom.x() + brdWid, geom.y() + brdWid, geom.width() - 2 * brdWid, geom.height() - 2 * brdWid);
-    drawRect(back, bckCol);
-  } else {
-    drawRect(geom, bckCol);
+    drawRect(QRect(QPoint(0, 0), QSize(geom.width(), brdWid)), brdCol);
+    drawRect(QRect(QPoint(0, 0), QSize(brdWid, geom.height())), brdCol);
+    drawRect(QRect(QPoint(0, geom.height() - brdWid), QSize(geom.width(), brdWid)), brdCol);
+    drawRect(QRect(QPoint(geom.width() - brdWid, 0), QSize(brdWid, geom.height())), brdCol);
   }
-
-  glEnable(GL_BLEND);
 
   for (int i = 0; i < b->getRectCount(); i++)
     drawRect(b->getRect(i).rect, b->getRect(i).col);
 
-  _prog->bind();
-
   for (int i = 0; i < b->getTextCount(); i++)
     drawText(b->getText(i), fonts);
-
-  _prog->release();
 
   b->discardUpdate();
 }
@@ -185,10 +170,10 @@ void InfoEngine::drawText(const InfoText& text, InfoFonts* fonts) {
       break;
   }
 
-  for (int i = 0; i < text.str[_lang].size(); i++) {
-    for (int j = 0; j < 4; j++) {
-      QPoint lefttop = anchor + QPoint(i * font_size.width(), 0);
 
+  for (int i = 0; i < text.str[_lang].size(); i++) {
+    QPoint lefttop = anchor + QPoint(i * font_size.width(), 0);
+    for (int j = 0; j < 4; j++) {
       pos.push_back(lefttop.x());
       pos.push_back(lefttop.y());
       ord.push_back(j);
@@ -196,8 +181,10 @@ void InfoEngine::drawText(const InfoText& text, InfoFonts* fonts) {
     }
   }
 
-  glUniform2f(_uniform_locs[INFO_UNIFORM_SIZE], font_size.width(), font_size.height());
-  glUniform4f(_uniform_locs[INFO_UNIFORM_COLOR], text.color.redF(), text.color.greenF(), text.color.blueF(), 1.f);
+
+  glUniform2f(_uniform_locs[INFO_UNIF_SIZE], font_size.width(), font_size.height());
+  glUniform4f(_uniform_locs[INFO_UNIF_COLOR], text.color.redF(), text.color.greenF(), text.color.blueF(), 1.f);
+
 
   glBindBuffer(GL_ARRAY_BUFFER, _vbo_ids[INFO_ATTR_POSITION]);
   glBufferData(GL_ARRAY_BUFFER, pos.size()*sizeof(GLfloat), pos.data(), GL_STATIC_DRAW);
@@ -214,47 +201,59 @@ void InfoEngine::drawText(const InfoText& text, InfoFonts* fonts) {
   glVertexAttribPointer(_attr_locs[INFO_ATTR_CHAR_VAL], 1, GL_FLOAT, GL_FALSE, 0, (void*) (0));
   glEnableVertexAttribArray(_attr_locs[INFO_ATTR_CHAR_VAL]);
 
+
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, tex_id);
 
-  glDrawArrays(GL_QUADS, 0, ord.size());
+  glDrawArrays(GL_TRIANGLE_STRIP, 0, ord.size());
+
   glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 
 void InfoEngine::drawRect(const QRect& rect, const QColor& col) {
-  glBegin(GL_QUADS);
-  glColor4f(col.redF(), col.greenF(), col.blueF(), col.alphaF());
-  glVertex2f(rect.x(), rect.y());
-  glVertex2f(rect.x(), rect.y() + rect.height());
-  glVertex2f(rect.x() + rect.width() , rect.y() + rect.height());
-  glVertex2f(rect.x() + rect.width() , rect.y());
-  glEnd();
+  std::vector<GLfloat> pos;
+
+  pos.push_back(rect.x());
+  pos.push_back(rect.y());
+  pos.push_back(rect.x());
+  pos.push_back(rect.y() + rect.height());
+  pos.push_back(rect.x() + rect.width());
+  pos.push_back(rect.y());
+  pos.push_back(rect.x() + rect.width());
+  pos.push_back(rect.y() + rect.height());
+
+  glUniform2f(_uniform_locs[INFO_UNIF_SIZE], 0.f, 0.f);
+  glUniform4f(_uniform_locs[INFO_UNIF_COLOR], col.redF(), col.greenF(), col.blueF(), col.alphaF());
+
+  glBindBuffer(GL_ARRAY_BUFFER, _vbo_ids[INFO_ATTR_POSITION]);
+  glBufferData(GL_ARRAY_BUFFER, pos.size()*sizeof(GLfloat), pos.data(), GL_STATIC_DRAW);
+  glVertexAttribPointer(_attr_locs[INFO_ATTR_POSITION], 2, GL_FLOAT, GL_FALSE, 0, (void*) (0));
+  glEnableVertexAttribArray(_attr_locs[INFO_ATTR_POSITION]);
+
+  glVertexAttrib1f(_attr_locs[INFO_ATTR_ORDER], 0.f);
+  glDisableVertexAttribArray(_attr_locs[INFO_ATTR_ORDER]);
+
+  glVertexAttrib1f(_attr_locs[INFO_ATTR_CHAR_VAL], 0.f);
+  glDisableVertexAttribArray(_attr_locs[INFO_ATTR_CHAR_VAL]);
+
+  glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }
 
 
-bool InfoEngine::initShaders() {
-  // Overriding system locale until shaders are compiled
-  setlocale(LC_NUMERIC, "C");
-
-  // OR statements whould be executed one by one until false
-  if (!_prog->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/info.vert.glsl")
-   || !_prog->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/info.frag.glsl")
-   || !_prog->link()
-   || !_prog->bind())
-      return false;
-
-  // Restore system locale
-  setlocale(LC_ALL, "");
+void InfoEngine::initShaders() {
+  _prog->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/info.vert.glsl");
+  _prog->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/info.frag.glsl");
+  _prog->link();
+  _prog->bind();
 
   _attr_locs[INFO_ATTR_POSITION]  = _prog->attributeLocation("position");
   _attr_locs[INFO_ATTR_ORDER]     = _prog->attributeLocation("order");
   _attr_locs[INFO_ATTR_CHAR_VAL]  = _prog->attributeLocation("char_val");
 
-  _uniform_locs[INFO_UNIFORM_COLOR]  = _prog->uniformLocation("color");
-  _uniform_locs[INFO_UNIFORM_SIZE]  = _prog->uniformLocation("size");
+  _uniform_locs[INFO_UNIF_MVP]    = _prog->uniformLocation("mvp_matrix");
+  _uniform_locs[INFO_UNIF_COLOR]  = _prog->uniformLocation("color");
+  _uniform_locs[INFO_UNIF_SIZE]   = _prog->uniformLocation("size");
 
   _prog->release();
-
-  return true;
 }

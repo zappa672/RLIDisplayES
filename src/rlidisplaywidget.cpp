@@ -202,9 +202,8 @@ void RLIDisplayWidget::paintLayers() {
 
   drawRect(rect(), _maskEngine->textureId());
 
-  for (int i = 0; i < _infoEngine->getBlockCount(); i++)
-    drawRect(_infoEngine->getBlockGeometry(i), _infoEngine->getBlockTextId(i));
-
+  for (int i = 0; i < _infoEngine->blockCount(); i++)
+    drawRect(_infoEngine->blockGeometry(i), _infoEngine->blockTextId(i));
 
   glFlush();
 }
@@ -255,7 +254,6 @@ void RLIDisplayWidget::drawRect(const QRectF& rect, GLuint textureId) {
 
   glBindTexture(GL_TEXTURE_2D, 0);
   glBindBuffer(GL_ARRAY_BUFFER, 0);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
   _program->release();
 }

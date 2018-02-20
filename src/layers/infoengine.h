@@ -96,9 +96,9 @@ public:
   explicit InfoEngine   (QOpenGLContext* context, QObject* parent = nullptr);
   virtual ~InfoEngine   ();
 
-  inline int getBlockCount() { return _blocks.size(); }
-  inline int getBlockTextId(int b_id) { return _blocks[b_id]->getTextureId(); }
-  inline const QRect& getBlockGeometry(int b_id) { return _blocks[b_id]->getGeometry(); }
+  inline int blockCount() { return _blocks.size(); }
+  inline int blockTextId(int b_id) { return _blocks[b_id]->getTextureId(); }
+  inline const QRect& blockGeometry(int b_id) { return _blocks[b_id]->getGeometry(); }
 
   InfoBlock* addInfoBlock();
 
@@ -116,7 +116,7 @@ private:
   bool _full_update;
   QVector<InfoBlock*> _blocks;
 
-  bool initShaders();
+  void initShaders();
 
   // Info shader program
   QOpenGLShaderProgram* _prog;
@@ -126,17 +126,17 @@ private:
        , INFO_ATTR_ORDER = 1
        , INFO_ATTR_CHAR_VAL = 2
        , INFO_ATTR_COUNT = 3 } ;
-  enum { INFO_UNIFORM_COLOR = 0
-       , INFO_UNIFORM_SIZE = 1
-       , INFO_UNIFORM_COUNT = 2 } ;
+  enum { INFO_UNIF_MVP = 0
+       , INFO_UNIF_COLOR = 1
+       , INFO_UNIF_SIZE = 2
+       , INFO_UNIF_COUNT = 3 } ;
 
   GLuint _vbo_ids[INFO_ATTR_COUNT];
   GLuint _attr_locs[INFO_ATTR_COUNT];
-  GLuint _uniform_locs[INFO_UNIFORM_COUNT];
+  GLuint _uniform_locs[INFO_UNIF_COUNT];
 
-  QTextEncoder* enc;
-  QTextDecoder* dec;
-  QTextDecoder* dec1;
+  QTextDecoder* decUTF8;
+  QTextDecoder* decCP866;
 };
 
 #endif // INFOENGINE_H
