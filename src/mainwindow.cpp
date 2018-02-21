@@ -25,13 +25,13 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
          ,&RLIState::instance(), SLOT(onShipPositionChanged(std::pair<float,float>)));
 
   _gain_ctrl = new ValueBarController(RLIStrings::nGain, 255, this);
-  connect(wgtButtonPanel, SIGNAL(gainChanged(int)), _gain_ctrl, SLOT(onValueChanged(int)));
+  connect(this, SIGNAL(gainChanged(int)), _gain_ctrl, SLOT(onValueChanged(int)));
 
   _water_ctrl = new ValueBarController(RLIStrings::nWave, 255, this);
-  connect(wgtButtonPanel, SIGNAL(waterChanged(int)), _water_ctrl, SLOT(onValueChanged(int)));
+  connect(this, SIGNAL(waterChanged(int)), _water_ctrl, SLOT(onValueChanged(int)));
 
   _rain_ctrl = new ValueBarController(RLIStrings::nRain, 255, this);
-  connect(wgtButtonPanel, SIGNAL(rainChanged(int)), _rain_ctrl, SLOT(onValueChanged(int)));
+  connect(this, SIGNAL(rainChanged(int)), _rain_ctrl, SLOT(onValueChanged(int)));
 
   _apch_ctrl = new ValueBarController(RLIStrings::nAfc, 255, this);
   _rdtn_ctrl = new ValueBarController(RLIStrings::nEmsn, 255, this);
@@ -49,7 +49,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
   //connect(wgtRLI, SIGNAL(cursor_moved(float,float, const char *)), _curs_ctrl, SLOT(cursor_moved(float,float, const char *)));
 
   _clck_ctrl = new ClockController(this);
-  //connect(wgtRLI, SIGNAL(per_second()), _clck_ctrl, SLOT(second_changed()));
+  connect(wgtRLI, SIGNAL(secondChanged()), _clck_ctrl, SLOT(onSecondChanged()));
 
   _scle_ctrl = new ScaleController(this);
 
@@ -227,12 +227,11 @@ void MainWindow::keyReleaseEvent(QKeyEvent *event) {
 
 void MainWindow::keyPressEvent(QKeyEvent *event) {
   std::pair<float, float> shipPos;
+  Qt::KeyboardModifiers mod_keys = event->modifiers();
+
   float chartScale;
 
   switch(event->key()) {
-  case Qt::Key_Control:
-    wgtRLI->toggleRadarTailsShift();
-
   //Под. имп. Помех
   case Qt::Key_S:
     break;
@@ -241,12 +240,42 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
     break;
   //Шкала +
   case Qt::Key_Plus:
+    if (mod_keys & Qt::ControlModifier) {
+      emit gainChanged(qMax(_gain_ctrl->value() + 5, 255));
+      break;
+    }
+
+    if (mod_keys & Qt::AltModifier) {
+      emit waterChanged(qMax(_water_ctrl->value() + 5, 255));
+      break;
+    }
+
+    if (mod_keys & Qt::ShiftModifier) {
+      emit rainChanged(qMax(_rain_ctrl->value() + 5, 255));
+      break;
+    }
+
     chartScale = RLIState::instance().chartScale();
     chartScale *= 0.95;
     RLIState::instance().onChartScaleChanged(chartScale);
     break;
   //Шкала -
   case Qt::Key_Minus:
+    if (mod_keys & Qt::ControlModifier) {
+      emit gainChanged(qMin(_gain_ctrl->value() - 5, 0));
+      break;
+    }
+
+    if (mod_keys & Qt::AltModifier) {
+      emit waterChanged(qMin(_water_ctrl->value() - 5, 0));
+      break;
+    }
+
+    if (mod_keys & Qt::ShiftModifier) {
+      emit rainChanged(qMin(_rain_ctrl->value() - 5, 0));
+      break;
+    }
+
     chartScale = RLIState::instance().chartScale();
     chartScale *= 1.05;
     RLIState::instance().onChartScaleChanged(chartScale);
@@ -299,6 +328,7 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
     break;
   //Обзор
   case Qt::Key_X:
+    wgtRLI->toggleRadarTailsShift();
     break;
   //Узкий / Шир.
   case Qt::Key_Greater:

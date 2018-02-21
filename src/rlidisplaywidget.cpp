@@ -16,7 +16,7 @@ RLIDisplayWidget::RLIDisplayWidget(QWidget *parent) : QOpenGLWidget(parent) {
   _initialized = false;
   _debug_radar_tails_shift = 0;
 
-  setMouseTracking(true);
+  setMouseTracking(true);  
 
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "RLIDisplayWidget construction finish";
 }
@@ -171,6 +171,15 @@ void RLIDisplayWidget::resizeGL(int w, int h) {
 }
 
 void RLIDisplayWidget::paintGL() {
+  QDateTime time = QDateTime::currentDateTime();
+
+  if (frameTimes.size() == 0 || frameTimes.last().time().second() != time.time().second())
+    emit secondChanged();
+
+  frameTimes.push_back(time);
+  while (frameTimes.size() > 20)
+    frameTimes.removeFirst();
+
   if (!_initialized)
     return;
 

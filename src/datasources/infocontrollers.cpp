@@ -915,7 +915,7 @@ void ClockController::initBlock(const RLIPanelInfo& panelInfo) {
   _text_id = _block->addText(t);
 }
 
-void ClockController::second_changed() {
+void ClockController::onSecondChanged() {
   if (_text_id == -1)
     return;
 

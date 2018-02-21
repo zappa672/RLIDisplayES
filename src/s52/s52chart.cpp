@@ -30,6 +30,10 @@ S52Chart::S52Chart(char* file_name, S52References* ref) {
     OGRLayer* poLayer = poDS->GetLayer(iLayer);
     QString layer_name = poLayer->GetName();
 
+
+    //poLayer->SetSpatialFilterRect(14.2, 16.2, 144.6, 146.6);
+
+
     if (layer_name == "M_COVR") {
       OGREnvelope oExt;
       if (!(poLayer->GetExtent(&oExt, TRUE) == OGRERR_NONE))

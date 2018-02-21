@@ -52,6 +52,8 @@ class ValueBarController : public InfoBlockController {
 public:
   explicit ValueBarController(char** name, int max_val, QObject* parent = 0);
 
+  inline int value() { return _val; }
+
 public slots:
   void onValueChanged(int val);
 
@@ -308,7 +310,7 @@ public:
   explicit ClockController(QObject* parent = 0);
 
 public slots:
-  void second_changed();
+  void onSecondChanged();
 
 signals:
   void setRect(int rectId, const QRect& r);

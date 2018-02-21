@@ -1,6 +1,7 @@
 #ifndef RLIDISPLAYWIDGET_H
 #define RLIDISPLAYWIDGET_H
 
+#include <QQueue>
 #include <QWidget>
 #include <QMouseEvent>
 
@@ -33,6 +34,7 @@ public:
 
 signals:
   void initialized();
+  void secondChanged();
 
 protected slots:
   void initializeGL();
@@ -44,6 +46,7 @@ private slots:
 
 private:
   bool _initialized;
+  QQueue<QDateTime> frameTimes;
 
   int _debug_radar_tails_shift;
 
@@ -72,7 +75,7 @@ private:
 
   GLuint _vbo_ids[ATTR_COUNT];
   GLuint _unif_locs[UNIF_COUNT];
-  GLuint _attr_locs[ATTR_COUNT];
+  GLuint _attr_locs[ATTR_COUNT];  
 
   QMatrix4x4 _projection;
 };

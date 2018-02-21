@@ -23,6 +23,11 @@ public:
   explicit MainWindow(QWidget *parent = 0);
   ~MainWindow();
 
+signals:
+  void gainChanged(int val);
+  void waterChanged(int val);
+  void rainChanged(int val);
+
 protected slots:
   void resizeEvent(QResizeEvent* e);
   void timerEvent(QTimerEvent* e);
