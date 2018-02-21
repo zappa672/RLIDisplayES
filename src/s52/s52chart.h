@@ -117,7 +117,7 @@ private:
 
   // Reads OGRLayer, appends presented layers to one or more layer maps
   bool readLayer(OGRLayer* poLayer);
-  bool readSoundingLayer(OGRLayer* poLayer);
+  bool readSoundingLayer(OGRLayer* poLayer, const QRectF& filterRect);
   bool readTextLayer(OGRLayer* poLayer);
 
   // Reading and tesselating OGRPolygon, append result to triangles

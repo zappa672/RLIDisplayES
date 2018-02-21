@@ -26,13 +26,12 @@ S52Chart::S52Chart(char* file_name, S52References* ref) {
     return;
 
   // iterate through
-  for( int iLayer = 0; iLayer < poDS->GetLayerCount(); iLayer++ ) {
-    OGRLayer* poLayer = poDS->GetLayer(iLayer);
+  for( int i = 0; i < poDS->GetLayerCount(); i++ ) {
+    OGRLayer* poLayer = poDS->GetLayer(i);
     QString layer_name = poLayer->GetName();
 
-
-    //poLayer->SetSpatialFilterRect(14.2, 16.2, 144.6, 146.6);
-
+    QRectF fRect(QPointF(144.6, 14.2), QSizeF(2.0, 2.0));
+    poLayer->SetSpatialFilterRect(fRect.left(), fRect.top(), fRect.right(), fRect.bottom());
 
     if (layer_name == "M_COVR") {
       OGREnvelope oExt;
@@ -50,9 +49,9 @@ S52Chart::S52Chart(char* file_name, S52References* ref) {
 
     poLayer->ResetReading();
     if (layer_name == "SOUNDG") {
-      if (!readSoundingLayer(poLayer))
+      if (!readSoundingLayer(poLayer, fRect))
         return;
-     
+
       continue;
     }
 
@@ -108,7 +107,7 @@ S52SndgLayer* S52Chart::getSndgLayer() {
   return sndg_layer;
 }
 
-bool S52Chart::readSoundingLayer(OGRLayer* poLayer) {
+bool S52Chart::readSoundingLayer(OGRLayer* poLayer, const QRectF& filterRect) {
   OGRFeature* poFeature = NULL;
 
   if (sndg_layer != NULL)
@@ -126,9 +125,12 @@ bool S52Chart::readSoundingLayer(OGRLayer* poLayer) {
 
         for (int j = 0; j < mp->getNumGeometries(); j++) {
           OGRPoint *p = (OGRPoint *) mp->getGeometryRef(j);
-          sndg_layer->points.push_back(p->getY());
-          sndg_layer->points.push_back(p->getX());
-          sndg_layer->depths.push_back(p->getZ());
+
+          if (filterRect.contains(p->getX(), p->getY())) {
+            sndg_layer->points.push_back(p->getY());
+            sndg_layer->points.push_back(p->getX());
+            sndg_layer->depths.push_back(p->getZ());
+          }
         }
       }
     }
