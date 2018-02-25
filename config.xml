@@ -249,7 +249,7 @@
     </layout>
 
     <layout size="1920x1080">
-      <rli-circle x="540" y="540" radius="500" font="F8X8B" />
+      <rli-circle x="800" y="540" radius="524" font="F8X8B" />
       <menu x="-4" y="152" width="236" height="262" font="F12X14B" />
       <magnifier x="-10" y="155" width="224" height="224" />
 
@@ -498,11 +498,11 @@
       <magnifier x="-10" y="155" width="224" height="224" />
 
       <panels>
-        <value-bar name="gain" x="4" y="4" width="143" height="21" bar_width="40" font="F12X14B" />
-        <value-bar name="water" x="4" y="29" width="143" height="21" bar_width="40" font="F12X14B" />
-        <value-bar name="rain" x="4" y="54" width="143" height="21" bar_width="40" font="F12X14B" />
-        <value-bar name="apch" x="4" y="79" width="143" height="21" bar_width="40" font="F12X14B" />
-        <value-bar name="emission" x="151" y="4" width="155" height="21" bar_width="40" font="F12X14B" />
+        <value-bar name="gain" x="4" y="4" width="151" height="21" bar_width="50" font="F12X14B" />
+        <value-bar name="water" x="4" y="29" width="151" height="21" bar_width="50" font="F12X14B" />
+        <value-bar name="rain" x="4" y="54" width="151" height="21" bar_width="50" font="F12X14B" />
+        <value-bar name="apch" x="4" y="79" width="151" height="21" bar_width="50" font="F12X14B" />
+        <value-bar name="emission" x="159" y="4" width="163" height="21" bar_width="50" font="F12X14B" />
 
         <label name="label5" x="4" y="104" width="102" height="20" font="F12X14B" />
         <label name="band" x="4" y="128" width="102" height="20" font="F12X14B" />

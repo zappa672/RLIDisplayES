@@ -150,11 +150,12 @@ void ValueBarController::onValueChanged(int val) {
   int block_height = _block->getGeometry().height();
 
   if (_val_rect_id != -1) {
-    if (_val >= 0)
+    if (_val >= 0) {
       emit setRect(_val_rect_id, QRect(block_width - _bar_width - border_width, 3, (_val*_bar_width) / _maxval, block_height - 2*3));
-    else {
+      for (int i = 0; i < RLI_LANG_COUNT; i++)
+        emit setText(_val_text_id, i, QByteArray());
+    } else {
       emit setRect(_val_rect_id, QRect(block_width - _bar_width - border_width, 3, 0, block_height - 2*3));
-
       for (int i = 0; i < RLI_LANG_COUNT; i++)
         emit setText(_val_text_id, i, enc->fromUnicode(dec->toUnicode(RLIStrings::nOff[i])));
     }
@@ -417,14 +418,15 @@ void TailsController::initBlock(const RLIPanelInfo& panelInfo) {
   setInfoTextStr(t, RLIStrings::nTrl);
   _mode_text_id = _block->addText(t);
 
-  QString mins;
-  for (int i = 0; i < RLI_LANG_COUNT; i++) {
-    if(_minutes <= 0)
-       mins.sprintf("%s", RLIStrings::nOff[i]);
-    else
-       mins.sprintf("%d", _minutes);
-
-    minsarray[i] = mins.toLocal8Bit().data();
+  if (_minutes <= 0) {
+    for (int i = 0; i < RLI_LANG_COUNT; i++)
+      minsarray[i] = RLIStrings::nOff[i];
+  } else {
+    QString mins;
+    for (int i = 0; i < RLI_LANG_COUNT; i++) {
+      mins.sprintf("%d", _minutes);
+      minsarray[i] = mins.toLocal8Bit().data();
+    }
   }
 
   t.color = INFO_TEXT_DYNAMIC_COLOR;

@@ -30,6 +30,7 @@ RLIDisplayWidget::~RLIDisplayWidget() {
     delete _tailsEngine;
     delete _maskEngine;
     delete _chartEngine;
+    delete _menuEngine;
 
     delete _program;
   }
@@ -85,7 +86,6 @@ void RLIDisplayWidget::initializeGL() {
   _program = new QOpenGLShaderProgram(this);
   _chart_mngr = new ChartManager(this);
 
-
   const RLILayout* layout = RLIConfig::instance().currentLayout();
 
   uint peleng_size         = qApp->property(PROPERTY_PELENG_SIZE).toInt();
@@ -119,6 +119,11 @@ void RLIDisplayWidget::initializeGL() {
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Info engine init start";
   _infoEngine = new InfoEngine(context(), this);
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Info engine init finish";
+
+  qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Menu engine init start";
+  _menuEngine = new MenuEngine(size(), layout->menu, context(), this);
+  _menuEngine->setFonts(_infoFonts);
+  qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Menu engine init finish";
 
   //-------------------------------------------------------------
 
@@ -168,6 +173,7 @@ void RLIDisplayWidget::resizeGL(int w, int h) {
   _chartEngine->resize(layout->circle.radius);
 
   _maskEngine->resize(QSize(w, h));
+   _menuEngine->resize(QSize(w, h), layout->menu);
 }
 
 void RLIDisplayWidget::paintGL() {
@@ -214,6 +220,8 @@ void RLIDisplayWidget::paintLayers() {
   for (int i = 0; i < _infoEngine->blockCount(); i++)
     drawRect(_infoEngine->blockGeometry(i), _infoEngine->blockTextId(i));
 
+  drawRect(QRect(_menuEngine->position(), _menuEngine->size()), _menuEngine->texture());
+
   glFlush();
 }
 
@@ -228,6 +236,7 @@ void RLIDisplayWidget::updateLayers() {
   _chartEngine->update(shipPosition, chartScale , 0.f,  QPoint(0.f, 0.f), colorScheme);
 
   _infoEngine->update(_infoFonts);
+  _menuEngine->update();
 }
 
 void RLIDisplayWidget::drawRect(const QRectF& rect, GLuint textureId) {
@@ -265,4 +274,39 @@ void RLIDisplayWidget::drawRect(const QRectF& rect, GLuint textureId) {
   glBindBuffer(GL_ARRAY_BUFFER, 0);
 
   _program->release();
+}
+
+
+void RLIDisplayWidget::onMenuToggled() {
+  if (_menuEngine->state() == MenuEngine::MAIN)
+    _menuEngine->setState(MenuEngine::DISABLED);
+  else
+    _menuEngine->setState(MenuEngine::MAIN);
+}
+
+void RLIDisplayWidget::onConfigMenuToggled() {
+  if (_menuEngine->state() == MenuEngine::CONFIG)
+    _menuEngine->setState(MenuEngine::DISABLED);
+  else
+    _menuEngine->setState(MenuEngine::CONFIG);
+}
+
+void RLIDisplayWidget::onUpToggled() {
+  if (_menuEngine->visible())
+    _menuEngine->onUp();
+}
+
+void RLIDisplayWidget::onDownToggled() {
+  if (_menuEngine->visible())
+    _menuEngine->onDown();
+}
+
+void RLIDisplayWidget::onEnterToggled() {
+  if (_menuEngine->visible())
+    _menuEngine->onEnter();
+}
+
+void RLIDisplayWidget::onBackToggled() {
+  if (_menuEngine->visible())
+    _menuEngine->onBack();
 }

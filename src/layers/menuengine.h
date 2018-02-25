@@ -1,4 +1,3 @@
-/*
 #ifndef MENUENGINE_H
 #define MENUENGINE_H
 
@@ -8,13 +7,14 @@
 #include <QTextEncoder>
 #include <QTextDecoder>
 
-#include <QtOpenGL/QGLFunctions>
-#include <QtOpenGL/QGLFramebufferObject>
-#include <QtOpenGL/QGLShaderProgram>
+#include <QOpenGLFunctions>
+#include <QOpenGLFramebufferObject>
+#include <QOpenGLShaderProgram>
 
 #include "infofonts.h"
 #include "../common/rlistrings.h"
 #include "routeengine.h"
+
 
 class RLIMenuItem : public QObject {
   Q_OBJECT
@@ -77,10 +77,10 @@ public:
 
   inline QByteArray value(int lang_id) { Q_UNUSED(lang_id); return QByteArray(); }
 
-  inline RLIMenuItemMenu* parent() { return _parent; }
-  inline RLIMenuItem* item(int i) { return _items[i]; }
-  inline int item_count() { return _items.size(); }
-  inline void add_item(RLIMenuItem* i) { _items.push_back(i); }
+  inline RLIMenuItemMenu* parent()      { return _parent; }
+  inline RLIMenuItem*     item(int i)   { return _items[i]; }
+  inline int              item_count()  { return _items.size(); }
+  inline void add_item(RLIMenuItem* i)  { _items.push_back(i); }
 
 private:
   RLIMenuItemMenu* _parent;
@@ -165,23 +165,23 @@ private:
 
 
 
-class MenuEngine : public QObject, protected QGLFunctions {
+class MenuEngine : public QObject, protected QOpenGLFunctions {
   Q_OBJECT
+
 public:
   enum MenuState { DISABLED, MAIN, CONFIG };
 
-  explicit MenuEngine  (const QSize& screen_size, const QMap<QString, QString>& params, QObject* parent = 0);
+  explicit MenuEngine  (const QSize& screen_size, const QMap<QString, QString>& params, QOpenGLContext* context, QObject* parent = 0);
   virtual ~MenuEngine  ();
 
-  inline QPointF position() { return _position; }
+  inline QPoint position() { return _position; }
   inline QSize size() { return _size; }
-  inline GLuint getTextureId() { return _fbo->texture(); }
+  inline GLuint texture() { return _fbo->texture(); }
 
-  inline void setRouteEngine(RouteEngine* e) { _routeEngine = e; }
+  //inline void setRouteEngine(RouteEngine* e) { _routeEngine = e; }
 
   inline void setFonts(InfoFonts* fonts) { _fonts = fonts; }
 
-  bool init     (const QGLContext* context);
   void resize   (const QSize& screen_size, const QMap<QString, QString>& params);
 
   inline MenuState state() { return _state; }
@@ -219,20 +219,21 @@ public slots:
 private:
   void initMainMenuTree();
   void initCnfgMenuTree();
-  bool initShader();
+  void initShader();
 
   enum TextAllignement { ALIGN_LEFT, ALIGN_CENTER, ALIGN_RIGHT };
 
   void drawBar();
   void drawSelection();
+
+  void drawRect(const QRect& rect, const QColor& col);
   void drawText(const QByteArray& text, int line, TextAllignement align, const QColor& col);
 
-  bool _initialized;
   bool _need_update;
 
   MenuState _state;
 
-  QPointF _position;
+  QPoint _position;
   QSize _size;
 
   QString _font_tag;
@@ -249,7 +250,7 @@ private:
 
   RLIMenuItemInt* analogZeroItem;
 
-  RouteEngine* _routeEngine;
+//  RouteEngine* _routeEngine;
 
   int _selected_line;
   bool _selection_active;
@@ -260,22 +261,22 @@ private:
   QTextDecoder* _dec;
   QTextDecoder* _dec1;
 
-  QGLFramebufferObject* _fbo;
-  QGLShaderProgram* _prog;
+  QOpenGLFramebufferObject* _fbo;
+  QOpenGLShaderProgram* _prog;
 
   // -----------------------------------------------
   enum { INFO_ATTR_POSITION = 0
        , INFO_ATTR_ORDER = 1
        , INFO_ATTR_CHAR_VAL = 2
        , INFO_ATTR_COUNT = 3 } ;
-  enum { INFO_UNIFORM_COLOR = 0
-       , INFO_UNIFORM_SIZE = 1
-       , INFO_UNIFORM_COUNT = 2 } ;
+  enum { INFO_UNIF_MVP = 0
+       , INFO_UNIF_COLOR = 1
+       , INFO_UNIF_SIZE = 2
+       , INFO_UNIF_COUNT = 3 } ;
 
   GLuint _vbo_ids[INFO_ATTR_COUNT];
   GLuint _attr_locs[INFO_ATTR_COUNT];
-  GLuint _uniform_locs[INFO_UNIFORM_COUNT];
+  GLuint _uniform_locs[INFO_UNIF_COUNT];
 };
 
 #endif // MENUENGINE_H
-*/

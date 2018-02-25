@@ -168,7 +168,6 @@ void ChartEngine::update(std::pair<float, float> center, float scale, float angl
 
 void ChartEngine::draw(const QString& color_scheme) {
   glEnable(GL_BLEND);
-  glEnable(GL_TEXTURE_2D);
   glDisable(GL_DEPTH);
   glDisable(GL_DEPTH_TEST);
 

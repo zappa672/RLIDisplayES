@@ -1,6 +1,6 @@
-/*
 #include "menuengine.h"
 
+#include <QColor>
 
 const QColor MENU_LOCKED_ITEM_COLOR   (0xB4, 0xB4, 0xB4);
 const QColor MENU_DISABLED_ITEM_COLOR (0xFC, 0x54, 0x54);
@@ -124,17 +124,17 @@ int RLIMenuItemInt::setValue(int val) {
 }
 
 int RLIMenuItemInt::setValue(QByteArray val) {
-    int  res;
-    bool ok = false;
+  int  res;
+  bool ok = false;
 
-    res = val.toInt(&ok);
-    if(!ok)
-        return -1;
-    if((res < _min) || (res > _max))
-        return -2;
-    _value = res;
+  res = val.toInt(&ok);
+  if(!ok)
+      return -1;
+  if((res < _min) || (res > _max))
+      return -2;
+  _value = res;
 
-    return 0;
+  return 0;
 }
 
 void RLIMenuItemInt::adjustDelta() {
@@ -173,13 +173,17 @@ RLIMenuItemFloat::RLIMenuItemFloat(char** name, float min, float max, float def)
 
 
 
-MenuEngine::MenuEngine(const QSize& screen_size, const QMap<QString, QString>& params, QObject* parent) : QObject(parent), QGLFunctions() {
-  _initialized = false;
+MenuEngine::MenuEngine(const QSize& screen_size, const QMap<QString, QString>& params, QOpenGLContext* context, QObject* parent)
+  : QObject(parent), QOpenGLFunctions(context)  {
+
+  initializeOpenGLFunctions();
+
   _selected_line = 1;
   _selection_active = false;
   _state = DISABLED;
 
-  _prog = new QGLShaderProgram();
+  _prog = new QOpenGLShaderProgram();
+  _fbo = nullptr;
 
   _lang = RLI_LANG_RUSSIAN;
 
@@ -189,12 +193,16 @@ MenuEngine::MenuEngine(const QSize& screen_size, const QMap<QString, QString>& p
 
   resize(screen_size, params);
 
+  glGenBuffers(INFO_ATTR_COUNT, _vbo_ids);
+  initShader();
+
   initMainMenuTree();
   initCnfgMenuTree();
 
   _menu = NULL;
-  _routeEngine = NULL;
+  //_routeEngine = NULL;
   _last_action_time = QDateTime::currentDateTime();
+  _need_update = true;
 }
 
 void MenuEngine::initCnfgMenuTree() {
@@ -601,10 +609,6 @@ void MenuEngine::initMainMenuTree() {
 
 MenuEngine::~MenuEngine() {
   delete _prog;
-
-  if (!_initialized)
-    return;
-
   delete _fbo;
   glDeleteBuffers(INFO_ATTR_COUNT, _vbo_ids);
   delete _main_menu;
@@ -727,115 +731,79 @@ void MenuEngine::onBack() {
   }
 }
 
-bool MenuEngine::init(const QGLContext* context) {
-  if (_initialized)
-    return false;
-
-  initializeGLFunctions(context);
-
-  _fbo = new QGLFramebufferObject(_size);
-  _need_update = true;
-
-  glGenBuffers(INFO_ATTR_COUNT, _vbo_ids);
-
-  if (!initShader())
-    return false;
-
-  _initialized = true;
-  return _initialized;
-}
 
 void MenuEngine::resize(const QSize& screen_size, const QMap<QString, QString>& params) {
   _size = QSize(params["width"].toInt(), params["height"].toInt());
-  _position = QPointF(params["x"].toFloat(), params["y"].toFloat());
+  _position = QPoint(params["x"].toInt(), params["y"].toInt());
 
   if (_position.x() < 0) _position.setX(_position.x() + screen_size.width() - _size.width());
   if (_position.y() < 0) _position.setX(_position.y() + screen_size.height() - _size.height());
 
   _font_tag = params["font"];
 
-  if (_initialized) {
+  if (_fbo != nullptr)
     delete _fbo;
-    _fbo = new QGLFramebufferObject(_size);
-  }
+
+  _fbo = new QOpenGLFramebufferObject(_size);
 
   _need_update = true;
 }
 
 void MenuEngine::update() {
   if (visible() && _last_action_time.secsTo(QDateTime::currentDateTime()) > 90)
-      setState(DISABLED);
+    setState(DISABLED);
 
-  if (!_initialized || !_need_update)
+  if (!_need_update)
     return;
 
   glViewport(0, 0, _size.width(), _size.height());
 
-  glDisable(GL_BLEND);
+  glEnable(GL_BLEND);
 
   _fbo->bind();
 
   glClearColor(MENU_BACKGRD_COLOR.redF(), MENU_BACKGRD_COLOR.greenF(), MENU_BACKGRD_COLOR.blueF(), 1.f);
   glClear(GL_COLOR_BUFFER_BIT);
 
-  glMatrixMode( GL_PROJECTION );
-  glPushMatrix();
-  glLoadIdentity();
-  glOrtho(0, _size.width(), _size.height(), 0, -1, 1 );
 
-  glShadeModel( GL_FLAT );
+  QMatrix4x4 projection;
+  projection.setToIdentity();
+  projection.ortho(0.f, _size.width(), 0.f, _size.height(), -1.f, 1.f);
 
-  glLineWidth(1.f);
+  _prog->bind();
 
-  // Draw border
-  glBegin(GL_LINES);
-    glColor3f(MENU_BORDER_COLOR.redF(), MENU_BORDER_COLOR.greenF(), MENU_BORDER_COLOR.blueF());
-    glVertex2f(0.5f, 0.f);
-    glVertex2f(0.5f, _size.height());
+  _prog->setUniformValue(_uniform_locs[INFO_UNIF_MVP], projection);
 
-    glVertex2f(0.f, 0.5f);
-    glVertex2f(_size.width(), 0.5f);
-
-    glVertex2f(_size.width()-0.5f, 0.f);
-    glVertex2f(_size.width()-0.5f, _size.height());
-
-    glVertex2f(0.f, _size.height()-0.5f);
-    glVertex2f(_size.width(), _size.height()-0.5f);
-  glEnd();
+  // Border
+  drawRect(QRect(QPoint(0, 0), QSize(_size.width(), 1)), MENU_BORDER_COLOR);
+  drawRect(QRect(QPoint(0, 0), QSize(1, _size.height())), MENU_BORDER_COLOR);
+  drawRect(QRect(QPoint(0, _size.height()-1), QSize(_size.width(), 1)), MENU_BORDER_COLOR);
+  drawRect(QRect(QPoint(_size.width()-1, 0), QSize(1, _size.height())), MENU_BORDER_COLOR);
 
   if (_menu != NULL) {
     QSize font_size = _fonts->getFontSize(_font_tag);
 
-    glBegin(GL_LINES);
-      glColor3f(MENU_BORDER_COLOR.redF(), MENU_BORDER_COLOR.greenF(), MENU_BORDER_COLOR.blueF());
+    // Header separator
+    drawRect(QRect(QPoint(0, font_size.height() + 6), QSize(_size.width(), 1)), MENU_BORDER_COLOR);
+    // Footer separator
+    drawRect(QRect(QPoint(0, _size.height() - font_size.height() - 6), QSize(_size.width(), 1)), MENU_BORDER_COLOR);
 
-      // Header separator
-      glVertex2f(0.f, 6.5f + font_size.height());
-      glVertex2f(_size.width(), 6.5f + font_size.height());
-      // Footer separator
-      glVertex2f(0.f, 2.5f + 12*(6+font_size.height()));
-      glVertex2f(_size.width(), 2.5f + 12*(6+font_size.height()));
-    glEnd();
-
-    glEnable(GL_BLEND);
-
-    _prog->bind();
-
+    // Header
     drawText(_menu->name(_lang), 0, ALIGN_CENTER, MENU_TEXT_STATIC_COLOR);
 
+    // Menu
     for (int i = 0; i < _menu->item_count(); i++) {
+//      if ((_menu->item(i) == routeLoaderItem || _menu->item(i) == routeSaverItem) && _routeEngine != NULL) {
+//        if (_routeEngine->isIndexUsed(static_cast<RLIMenuItemInt*>(_menu->item(i))->intValue())) {
+//          drawText(_menu->item(i)->name(_lang), i+1, ALIGN_LEFT, MENU_TEXT_STATIC_COLOR);
+//          drawText(_menu->item(i)->value(_lang), i+1, ALIGN_RIGHT, MENU_TEXT_DYNAMIC_COLOR);
+//        } else {
+//          drawText(_menu->item(i)->name(_lang), i+1, ALIGN_LEFT, MENU_TEXT_STATIC_COLOR);
+//          drawText(_menu->item(i)->value(_lang), i+1, ALIGN_RIGHT, MENU_DISABLED_ITEM_COLOR);
+//        }
 
-      if ((_menu->item(i) == routeLoaderItem || _menu->item(i) == routeSaverItem) && _routeEngine != NULL) {
-        if (_routeEngine->isIndexUsed(static_cast<RLIMenuItemInt*>(_menu->item(i))->intValue())) {
-          drawText(_menu->item(i)->name(_lang), i+1, ALIGN_LEFT, MENU_TEXT_STATIC_COLOR);
-          drawText(_menu->item(i)->value(_lang), i+1, ALIGN_RIGHT, MENU_TEXT_DYNAMIC_COLOR);
-        } else {
-          drawText(_menu->item(i)->name(_lang), i+1, ALIGN_LEFT, MENU_TEXT_STATIC_COLOR);
-          drawText(_menu->item(i)->value(_lang), i+1, ALIGN_RIGHT, MENU_DISABLED_ITEM_COLOR);
-        }
-
-        continue;
-      }
+//        continue;
+//      }
 
       if (_menu->item(i)->locked()) {
         drawText(_menu->item(i)->name(_lang), i+1, ALIGN_LEFT, MENU_LOCKED_ITEM_COLOR);
@@ -849,40 +817,32 @@ void MenuEngine::update() {
       }
     }
 
-    _prog->release();
-
     drawBar();
     drawSelection();
   }
 
-  glMatrixMode( GL_PROJECTION );
-  glPopMatrix();
-
+  _prog->release();
   _fbo->release();
 
   _need_update = false;
 }
 
 void MenuEngine::drawSelection() {
-  glShadeModel( GL_FLAT );
-
   QSize font_size = _fonts->getFontSize(_font_tag);
 
-  glLineWidth(2.f);
-
-  glBegin(GL_LINE_LOOP);
+  QColor col;
   if (_selection_active)
-    glColor3f(MENU_TEXT_DYNAMIC_COLOR.redF(), MENU_TEXT_DYNAMIC_COLOR.greenF(), MENU_TEXT_DYNAMIC_COLOR.blueF());
+    col = MENU_TEXT_DYNAMIC_COLOR;
   else
-    glColor3f(MENU_TEXT_STATIC_COLOR.redF(), MENU_TEXT_STATIC_COLOR.greenF(), MENU_TEXT_STATIC_COLOR.blueF());
+    col = MENU_TEXT_STATIC_COLOR;
 
-  // Left border
-  glVertex2f(2.f, 2.f + _selected_line*(6+font_size.height()));
-  glVertex2f(2.f, (_selected_line+1)*(6+font_size.height()));
-  glVertex2f(_size.width() - 2.f, (_selected_line+1)*(6+font_size.height()));
-  glVertex2f(_size.width() - 2.f, 2.f + _selected_line*(6+font_size.height()));
+  QPoint anchor = QPoint(2, 2+_selected_line*(6+font_size.height()));
+  QSize  size = QSize(_size.width() - 4, font_size.height() + 4);
 
-  glEnd();
+  drawRect(QRect(anchor, QSize(size.width(), 1)), col);
+  drawRect(QRect(anchor, QSize(1, size.height())), col);
+  drawRect(QRect(anchor + QPoint(0, size.height() - 1), QSize(size.width(), 1)), col);
+  drawRect(QRect(anchor + QPoint(size.width()-1, 0), QSize(1, size.height())), col);
 }
 
 void MenuEngine::drawBar() {
@@ -910,15 +870,38 @@ void MenuEngine::drawBar() {
     bar_width = (size.width() - 2) * (val - min_val) / (max_val - min_val);
   }
 
-  glShadeModel( GL_FLAT );
-
-  glBegin(GL_QUADS);
-  glVertex2f(1, size.height()-17);
-  glVertex2f(1, size.height()-3);
-  glVertex2f(1+bar_width, size.height()-3);
-  glVertex2f(1+bar_width, size.height()-17);
-  glEnd();
+  drawRect(QRect(QPoint(1, size.height()-17), QSize(bar_width, 14)), MENU_BORDER_COLOR);
 }
+
+void MenuEngine::drawRect(const QRect& rect, const QColor& col) {
+  std::vector<GLfloat> pos;
+
+  pos.push_back(rect.x());
+  pos.push_back(rect.y());
+  pos.push_back(rect.x());
+  pos.push_back(rect.y() + rect.height());
+  pos.push_back(rect.x() + rect.width());
+  pos.push_back(rect.y());
+  pos.push_back(rect.x() + rect.width());
+  pos.push_back(rect.y() + rect.height());
+
+  glUniform2f(_uniform_locs[INFO_UNIF_SIZE], 0.f, 0.f);
+  glUniform4f(_uniform_locs[INFO_UNIF_COLOR], col.redF(), col.greenF(), col.blueF(), col.alphaF());
+
+  glBindBuffer(GL_ARRAY_BUFFER, _vbo_ids[INFO_ATTR_POSITION]);
+  glBufferData(GL_ARRAY_BUFFER, pos.size()*sizeof(GLfloat), pos.data(), GL_STATIC_DRAW);
+  glVertexAttribPointer(_attr_locs[INFO_ATTR_POSITION], 2, GL_FLOAT, GL_FALSE, 0, (void*) (0));
+  glEnableVertexAttribArray(_attr_locs[INFO_ATTR_POSITION]);
+
+  glVertexAttrib1f(_attr_locs[INFO_ATTR_ORDER], 0.f);
+  glDisableVertexAttribArray(_attr_locs[INFO_ATTR_ORDER]);
+
+  glVertexAttrib1f(_attr_locs[INFO_ATTR_CHAR_VAL], 0.f);
+  glDisableVertexAttribArray(_attr_locs[INFO_ATTR_CHAR_VAL]);
+
+  glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+}
+
 
 void MenuEngine::drawText(const QByteArray& text, int line, TextAllignement align, const QColor& col) {
   GLuint tex_id = _fonts->getTexture(_font_tag)->textureId();
@@ -954,11 +937,11 @@ void MenuEngine::drawText(const QByteArray& text, int line, TextAllignement alig
     }
   }
 
-  // Set shader uniforms
-  glUniform2f(_uniform_locs[INFO_UNIFORM_SIZE], font_size.width(), font_size.height());
-  glUniform4f(_uniform_locs[INFO_UNIFORM_COLOR], col.redF(), col.greenF(), col.blueF(), 1.f);
 
-  // Push vertex data to VBOs, lind them toshader attributes
+  glUniform2f(_uniform_locs[INFO_UNIF_SIZE], font_size.width(), font_size.height());
+  glUniform4f(_uniform_locs[INFO_UNIF_COLOR], col.redF(), col.greenF(), col.blueF(), 1.f);
+
+
   glBindBuffer(GL_ARRAY_BUFFER, _vbo_ids[INFO_ATTR_POSITION]);
   glBufferData(GL_ARRAY_BUFFER, pos.size()*sizeof(GLfloat), pos.data(), GL_STATIC_DRAW);
   glVertexAttribPointer(_attr_locs[INFO_ATTR_POSITION], 2, GL_FLOAT, GL_FALSE, 0, (void*) (0));
@@ -974,38 +957,29 @@ void MenuEngine::drawText(const QByteArray& text, int line, TextAllignement alig
   glVertexAttribPointer(_attr_locs[INFO_ATTR_CHAR_VAL], 1, GL_FLOAT, GL_FALSE, 0, (void*) (0));
   glEnableVertexAttribArray(_attr_locs[INFO_ATTR_CHAR_VAL]);
 
-  // Bind fonts texture
+
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, tex_id);
 
-  glDrawArrays(GL_QUADS, 0, ord.size());
+  glDrawArrays(GL_TRIANGLE_STRIP, 0, ord.size());
+
   glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 
-bool MenuEngine::initShader() {
-  // Overriding system locale until shaders are compiled
-  setlocale(LC_NUMERIC, "C");
-
-  // OR statements whould be executed one by one until false
-  if (!_prog->addShaderFromSourceFile(QGLShader::Vertex, ":/res/shaders/info.vert.glsl")
-   || !_prog->addShaderFromSourceFile(QGLShader::Fragment, ":/res/shaders/info.frag.glsl")
-   || !_prog->link()
-   || !_prog->bind())
-      return false;
-
-  // Restore system locale
-  setlocale(LC_ALL, "");
+void MenuEngine::initShader() {
+  _prog->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/info.vert.glsl");
+  _prog->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/info.frag.glsl");
+  _prog->link();
+  _prog->bind();
 
   _attr_locs[INFO_ATTR_POSITION]  = _prog->attributeLocation("position");
   _attr_locs[INFO_ATTR_ORDER]     = _prog->attributeLocation("order");
   _attr_locs[INFO_ATTR_CHAR_VAL]  = _prog->attributeLocation("char_val");
 
-  _uniform_locs[INFO_UNIFORM_COLOR]  = _prog->uniformLocation("color");
-  _uniform_locs[INFO_UNIFORM_SIZE]  = _prog->uniformLocation("size");
+  _uniform_locs[INFO_UNIF_MVP]    = _prog->uniformLocation("mvp_matrix");
+  _uniform_locs[INFO_UNIF_COLOR]  = _prog->uniformLocation("color");
+  _uniform_locs[INFO_UNIF_SIZE]   = _prog->uniformLocation("size");
 
   _prog->release();
-
-  return true;
 }
-*/

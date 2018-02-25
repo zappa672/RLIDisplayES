@@ -237,21 +237,25 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
     break;
   //Меню
   case Qt::Key_W:
-    break;
+    if(pressedKeys.contains(Qt::Key_B))
+       wgtRLI->onConfigMenuToggled();
+     else
+       wgtRLI->onMenuToggled();
+     break;
   //Шкала +
   case Qt::Key_Plus:
     if (mod_keys & Qt::ControlModifier) {
-      emit gainChanged(qMax(_gain_ctrl->value() + 5, 255));
+      emit gainChanged(qMin(_gain_ctrl->value() + 5, 255));
       break;
     }
 
     if (mod_keys & Qt::AltModifier) {
-      emit waterChanged(qMax(_water_ctrl->value() + 5, 255));
+      emit waterChanged(qMin(_water_ctrl->value() + 5, 255));
       break;
     }
 
     if (mod_keys & Qt::ShiftModifier) {
-      emit rainChanged(qMax(_rain_ctrl->value() + 5, 255));
+      emit rainChanged(qMin(_rain_ctrl->value() + 5, 255));
       break;
     }
 
@@ -262,17 +266,17 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
   //Шкала -
   case Qt::Key_Minus:
     if (mod_keys & Qt::ControlModifier) {
-      emit gainChanged(qMin(_gain_ctrl->value() - 5, 0));
+      emit gainChanged(qMax(_gain_ctrl->value() - 5, -1));
       break;
     }
 
     if (mod_keys & Qt::AltModifier) {
-      emit waterChanged(qMin(_water_ctrl->value() - 5, 0));
+      emit waterChanged(qMax(_water_ctrl->value() - 5, -1));
       break;
     }
 
     if (mod_keys & Qt::ShiftModifier) {
-      emit rainChanged(qMin(_rain_ctrl->value() - 5, 0));
+      emit rainChanged(qMax(_rain_ctrl->value() - 5, -1));
       break;
     }
 
@@ -291,34 +295,39 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
     break;
   //Выбор цели
   case Qt::Key_Up:
-    shipPos = RLIState::instance().shipPosition();
-    shipPos.first += 0.005;
-    RLIState::instance().onShipPositionChanged(shipPos);
+    wgtRLI->onUpToggled();
+//    shipPos = RLIState::instance().shipPosition();
+//    shipPos.first += 0.005;
+//    RLIState::instance().onShipPositionChanged(shipPos);
     break;
   //ЛИД / ЛОД
   case Qt::Key_Down:
-    shipPos = RLIState::instance().shipPosition();
-    shipPos.first -= 0.005;
-    RLIState::instance().onShipPositionChanged(shipPos);
+    wgtRLI->onDownToggled();
+//    shipPos = RLIState::instance().shipPosition();
+//    shipPos.first -= 0.005;
+//    RLIState::instance().onShipPositionChanged(shipPos);
     break;
   case Qt::Key_Left:
-    shipPos = RLIState::instance().shipPosition();
-    shipPos.second -= 0.005;
-    RLIState::instance().onShipPositionChanged(shipPos);
+//    shipPos = RLIState::instance().shipPosition();
+//    shipPos.second -= 0.005;
+//    RLIState::instance().onShipPositionChanged(shipPos);
     break;
   case Qt::Key_Right:
-    shipPos = RLIState::instance().shipPosition();
-    shipPos.second += 0.005;
-    RLIState::instance().onShipPositionChanged(shipPos);
+//    shipPos = RLIState::instance().shipPosition();
+//    shipPos.second += 0.005;
+//    RLIState::instance().onShipPositionChanged(shipPos);
     break;
   //Захват
   case Qt::Key_Enter:
+    wgtRLI->onEnterToggled();
     break;
   //Захват
   case Qt::Key_Return:
+    wgtRLI->onEnterToggled();
     break;
   //Сброс
   case Qt::Key_Escape:
+    wgtRLI->onBackToggled();
     break;
   //Парал. Линии
   case Qt::Key_Backslash:

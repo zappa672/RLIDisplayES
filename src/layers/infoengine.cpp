@@ -98,6 +98,8 @@ void InfoEngine::onLanguageChanged(const QByteArray& lang) {
 }
 
 void InfoEngine::update(InfoFonts* fonts) {
+  glEnable(GL_BLEND);
+
   for (InfoBlock* block : _blocks)
     if (_full_update || block->needUpdate()) {
       block->fbo()->bind();

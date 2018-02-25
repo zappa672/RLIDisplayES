@@ -17,6 +17,7 @@
 #include "layers/maskengine.h"
 #include "layers/chartengine.h"
 #include "layers/infoengine.h"
+#include "layers/menuengine.h"
 
 
 class RLIDisplayWidget : public QOpenGLWidget, protected QOpenGLFunctions
@@ -26,15 +27,26 @@ public:
   explicit RLIDisplayWidget(QWidget *parent = 0);
   ~RLIDisplayWidget();
 
+  inline MaskEngine*  maskEngine()  { return _maskEngine; }
   inline RadarEngine* radarEngine() { return _radarEngine; }
   inline RadarEngine* tailsEngine() { return _tailsEngine; }
-  inline InfoEngine* infoEngine() { return _infoEngine; }
+  inline ChartEngine* chartEngine() { return _chartEngine; }
+  inline InfoEngine*  infoEngine()  { return _infoEngine; }
+  inline MenuEngine*  menuEngine()  { return _menuEngine; }
 
   void toggleRadarTailsShift();
 
 signals:
   void initialized();
   void secondChanged();
+
+public slots:
+  void onMenuToggled();
+  void onConfigMenuToggled();
+  void onUpToggled();
+  void onDownToggled();
+  void onEnterToggled();
+  void onBackToggled();
 
 protected slots:
   void initializeGL();
@@ -60,13 +72,14 @@ private:
 
   ChartManager* _chart_mngr;
 
-  InfoFonts* _infoFonts;
+  InfoFonts*    _infoFonts;
 
-  MaskEngine* _maskEngine;
-  RadarEngine* _radarEngine;
-  RadarEngine* _tailsEngine;
-  ChartEngine* _chartEngine;
-  InfoEngine*  _infoEngine;
+  MaskEngine*   _maskEngine;
+  RadarEngine*  _radarEngine;
+  RadarEngine*  _tailsEngine;
+  ChartEngine*  _chartEngine;
+  InfoEngine*   _infoEngine;
+  MenuEngine*   _menuEngine;
 
   QOpenGLShaderProgram* _program;
 
