@@ -161,6 +161,7 @@ void ChartEngine::update(std::pair<float, float> center, float scale, float angl
     _scale = scale;
     _angle = angle;
     _center_shift = center_shift;
+
     draw(color_scheme);
   }
 }
@@ -192,6 +193,7 @@ void ChartEngine::draw(const QString& color_scheme) {
       if (!settings->isLayerVisible(displayOrder[i]))
         displayOrder.removeAt(i);
 
+
     drawAreaLayers(displayOrder, projection*transform, color_scheme);
     drawLineLayers(displayOrder, projection*transform, color_scheme);
     drawTextLayers(displayOrder, projection*transform);
@@ -200,13 +202,13 @@ void ChartEngine::draw(const QString& color_scheme) {
   }
 
   _fbo->release();
-
   _force_update = false;
 }
 
 
 void ChartEngine::drawAreaLayers(const QStringList& displayOrder, const QMatrix4x4& mvp_matrix, const QString& color_scheme) {
   QOpenGLShaderProgram* prog = shaders->getChartAreaProgram();
+
   prog->bind();
 
   QOpenGLTexture* pattern_tex = assets->getAreaPatternTex(color_scheme);
@@ -218,17 +220,21 @@ void ChartEngine::drawAreaLayers(const QStringList& displayOrder, const QMatrix4
   prog->setUniformValue(shaders->getAreaUniformLoc(COMMON_UNIFORMS_PATTERN_TEX_DIM), pattern_tex->width(), pattern_tex->height());
   prog->setUniformValue(shaders->getAreaUniformLoc(COMMON_UNIFORMS_MVP_MATRIX), mvp_matrix);
 
-  pattern_tex->bind(0);
-  glUniform1i(shaders->getAreaUniformLoc(COMMON_UNIFORMS_PATTERN_TEX_ID), 0);
-
-  color_scheme_tex->bind(1);
+  glUniform1i(shaders->getAreaUniformLoc(COMMON_UNIFORMS_PATTERN_TEX_ID), 0);  
   glUniform1i(shaders->getAreaUniformLoc(AREA_UNIFORMS_COLOR_TABLE_TEX), 1);
+
+  pattern_tex->bind(0);
+  color_scheme_tex->bind(1);
 
   for (QString layer : displayOrder)
     if (area_engines.contains(layer) && area_engines[layer] != nullptr)
       area_engines[layer]->draw(shaders);
 
+  pattern_tex->release();
+  color_scheme_tex->release();
+
   prog->release();
+  glFlush();
 }
 
 void ChartEngine::drawLineLayers(const QStringList& displayOrder, const QMatrix4x4& mvp_matrix, const QString& color_scheme) {
@@ -254,7 +260,11 @@ void ChartEngine::drawLineLayers(const QStringList& displayOrder, const QMatrix4
     if (line_engines.contains(layer) && line_engines[layer] != nullptr)
       line_engines[layer]->draw(shaders);
 
+  pattern_tex->release();
+  color_scheme_tex->release();
   prog->release();
+
+  glFlush();
 }
 
 void ChartEngine::drawTextLayers(const QStringList& displayOrder, const QMatrix4x4& mvp_matrix) {
@@ -275,7 +285,10 @@ void ChartEngine::drawTextLayers(const QStringList& displayOrder, const QMatrix4
     if (text_engines.contains(layer) && text_engines[layer] != nullptr)
       text_engines[layer]->draw(shaders);
 
+  fontTex->release();
   prog->release();
+
+  glFlush();
 }
 
 void ChartEngine::drawMarkLayers(const QStringList& displayOrder, const QMatrix4x4& mvp_matrix, const QString& color_scheme) {
@@ -297,7 +310,10 @@ void ChartEngine::drawMarkLayers(const QStringList& displayOrder, const QMatrix4
     if (mark_engines.contains(layer) && mark_engines[layer] != nullptr)
       mark_engines[layer]->draw(shaders);
 
+  pattern_tex->release();
   prog->release();
+
+  glFlush();
 }
 
 void ChartEngine::drawSndgLayer(const QMatrix4x4& mvp_matrix, const QString& color_scheme) {
@@ -317,5 +333,8 @@ void ChartEngine::drawSndgLayer(const QMatrix4x4& mvp_matrix, const QString& col
 
   sndg_engine->draw(shaders);
 
+  pattern_tex->release();
   prog->release();
+
+  glFlush();
 }

@@ -21,8 +21,6 @@ class RLIMenuItem : public QObject {
 public:
   RLIMenuItem(char** name, QObject* parent = 0);
 
-  //virtual ~RLIMenuItem();
-
   virtual QByteArray name(int lang_id) { return _name[lang_id]; }
   virtual QByteArray value(int lang_id) { Q_UNUSED(lang_id); return QByteArray(); }
   virtual int setValue(QByteArray val) {Q_UNUSED(val); return -1; }

@@ -123,10 +123,10 @@ void MaskEngine::initRectBuffers() {
                      , .04f, .05f, .04f, 1.0f};
 
   glBindBuffer(GL_ARRAY_BUFFER, _rect_vbo_ids[ATTR_POS]);
-  glBufferData(GL_ARRAY_BUFFER, 8*sizeof(GLfloat), positions, GL_DYNAMIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, 8*sizeof(GLfloat), positions, GL_STATIC_DRAW);
 
   glBindBuffer(GL_ARRAY_BUFFER, _rect_vbo_ids[ATTR_CLR]);
-  glBufferData(GL_ARRAY_BUFFER, 16*sizeof(GLfloat), colors, GL_DYNAMIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, 16*sizeof(GLfloat), colors, GL_STATIC_DRAW);
 
   glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -160,10 +160,10 @@ void MaskEngine::initHoleBuffers() {
   }
 
   glBindBuffer(GL_ARRAY_BUFFER, _hole_vbo_ids[ATTR_POS]);
-  glBufferData(GL_ARRAY_BUFFER, 2*(CIRCLE_RAY_COUNT+2)*sizeof(GLfloat), positions.data(), GL_DYNAMIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, 2*(CIRCLE_RAY_COUNT+2)*sizeof(GLfloat), positions.data(), GL_STATIC_DRAW);
 
   glBindBuffer(GL_ARRAY_BUFFER, _hole_vbo_ids[ATTR_CLR]);
-  glBufferData(GL_ARRAY_BUFFER, 4*(CIRCLE_RAY_COUNT+2)*sizeof(GLfloat), colors.data(), GL_DYNAMIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, 4*(CIRCLE_RAY_COUNT+2)*sizeof(GLfloat), colors.data(), GL_STATIC_DRAW);
 
   glBindBuffer(GL_ARRAY_BUFFER, 0);
 }

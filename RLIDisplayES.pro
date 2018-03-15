@@ -9,6 +9,10 @@ QT       += core gui widgets concurrent opengl
 TARGET = RLIDisplayES
 TEMPLATE = app
 
+target.path = /home/root/RLIDisplayES
+INSTALLS += target
+
+
 unix:QMAKE_CXXFLAGS += -Wno-write-strings
 unix:QMAKE_CXXFLAGS += -Wno-unused-variable
 unix:QMAKE_CXXFLAGS += -std=gnu++11
@@ -94,7 +98,6 @@ FORMS       += \
     forms/rlicontrolwidget.ui
 
 RESOURCES   += \
-    res/icons.qrc \
     res/shaders.qrc \
     res/fonts.qrc \
     res/chartsymbols.qrc

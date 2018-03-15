@@ -76,7 +76,7 @@ void ChartAreaEngine::setData(S52AreaLayer* layer, S52Assets* assets, S52Referen
   point_count = layer->triangles.size() / 2;
 
   glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[AREA_ATTRIBUTES_COORDS]);
-  glBufferData(GL_ARRAY_BUFFER, layer->triangles.size() * sizeof(GLfloat), &(layer->triangles[0]), GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, layer->triangles.size() * sizeof(GLfloat), layer->triangles.data(), GL_STATIC_DRAW);
 
   if (!is_color_uniform) {
     glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[AREA_ATTRIBUTES_COLOR_INDEX]);
@@ -122,7 +122,7 @@ void ChartAreaEngine::draw(ChartShaders* shaders) {
     glDisableVertexAttribArray(shaders->getAreaAttributeLoc(AREA_ATTRIBUTES_PATTERN_INDEX));
 
     glVertexAttrib2f(shaders->getAreaAttributeLoc(AREA_ATTRIBUTES_PATTERN_DIM), patternSize.width(), patternSize.height());
-    glDisableVertexAttribArray(shaders->getAreaAttributeLoc(AREA_ATTRIBUTES_PATTERN_INDEX));
+    glDisableVertexAttribArray(shaders->getAreaAttributeLoc(AREA_ATTRIBUTES_PATTERN_DIM));
   }
 
   glDrawArrays(GL_TRIANGLES, 0, point_count);

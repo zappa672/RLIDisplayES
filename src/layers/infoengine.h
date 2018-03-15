@@ -47,12 +47,12 @@ public:
   void clear();
 
   void setGeometry(const QRect& r);
-  inline const QRect& getGeometry()         { return _geometry; }
+  inline const QRect& geometry()            { return _geometry; }
   void setBackColor(const QColor& c)        { _back_color = c; _need_update = true; }
-  inline const QColor& getBackColor()       { return _back_color; }
+  inline const QColor& backColor()          { return _back_color; }
   void setBorder(int w, const QColor& c)    { _border_width = w; _border_color = c; _need_update = true; }
-  inline const QColor& getBorderColor()     { return _border_color; }
-  inline int getBorderWidth()               { return _border_width; }
+  inline const QColor& borderColor()        { return _border_color; }
+  inline int borderWidth()                  { return _border_width; }
 
   inline bool needUpdate()                  { return _need_update; }
   inline void discardUpdate()               { _need_update = false; }
@@ -60,12 +60,12 @@ public:
   int addRect(const InfoRect& t)            { _rects.push_back(t); _need_update = true; return _rects.size() - 1; }
   int addText(const InfoText& t)            { _texts.push_back(t); _need_update = true; return _texts.size() - 1; }
 
-  inline int getRectCount()                 { return _rects.size(); }
+  inline int rectCount()                    { return _rects.size(); }
   inline const InfoRect& getRect(int i)     { return _rects[i]; }
-  inline int getTextCount()                 { return _texts.size(); }
+  inline int textCount()                    { return _texts.size(); }
   inline const InfoText& getText(int i)     { return _texts[i]; }
 
-  inline GLuint getTextureId()              { return _fbo->texture(); }
+  inline GLuint texture()                   { return _fbo->texture(); }
   QOpenGLFramebufferObject* fbo()           { return _fbo; }
 
 public slots:
@@ -97,8 +97,8 @@ public:
   virtual ~InfoEngine   ();
 
   inline int blockCount() { return _blocks.size(); }
-  inline int blockTextId(int b_id) { return _blocks[b_id]->getTextureId(); }
-  inline const QRect& blockGeometry(int b_id) { return _blocks[b_id]->getGeometry(); }
+  inline int blockTextId(int b_id) { return _blocks[b_id]->texture(); }
+  inline const QRect& blockGeometry(int b_id) { return _blocks[b_id]->geometry(); }
 
   InfoBlock* addInfoBlock();
 

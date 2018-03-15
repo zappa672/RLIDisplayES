@@ -105,7 +105,7 @@ void InfoEngine::update(InfoFonts* fonts) {
       block->fbo()->bind();
       _prog->bind();
 
-      QRect geom = block->getGeometry();
+      QRect geom = block->geometry();
 
       glViewport(0, 0, geom.width(), geom.height());
 
@@ -122,13 +122,14 @@ void InfoEngine::update(InfoFonts* fonts) {
     }
 
   _full_update = false;
+  glFlush();
 }
 
 void InfoEngine::updateBlock(InfoBlock* b, InfoFonts* fonts) {
-  QColor bckCol = b->getBackColor();
-  QColor brdCol = b->getBorderColor();
-  int    brdWid = b->getBorderWidth();
-  QRect  geom   = QRect(0, 0, b->getGeometry().width(), b->getGeometry().height());
+  QColor bckCol = b->backColor();
+  QColor brdCol = b->borderColor();
+  int    brdWid = b->borderWidth();
+  QRect  geom   = QRect(QPoint(0, 0), b->geometry().size());
 
   glClearColor(bckCol.redF(), bckCol.greenF(), bckCol.blueF(), bckCol.alphaF());
   glClear(GL_COLOR_BUFFER_BIT);
@@ -140,10 +141,10 @@ void InfoEngine::updateBlock(InfoBlock* b, InfoFonts* fonts) {
     drawRect(QRect(QPoint(geom.width() - brdWid, 0), QSize(brdWid, geom.height())), brdCol);
   }
 
-  for (int i = 0; i < b->getRectCount(); i++)
+  for (int i = 0; i < b->rectCount(); i++)
     drawRect(b->getRect(i).rect, b->getRect(i).col);
 
-  for (int i = 0; i < b->getTextCount(); i++)
+  for (int i = 0; i < b->textCount(); i++)
     drawText(b->getText(i), fonts);
 
   b->discardUpdate();
@@ -229,7 +230,7 @@ void InfoEngine::drawRect(const QRect& rect, const QColor& col) {
   glUniform4f(_uniform_locs[INFO_UNIF_COLOR], col.redF(), col.greenF(), col.blueF(), col.alphaF());
 
   glBindBuffer(GL_ARRAY_BUFFER, _vbo_ids[INFO_ATTR_POSITION]);
-  glBufferData(GL_ARRAY_BUFFER, pos.size()*sizeof(GLfloat), pos.data(), GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, pos.size()*sizeof(GLfloat), pos.data(), GL_DYNAMIC_DRAW);
   glVertexAttribPointer(_attr_locs[INFO_ATTR_POSITION], 2, GL_FLOAT, GL_FALSE, 0, (void*) (0));
   glEnableVertexAttribArray(_attr_locs[INFO_ATTR_POSITION]);
 

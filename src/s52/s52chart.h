@@ -1,6 +1,7 @@
 #ifndef S52CHART_H
 #define S52CHART_H
 
+#include <QtOpenGL>
 #include <QMap>
 #include <QRectF>
 #include <QString>
@@ -30,7 +31,7 @@ struct S52AreaLayer {
   // layer i-th area triangles start index
   std::vector<int>    start_inds;
   // sequence of coords representing triangulated polygon
-  std::vector<float>  triangles;
+  std::vector<GLfloat>  triangles;
 };
 
 struct S52LineLayer {

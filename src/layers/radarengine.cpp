@@ -54,7 +54,6 @@ void RadarEngine::initVAO() {
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ind_vbo_id);
 
   glBindBuffer(GL_ARRAY_BUFFER, _vbo_ids[ATTR_POS]);
-  //glVertexAttribPointer( _attr_locs[ATTR_POS], 2, GL_FLOAT, GL_FALSE, 0, (void*) (0 * sizeof(GLfloat)));
   glVertexAttribPointer(_attr_locs[ATTR_POS], 1, GL_FLOAT, GL_FALSE, 0, (void*) (0 * sizeof(GLfloat)));
   glEnableVertexAttribArray(_attr_locs[ATTR_POS]);
 
@@ -138,11 +137,10 @@ void RadarEngine::resizeTexture(uint radius) {
 
 void RadarEngine::clearData() {
   glBindBuffer(GL_ARRAY_BUFFER, _vbo_ids[ATTR_POS]);
-  //glBufferData(GL_ARRAY_BUFFER, 2*_peleng_count*_peleng_len*sizeof(GLfloat), _positions.data(), GL_DYNAMIC_DRAW);
   glBufferData(GL_ARRAY_BUFFER, _peleng_count*_peleng_len*sizeof(GLfloat), _positions.data(), GL_STATIC_DRAW);
 
   glBindBuffer(GL_ARRAY_BUFFER, _vbo_ids[ATTR_AMP]);
-  glBufferData(GL_ARRAY_BUFFER, _peleng_count*_peleng_len*sizeof(GLfloat), NULL, GL_DYNAMIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, _peleng_count*_peleng_len*sizeof(GLfloat), NULL, GL_STATIC_DRAW);
 
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ind_vbo_id);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, _draw_indices.size()*sizeof(GLuint), _draw_indices.data(), GL_STATIC_DRAW);

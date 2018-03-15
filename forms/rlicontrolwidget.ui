@@ -133,8 +133,8 @@
            <string>...</string>
           </property>
           <property name="icon">
-           <iconset resource="../res/icons.qrc">
-            <normaloff>:/icons/btnRLI1.png</normaloff>:/icons/btnRLI1.png</iconset>
+           <iconset>
+            <normaloff>data/icons/btnRLI1.png</normaloff>data/icons/btnRLI1.png</iconset>
           </property>
           <property name="iconSize">
            <size>
@@ -162,8 +162,8 @@
            <string>...</string>
           </property>
           <property name="icon">
-           <iconset resource="../res/icons.qrc">
-            <normaloff>:/icons/btnRLI2.png</normaloff>:/icons/btnRLI2.png</iconset>
+           <iconset>
+            <normaloff>data/icons/btnRLI2.png</normaloff>data/icons/btnRLI2.png</iconset>
           </property>
           <property name="iconSize">
            <size>
@@ -191,8 +191,8 @@
            <string>...</string>
           </property>
           <property name="icon">
-           <iconset resource="../res/icons.qrc">
-            <normaloff>:/icons/btnRLI3.png</normaloff>:/icons/btnRLI3.png</iconset>
+           <iconset>
+            <normaloff>data/icons/btnRLI3.png</normaloff>data/icons/btnRLI3.png</iconset>
           </property>
           <property name="iconSize">
            <size>
@@ -220,8 +220,8 @@
            <string>...</string>
           </property>
           <property name="icon">
-           <iconset resource="../res/icons.qrc">
-            <normaloff>:/icons/btnRLI4.png</normaloff>:/icons/btnRLI4.png</iconset>
+           <iconset>
+            <normaloff>data/icons/btnRLI4.png</normaloff>data/icons/btnRLI4.png</iconset>
           </property>
           <property name="iconSize">
            <size>
@@ -358,8 +358,8 @@
              <string>...</string>
             </property>
             <property name="icon">
-             <iconset resource="../res/icons.qrc">
-              <normaloff>:/icons/btnTrace2.png</normaloff>:/icons/btnTrace2.png</iconset>
+             <iconset>
+              <normaloff>data/icons/btnTrace2.png</normaloff>data/icons/btnTrace2.png</iconset>
             </property>
             <property name="iconSize">
              <size>
@@ -387,8 +387,8 @@
              <string>...</string>
             </property>
             <property name="icon">
-             <iconset resource="../res/icons.qrc">
-              <normaloff>:/icons/btnTrace6.png</normaloff>:/icons/btnTrace6.png</iconset>
+             <iconset>
+              <normaloff>data/icons/btnTrace6.png</normaloff>data/icons/btnTrace6.png</iconset>
             </property>
             <property name="iconSize">
              <size>
@@ -416,8 +416,8 @@
              <string>...</string>
             </property>
             <property name="icon">
-             <iconset resource="../res/icons.qrc">
-              <normaloff>:/icons/btnTrace3.png</normaloff>:/icons/btnTrace3.png</iconset>
+             <iconset>
+              <normaloff>data/icons/btnTrace3.png</normaloff>data/icons/btnTrace3.png</iconset>
             </property>
             <property name="iconSize">
              <size>
@@ -445,8 +445,8 @@
              <string>...</string>
             </property>
             <property name="icon">
-             <iconset resource="../res/icons.qrc">
-              <normaloff>:/icons/btnTrace5.png</normaloff>:/icons/btnTrace5.png</iconset>
+             <iconset>
+              <normaloff>data/icons/btnTrace5.png</normaloff>data/icons/btnTrace5.png</iconset>
             </property>
             <property name="iconSize">
              <size>
@@ -474,8 +474,8 @@
              <string>...</string>
             </property>
             <property name="icon">
-             <iconset resource="../res/icons.qrc">
-              <normaloff>:/icons/btnTrace4.png</normaloff>:/icons/btnTrace4.png</iconset>
+             <iconset>
+              <normaloff>data/icons/btnTrace4.png</normaloff>data/icons/btnTrace4.png</iconset>
             </property>
             <property name="iconSize">
              <size>
@@ -503,8 +503,8 @@
              <string>...</string>
             </property>
             <property name="icon">
-             <iconset resource="../res/icons.qrc">
-              <normaloff>:/icons/btnTrace1.png</normaloff>:/icons/btnTrace1.png</iconset>
+             <iconset>
+              <normaloff>data/icons/btnTrace1.png</normaloff>data/icons/btnTrace1.png</iconset>
             </property>
             <property name="iconSize">
              <size>
@@ -552,8 +552,8 @@
             <string>...</string>
            </property>
            <property name="icon">
-            <iconset resource="../res/icons.qrc">
-             <normaloff>:/icons/btnMenu.png</normaloff>:/icons/btnMenu.png</iconset>
+            <iconset>
+             <normaloff>data/icons/btnMenu.png</normaloff>data/icons/btnMenu.png</iconset>
            </property>
            <property name="iconSize">
             <size>
@@ -581,8 +581,8 @@
             <string>...</string>
            </property>
            <property name="icon">
-            <iconset resource="../res/icons.qrc">
-             <normaloff>:/icons/btnMagnifier.png</normaloff>:/icons/btnMagnifier.png</iconset>
+            <iconset>
+             <normaloff>data/icons/btnMagnifier.png</normaloff>data/icons/btnMagnifier.png</iconset>
            </property>
            <property name="iconSize">
             <size>
@@ -640,8 +640,8 @@
              <string>...</string>
             </property>
             <property name="icon">
-             <iconset resource="../res/icons.qrc">
-              <normaloff>:/icons/btnMode1.png</normaloff>:/icons/btnMode1.png</iconset>
+             <iconset>
+              <normaloff>data/icons/btnMode1.png</normaloff>data/icons/btnMode1.png</iconset>
             </property>
             <property name="iconSize">
              <size>
@@ -669,8 +669,8 @@
              <string>...</string>
             </property>
             <property name="icon">
-             <iconset resource="../res/icons.qrc">
-              <normaloff>:/icons/btnMode2.png</normaloff>:/icons/btnMode2.png</iconset>
+             <iconset>
+              <normaloff>data/icons/btnMode2.png</normaloff>data/icons/btnMode2.png</iconset>
             </property>
             <property name="iconSize">
              <size>
@@ -698,8 +698,8 @@
              <string>...</string>
             </property>
             <property name="icon">
-             <iconset resource="../res/icons.qrc">
-              <normaloff>:/icons/btnMode3.png</normaloff>:/icons/btnMode3.png</iconset>
+             <iconset>
+              <normaloff>data/icons/btnMode3.png</normaloff>data/icons/btnMode3.png</iconset>
             </property>
             <property name="iconSize">
              <size>
@@ -727,8 +727,8 @@
              <string>...</string>
             </property>
             <property name="icon">
-             <iconset resource="../res/icons.qrc">
-              <normaloff>:/icons/btnModeDec.png</normaloff>:/icons/btnModeDec.png</iconset>
+             <iconset>
+              <normaloff>data/icons/btnModeDec.png</normaloff>data/icons/btnModeDec.png</iconset>
             </property>
             <property name="iconSize">
              <size>
@@ -766,8 +766,8 @@
              <string>...</string>
             </property>
             <property name="icon">
-             <iconset resource="../res/icons.qrc">
-              <normaloff>:/icons/btnModeInc.png</normaloff>:/icons/btnModeInc.png</iconset>
+             <iconset>
+              <normaloff>data/icons/btnModeInc.png</normaloff>data/icons/btnModeInc.png</iconset>
             </property>
             <property name="iconSize">
              <size>
@@ -819,8 +819,8 @@
              <string>...</string>
             </property>
             <property name="icon">
-             <iconset resource="../res/icons.qrc">
-              <normaloff>:/icons/btnOnOff1.png</normaloff>:/icons/btnOnOff1.png</iconset>
+             <iconset>
+              <normaloff>data/icons/btnOnOff1.png</normaloff>data/icons/btnOnOff1.png</iconset>
             </property>
             <property name="iconSize">
              <size>
@@ -848,8 +848,8 @@
              <string>...</string>
             </property>
             <property name="icon">
-             <iconset resource="../res/icons.qrc">
-              <normaloff>:/icons/btnOnOff2.png</normaloff>:/icons/btnOnOff2.png</iconset>
+             <iconset>
+              <normaloff>data/icons/btnOnOff2.png</normaloff>data/icons/btnOnOff2.png</iconset>
             </property>
             <property name="iconSize">
              <size>
@@ -877,8 +877,8 @@
              <string>...</string>
             </property>
             <property name="icon">
-             <iconset resource="../res/icons.qrc">
-              <normaloff>:/icons/btnOnOff3.png</normaloff>:/icons/btnOnOff3.png</iconset>
+             <iconset>
+              <normaloff>data/icons/btnOnOff3.png</normaloff>data/icons/btnOnOff3.png</iconset>
             </property>
             <property name="iconSize">
              <size>
@@ -906,8 +906,8 @@
              <string>...</string>
             </property>
             <property name="icon">
-             <iconset resource="../res/icons.qrc">
-              <normaloff>:/icons/btnOnOff4.png</normaloff>:/icons/btnOnOff4.png</iconset>
+             <iconset>
+              <normaloff>data/icons/btnOnOff4.png</normaloff>data/icons/btnOnOff4.png</iconset>
             </property>
             <property name="iconSize">
              <size>
@@ -935,8 +935,8 @@
              <string>...</string>
             </property>
             <property name="icon">
-             <iconset resource="../res/icons.qrc">
-              <normaloff>:/icons/btnOnOff5.png</normaloff>:/icons/btnOnOff5.png</iconset>
+             <iconset>
+              <normaloff>data/icons/btnOnOff5.png</normaloff>data/icons/btnOnOff5.png</iconset>
             </property>
             <property name="iconSize">
              <size>
@@ -964,8 +964,8 @@
              <string>...</string>
             </property>
             <property name="icon">
-             <iconset resource="../res/icons.qrc">
-              <normaloff>:/icons/btnOnOff6.png</normaloff>:/icons/btnOnOff6.png</iconset>
+             <iconset>
+              <normaloff>data/icons/btnOnOff6.png</normaloff>data/icons/btnOnOff6.png</iconset>
             </property>
             <property name="iconSize">
              <size>
@@ -1071,8 +1071,6 @@
    </item>
   </layout>
  </widget>
- <resources>
-  <include location="../res/icons.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

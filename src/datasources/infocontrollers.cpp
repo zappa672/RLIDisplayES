@@ -112,9 +112,9 @@ void ValueBarController::initBlock(const RLIPanelInfo& panelInfo) {
   _block->setBackColor(INFO_BACKGRD_COLOR);
   _block->setBorder(1, INFO_BORDER_COLOR);
 
-  int border_width = _block->getBorderWidth();
-  int block_width = _block->getGeometry().width();
-  int block_height = _block->getGeometry().height();
+  int border_width = _block->borderWidth();
+  int block_width = _block->geometry().width();
+  int block_height = _block->geometry().height();
   _bar_width = panelInfo.params["bar_width"].toInt();
   QString font = panelInfo.params["font"];
 
@@ -145,9 +145,9 @@ void ValueBarController::initBlock(const RLIPanelInfo& panelInfo) {
 void ValueBarController::onValueChanged(int val) {
   _val = val;
 
-  int border_width = _block->getBorderWidth();
-  int block_width = _block->getGeometry().width();
-  int block_height = _block->getGeometry().height();
+  int border_width = _block->borderWidth();
+  int block_width = _block->geometry().width();
+  int block_height = _block->geometry().height();
 
   if (_val_rect_id != -1) {
     if (_val >= 0) {
@@ -181,7 +181,7 @@ void LabelController::initBlock(const RLIPanelInfo& panelInfo) {
   _block->setBorder(1, INFO_BORDER_COLOR);
 
   InfoText t;
-  QRect geom = _block->getGeometry();
+  QRect geom = _block->geometry();
 
   t.font_tag = panelInfo.params["font"];
   t.allign = INFOTEXT_ALLIGN_CENTER;

@@ -232,6 +232,29 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
   float chartScale;
 
   switch(event->key()) {
+  case Qt::Key_PageUp:
+    if (mod_keys & Qt::ControlModifier)
+      emit gainChanged(qMin(_gain_ctrl->value() + 5, 255));
+
+    if (mod_keys & Qt::AltModifier)
+      emit waterChanged(qMin(_water_ctrl->value() + 5, 255));
+
+    if (mod_keys & Qt::ShiftModifier)
+      emit rainChanged(qMin(_rain_ctrl->value() + 5, 255));
+
+    break;
+  case Qt::Key_PageDown:
+    if (mod_keys & Qt::ControlModifier)
+      emit gainChanged(qMin(_gain_ctrl->value() - 5, 255));
+
+    if (mod_keys & Qt::AltModifier)
+      emit waterChanged(qMin(_water_ctrl->value() - 5, 255));
+
+    if (mod_keys & Qt::ShiftModifier)
+      emit rainChanged(qMin(_rain_ctrl->value() - 5, 255));
+
+    break;
+
   //Под. имп. Помех
   case Qt::Key_S:
     break;
@@ -243,43 +266,13 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
        wgtRLI->onMenuToggled();
      break;
   //Шкала +
-  case Qt::Key_Plus:
-    if (mod_keys & Qt::ControlModifier) {
-      emit gainChanged(qMin(_gain_ctrl->value() + 5, 255));
-      break;
-    }
-
-    if (mod_keys & Qt::AltModifier) {
-      emit waterChanged(qMin(_water_ctrl->value() + 5, 255));
-      break;
-    }
-
-    if (mod_keys & Qt::ShiftModifier) {
-      emit rainChanged(qMin(_rain_ctrl->value() + 5, 255));
-      break;
-    }
-
+  case Qt::Key_Plus:  
     chartScale = RLIState::instance().chartScale();
     chartScale *= 0.95;
     RLIState::instance().onChartScaleChanged(chartScale);
     break;
   //Шкала -
   case Qt::Key_Minus:
-    if (mod_keys & Qt::ControlModifier) {
-      emit gainChanged(qMax(_gain_ctrl->value() - 5, -1));
-      break;
-    }
-
-    if (mod_keys & Qt::AltModifier) {
-      emit waterChanged(qMax(_water_ctrl->value() - 5, -1));
-      break;
-    }
-
-    if (mod_keys & Qt::ShiftModifier) {
-      emit rainChanged(qMax(_rain_ctrl->value() - 5, -1));
-      break;
-    }
-
     chartScale = RLIState::instance().chartScale();
     chartScale *= 1.05;
     RLIState::instance().onChartScaleChanged(chartScale);
