@@ -26,12 +26,15 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
   _gain_ctrl = new ValueBarController(RLIStrings::nGain, 255, this);
   connect(this, SIGNAL(gainChanged(int)), _gain_ctrl, SLOT(onValueChanged(int)));
+  connect(wgtButtonPanel, SIGNAL(gainChanged(int)), _gain_ctrl, SLOT(onValueChanged(int)));
 
   _water_ctrl = new ValueBarController(RLIStrings::nWave, 255, this);
   connect(this, SIGNAL(waterChanged(int)), _water_ctrl, SLOT(onValueChanged(int)));
+  connect(wgtButtonPanel, SIGNAL(waterChanged(int)), _water_ctrl, SLOT(onValueChanged(int)));
 
   _rain_ctrl = new ValueBarController(RLIStrings::nRain, 255, this);
   connect(this, SIGNAL(rainChanged(int)), _rain_ctrl, SLOT(onValueChanged(int)));
+  connect(wgtButtonPanel, SIGNAL(rainChanged(int)), _rain_ctrl, SLOT(onValueChanged(int)));
 
   _apch_ctrl = new ValueBarController(RLIStrings::nAfc, 255, this);
   _rdtn_ctrl = new ValueBarController(RLIStrings::nEmsn, 255, this);
