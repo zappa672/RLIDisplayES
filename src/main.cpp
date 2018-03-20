@@ -46,7 +46,7 @@ int main(int argc, char *argv[]) {
   if (args.contains("-f"))
     a.setProperty(PROPERTY_FRAME_DELAY, args[args.indexOf("-f") + 1].toInt());
   else
-    a.setProperty(PROPERTY_FRAME_DELAY, 33);
+    a.setProperty(PROPERTY_FRAME_DELAY, 25);
 
   if (args.contains("-d"))
     a.setProperty(PROPERTY_DATA_DELAY, args[args.indexOf("-d") + 1].toInt());

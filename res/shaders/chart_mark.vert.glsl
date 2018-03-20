@@ -10,6 +10,8 @@ uniform float north;            // Angle to north
 uniform vec2  center;           // Chart center position lat/lon in degrees
 uniform float scale;            // meters per pixel
 uniform vec2  assetdim;         // Pattern texture full size in pixels
+uniform float display_order;
+
 
 varying vec2	v_texcoords;
 
@@ -22,19 +24,19 @@ void main() {
 
   if (vertex_order == 0.0) {
     // Left-top
-    gl_Position = mvp_matrix * vec4(pix_pos + vec2(-pivot.x, -pivot.y), 0.0, 1.0);
+    gl_Position = mvp_matrix * vec4(pix_pos + vec2(-pivot.x, -pivot.y), -display_order, 1.0);
     v_texcoords = origin / assetdim;
   } else if (vertex_order == 1.0) {
     // Left-bottom
-    gl_Position = mvp_matrix * vec4(pix_pos + vec2(size.x-pivot.x, -pivot.y), 0.0, 1.0);
+    gl_Position = mvp_matrix * vec4(pix_pos + vec2(size.x-pivot.x, -pivot.y), -display_order, 1.0);
     v_texcoords = (origin + vec2(size.x, 0.0)) / assetdim;
   } else if (vertex_order == 2.0) {
     // Right-bottom
-    gl_Position = mvp_matrix * vec4(pix_pos + vec2(size.x-pivot.x, size.y-pivot.y), 0.0, 1.0);
+    gl_Position = mvp_matrix * vec4(pix_pos + vec2(size.x-pivot.x, size.y-pivot.y), -display_order, 1.0);
     v_texcoords = (origin + size) / assetdim;
   } else if (vertex_order == 3.0) {
     // Right-top
-    gl_Position = mvp_matrix * vec4(pix_pos + vec2(-pivot.x, size.y-pivot.y), 0.0, 1.0);
+    gl_Position = mvp_matrix * vec4(pix_pos + vec2(-pivot.x, size.y-pivot.y), -display_order, 1.0);
     v_texcoords = (origin + vec2(0.0, size.y)) / assetdim;
   }
 }

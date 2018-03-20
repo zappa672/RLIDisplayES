@@ -12,6 +12,7 @@ uniform float	north;
 uniform vec2	center;
 uniform float	scale;
 uniform vec2  assetdim;
+uniform float display_order;
 
 varying float	v_color_index;
 varying vec2	v_tex_dim;
@@ -44,16 +45,16 @@ void main() {
   vec2 norm_pix = (v_tex_dim.y / 2.0) * vec2(unit_tan_pix.y, -unit_tan_pix.x);
 
   if (order == 0.0) {
-    gl_Position = mvp_matrix * vec4(pos1_pix - norm_pix, 0.0, 1.0);
+    gl_Position = mvp_matrix * vec4(pos1_pix - norm_pix, -display_order, 1.0);
     v_inner_texcoords = vec2(dist_pix/v_tex_dim.x, 0.0);
   } else if (order == 1.0) {
-    gl_Position = mvp_matrix * vec4(pos2_pix - norm_pix, 0.0, 1.0);
+    gl_Position = mvp_matrix * vec4(pos2_pix - norm_pix, -display_order, 1.0);
     v_inner_texcoords = vec2((dist_pix + len_pix)/v_tex_dim.x, 0.0);
   } else if (order == 2.0) {
-    gl_Position = mvp_matrix * vec4(pos2_pix + norm_pix, 0.0, 1.0);
+    gl_Position = mvp_matrix * vec4(pos2_pix + norm_pix, -display_order, 1.0);
     v_inner_texcoords = vec2((dist_pix + len_pix)/v_tex_dim.x, 1.0);
   } else if (order == 3.0) {
-    gl_Position = mvp_matrix * vec4(pos1_pix + norm_pix, 0.0, 1.0);
+    gl_Position = mvp_matrix * vec4(pos1_pix + norm_pix, -display_order, 1.0);
     v_inner_texcoords = vec2(dist_pix/v_tex_dim.x, 1.0);
   }
 }

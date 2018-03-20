@@ -616,6 +616,7 @@ QString S52Chart::getLineColorRef(QString& layer_name, OGRFeature* poFeature) {
 QString S52Chart::getLinePatternRef(QString& layer_name, OGRFeature* poFeature) {
   Q_UNUSED(poFeature);
 
+  /*
   if (layer_name == "RIVERS"
    || layer_name == "LAKARE")
     return "DOTTED";
@@ -627,6 +628,7 @@ QString S52Chart::getLinePatternRef(QString& layer_name, OGRFeature* poFeature) 
       layer_name == "DEPARE" ||
       layer_name == "WATTUR")
     return "DASHED";
+  */
 
   //Default
   return "SOLID";

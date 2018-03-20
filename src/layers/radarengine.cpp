@@ -176,7 +176,6 @@ void RadarEngine::updateData(uint offset, uint count, GLfloat* amps) {
 
 void RadarEngine::clearTexture() {
   glDisable(GL_BLEND);
-  glEnable(GL_DEPTH);
   glEnable(GL_DEPTH_TEST);
   glDepthFunc(GL_ALWAYS);
 
@@ -214,7 +213,6 @@ void RadarEngine::updateTexture() {
   // --------------------------------------
 
   glDisable(GL_BLEND);
-  glEnable(GL_DEPTH);
   glEnable(GL_DEPTH_TEST);
   glDepthFunc(GL_LESS);
 
@@ -224,7 +222,7 @@ void RadarEngine::updateTexture() {
 
   QMatrix4x4 projection;
   projection.setToIdentity();
-  projection.ortho(0.f, _fbo->width(), 0.f, _fbo->height(), -255.f, 255.f);
+  projection.ortho(0.f, _fbo->width(), 0.f, _fbo->height(), 255.f, 0.f);
 
   QMatrix4x4 transform;
   transform.setToIdentity();

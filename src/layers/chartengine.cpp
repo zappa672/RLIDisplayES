@@ -55,7 +55,11 @@ void ChartEngine::resize(uint radius) {
   _radius = radius;
 
   delete _fbo;
-  _fbo = new QOpenGLFramebufferObject(QSize(2*_radius+1, 2*_radius+1));
+
+  QOpenGLFramebufferObjectFormat format;
+  format.setAttachment(QOpenGLFramebufferObject::Depth);
+
+  _fbo = new QOpenGLFramebufferObject(QSize(2*_radius+1, 2*_radius+1), format);
 
   _fbo->bind();
 
@@ -104,18 +108,30 @@ void ChartEngine::clearChartData() {
 void ChartEngine::setAreaLayers(S52Chart* chrt, S52References* ref) {
   for (QString layer_name : chrt->getAreaLayerNames()) {
     S52AreaLayer* layer = chrt->getAreaLayer(layer_name);
+    ChartLayerDisplaySettings clds = settings->layerSettings(layer_name);
+
+    if (!clds.visible)
+      continue;
+
     if (!area_engines.contains(layer_name))
       area_engines[layer_name] = new ChartAreaEngine(_context);
-    area_engines[layer_name]->setData(layer, assets, ref);
+
+    area_engines[layer_name]->setData(layer, assets, ref, clds.order);
   }
 }
 
 void ChartEngine::setLineLayers(S52Chart* chrt, S52References* ref) {
   for (QString layer_name : chrt->getLineLayerNames()) {
     S52LineLayer* layer = chrt->getLineLayer(layer_name);
+    ChartLayerDisplaySettings clds = settings->layerSettings(layer_name);
+
+    if (!clds.visible)
+      continue;
+
     if (!line_engines.contains(layer_name))
       line_engines[layer_name] = new ChartLineEngine(_context);
-    line_engines[layer_name]->setData(layer, assets, ref);
+
+    line_engines[layer_name]->setData(layer, assets, ref, clds.order);
   }
 }
 
@@ -124,18 +140,30 @@ void ChartEngine::setTextLayers(S52Chart* chrt, S52References* ref) {
 
   for (QString layer_name : chrt->getTextLayerNames()) {
     S52TextLayer* layer = chrt->getTextLayer(layer_name);
+    ChartLayerDisplaySettings clds = settings->layerSettings(layer_name);
+
+    if (!clds.visible)
+      continue;
+
     if (!text_engines.contains(layer_name))
       text_engines[layer_name] = new ChartTextEngine(_context);
-    text_engines[layer_name]->setData(layer);
+
+    text_engines[layer_name]->setData(layer, clds.order);
   }
 }
 
 void ChartEngine::setMarkLayers(S52Chart* chrt, S52References* ref) {
   for (QString layer_name : chrt->getMarkLayerNames()) {
     S52MarkLayer* layer = chrt->getMarkLayer(layer_name);
+    ChartLayerDisplaySettings clds = settings->layerSettings(layer_name);
+
+    if (!clds.visible)
+      continue;
+
     if (!mark_engines.contains(layer_name))
       mark_engines[layer_name] = new ChartMarkEngine(_context);
-    mark_engines[layer_name]->setData(layer, ref);
+
+    mark_engines[layer_name]->setData(layer, ref, clds.order);
   }
 }
 
@@ -168,11 +196,11 @@ void ChartEngine::update(std::pair<float, float> center, float scale, float angl
 
 
 void ChartEngine::draw(const QString& color_scheme) {
-  glEnable(GL_BLEND);
-  glDisable(GL_DEPTH);
-  glDisable(GL_DEPTH_TEST);
-
   _fbo->bind();
+
+  glEnable(GL_BLEND);
+  glEnable(GL_DEPTH_TEST);
+  glDepthFunc(GL_GREATER);
 
   glClearColor(0.0f, 0.0f, 0.0f, 1.f);
   glClear(GL_COLOR_BUFFER_BIT);
@@ -182,7 +210,7 @@ void ChartEngine::draw(const QString& color_scheme) {
   if (_ready) {
     QMatrix4x4 projection;
     projection.setToIdentity();
-    projection.ortho(0, _fbo->width(), 0, _fbo->height(), -1, 1);
+    projection.ortho(0.f, _fbo->width(), 0.f, _fbo->height(), -1000.f, 1000.f);
 
     QMatrix4x4 transform;
     transform.setToIdentity();
@@ -193,11 +221,10 @@ void ChartEngine::draw(const QString& color_scheme) {
       if (!settings->isLayerVisible(displayOrder[i]))
         displayOrder.removeAt(i);
 
-
-    drawAreaLayers(displayOrder, projection*transform, color_scheme);
-    drawLineLayers(displayOrder, projection*transform, color_scheme);
-    drawTextLayers(displayOrder, projection*transform);
-    drawMarkLayers(displayOrder, projection*transform, color_scheme);
+    drawAreaLayers(projection*transform, color_scheme);
+    drawLineLayers(projection*transform, color_scheme);
+    drawTextLayers(projection*transform);
+    drawMarkLayers(projection*transform, color_scheme);
     drawSndgLayer(projection*transform, color_scheme);
   }
 
@@ -206,7 +233,10 @@ void ChartEngine::draw(const QString& color_scheme) {
 }
 
 
-void ChartEngine::drawAreaLayers(const QStringList& displayOrder, const QMatrix4x4& mvp_matrix, const QString& color_scheme) {
+void ChartEngine::drawAreaLayers(const QMatrix4x4& mvp_matrix, const QString& color_scheme) {
+  glClearDepthf(0.f);
+  glClear(GL_DEPTH_BUFFER_BIT);
+
   QOpenGLShaderProgram* prog = shaders->getChartAreaProgram();
 
   prog->bind();
@@ -220,24 +250,27 @@ void ChartEngine::drawAreaLayers(const QStringList& displayOrder, const QMatrix4
   prog->setUniformValue(shaders->getAreaUniformLoc(COMMON_UNIFORMS_PATTERN_TEX_DIM), pattern_tex->width(), pattern_tex->height());
   prog->setUniformValue(shaders->getAreaUniformLoc(COMMON_UNIFORMS_MVP_MATRIX), mvp_matrix);
 
-  glUniform1i(shaders->getAreaUniformLoc(COMMON_UNIFORMS_PATTERN_TEX_ID), 0);  
-  glUniform1i(shaders->getAreaUniformLoc(AREA_UNIFORMS_COLOR_TABLE_TEX), 1);
+  prog->setUniformValue(shaders->getAreaUniformLoc(COMMON_UNIFORMS_PATTERN_TEX_ID), 0);
+  prog->setUniformValue(shaders->getAreaUniformLoc(AREA_UNIFORMS_COLOR_TABLE_TEX), 1);
 
   pattern_tex->bind(0);
   color_scheme_tex->bind(1);
 
-  for (QString layer : displayOrder)
-    if (area_engines.contains(layer) && area_engines[layer] != nullptr)
-      area_engines[layer]->draw(shaders);
+  for (ChartAreaEngine* areaEngine : area_engines) {
+    prog->setUniformValue(shaders->getAreaUniformLoc(COMMON_UNIFORMS_DISPLAY_ORDER), static_cast<float>(areaEngine->displayOrder()));
+    areaEngine->draw(shaders);
+  }
 
   pattern_tex->release();
   color_scheme_tex->release();
 
   prog->release();
-  glFlush();
 }
 
-void ChartEngine::drawLineLayers(const QStringList& displayOrder, const QMatrix4x4& mvp_matrix, const QString& color_scheme) {
+void ChartEngine::drawLineLayers(const QMatrix4x4& mvp_matrix, const QString& color_scheme) {
+  glClearDepthf(0.f);
+  glClear(GL_DEPTH_BUFFER_BIT);
+
   QOpenGLShaderProgram* prog = shaders->getChartLineProgram();
   prog->bind();
 
@@ -256,18 +289,20 @@ void ChartEngine::drawLineLayers(const QStringList& displayOrder, const QMatrix4
   color_scheme_tex->bind(1);
   glUniform1i(shaders->getLineUniformLoc(LINE_UNIFORMS_COLOR_TABLE_TEX), 1);
 
-  for (QString layer : displayOrder)
-    if (line_engines.contains(layer) && line_engines[layer] != nullptr)
-      line_engines[layer]->draw(shaders);
+  for (ChartLineEngine* lineEngine : line_engines) {
+    prog->setUniformValue(shaders->getLineUniformLoc(COMMON_UNIFORMS_DISPLAY_ORDER), static_cast<float>(lineEngine->displayOrder()));
+    lineEngine->draw(shaders);
+  }
 
   pattern_tex->release();
   color_scheme_tex->release();
-  prog->release();
 
-  glFlush();
+  prog->release();
 }
 
-void ChartEngine::drawTextLayers(const QStringList& displayOrder, const QMatrix4x4& mvp_matrix) {
+void ChartEngine::drawTextLayers(const QMatrix4x4& mvp_matrix) {
+  glDisable(GL_DEPTH_TEST);
+
   QOpenGLShaderProgram* prog = shaders->getChartTextProgram();
   prog->bind();
 
@@ -281,17 +316,22 @@ void ChartEngine::drawTextLayers(const QStringList& displayOrder, const QMatrix4
   fontTex->bind(0);
   glUniform1i(shaders->getTextUniformLoc(COMMON_UNIFORMS_PATTERN_TEX_ID), 0);
 
-  for (QString layer : displayOrder)
-    if (text_engines.contains(layer) && text_engines[layer] != nullptr)
-      text_engines[layer]->draw(shaders);
+  for (ChartTextEngine* textEngine : text_engines) {
+    //prog->setUniformValue(shaders->getTextUniformLoc(COMMON_UNIFORMS_DISPLAY_ORDER), static_cast<float>(textEngine->displayOrder()));
+    prog->setUniformValue(shaders->getTextUniformLoc(COMMON_UNIFORMS_DISPLAY_ORDER), 100.f);
+    textEngine->draw(shaders);
+  }
 
   fontTex->release();
   prog->release();
 
-  glFlush();
+  glEnable(GL_DEPTH_TEST);
 }
 
-void ChartEngine::drawMarkLayers(const QStringList& displayOrder, const QMatrix4x4& mvp_matrix, const QString& color_scheme) {
+void ChartEngine::drawMarkLayers(const QMatrix4x4& mvp_matrix, const QString& color_scheme) {
+  glClearDepthf(0.f);
+  glClear(GL_DEPTH_BUFFER_BIT);
+
   QOpenGLShaderProgram* prog = shaders->getChartMarkProgram();
   prog->bind();
 
@@ -306,17 +346,19 @@ void ChartEngine::drawMarkLayers(const QStringList& displayOrder, const QMatrix4
   pattern_tex->bind(0);
   glUniform1i(shaders->getMarkUniformLoc(COMMON_UNIFORMS_PATTERN_TEX_ID), 0);
 
-  for (QString layer : displayOrder)
-    if (mark_engines.contains(layer) && mark_engines[layer] != nullptr)
-      mark_engines[layer]->draw(shaders);
+  for (ChartMarkEngine* markEngine : mark_engines) {
+    prog->setUniformValue(shaders->getMarkUniformLoc(COMMON_UNIFORMS_DISPLAY_ORDER), static_cast<float>(markEngine->displayOrder()));
+    markEngine->draw(shaders);
+  }
 
   pattern_tex->release();
   prog->release();
-
-  glFlush();
 }
 
 void ChartEngine::drawSndgLayer(const QMatrix4x4& mvp_matrix, const QString& color_scheme) {
+  glClearDepthf(0.f);
+  glClear(GL_DEPTH_BUFFER_BIT);
+
   QOpenGLShaderProgram* prog = shaders->getChartSndgProgram();
   prog->bind();
 
@@ -327,6 +369,7 @@ void ChartEngine::drawSndgLayer(const QMatrix4x4& mvp_matrix, const QString& col
   glUniform1f(shaders->getSndgUniformLoc(COMMON_UNIFORMS_NORTH), _angle);
   glUniform2f(shaders->getSndgUniformLoc(COMMON_UNIFORMS_PATTERN_TEX_DIM), pattern_tex->width(), pattern_tex->height());
   prog->setUniformValue(shaders->getSndgUniformLoc(COMMON_UNIFORMS_MVP_MATRIX), mvp_matrix);
+  prog->setUniformValue(shaders->getSndgUniformLoc(COMMON_UNIFORMS_DISPLAY_ORDER), 1.f);
 
   pattern_tex->bind(0);
   glUniform1i(shaders->getSndgUniformLoc(COMMON_UNIFORMS_PATTERN_TEX_ID), 0);
@@ -335,6 +378,4 @@ void ChartEngine::drawSndgLayer(const QMatrix4x4& mvp_matrix, const QString& col
 
   pattern_tex->release();
   prog->release();
-
-  glFlush();
 }

@@ -35,6 +35,7 @@ public:
   inline MenuEngine*  menuEngine()  { return _menuEngine; }
 
   void toggleRadarTailsShift();
+  float frameRate();
 
 signals:
   void initialized();
@@ -58,6 +59,8 @@ private slots:
 
 private:
   bool _initialized;
+
+  QMutex frameRateMutex;
   QQueue<QDateTime> frameTimes;
 
   int _debug_radar_tails_shift;

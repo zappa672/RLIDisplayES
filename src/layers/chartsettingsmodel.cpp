@@ -31,7 +31,7 @@ void ChartSettingsModel::load(void) {
     }
   }
 
-  QList<LayerSettings> settings = layers_settings.values();
+  QList<ChartLayerDisplaySettings> settings = layers_settings.values();
   qSort(settings);
 
   for (int i = 0; i < settings.size(); i++)
@@ -65,7 +65,7 @@ void ChartSettingsModel::readDepths(QXmlStreamReader* xml) {
 }
 
 void ChartSettingsModel::readLayers(QXmlStreamReader* xml) {
-  LayerSettings ls;
+  ChartLayerDisplaySettings ls;
 
   while (!xml->atEnd()) {
     switch (xml->readNext()) {
@@ -125,7 +125,7 @@ void ChartSettingsModel::save(void) {
 
   int order = 1;
   for (int i = 0; i < layer_order.size(); i++) {
-    LayerSettings ls = layers_settings[layer_order[i]];
+    ChartLayerDisplaySettings ls = layers_settings[layer_order[i]];
     xml->writeStartElement("Layer");
     xml->writeTextElement("Id"        , QString::number(ls.id));
     xml->writeTextElement("Name"      , ls.name);
@@ -165,7 +165,7 @@ bool ChartSettingsModel::isLayerVisible(const QString& layer_name) {
 }
 
 void ChartSettingsModel::setLayerVisibility(const QString& layer_name, bool val) {
-  layers_settings[layer_name] = LayerSettings(layer_name);
+  layers_settings[layer_name] = ChartLayerDisplaySettings(layer_name);
   layers_settings[layer_name].visible = val;
 }
 

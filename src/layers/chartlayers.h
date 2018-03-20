@@ -19,21 +19,23 @@ public:
   virtual ~ChartAreaEngine();
 
   void clearData();
-  void setData(S52AreaLayer* layer, S52Assets* assets, S52References* ref);
+  void setData(S52AreaLayer* layer, S52Assets* assets, S52References* ref, int display_order);
 
   void draw(ChartShaders* shaders);
+  inline int displayOrder() { return _display_order; }
 
 private:
-  GLuint vbo_ids[AREA_ATTRIBUTES_COUNT];
+  GLuint _vbo_ids[AREA_ATTRIBUTES_COUNT];
 
-  int point_count;
+  int _point_count;
+  int _display_order;
 
-  bool is_pattern_uniform;
-  QPointF patternLocation;
-  QSizeF patternSize;
+  bool _is_pattern_uniform;
+  QPointF _patternLocation;
+  QSizeF _patternSize;
 
-  bool is_color_uniform;
-  GLfloat color_ind;
+  bool _is_color_uniform;
+  GLfloat _color_ind;
 };
 
 
@@ -43,12 +45,17 @@ public:
   virtual ~ChartLineEngine();
 
   void clearData();
-  void setData(S52LineLayer* layer, S52Assets* assets, S52References* ref);
+  void setData(S52LineLayer* layer, S52Assets* assets, S52References* ref, int display_order);
 
   void draw(ChartShaders* shaders);
+  inline int displayOrder() { return _display_order; }
 
 private:
+  GLuint  vbo_ids[LINE_ATTRIBUTES_COUNT];
+  GLuint _ind_vbo_id;
+
   GLuint point_count;
+  int _display_order;
 
   bool is_pattern_uniform;
   QPoint patternIdx;
@@ -56,9 +63,6 @@ private:
 
   bool is_color_uniform;
   GLfloat color_ind;
-
-  GLuint  vbo_ids[LINE_ATTRIBUTES_COUNT];
-  GLuint _ind_vbo_id;
 };
 
 
@@ -68,12 +72,14 @@ public:
   virtual ~ChartTextEngine();
 
   void clearData();
-  void setData(S52TextLayer* layer);
+  void setData(S52TextLayer* layer, int display_order);
 
   void draw(ChartShaders* shaders);
+  inline int displayOrder() { return _display_order; }
 
 private:
   GLuint point_count;
+  int _display_order;
 
   GLuint _ind_vbo_id;
   GLuint vbo_ids[TEXT_ATTRIBUTES_COUNT];
@@ -86,15 +92,17 @@ public:
   virtual ~ChartMarkEngine();
 
   void clearData();
-  void setData(S52MarkLayer* layer, S52References* ref);
+  void setData(S52MarkLayer* layer, S52References* ref, int display_order);
 
   void draw(ChartShaders* shaders);
+  inline int displayOrder() { return _display_order; }
 
 private:
   GLuint vbo_ids[MARK_ATTRIBUTES_COUNT];
   GLuint _ind_vbo_id;
 
   GLuint point_count;
+  int _display_order;
 
   bool is_pattern_uniform;
   QPointF patternOrigin;

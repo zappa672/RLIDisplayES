@@ -288,9 +288,6 @@ class CursorController : public InfoBlockController {
 public:
   explicit CursorController(QObject* parent = 0);
 
-public slots:
-  void cursor_moved(float peleng, float distance, const char * dist_fmt);
-
 signals:
   void setRect(int rectId, const QRect& r);
   void setText(int textId, int lang_id, const QByteArray& str);
@@ -328,9 +325,6 @@ class VnController : public InfoBlockController {
 public:
   explicit VnController(QObject* parent = 0);
 
-public slots:
-  void display_brg(float brg, float crsangle);
-
 signals:
   void setRect(int rectId, const QRect& r);
   void setText(int textId, int lang_id, const QByteArray& str);
@@ -350,9 +344,6 @@ class VdController : public InfoBlockController {
 public:
   explicit VdController(QObject* parent = 0);
 
-public slots:
-  void display_distance(float dist, const char * fmt);
-
 signals:
   void setRect(int rectId, const QRect& r);
   void setText(int textId, int lang_id, const QByteArray& str);
@@ -361,6 +352,26 @@ private:
   void initBlock(const RLIPanelInfo& panelInfo);
 
   int _vd_text_id;
+};
+
+
+
+class FpsController : public InfoBlockController {
+  Q_OBJECT
+public:
+  explicit FpsController(QObject* parent = 0);
+
+public slots:
+  void setFpsVal(float val);
+
+signals:
+  void setRect(int rectId, const QRect& r);
+  void setText(int textId, int lang_id, const QByteArray& str);
+
+private:
+  void initBlock(const RLIPanelInfo& panelInfo);
+
+  int _val_text_id;
 };
 
 #endif // INFOCONTROLLERS_H

@@ -55,10 +55,10 @@ private:
 
   void draw(const QString& color_scheme);
 
-  void drawAreaLayers(const QStringList& displayOrder, const QMatrix4x4& mvp_matrix, const QString& color_scheme);
-  void drawLineLayers(const QStringList& displayOrder, const QMatrix4x4& mvp_matrix, const QString& color_scheme);
-  void drawTextLayers(const QStringList& displayOrder, const QMatrix4x4& mvp_matrix);
-  void drawMarkLayers(const QStringList& displayOrder, const QMatrix4x4& mvp_matrix, const QString& color_scheme);
+  void drawAreaLayers(const QMatrix4x4& mvp_matrix, const QString& color_scheme);
+  void drawLineLayers(const QMatrix4x4& mvp_matrix, const QString& color_scheme);
+  void drawTextLayers(const QMatrix4x4& mvp_matrix);
+  void drawMarkLayers(const QMatrix4x4& mvp_matrix, const QString& color_scheme);
   void drawSndgLayer(const QMatrix4x4& mvp_matrix, const QString& color_scheme);
 
   void setAreaLayers(S52Chart* chrt, S52References* ref);

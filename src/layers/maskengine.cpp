@@ -39,7 +39,6 @@ void MaskEngine::resize(const QSize& sz) {
 
 void MaskEngine::update() {
   glDisable(GL_BLEND);
-  glDisable(GL_DEPTH);
   glDisable(GL_DEPTH_TEST);
 
   _fbo->bind();
