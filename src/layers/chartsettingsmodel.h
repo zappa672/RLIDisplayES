@@ -8,6 +8,34 @@
 #include <QMap>
 #include <QXmlStreamReader>
 
+struct ChartLayerDisplaySettings {
+  int id;
+  QString name;
+  QString desc;
+  bool visible;
+  int order;
+
+  ChartLayerDisplaySettings() {
+    id = -1;
+    name = "";
+    desc = "";
+    visible = false;
+    order = 1000;
+  }
+
+  ChartLayerDisplaySettings(const QString& layer_name) {
+    id = -1;
+    name = layer_name;
+    desc = layer_name;
+    visible = false;
+    order = 1000;
+  }
+
+  bool operator<(const ChartLayerDisplaySettings& rhs) const {
+    return order < rhs.order;
+  }
+};
+
 class ChartSettingsModel : public QAbstractTableModel {
     Q_OBJECT
 public:
@@ -40,29 +68,16 @@ public:
   float getDeepDepth(void);
   void setDeepDepth(float val);
 
+  inline ChartLayerDisplaySettings layerSettings(QString name) { return layers_settings.value(name, ChartLayerDisplaySettings()); }
+
 private:
-  struct LayerSettings {
-    int id;
-    QString name;
-    QString desc;
-    bool visible;
-    int order;
-
-    LayerSettings() { id = -1; name = ""; desc = ""; visible = false; order = 1000; }
-    LayerSettings(const QString& layer_name) { id = -1; name = layer_name; desc = layer_name; visible = false; order = 1000; }
-
-    bool operator<(const LayerSettings& rhs) const {
-      return order < rhs.order;
-    }
-  };
-
   void readDepths(QXmlStreamReader* xml);
   void readLayers(QXmlStreamReader* xml);
 
   QFile file;
 
   bool display_soundings;
-  QMap<QString, LayerSettings> layers_settings;
+  QMap<QString, ChartLayerDisplaySettings> layers_settings;
   QStringList layer_order;
 
   float shallow_depth;

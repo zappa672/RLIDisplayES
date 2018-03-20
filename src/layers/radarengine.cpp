@@ -176,7 +176,6 @@ void RadarEngine::updateData(uint offset, uint count, GLfloat* amps) {
 
 void RadarEngine::clearTexture() {
   glDisable(GL_BLEND);
-  glEnable(GL_DEPTH);
   glEnable(GL_DEPTH_TEST);
   glDepthFunc(GL_ALWAYS);
 
@@ -214,7 +213,6 @@ void RadarEngine::updateTexture() {
   // --------------------------------------
 
   glDisable(GL_BLEND);
-  glEnable(GL_DEPTH);
   glEnable(GL_DEPTH_TEST);
   glDepthFunc(GL_LESS);
 

@@ -59,6 +59,7 @@ private:
 
   CursorController* _curs_ctrl;
   ClockController* _clck_ctrl;
+  FpsController* _fps_ctrl;
 
   ScaleController* _scle_ctrl;
   CourseController* _crse_ctrl;

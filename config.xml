@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <rli-config>
-  <use-button-pannel>true</use-button-pannel>
+  <use-button-pannel>false</use-button-pannel>
   <default-layout>1920x1080</default-layout>
 
   <layouts>
@@ -22,6 +22,11 @@
         <label name="label2" x="-244" y="68" width="112" height="20" font="F12X14B" />
         <label name="label3" x="-244" y="92" width="112" height="20" font="F12X14B" />
         <label name="label4" x="-244" y="-68" width="96" height="32" font="F16X28B" />
+
+        <panel name="fps" x="4" y="152" width="102" height="22">
+          <text name="label" rect="5x5x92x14" allign="left" font="F12X14B" />
+          <text name="value" rect="5x5x92x14" allign="right" font="F12X14B" />
+        </panel>
 
         <!-- rect="left_x_top_x_width_x_height" -->
         <panel name="scale" x="-244" y="4" width="236" height="36">
@@ -145,6 +150,11 @@
         <label name="label3" x="-244" y="92" width="112" height="20" font="F12X14B" />
         <label name="label4" x="-244" y="-68" width="96" height="32" font="F16X28B" />
 
+        <panel name="fps" x="4" y="152" width="102" height="22">
+          <text name="label" rect="5x5x92x14" allign="left" font="F12X14B" />
+          <text name="value" rect="5x5x92x14" allign="right" font="F12X14B" />
+        </panel>
+
         <!-- rect="left_x_top_x_width_x_height" -->
         <panel name="scale" x="-244" y="4" width="236" height="36">
           <text name="scale1" rect="5x5x80x28" allign="center" font="F16X28B" />
@@ -266,6 +276,11 @@
         <label name="label2" x="-244" y="68" width="112" height="20" font="F12X14B" />
         <label name="label3" x="-244" y="92" width="112" height="20" font="F12X14B" />
         <label name="label4" x="-244" y="-68" width="96" height="32" font="F16X28B" />
+
+        <panel name="fps" x="4" y="152" width="102" height="22">
+          <text name="label" rect="5x5x92x14" allign="left" font="F12X14B" />
+          <text name="value" rect="5x5x92x14" allign="right" font="F12X14B" />
+        </panel>
 
         <!-- rect="left_x_top_x_width_x_height" -->
         <panel name="scale" x="-244" y="4" width="236" height="36">
@@ -389,6 +404,11 @@
         <label name="label3" x="-244" y="92" width="112" height="20" font="F12X14B" />
         <label name="label4" x="-244" y="-68" width="96" height="32" font="F16X28B" />
 
+        <panel name="fps" x="4" y="152" width="102" height="22">
+          <text name="label" rect="5x5x92x14" allign="left" font="F12X14B" />
+          <text name="value" rect="5x5x92x14" allign="right" font="F12X14B" />
+        </panel>
+
         <!-- rect="left_x_top_x_width_x_height" -->
         <panel name="scale" x="-244" y="4" width="236" height="36">
           <text name="scale1" rect="5x5x80x28" allign="center" font="F16X28B" />
@@ -510,6 +530,11 @@
         <label name="label2" x="-244" y="68" width="112" height="20" font="F12X14B" />
         <label name="label3" x="-244" y="92" width="112" height="20" font="F12X14B" />
         <label name="label4" x="-244" y="-68" width="96" height="32" font="F16X28B" />
+
+        <panel name="fps" x="4" y="152" width="102" height="22">
+          <text name="label" rect="5x5x92x14" allign="left" font="F12X14B" />
+          <text name="value" rect="5x5x92x14" allign="right" font="F12X14B" />
+        </panel>
 
         <!-- rect="left_x_top_x_width_x_height" -->
         <panel name="scale" x="-244" y="4" width="236" height="36">

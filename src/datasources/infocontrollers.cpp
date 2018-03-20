@@ -739,28 +739,6 @@ void CursorController::initBlock(const RLIPanelInfo& panelInfo) {
   _block->addText(t);
 }
 
-void CursorController::cursor_moved(float peleng, float distance, const char * dist_fmt) {
-  QByteArray str[RLI_LANG_COUNT];
-
-  if (_pel_text_id != -1)
-    for (int i = 0; i < RLI_LANG_COUNT; i++)
-      emit setText(_pel_text_id, i, QString::number(peleng, 'f', 2).left(5).toLocal8Bit());
-
-  if (_dis_text_id != -1)
-  {
-    for (int i = 0; i < RLI_LANG_COUNT; i++)
-    {
-      if(dist_fmt)
-      {
-          QString s;
-          s.sprintf(dist_fmt, distance);
-          emit setText(_dis_text_id, i, s.toLocal8Bit());
-      }
-      else
-          emit setText(_dis_text_id, i, QString::number(distance, 'f', 2).left(5).toLocal8Bit());
-    }
-  }
-}
 
 //------------------------------------------------------------------------------
 
@@ -768,49 +746,6 @@ VnController::VnController(QObject* parent) : InfoBlockController(parent) {
   _p_text_id     = -1;
   _cu_text_id    = -1;
   _board_ptr_id  = -1;
-}
-
-void VnController::display_brg(float brg, float crsangle) {
-  //QByteArray str;
-  QString s;
-  if (_p_text_id != -1) {
-    for (int i = 0; i < RLI_LANG_COUNT; i++) {
-      s.sprintf("%.1f", brg);
-      //str = s.toStdString().c_str();
-      emit setText(_p_text_id, i, s.toStdString().c_str());
-    }
-  }
-
-  if (_cu_text_id != -1) {
-    bool starboard = true;
-    bool oncourse  = false;
-
-    if (crsangle < 0) {
-      crsangle *= -1;
-      starboard = false; // portside
-    } else if((crsangle == 0) || (crsangle == 180))
-      oncourse = true;
-
-    s.sprintf("%.1f", crsangle);
-    //str = s.toStdString().c_str();
-    for (int i = 0; i < RLI_LANG_COUNT; i++) {
-      emit setText(_cu_text_id, i, s.toStdString().c_str());
-
-      if(_board_ptr_id == -1)
-        continue;
-
-      QByteArray brdptr;
-
-      if(oncourse)
-        brdptr = " ";
-      else if(starboard)
-        brdptr = enc->fromUnicode(dec->toUnicode(RLIStrings::nGradRb[i]));
-      else
-        brdptr = enc->fromUnicode(dec->toUnicode(RLIStrings::nGradLb[i]));
-
-      emit setText(_board_ptr_id, i, brdptr);
-    }
-  }
 }
 
 void VnController::initBlock(const RLIPanelInfo& panelInfo) {
@@ -859,17 +794,6 @@ void VnController::initBlock(const RLIPanelInfo& panelInfo) {
 
 VdController::VdController(QObject* parent) : InfoBlockController(parent) {
   _vd_text_id = -1;
-}
-
-void VdController::display_distance(float dist, const char * fmt) {
-    QString s;
-    if (fmt)
-      s.sprintf(fmt, dist);
-    else
-      s.sprintf("%5.1f", dist);
-
-    emit setText(_vd_text_id, 0, s.toLocal8Bit());
-    emit setText(_vd_text_id, 1, s.toLocal8Bit());
 }
 
 void VdController::initBlock(const RLIPanelInfo& panelInfo) {
@@ -924,3 +848,34 @@ void ClockController::onSecondChanged() {
   for (int i = 0; i < RLI_LANG_COUNT; i++)
     emit setText(_text_id, i, QTime::currentTime().toString().toLocal8Bit());
 }
+
+//------------------------------------------------------------------------------
+
+FpsController::FpsController(QObject* parent) : InfoBlockController(parent) {
+  _val_text_id = -1;
+}
+
+void FpsController::setFpsVal(float val) {
+  if (_val_text_id == -1)
+    return;
+
+  for (int i = 0; i < RLI_LANG_COUNT; i++)
+    emit setText(_val_text_id, i, QString::number(val, 'g', 2).toLocal8Bit());
+}
+
+void FpsController::initBlock(const RLIPanelInfo& panelInfo) {
+  _block->setBackColor(INFO_BACKGRD_COLOR);
+  _block->setBorder(1, INFO_BORDER_COLOR);
+
+  InfoText t;
+  t.color = INFO_TEXT_STATIC_COLOR;
+  setInfoTextParams(t, panelInfo.texts["label"]);
+  setInfoTextBts(t, "FPS");
+  _block->addText(t);
+
+  t.color = INFO_TEXT_DYNAMIC_COLOR;
+  setInfoTextParams(t, panelInfo.texts["value"]);
+  setInfoTextBts(t, "0.0");
+  _val_text_id = _block->addText(t);
+}
+

@@ -9,7 +9,7 @@ uniform float	north;
 uniform vec2	center;
 uniform float	scale;
 uniform vec2  assetdim;
-
+uniform float display_order;
 
 varying float v_color_index;
 varying vec2	v_tex_dim;
@@ -24,7 +24,7 @@ void main() {
 
   // screen position
   vec2 pix_pos = vec2(x_m, y_m);
-  gl_Position = mvp_matrix  * vec4(pix_pos, 0.0, 1.0);
+  gl_Position = mvp_matrix  * vec4(pix_pos, -display_order, 1.0);
 
   if (tex_origin.x >= 0.0) {
     v_inner_texcoords = pix_pos / tex_dim;

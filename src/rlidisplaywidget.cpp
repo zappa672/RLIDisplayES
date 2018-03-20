@@ -173,10 +173,21 @@ void RLIDisplayWidget::resizeGL(int w, int h) {
   _chartEngine->resize(layout->circle.radius);
 
   _maskEngine->resize(QSize(w, h));
-   _menuEngine->resize(QSize(w, h), layout->menu);
+  _menuEngine->resize(QSize(w, h), layout->menu);
 }
 
-void RLIDisplayWidget::paintGL() {
+float RLIDisplayWidget::frameRate() {
+  if (frameTimes.size() < 2)
+    return 0.f;
+
+  QDateTime f = frameTimes.first();
+  QDateTime l = frameTimes.last();
+  int count = frameTimes.size() - 1;
+
+  return 1000.f / (f.msecsTo(l) / count);
+}
+
+void RLIDisplayWidget::paintGL() {  
   QDateTime time = QDateTime::currentDateTime();
 
   if (frameTimes.size() == 0 || frameTimes.last().time().second() != time.time().second())
@@ -195,7 +206,6 @@ void RLIDisplayWidget::paintGL() {
 
 void RLIDisplayWidget::paintLayers() {
   glEnable(GL_BLEND);
-  glDisable(GL_DEPTH);
   glDisable(GL_DEPTH_TEST);
 
   glBlendEquation(GL_FUNC_ADD);

@@ -55,6 +55,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
   connect(wgtRLI, SIGNAL(secondChanged()), _clck_ctrl, SLOT(onSecondChanged()));
 
   _scle_ctrl = new ScaleController(this);
+  _fps_ctrl = new FpsController(this);
 
   _crse_ctrl = new CourseController(this);
   _pstn_ctrl = new PositionController(this);
@@ -99,6 +100,8 @@ MainWindow::~MainWindow() {
 
   delete _curs_ctrl;
   delete _clck_ctrl;
+  delete _fps_ctrl;
+
   delete _tals_ctrl;
   delete _dgdt_ctrl;
   delete _vctr_ctrl;
@@ -141,6 +144,7 @@ void MainWindow::resizeEvent(QResizeEvent* e) {
   _rdtn_ctrl->resize(curSize, layout->panels["emission"]);
   _curs_ctrl->resize(curSize, layout->panels["cursor"]);
   _clck_ctrl->resize(curSize, layout->panels["clock"]);
+  _fps_ctrl->resize(curSize, layout->panels["fps"]);
   _pstn_ctrl->resize(curSize, layout->panels["position"]);
   _blnk_ctrl->resize(curSize, layout->panels["blank"]);
   _crse_ctrl->resize(curSize, layout->panels["course"]);
@@ -167,6 +171,8 @@ void MainWindow::resizeEvent(QResizeEvent* e) {
 void MainWindow::timerEvent(QTimerEvent* e) {
   Q_UNUSED(e);
 
+  _fps_ctrl->setFpsVal(wgtRLI->frameRate());
+
   wgtRLI->update();
 }
 
@@ -191,6 +197,7 @@ void MainWindow::onRLIWidgetInitialized() {
   setupInfoBlock(_rdtn_ctrl, layout->panels["emission"]);
   setupInfoBlock(_curs_ctrl, layout->panels["cursor"]);
   setupInfoBlock(_clck_ctrl, layout->panels["clock"]);
+  setupInfoBlock(_fps_ctrl, layout->panels["fps"]);
   setupInfoBlock(_pstn_ctrl, layout->panels["position"]);
   setupInfoBlock(_blnk_ctrl, layout->panels["blank"]);
   setupInfoBlock(_crse_ctrl, layout->panels["course"]);
