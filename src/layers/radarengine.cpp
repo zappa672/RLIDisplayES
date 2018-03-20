@@ -222,7 +222,7 @@ void RadarEngine::updateTexture() {
 
   QMatrix4x4 projection;
   projection.setToIdentity();
-  projection.ortho(0.f, _fbo->width(), 0.f, _fbo->height(), -255.f, 255.f);
+  projection.ortho(0.f, _fbo->width(), 0.f, _fbo->height(), 255.f, 0.f);
 
   QMatrix4x4 transform;
   transform.setToIdentity();
