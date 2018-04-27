@@ -23,24 +23,18 @@ ChartEngine::ChartEngine(uint tex_radius, S52References* ref, QOpenGLContext* co
   assets = new S52Assets(context, ref);
   shaders = new ChartShaders(context);
 
-  sndg_engine = new ChartSndgEngine(context);
-
   resize(tex_radius);
 }
 
 ChartEngine::~ChartEngine() {
-  delete sndg_engine;
-
-  QList<QString> layer_names;
-
-  for (int i = 0; i < (layer_names = area_engines.keys()).size(); i++)
-    delete area_engines[layer_names[i]];
-  for (int i = 0; i < (layer_names = line_engines.keys()).size(); i++)
-    delete line_engines[layer_names[i]];
-  for (int i = 0; i < (layer_names = mark_engines.keys()).size(); i++)
-    delete mark_engines[layer_names[i]];
-  for (int i = 0; i < (layer_names = text_engines.keys()).size(); i++)
-    delete text_engines[layer_names[i]];
+  for (ChartAreaEngine* engine : area_engines)
+    delete engine;
+  for (ChartLineEngine* engine : line_engines)
+    delete engine;
+  for (ChartTextEngine* engine : text_engines)
+    delete engine;
+  for (ChartMarkEngine* engine : mark_engines)
+    delete engine;
 
   delete _fbo;
   delete shaders;
@@ -79,8 +73,8 @@ void ChartEngine::setChart(S52Chart* chrt, S52References* ref) {
 
   setAreaLayers(chrt, ref);
   setLineLayers(chrt, ref);
-  setMarkLayers(chrt, ref);
   setTextLayers(chrt, ref);
+  setMarkLayers(chrt, ref);
   setSndgLayer(chrt, ref);
 
   _ready = true;
@@ -89,17 +83,14 @@ void ChartEngine::setChart(S52Chart* chrt, S52References* ref) {
 
 
 void ChartEngine::clearChartData() {
-  sndg_engine->clearData();
-  QList<QString> layer_names;
-
-  for (int i = 0; i < (layer_names = area_engines.keys()).size(); i++)
-    area_engines[layer_names[i]]->clearData();
-  for (int i = 0; i < (layer_names = line_engines.keys()).size(); i++)
-    line_engines[layer_names[i]]->clearData();
-  for (int i = 0; i < (layer_names = mark_engines.keys()).size(); i++)
-    mark_engines[layer_names[i]]->clearData();
-  for (int i = 0; i < (layer_names = text_engines.keys()).size(); i++)
-    text_engines[layer_names[i]]->clearData();
+  for (ChartAreaEngine* engine : area_engines)
+    engine->clearData();
+  for (ChartLineEngine* engine : line_engines)
+    engine->clearData();
+  for (ChartTextEngine* engine : text_engines)
+    engine->clearData();
+  for (ChartMarkEngine* engine : mark_engines)
+    engine->clearData();
 
   _force_update = true;
 }
@@ -168,9 +159,10 @@ void ChartEngine::setMarkLayers(S52Chart* chrt, S52References* ref) {
 }
 
 void ChartEngine::setSndgLayer(S52Chart* chrt, S52References* ref) {
-  S52SndgLayer* layer = chrt->getSndgLayer();
-  if (layer != NULL)
-    sndg_engine->setData(layer, assets, ref);
+  if (!mark_engines.contains("SOUNDG"))
+    mark_engines["SOUNDG"] = new ChartMarkEngine(_context);
+
+  mark_engines["SOUNDG"]->setData(chrt->getSndgLayer(), assets, ref, 1000);
 }
 
 
@@ -216,16 +208,10 @@ void ChartEngine::draw(const QString& color_scheme) {
     transform.setToIdentity();
     transform.translate(_center_shift.x() + _fbo->width()/2.f, _center_shift.y() + _fbo->height()/2.f, 0.f);
 
-    QStringList displayOrder = settings->getLayersDisplayOrder();
-    for (int i = displayOrder.size() - 1; i >= 0; i--)
-      if (!settings->isLayerVisible(displayOrder[i]))
-        displayOrder.removeAt(i);
-
     drawAreaLayers(projection*transform, color_scheme);
-    drawLineLayers(projection*transform, color_scheme);
+    //drawLineLayers(projection*transform, color_scheme);
     drawTextLayers(projection*transform);
     drawMarkLayers(projection*transform, color_scheme);
-    drawSndgLayer(projection*transform, color_scheme);
   }
 
   _fbo->release();
@@ -301,7 +287,8 @@ void ChartEngine::drawLineLayers(const QMatrix4x4& mvp_matrix, const QString& co
 }
 
 void ChartEngine::drawTextLayers(const QMatrix4x4& mvp_matrix) {
-  glDisable(GL_DEPTH_TEST);
+  glClearDepthf(0.f);
+  glClear(GL_DEPTH_BUFFER_BIT);
 
   QOpenGLShaderProgram* prog = shaders->getChartTextProgram();
   prog->bind();
@@ -317,15 +304,12 @@ void ChartEngine::drawTextLayers(const QMatrix4x4& mvp_matrix) {
   glUniform1i(shaders->getTextUniformLoc(COMMON_UNIFORMS_PATTERN_TEX_ID), 0);
 
   for (ChartTextEngine* textEngine : text_engines) {
-    //prog->setUniformValue(shaders->getTextUniformLoc(COMMON_UNIFORMS_DISPLAY_ORDER), static_cast<float>(textEngine->displayOrder()));
-    prog->setUniformValue(shaders->getTextUniformLoc(COMMON_UNIFORMS_DISPLAY_ORDER), 100.f);
+    prog->setUniformValue(shaders->getTextUniformLoc(COMMON_UNIFORMS_DISPLAY_ORDER), 0.f);
     textEngine->draw(shaders);
   }
 
   fontTex->release();
   prog->release();
-
-  glEnable(GL_DEPTH_TEST);
 }
 
 void ChartEngine::drawMarkLayers(const QMatrix4x4& mvp_matrix, const QString& color_scheme) {
@@ -355,27 +339,3 @@ void ChartEngine::drawMarkLayers(const QMatrix4x4& mvp_matrix, const QString& co
   prog->release();
 }
 
-void ChartEngine::drawSndgLayer(const QMatrix4x4& mvp_matrix, const QString& color_scheme) {
-  glClearDepthf(0.f);
-  glClear(GL_DEPTH_BUFFER_BIT);
-
-  QOpenGLShaderProgram* prog = shaders->getChartSndgProgram();
-  prog->bind();
-
-  QOpenGLTexture* pattern_tex = assets->getSymbolTex(color_scheme);
-
-  glUniform2f(shaders->getSndgUniformLoc(COMMON_UNIFORMS_CENTER), _center.first, _center.second);
-  glUniform1f(shaders->getSndgUniformLoc(COMMON_UNIFORMS_SCALE), _scale);
-  glUniform1f(shaders->getSndgUniformLoc(COMMON_UNIFORMS_NORTH), _angle);
-  glUniform2f(shaders->getSndgUniformLoc(COMMON_UNIFORMS_PATTERN_TEX_DIM), pattern_tex->width(), pattern_tex->height());
-  prog->setUniformValue(shaders->getSndgUniformLoc(COMMON_UNIFORMS_MVP_MATRIX), mvp_matrix);
-  prog->setUniformValue(shaders->getSndgUniformLoc(COMMON_UNIFORMS_DISPLAY_ORDER), 1.f);
-
-  pattern_tex->bind(0);
-  glUniform1i(shaders->getSndgUniformLoc(COMMON_UNIFORMS_PATTERN_TEX_ID), 0);
-
-  sndg_engine->draw(shaders);
-
-  pattern_tex->release();
-  prog->release();
-}

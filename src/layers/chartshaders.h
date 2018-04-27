@@ -57,10 +57,9 @@ typedef enum CHART_SHADER_TEXT_UNIFORMS
 typedef enum CHART_SHADER_TEXT_ATTRIBUTES
 { TEXT_ATTRIBUTES_COORDS          = 0
 , TEXT_ATTRIBUTES_POINT_ORDER     = 1
-, TEXT_ATTRIBUTES_CHAR_ORDER      = 2
-, TEXT_ATTRIBUTES_CHAR_COUNT      = 3
-, TEXT_ATTRIBUTES_CHAR_VALUE      = 4
-, TEXT_ATTRIBUTES_COUNT           = 5
+, TEXT_ATTRIBUTES_CHAR_SHIFT      = 2
+, TEXT_ATTRIBUTES_CHAR_VALUE      = 3
+, TEXT_ATTRIBUTES_COUNT           = 4
 } CHART_SHADER_TEXT_ATTRIBUTES;
 
 
@@ -71,30 +70,10 @@ typedef enum CHART_SHADER_MARK_UNIFORMS
 
 typedef enum CHART_SHADER_MARK_ATTRIBUTES
 { MARK_ATTRIBUTES_WORLD_COORDS    = 0
-, MARK_ATTRIBUTES_VERTEX_ORDER    = 1
-, MARK_ATTRIBUTES_SYMBOL_ORIGIN   = 2
-, MARK_ATTRIBUTES_SYMBOL_SIZE     = 3
-, MARK_ATTRIBUTES_SYMBOL_PIVOT    = 4
-, MARK_ATTRIBUTES_COUNT           = 5
+, MARK_ATTRIBUTES_VERTEX_OFFSET   = 1
+, MARK_ATTRIBUTES_TEX_COORDS      = 2
+, MARK_ATTRIBUTES_COUNT           = 3
 } CHART_SHADER_MARK_ATTRIBUTES;
-
-
-
-typedef enum CHART_SHADER_SNDG_UNIFORMS
-{ SNDG_UNIFORMS_COUNT             = COMMON_UNIFORMS_COUNT
-} CHART_SHADER_SNDG_UNIFORMS;
-
-typedef enum CHART_SHADER_SNDG_ATTRIBUTES
-{ SNDG_ATTRIBUTES_WORLD_COORDS    = 0
-, SNDG_ATTRIBUTES_VERTEX_ORDER    = 1
-, SNDG_ATTRIBUTES_SYMBOL_ORDER    = 2
-, SNDG_ATTRIBUTES_SYMBOL_FRAC     = 3
-, SNDG_ATTRIBUTES_SYMBOL_COUNT    = 4
-, SNDG_ATTRIBUTES_SYMBOL_ORIGIN   = 5
-, SNDG_ATTRIBUTES_SYMBOL_SIZE     = 6
-, SNDG_ATTRIBUTES_SYMBOL_PIVOT    = 7
-, SNDG_ATTRIBUTES_COUNT           = 8
-} CHART_SHADER_SNDG_ATTRIBUTES;
 
 
 
@@ -107,7 +86,6 @@ public:
   inline QOpenGLShaderProgram* getChartLineProgram() { return chart_line_program; }
   inline QOpenGLShaderProgram* getChartTextProgram() { return chart_text_program; }
   inline QOpenGLShaderProgram* getChartMarkProgram() { return chart_mark_program; }
-  inline QOpenGLShaderProgram* getChartSndgProgram() { return chart_sndg_program; }
 
   GLuint getAreaUniformLoc(unsigned int index);
   GLuint getAreaAttributeLoc(unsigned int index);
@@ -121,15 +99,11 @@ public:
   GLuint getMarkUniformLoc(unsigned int index);
   GLuint getMarkAttributeLoc(unsigned int index);
 
-  GLuint getSndgUniformLoc(unsigned int index);
-  GLuint getSndgAttributeLoc(unsigned int index);
-
 private:
   void initChartAreaProgram();
   void initChartLineProgram();
   void initChartTextProgram();
   void initChartMarkProgram();
-  void initChartSndgProgram();
 
   int area_uniform_locs[AREA_UNIFORMS_COUNT];
   int area_attribute_locs[AREA_ATTRIBUTES_COUNT];
@@ -143,14 +117,10 @@ private:
   int mark_uniform_locs[MARK_UNIFORMS_COUNT];
   int mark_attribute_locs[MARK_ATTRIBUTES_COUNT];
 
-  int sndg_uniform_locs[SNDG_UNIFORMS_COUNT];
-  int sndg_attribute_locs[SNDG_ATTRIBUTES_COUNT];
-
   QOpenGLShaderProgram* chart_area_program;
   QOpenGLShaderProgram* chart_line_program;
   QOpenGLShaderProgram* chart_text_program;
   QOpenGLShaderProgram* chart_mark_program;
-  QOpenGLShaderProgram* chart_sndg_program;
 };
 
 #endif // CHARTSHADERFACTORY_H

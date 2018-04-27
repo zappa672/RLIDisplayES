@@ -36,7 +36,6 @@ public slots:
 
 private:
   void initShader();
-  void initVAO();
 
   void fillCoordTable();
 
@@ -57,7 +56,6 @@ private:
   // OpenGL vars
   QOpenGLFramebufferObject* _fbo;
   QOpenGLShaderProgram* _program;
-  QOpenGLVertexArrayObject vao;
 
   // OpenGL program attributres enum
   enum { ATTR_POS = 0, ATTR_AMP = 1, ATTR_CNT = 2 } ;

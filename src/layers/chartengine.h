@@ -59,19 +59,17 @@ private:
   void drawLineLayers(const QMatrix4x4& mvp_matrix, const QString& color_scheme);
   void drawTextLayers(const QMatrix4x4& mvp_matrix);
   void drawMarkLayers(const QMatrix4x4& mvp_matrix, const QString& color_scheme);
-  void drawSndgLayer(const QMatrix4x4& mvp_matrix, const QString& color_scheme);
 
   void setAreaLayers(S52Chart* chrt, S52References* ref);
   void setLineLayers(S52Chart* chrt, S52References* ref);
   void setTextLayers(S52Chart* chrt, S52References* ref);
-  void setMarkLayers(S52Chart* chrt, S52References* ref);  
+  void setMarkLayers(S52Chart* chrt, S52References* ref);
   void setSndgLayer(S52Chart* chrt, S52References* ref);
 
   QMap<QString, ChartAreaEngine*>  area_engines;
   QMap<QString, ChartLineEngine*>  line_engines;
   QMap<QString, ChartTextEngine*>  text_engines;
-  QMap<QString, ChartMarkEngine*>  mark_engines;  
-  ChartSndgEngine* sndg_engine;
+  QMap<QString, ChartMarkEngine*>  mark_engines;
 };
 
 #endif // CHARTENGINE_H

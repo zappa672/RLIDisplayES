@@ -55,7 +55,7 @@ struct S52LineLayer {
 };
 
 struct S52MarkLayer {
-  bool is_symbol_uniform;
+  bool is_uniform;
   QString symbol_ref;
   // layer i-th point s52 symbol name
   std::vector<QString> symbol_refs;

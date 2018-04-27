@@ -20,13 +20,11 @@ RadarEngine::RadarEngine(uint pel_count, uint pel_len, uint tex_radius, QOpenGLC
 
   glGenBuffers(ATTR_CNT, _vbo_ids);
   glGenBuffers(1, &_ind_vbo_id);
-  vao.create();
 
   _program = new QOpenGLShaderProgram();
   _palette = new RadarPalette(context, this);
 
   initShader();
-  initVAO();
 
   resizeData(pel_count, pel_len);
   resizeTexture(tex_radius);
@@ -38,30 +36,12 @@ RadarEngine::~RadarEngine() {
 
   glDeleteBuffers(ATTR_CNT, _vbo_ids);
   glDeleteBuffers(1, &_ind_vbo_id);
-  vao.destroy();
 
   delete _palette;
 }
 
 void RadarEngine::onBrightnessChanged(int br) {
   _palette->setBrightness(br);
-}
-
-
-void RadarEngine::initVAO() {
-  vao.bind();
-
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ind_vbo_id);
-
-  glBindBuffer(GL_ARRAY_BUFFER, _vbo_ids[ATTR_POS]);
-  glVertexAttribPointer(_attr_locs[ATTR_POS], 1, GL_FLOAT, GL_FALSE, 0, (void*) (0 * sizeof(GLfloat)));
-  glEnableVertexAttribArray(_attr_locs[ATTR_POS]);
-
-  glBindBuffer(GL_ARRAY_BUFFER, _vbo_ids[ATTR_AMP]);
-  glVertexAttribPointer( _attr_locs[ATTR_AMP], 1, GL_FLOAT, GL_FALSE, 0, (void*) (0 * sizeof(GLfloat)));
-  glEnableVertexAttribArray(_attr_locs[ATTR_AMP]);
-
-  vao.release();
 }
 
 
@@ -264,7 +244,15 @@ void RadarEngine::drawPelengs(uint first, uint last) {
     glClear(GL_DEPTH_BUFFER_BIT);
   }
 
-  vao.bind();
+  glBindBuffer(GL_ARRAY_BUFFER, _vbo_ids[ATTR_POS]);
+  glVertexAttribPointer(_attr_locs[ATTR_POS], 1, GL_FLOAT, GL_FALSE, 0, (void*) (0 * sizeof(GLfloat)));
+  glEnableVertexAttribArray(_attr_locs[ATTR_POS]);
+
+  glBindBuffer(GL_ARRAY_BUFFER, _vbo_ids[ATTR_AMP]);
+  glVertexAttribPointer( _attr_locs[ATTR_AMP], 1, GL_FLOAT, GL_FALSE, 0, (void*) (0 * sizeof(GLfloat)));
+  glEnableVertexAttribArray(_attr_locs[ATTR_AMP]);
+
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ind_vbo_id);
 
   glDepthFunc(GL_GREATER);
   glDrawElements( GL_TRIANGLE_STRIP
@@ -272,5 +260,5 @@ void RadarEngine::drawPelengs(uint first, uint last) {
                 , GL_UNSIGNED_INT
                 , (const GLvoid*)(first*(2*_peleng_len+2) * sizeof(GLuint)));
 
-  vao.release();
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }

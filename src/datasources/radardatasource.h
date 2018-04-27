@@ -13,7 +13,7 @@
 class RadarDataSource : public QObject {
   Q_OBJECT
 public:
-  explicit RadarDataSource();
+  explicit RadarDataSource(QObject* parent = 0);
   virtual ~RadarDataSource();
 
 public slots:

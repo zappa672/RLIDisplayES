@@ -17,7 +17,7 @@ void qSleep(int ms) {
   nanosleep(&ts, NULL);
 }
 
-RadarDataSource::RadarDataSource() {
+RadarDataSource::RadarDataSource(QObject* parent) : QObject(parent) {
   finish_flag = true;
   _radar_scale = new RadarScale();
 

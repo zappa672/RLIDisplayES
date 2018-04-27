@@ -93,42 +93,21 @@ public:
 
   void clearData();
   void setData(S52MarkLayer* layer, S52References* ref, int display_order);
+  void setData(S52SndgLayer* layer, S52Assets* assets, S52References* ref, int display_order);
 
   void draw(ChartShaders* shaders);
   inline int displayOrder() { return _display_order; }
 
 private:
+  void setupBuffers( const std::vector<GLfloat>& world_coords
+                   , const std::vector<GLfloat>& vertex_offsets
+                   , const std::vector<GLfloat>& tex_coords );
+
   GLuint vbo_ids[MARK_ATTRIBUTES_COUNT];
   GLuint _ind_vbo_id;
 
   GLuint point_count;
   int _display_order;
-
-  bool is_pattern_uniform;
-  QPointF patternOrigin;
-  QSizeF patternSize;
-  QPointF patternPivot;
 };
-
-
-class ChartSndgEngine : protected QOpenGLFunctions {
-public:
-  explicit ChartSndgEngine(QOpenGLContext* context);
-  virtual ~ChartSndgEngine();
-
-  void clearData();
-
-  void setPatternTexture(GLuint tex_id, QVector2D size);
-  void setData(S52SndgLayer* layer, S52Assets* assets, S52References* ref);
-
-  void draw(ChartShaders* shaders);
-
-private:
-  GLuint point_count;
-
-  GLuint vbo_ids[SNDG_ATTRIBUTES_COUNT];
-  GLuint _ind_vbo_id;
-};
-
 
 #endif // CHARTLAYERENGINES_H

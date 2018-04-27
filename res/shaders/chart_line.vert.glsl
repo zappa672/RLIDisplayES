@@ -20,14 +20,16 @@ varying vec2	v_tex_orig;
 varying vec2	v_texcoords;
 varying vec2	v_inner_texcoords;
 
+const float EARTH_RAD_METERS = 6378137.0;
+
 void main() {
   float lat_rads = radians(center.x);
 
-  float y1_m = -(6378137.0 / scale) * radians(coords1.x - center.x);
-  float y2_m = -(6378137.0 / scale) * radians(coords2.x - center.x);
+  float y1_m = -(EARTH_RAD_METERS / scale) * radians(coords1.x - center.x);
+  float y2_m = -(EARTH_RAD_METERS / scale) * radians(coords2.x - center.x);
 
-  float x1_m =  (6378137.0 / scale) * cos(lat_rads)*radians(coords1.y - center.y);
-  float x2_m =  (6378137.0 / scale) * cos(lat_rads)*radians(coords2.y - center.y);
+  float x1_m =  (EARTH_RAD_METERS / scale) * cos(lat_rads)*radians(coords1.y - center.y);
+  float x2_m =  (EARTH_RAD_METERS / scale) * cos(lat_rads)*radians(coords2.y - center.y);
 
   // screen position
   vec2 pos1_pix = vec2(x1_m, y1_m);

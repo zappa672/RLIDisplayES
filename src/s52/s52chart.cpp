@@ -240,7 +240,7 @@ bool S52Chart::readLayer(OGRLayer* poLayer) {
   else {
     mark_layer = new S52MarkLayer();
 
-    mark_layer->is_symbol_uniform = isMarkSymbolUniform(layer_name);
+    mark_layer->is_uniform = isMarkSymbolUniform(layer_name);
     mark_layer->symbol_ref = "-";
   }
 
@@ -319,9 +319,9 @@ void S52Chart::fillAreaParams(QString& layer_name, S52AreaLayer* layer, OGRFeatu
 }
 
 void S52Chart::fillMarkParams(QString& layer_name, S52MarkLayer* layer, OGRFeature* poFeature) {
-  if (layer->is_symbol_uniform && layer->symbol_ref == "-")
+  if (layer->is_uniform && layer->symbol_ref == "-")
     layer->symbol_ref = getMarkSymbolRef(layer_name, NULL);
-  else if (!layer->is_symbol_uniform)
+  else if (!layer->is_uniform)
     layer->symbol_refs.push_back(getMarkSymbolRef(layer_name, poFeature));
 }
 

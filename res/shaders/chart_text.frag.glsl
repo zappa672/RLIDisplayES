@@ -4,4 +4,5 @@ uniform sampler2D glyph_tex;
 
 void main() {
   gl_FragColor = texture2D(glyph_tex, v_texcoord);
+  //gl_FragColor.a = 1.0;
 }

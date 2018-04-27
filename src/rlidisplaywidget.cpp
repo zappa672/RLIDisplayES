@@ -44,9 +44,14 @@ void RLIDisplayWidget::toggleRadarTailsShift() {
 }
 
 void RLIDisplayWidget::onNewChartAvailable(const QString& name) {
-  if (name == "US2SP01M.000")
+  if (name == "US2SP01M.000") {
   //if (name == "CO200008.000")
+    qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Setting up chart " << name;
+
     _chartEngine->setChart(_chart_mngr->getChart(name), _chart_mngr->refs());
+
+    qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Setting up chart finished";
+  }
 }
 
 void RLIDisplayWidget::debugInfo() {
@@ -201,7 +206,12 @@ void RLIDisplayWidget::paintGL() {
     return;
 
   paintLayers();
+
+  glFlush();
+
   updateLayers();
+
+  glFlush();
 }
 
 void RLIDisplayWidget::paintLayers() {
@@ -230,9 +240,7 @@ void RLIDisplayWidget::paintLayers() {
   for (int i = 0; i < _infoEngine->blockCount(); i++)
     drawRect(_infoEngine->blockGeometry(i), _infoEngine->blockTextId(i));
 
-  drawRect(QRect(_menuEngine->position(), _menuEngine->size()), _menuEngine->texture());
-
-  glFlush();
+  drawRect(QRect(_menuEngine->position(), _menuEngine->size()), _menuEngine->texture());  
 }
 
 void RLIDisplayWidget::updateLayers() {

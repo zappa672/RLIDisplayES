@@ -13,11 +13,13 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
   connect(wgtButtonPanel, SIGNAL(closeApp()), SLOT(close()));
   connect(wgtRLI, SIGNAL(initialized()), SLOT(onRLIWidgetInitialized()));
 
-  _radar_ds = new RadarDataSource();
-  _ship_ds = new ShipDataSource();
+  _radar_ds = new RadarDataSource(this);
+  _ship_ds = new ShipDataSource(this);
+  //_target_ds = new TargetDataSource(this);
 
   _radar_ds->start();
   _ship_ds->start();
+  //_target_ds->start();
 
   RLIState::instance().onShipPositionChanged(_ship_ds->getPosition());
 

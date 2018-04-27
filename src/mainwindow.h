@@ -9,6 +9,7 @@
 
 #include "datasources/radardatasource.h"
 #include "datasources/shipdatasource.h"
+#include "datasources/targetdatasource.h"
 #include "datasources/infocontrollers.h"
 
 namespace Ui {
@@ -46,6 +47,7 @@ private:
 
   RadarDataSource* _radar_ds;
   ShipDataSource* _ship_ds;
+  //TargetDataSource* _target_ds;
 
   RLIDisplayWidget* wgtRLI;
   RLIControlWidget* wgtButtonPanel;

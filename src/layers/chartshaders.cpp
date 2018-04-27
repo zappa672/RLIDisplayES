@@ -7,7 +7,6 @@ ChartShaders::ChartShaders(QOpenGLContext* context) : QOpenGLFunctions(context) 
   initChartLineProgram();
   initChartMarkProgram();
   initChartTextProgram();
-  initChartSndgProgram();
 }
 
 ChartShaders::~ChartShaders() {
@@ -15,7 +14,6 @@ ChartShaders::~ChartShaders() {
   delete chart_line_program;
   delete chart_text_program;
   delete chart_mark_program;
-  delete chart_sndg_program;
 }
 
 
@@ -77,19 +75,6 @@ GLuint ChartShaders::getMarkAttributeLoc(unsigned int index) {
   return 0;
 }
 
-GLuint ChartShaders::getSndgUniformLoc(unsigned int index) {
-  if (index < SNDG_UNIFORMS_COUNT)
-    return sndg_uniform_locs[index];
-
-  return 0;
-}
-
-GLuint ChartShaders::getSndgAttributeLoc(unsigned int index) {
-  if (index < SNDG_ATTRIBUTES_COUNT)
-    return sndg_attribute_locs[index];
-
-  return 0;
-}
 
 
 void ChartShaders::initChartAreaProgram() {
@@ -165,8 +150,7 @@ void ChartShaders::initChartTextProgram() {
 
   text_attribute_locs[TEXT_ATTRIBUTES_COORDS]         = chart_text_program->attributeLocation("coords");
   text_attribute_locs[TEXT_ATTRIBUTES_POINT_ORDER]    = chart_text_program->attributeLocation("point_order");
-  text_attribute_locs[TEXT_ATTRIBUTES_CHAR_ORDER]     = chart_text_program->attributeLocation("char_order");
-  text_attribute_locs[TEXT_ATTRIBUTES_CHAR_COUNT]     = chart_text_program->attributeLocation("char_count");
+  text_attribute_locs[TEXT_ATTRIBUTES_CHAR_SHIFT]     = chart_text_program->attributeLocation("char_shift");
   text_attribute_locs[TEXT_ATTRIBUTES_CHAR_VALUE]     = chart_text_program->attributeLocation("char_val");
 
   chart_text_program->release();
@@ -189,38 +173,8 @@ void ChartShaders::initChartMarkProgram() {
   mark_uniform_locs[COMMON_UNIFORMS_DISPLAY_ORDER]    = chart_mark_program->uniformLocation("display_order");
 
   mark_attribute_locs[MARK_ATTRIBUTES_WORLD_COORDS]   = chart_mark_program->attributeLocation("coords");
-  mark_attribute_locs[MARK_ATTRIBUTES_VERTEX_ORDER]   = chart_mark_program->attributeLocation("vertex_order");
-  mark_attribute_locs[MARK_ATTRIBUTES_SYMBOL_ORIGIN]  = chart_mark_program->attributeLocation("origin");
-  mark_attribute_locs[MARK_ATTRIBUTES_SYMBOL_SIZE]    = chart_mark_program->attributeLocation("size");
-  mark_attribute_locs[MARK_ATTRIBUTES_SYMBOL_PIVOT]   = chart_mark_program->attributeLocation("pivot");
+  mark_attribute_locs[MARK_ATTRIBUTES_VERTEX_OFFSET]  = chart_mark_program->attributeLocation("vertex_offset");
+  mark_attribute_locs[MARK_ATTRIBUTES_TEX_COORDS]     = chart_mark_program->attributeLocation("tex_coords");
 
   chart_mark_program->release();
-}
-
-void ChartShaders::initChartSndgProgram() {
-  chart_sndg_program = new QOpenGLShaderProgram();
-
-  chart_sndg_program->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/chart_sndg.vert.glsl");
-  chart_sndg_program->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/chart_sndg.frag.glsl");
-  chart_sndg_program->link();
-  chart_sndg_program->bind();
-
-  sndg_uniform_locs[COMMON_UNIFORMS_NORTH]            = chart_sndg_program->uniformLocation("north");
-  sndg_uniform_locs[COMMON_UNIFORMS_CENTER]           = chart_sndg_program->uniformLocation("center");
-  sndg_uniform_locs[COMMON_UNIFORMS_SCALE]            = chart_sndg_program->uniformLocation("scale");
-  sndg_uniform_locs[COMMON_UNIFORMS_PATTERN_TEX_ID]   = chart_sndg_program->uniformLocation("pattern_tex");
-  sndg_uniform_locs[COMMON_UNIFORMS_PATTERN_TEX_DIM]  = chart_sndg_program->uniformLocation("assetdim");
-  sndg_uniform_locs[COMMON_UNIFORMS_MVP_MATRIX]       = chart_sndg_program->uniformLocation("mvp_matrix");
-  sndg_uniform_locs[COMMON_UNIFORMS_DISPLAY_ORDER]    = chart_sndg_program->uniformLocation("display_order");
-
-  sndg_attribute_locs[SNDG_ATTRIBUTES_WORLD_COORDS]   = chart_sndg_program->attributeLocation("coords");
-  sndg_attribute_locs[SNDG_ATTRIBUTES_VERTEX_ORDER]   = chart_sndg_program->attributeLocation("vertex_order");
-  sndg_attribute_locs[SNDG_ATTRIBUTES_SYMBOL_ORDER]   = chart_sndg_program->attributeLocation("symbol_order");
-  sndg_attribute_locs[SNDG_ATTRIBUTES_SYMBOL_FRAC]    = chart_sndg_program->attributeLocation("symbol_frac");
-  sndg_attribute_locs[SNDG_ATTRIBUTES_SYMBOL_COUNT]   = chart_sndg_program->attributeLocation("symbol_count");
-  sndg_attribute_locs[SNDG_ATTRIBUTES_SYMBOL_ORIGIN]  = chart_sndg_program->attributeLocation("origin");
-  sndg_attribute_locs[SNDG_ATTRIBUTES_SYMBOL_SIZE]    = chart_sndg_program->attributeLocation("size");
-  sndg_attribute_locs[SNDG_ATTRIBUTES_SYMBOL_PIVOT]   = chart_sndg_program->attributeLocation("pivot");
-
-  chart_sndg_program->release();
 }
