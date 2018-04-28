@@ -105,17 +105,17 @@ private:
   void initChartTextProgram();
   void initChartMarkProgram();
 
-  int area_uniform_locs[AREA_UNIFORMS_COUNT];
-  int area_attribute_locs[AREA_ATTRIBUTES_COUNT];
+  int area_unif_locs[AREA_UNIFORMS_COUNT];
+  int area_attr_locs[AREA_ATTRIBUTES_COUNT];
 
-  int line_uniform_locs[LINE_UNIFORMS_COUNT];
-  int line_attribute_locs[LINE_ATTRIBUTES_COUNT];
+  int line_unif_locs[LINE_UNIFORMS_COUNT];
+  int line_attr_locs[LINE_ATTRIBUTES_COUNT];
 
-  int text_uniform_locs[TEXT_UNIFORMS_COUNT];
-  int text_attribute_locs[TEXT_ATTRIBUTES_COUNT];
+  int text_unif_locs[TEXT_UNIFORMS_COUNT];
+  int text_attr_locs[TEXT_ATTRIBUTES_COUNT];
 
-  int mark_uniform_locs[MARK_UNIFORMS_COUNT];
-  int mark_attribute_locs[MARK_ATTRIBUTES_COUNT];
+  int mark_unif_locs[MARK_UNIFORMS_COUNT];
+  int mark_attr_locs[MARK_ATTRIBUTES_COUNT];
 
   QOpenGLShaderProgram* chart_area_program;
   QOpenGLShaderProgram* chart_line_program;

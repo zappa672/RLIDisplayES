@@ -194,7 +194,7 @@ void ChartEngine::draw(const QString& color_scheme) {
   glEnable(GL_DEPTH_TEST);
   glDepthFunc(GL_GREATER);
 
-  glClearColor(0.0f, 0.0f, 0.0f, 1.f);
+  glClearColor(1.0f, 1.0f, 1.0f, 1.f);
   glClear(GL_COLOR_BUFFER_BIT);
 
   glViewport(0, 0, _fbo->width(), _fbo->height());
@@ -209,7 +209,7 @@ void ChartEngine::draw(const QString& color_scheme) {
     transform.translate(_center_shift.x() + _fbo->width()/2.f, _center_shift.y() + _fbo->height()/2.f, 0.f);
 
     drawAreaLayers(projection*transform, color_scheme);
-    //drawLineLayers(projection*transform, color_scheme);
+    drawLineLayers(projection*transform, color_scheme);
     drawTextLayers(projection*transform);
     drawMarkLayers(projection*transform, color_scheme);
   }
@@ -239,16 +239,22 @@ void ChartEngine::drawAreaLayers(const QMatrix4x4& mvp_matrix, const QString& co
   prog->setUniformValue(shaders->getAreaUniformLoc(COMMON_UNIFORMS_PATTERN_TEX_ID), 0);
   prog->setUniformValue(shaders->getAreaUniformLoc(AREA_UNIFORMS_COLOR_TABLE_TEX), 1);
 
-  pattern_tex->bind(0);
-  color_scheme_tex->bind(1);
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, pattern_tex->textureId());
+
+  glActiveTexture(GL_TEXTURE1);
+  glBindTexture(GL_TEXTURE_2D, color_scheme_tex->textureId());
 
   for (ChartAreaEngine* areaEngine : area_engines) {
     prog->setUniformValue(shaders->getAreaUniformLoc(COMMON_UNIFORMS_DISPLAY_ORDER), static_cast<float>(areaEngine->displayOrder()));
     areaEngine->draw(shaders);
   }
 
-  pattern_tex->release();
-  color_scheme_tex->release();
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, 0);
+
+  glActiveTexture(GL_TEXTURE1);
+  glBindTexture(GL_TEXTURE_2D, 0);
 
   prog->release();
 }
@@ -269,19 +275,25 @@ void ChartEngine::drawLineLayers(const QMatrix4x4& mvp_matrix, const QString& co
   prog->setUniformValue(shaders->getLineUniformLoc(COMMON_UNIFORMS_PATTERN_TEX_DIM), pattern_tex->width(), pattern_tex->height());
   prog->setUniformValue(shaders->getLineUniformLoc(COMMON_UNIFORMS_MVP_MATRIX), mvp_matrix);
 
-  pattern_tex->bind(0);
   glUniform1i(shaders->getLineUniformLoc(COMMON_UNIFORMS_PATTERN_TEX_ID), 0);
-
-  color_scheme_tex->bind(1);
   glUniform1i(shaders->getLineUniformLoc(LINE_UNIFORMS_COLOR_TABLE_TEX), 1);
+
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, pattern_tex->textureId());
+
+  glActiveTexture(GL_TEXTURE1);
+  glBindTexture(GL_TEXTURE_2D, color_scheme_tex->textureId());
 
   for (ChartLineEngine* lineEngine : line_engines) {
     prog->setUniformValue(shaders->getLineUniformLoc(COMMON_UNIFORMS_DISPLAY_ORDER), static_cast<float>(lineEngine->displayOrder()));
     lineEngine->draw(shaders);
   }
 
-  pattern_tex->release();
-  color_scheme_tex->release();
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, 0);
+
+  glActiveTexture(GL_TEXTURE1);
+  glBindTexture(GL_TEXTURE_2D, 0);
 
   prog->release();
 }
