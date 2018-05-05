@@ -47,7 +47,7 @@ private:
 
   RadarDataSource* _radar_ds;
   ShipDataSource* _ship_ds;
-  //TargetDataSource* _target_ds;
+  TargetDataSource* _target_ds;
 
   RLIDisplayWidget* wgtRLI;
   RLIControlWidget* wgtButtonPanel;

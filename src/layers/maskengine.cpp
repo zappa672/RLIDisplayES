@@ -78,7 +78,7 @@ void MaskEngine::update() {
   glDrawArrays(GL_TRIANGLE_FAN, 0, CIRCLE_RAY_COUNT+2);
 
 
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
+  //glBindBuffer(GL_ARRAY_BUFFER, 0);
 
   _program->release();
 
@@ -127,7 +127,7 @@ void MaskEngine::initRectBuffers() {
   glBindBuffer(GL_ARRAY_BUFFER, _rect_vbo_ids[ATTR_CLR]);
   glBufferData(GL_ARRAY_BUFFER, 16*sizeof(GLfloat), colors, GL_STATIC_DRAW);
 
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
+  //glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 void MaskEngine::initHoleBuffers() {
@@ -164,6 +164,6 @@ void MaskEngine::initHoleBuffers() {
   glBindBuffer(GL_ARRAY_BUFFER, _hole_vbo_ids[ATTR_CLR]);
   glBufferData(GL_ARRAY_BUFFER, 4*(CIRCLE_RAY_COUNT+2)*sizeof(GLfloat), colors.data(), GL_STATIC_DRAW);
 
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
+  //glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 

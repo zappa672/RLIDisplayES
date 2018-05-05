@@ -69,12 +69,12 @@ void S52Assets::initFontTexture() {
 
   font_texture = new QOpenGLTexture(QOpenGLTexture::Target2D);
 
-  font_texture->setMipLevels(0);
+  font_texture->setMipLevels(1);
   font_texture->setMinificationFilter(QOpenGLTexture::Nearest);
   font_texture->setMagnificationFilter(QOpenGLTexture::Nearest);
   font_texture->setWrapMode(QOpenGLTexture::ClampToEdge);
 
-  font_texture->setData(img);
+  font_texture->setData(img, QOpenGLTexture::DontGenerateMipMaps);
 }
 
 
@@ -91,12 +91,12 @@ void S52Assets::initColorSchemeTextures(S52References* ref) {
 
     QOpenGLTexture* tex = new QOpenGLTexture(QOpenGLTexture::Target2D);
 
-    tex->setMipLevels(0);
+    tex->setMipLevels(1);
     tex->setMinificationFilter(QOpenGLTexture::Nearest);
     tex->setMagnificationFilter(QOpenGLTexture::Nearest);
     tex->setWrapMode(QOpenGLTexture::ClampToEdge);
 
-    tex->setData(img);
+    tex->setData(img, QOpenGLTexture::DontGenerateMipMaps);
 
     color_scheme_textures.insert(scheme, tex);
   }
@@ -147,12 +147,12 @@ QOpenGLTexture* S52Assets::dirToPatternTex(const QString& path, const QString& e
   // Create OpenGL texture using combined image
   QOpenGLTexture* tex = new QOpenGLTexture(QOpenGLTexture::Target2D);
 
-  tex->setMipLevels(0);
+  tex->setMipLevels(1);
   tex->setMinificationFilter(QOpenGLTexture::Nearest);
   tex->setMagnificationFilter(QOpenGLTexture::Nearest);
   tex->setWrapMode(QOpenGLTexture::Repeat);
 
-  tex->setData(img);
+  tex->setData(img, QOpenGLTexture::DontGenerateMipMaps);
   return tex;
 }
 
@@ -202,7 +202,7 @@ void S52Assets::initSymbolTextures(S52References* ref) {
     tex->setMagnificationFilter(QOpenGLTexture::Nearest);
     tex->setWrapMode(QOpenGLTexture::ClampToEdge);
 
-    tex->setData(img);
+    tex->setData(img, QOpenGLTexture::DontGenerateMipMaps);
     symbol_textures.insert(file_name, tex);
   }
 }

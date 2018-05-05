@@ -15,11 +15,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
   _radar_ds = new RadarDataSource(this);
   _ship_ds = new ShipDataSource(this);
-  //_target_ds = new TargetDataSource(this);
+  _target_ds = new TargetDataSource(this);
 
   _radar_ds->start();
   _ship_ds->start();
-  //_target_ds->start();
+  _target_ds->start();
 
   RLIState::instance().onShipPositionChanged(_ship_ds->getPosition());
 
@@ -184,6 +184,11 @@ void MainWindow::onRLIWidgetInitialized() {
 
   connect( _radar_ds, SIGNAL(updateData2(uint,uint,GLfloat*))
          , wgtRLI->tailsEngine(), SLOT(updateData(uint,uint,GLfloat*)));
+
+  qRegisterMetaType<RadarTarget>("RadarTarget");
+  connect(_target_ds, SIGNAL(updateTarget(QString, RadarTarget))
+         , wgtRLI->targetEngine(), SLOT(updateTarget(QString, RadarTarget)));
+
 
   int frame = qApp->property(PROPERTY_FRAME_DELAY).toInt();
   startTimer(frame, Qt::CoarseTimer);

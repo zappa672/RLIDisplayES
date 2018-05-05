@@ -23,7 +23,6 @@ void ChartAreaEngine::clearData() {
     glBindBuffer(GL_ARRAY_BUFFER, _vbo_ids[i]);
     glBufferData(GL_ARRAY_BUFFER, 0, NULL, GL_STATIC_DRAW);
   }
-
   glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
@@ -169,11 +168,10 @@ void ChartLineEngine::clearData() {
     glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[i]);
     glBufferData(GL_ARRAY_BUFFER, 0, NULL, GL_STATIC_DRAW);
   }
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
 
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ind_vbo_id);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, 0, NULL, GL_STATIC_DRAW);
-
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
@@ -284,7 +282,6 @@ void ChartLineEngine::setData(S52LineLayer* layer, S52Assets* assets, S52Referen
 
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ind_vbo_id);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, draw_indices.size()*sizeof(GLuint), draw_indices.data(), GL_STATIC_DRAW);
-
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
@@ -333,11 +330,10 @@ void ChartLineEngine::draw(ChartShaders* shaders) {
     glDisableVertexAttribArray(shaders->getLineAttributeLoc(LINE_ATTRIBUTES_COLOR_INDEX));
   }
 
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ind_vbo_id);
-
-  glDrawElements(GL_TRIANGLES, 3*(point_count/2), GL_UNSIGNED_INT, (const GLvoid*)(0 * sizeof(GLuint)));
-
   glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ind_vbo_id);
+  glDrawElements(GL_TRIANGLES, 3*(point_count/2), GL_UNSIGNED_INT, (const GLvoid*)(0 * sizeof(GLuint)));  
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
@@ -370,11 +366,10 @@ void ChartMarkEngine::clearData() {
     glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[i]);
     glBufferData(GL_ARRAY_BUFFER, 0, NULL, GL_STATIC_DRAW);
   }
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
 
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ind_vbo_id);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, 0, NULL, GL_STATIC_DRAW);
-
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
@@ -452,6 +447,7 @@ void ChartMarkEngine::setupBuffers( const std::vector<GLfloat>& world_coords
   glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[MARK_ATTRIBUTES_TEX_COORDS]);
   glBufferData(GL_ARRAY_BUFFER, tex_coords.size() * sizeof(GLfloat), &tex_coords[0], GL_STATIC_DRAW);
 
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
 
   std::vector<GLuint> draw_indices;
 
@@ -466,7 +462,6 @@ void ChartMarkEngine::setupBuffers( const std::vector<GLfloat>& world_coords
 
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ind_vbo_id);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, draw_indices.size()*sizeof(GLuint), draw_indices.data(), GL_STATIC_DRAW);
-
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
@@ -563,11 +558,10 @@ void ChartMarkEngine::draw(ChartShaders* shaders) {
   glVertexAttribPointer(shaders->getMarkAttributeLoc(MARK_ATTRIBUTES_TEX_COORDS), 2, GL_FLOAT, GL_FALSE, 0, (void *) 0);
   glEnableVertexAttribArray(shaders->getMarkAttributeLoc(MARK_ATTRIBUTES_TEX_COORDS));
 
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
 
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ind_vbo_id);
-
-  glDrawElements( GL_TRIANGLES, 3*(point_count/2), GL_UNSIGNED_INT, (const GLvoid*)(0 * sizeof(GLuint)));
-
+  glDrawElements(GL_TRIANGLES, 3*(point_count/2), GL_UNSIGNED_INT, (const GLvoid*)(0 * sizeof(GLuint)));
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
@@ -603,11 +597,10 @@ void ChartTextEngine::clearData() {
     glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[i]);
     glBufferData(GL_ARRAY_BUFFER, 0, NULL, GL_STATIC_DRAW);
   }
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
 
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ind_vbo_id);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, 0, NULL, GL_STATIC_DRAW);
-
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
@@ -687,6 +680,7 @@ void ChartTextEngine::draw(ChartShaders* shaders) {
   glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[TEXT_ATTRIBUTES_CHAR_VALUE]);
   glVertexAttribPointer(shaders->getTextAttributeLoc(TEXT_ATTRIBUTES_CHAR_VALUE), 1, GL_FLOAT, GL_FALSE, 0, (void *) 0);
   glEnableVertexAttribArray(shaders->getTextAttributeLoc(TEXT_ATTRIBUTES_CHAR_VALUE));
+
   glBindBuffer(GL_ARRAY_BUFFER, 0);
 
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ind_vbo_id);

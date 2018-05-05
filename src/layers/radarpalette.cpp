@@ -27,6 +27,7 @@ RadarPalette::RadarPalette(QOpenGLContext* context, QObject* parent)
 
   tex = new QOpenGLTexture(QOpenGLTexture::Target2D);
 
+  tex->setMipLevels(1);
   tex->setMinificationFilter(QOpenGLTexture::Nearest);
   tex->setMagnificationFilter(QOpenGLTexture::Nearest);
   tex->setWrapMode(QOpenGLTexture::ClampToEdge);
@@ -125,5 +126,5 @@ void RadarPalette::updatePalette() {
   for (int i = 0; i < 16; i++)
     img.setPixel(0, i, qRgb(palette[i][0], palette[i][1], palette[i][2]));
 
-  tex->setData(img);
+  tex->setData(img, QOpenGLTexture::DontGenerateMipMaps);
 }

@@ -22,7 +22,8 @@ InfoFonts::InfoFonts(QOpenGLContext* context, const QString& dirPath) : QOpenGLF
     tex->setMagnificationFilter(QOpenGLTexture::Nearest);
     tex->setWrapMode(QOpenGLTexture::Repeat);
 
-    tex->setData(img);
+    tex->setData(img, QOpenGLTexture::DontGenerateMipMaps);
+
     _textures.insert(tag, tex);
     _fontSizes.insert(tag, fontSize);
   }

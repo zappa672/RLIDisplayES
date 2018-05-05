@@ -1,57 +1,29 @@
-/*
 #ifndef TARGETENGINE_H
 #define TARGETENGINE_H
+
+#include "../datasources/targetdatasource.h"
 
 #include <QPoint>
 #include <QMutex>
 #include <QList>
 #include <QTimer>
 #include <QVector2D>
-#include <QGLShaderProgram>
-#include <QGLFunctions>
+
+#include <QOpenGLTexture>
+#include <QOpenGLFunctions>
+#include <QOpenGLFramebufferObject>
+#include <QOpenGLShaderProgram>
+#include <QOpenGLVertexArrayObject>
 
 
-struct RadarTarget {
-public:
-  RadarTarget() {
-    Lost = false;
-    Latitude = 0;
-    Longtitude = 0;
-    Heading = 0;
-    Rotation = 0;
-    CourseOverGround = 0;
-    SpeedOverGround = 0;
-  }
-
-  RadarTarget(const RadarTarget& o) {
-    Lost = o.Lost;
-    Latitude = o.Latitude;
-    Longtitude = o.Longtitude;
-    Heading = o.Heading;
-    Rotation = o.Rotation;
-    CourseOverGround = o.CourseOverGround;
-    SpeedOverGround = o.SpeedOverGround;
-  }
-
-  ~RadarTarget() { }
-
-  bool Lost;
-  float Latitude, Longtitude;
-  float Heading, Rotation;
-  float CourseOverGround, SpeedOverGround;
-};
-
-Q_DECLARE_METATYPE(RadarTarget)
-
-
-class TargetEngine : public QObject, protected QGLFunctions {
+class TargetEngine : public QObject, protected QOpenGLFunctions {
   Q_OBJECT
+
 public:
-  explicit TargetEngine(QObject* parent = 0);
+  explicit TargetEngine(QOpenGLContext* context, QObject* parent = 0);
   virtual ~TargetEngine();
 
-  bool init(const QGLContext* context);
-  void draw(QVector2D world_coords, float scale);
+  void draw(const QMatrix4x4& mvp_matrix, std::pair<float, float> coords, float scale);
 
   int getTailsTime(void);
   int getCurrentIndex();
@@ -63,7 +35,9 @@ signals:
 public slots:
   void onTailsTimer();
   void onTailsModeChanged(int mode, int minutes);
+
   void trySelect(QVector2D cursorCoords, float scale);
+
   void deleteTarget(QString tag);
   void updateTarget(QString tag, RadarTarget target);
 
@@ -73,7 +47,7 @@ private:
   int initBuffersTails();
 
   void initShader();
-  void initTexture(QString path, GLuint* tex_id);
+  QOpenGLTexture* initTexture(QString path);
 
   QMutex _trgtsMutex;
   QString _selected;
@@ -85,12 +59,10 @@ private:
 
   enum {TRG_TAIL_NUM = 4};
 
-  bool _initialized;
-
   // Mask shader programs
-  GLuint _asset_texture_id;
-  GLuint _selection_texture_id;
-  QGLShaderProgram* _prog;
+  QOpenGLTexture* _asset_tex;
+  QOpenGLTexture* _selection_tex;
+  QOpenGLShaderProgram* _prog;
 
   // -----------------------------------------------
   enum { AIS_TRGT_ATTR_COORDS = 0
@@ -100,10 +72,11 @@ private:
        , AIS_TRGT_ATTR_ROTATION = 4
        , AIS_TRGT_ATTR_SPEED = 5
        , AIS_TRGT_ATTR_COUNT = 6 } ;
-  enum { AIS_TRGT_UNIF_CENTER = 0
-       , AIS_TRGT_UNIF_SCALE = 1
-       , AIS_TRGT_UNIF_TYPE = 2
-       , AIS_TRGT_UNIF_COUNT = 3 } ;
+  enum { AIS_TRGT_UNIF_MVP = 0
+       , AIS_TRGT_UNIF_CENTER = 1
+       , AIS_TRGT_UNIF_SCALE = 2
+       , AIS_TRGT_UNIF_TYPE = 3
+       , AIS_TRGT_UNIF_COUNT = 4 } ;
 
   GLuint _tbo_id;
   GLuint _vbo_ids[AIS_TRGT_ATTR_COUNT];
@@ -112,4 +85,4 @@ private:
 };
 
 #endif // TARGETENGINE_H
-*/
+

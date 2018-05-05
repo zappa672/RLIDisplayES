@@ -206,9 +206,7 @@ void InfoEngine::drawText(const InfoText& text, InfoFonts* fonts) {
 
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, tex_id);
-
   glDrawArrays(GL_TRIANGLE_STRIP, 0, ord.size());
-
   glBindTexture(GL_TEXTURE_2D, 0);
 }
 

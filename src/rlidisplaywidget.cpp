@@ -31,6 +31,7 @@ RLIDisplayWidget::~RLIDisplayWidget() {
     delete _maskEngine;
     delete _chartEngine;
     delete _menuEngine;
+    delete _trgtEngine;
 
     delete _program;
   }
@@ -45,11 +46,9 @@ void RLIDisplayWidget::toggleRadarTailsShift() {
 
 void RLIDisplayWidget::onNewChartAvailable(const QString& name) {
   if (name == "US2SP01M.000") {
-  //if (name == "CO200008.000")
+  //if (name == "CO200008.000") {
     qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Setting up chart " << name;
-
     _chartEngine->setChart(_chart_mngr->getChart(name), _chart_mngr->refs());
-
     qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Setting up chart finished";
   }
 }
@@ -86,6 +85,8 @@ void RLIDisplayWidget::initializeGL() {
 
   glDisable(GL_STENCIL);
   glDisable(GL_CULL_FACE);
+
+  glEnable(GL_DEPTH_TEST);
   glEnable(GL_TEXTURE_2D);
 
   _program = new QOpenGLShaderProgram(this);
@@ -130,10 +131,13 @@ void RLIDisplayWidget::initializeGL() {
   _menuEngine->setFonts(_infoFonts);
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Menu engine init finish";
 
+  qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Target engine init start";
+  _trgtEngine = new TargetEngine(context(), this);
+  qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Target engine init finish";
+
   //-------------------------------------------------------------
 
   glGenBuffers(ATTR_COUNT, _vbo_ids);
-
   initShaders();
 
   emit initialized();
@@ -146,6 +150,10 @@ void RLIDisplayWidget::initializeGL() {
 
   _chart_mngr->loadCharts();
   connect(_chart_mngr, SIGNAL(new_chart_available(QString)), SLOT(onNewChartAvailable(QString)));
+
+  connect(_menuEngine, SIGNAL(radarBrightnessChanged(int)), _radarEngine, SLOT(onBrightnessChanged(int)));
+  connect(_menuEngine, SIGNAL(languageChanged(QByteArray)), _menuEngine, SLOT(onLanguageChanged(QByteArray)));
+  connect(_menuEngine, SIGNAL(languageChanged(QByteArray)), _infoEngine, SLOT(onLanguageChanged(QByteArray)));
 }
 
 void RLIDisplayWidget::initShaders() {
@@ -206,9 +214,6 @@ void RLIDisplayWidget::paintGL() {
     return;
 
   paintLayers();
-
-  glFlush();
-
   updateLayers();
 
   glFlush();
@@ -223,6 +228,10 @@ void RLIDisplayWidget::paintLayers() {
 
   const RLILayout* layout = RLIConfig::instance().currentLayout();
 
+
+  std::pair<float, float> shipPos = RLIState::instance().shipPosition();
+  float scale = RLIState::instance().chartScale();
+
   glViewport(0, 0, width(), height());
 
   glClearColor(0.f, 0.f, 0.f, 1.f);
@@ -234,6 +243,20 @@ void RLIDisplayWidget::paintLayers() {
 
   drawRect(QRect(layout->circle.boundRect.topLeft().toPoint() + shift, _radarEngine->size()), _radarEngine->textureId());
   drawRect(QRect(layout->circle.boundRect.topLeft().toPoint() - shift, _tailsEngine->size()), _tailsEngine->textureId());
+
+
+  QPointF center = layout->circle.center;
+
+  QMatrix4x4 projection;
+  projection.setToIdentity();
+  projection.ortho(0.f, width(), 0.f, height(), -1.f, 1.f);
+
+  QMatrix4x4 transform;
+  transform.setToIdentity();
+  transform.translate(center.x(), center.y(), 0.f);
+
+  _trgtEngine->draw(projection*transform, shipPos, scale);
+
 
   drawRect(rect(), _maskEngine->textureId());
 
@@ -289,7 +312,7 @@ void RLIDisplayWidget::drawRect(const QRectF& rect, GLuint textureId) {
   glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
   glBindTexture(GL_TEXTURE_2D, 0);
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
+  //glBindBuffer(GL_ARRAY_BUFFER, 0);
 
   _program->release();
 }

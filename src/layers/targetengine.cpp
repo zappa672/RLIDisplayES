@@ -1,25 +1,40 @@
-/*
 #include "targetengine.h"
 
 #include "../common/rlimath.h"
 
-TargetEngine::TargetEngine(QObject* parent) : QObject(parent), QGLFunctions() {
-  _initialized = false;
+#include <QImage>
+#include <QDateTime>
+
+
+TargetEngine::TargetEngine(QOpenGLContext* context, QObject* parent) : QObject(parent), QOpenGLFunctions(context) {
   _tailsTime   = 0;
   _selected = "1";
 
   connect(&_tailsTimer, SIGNAL(timeout()), SLOT(onTailsTimer()));
-  if(_tailsTime > 0)
-      _tailsTimer.start((_tailsTime * 60 * 1000) / TRG_TAIL_NUM);
+  if (_tailsTime > 0)
+    _tailsTimer.start((_tailsTime * 60 * 1000) / TRG_TAIL_NUM);
+
+
+  initializeOpenGLFunctions();
+
+  _prog = new QOpenGLShaderProgram();
+
+  glGenBuffers(1, &_tbo_id);
+  glGenBuffers(AIS_TRGT_ATTR_COUNT, _vbo_ids);
+
+  initShader();
+
+  _asset_tex = initTexture("data//textures//targets///target.png");
+  _selection_tex = initTexture("data//textures//targets//selection.png");
 }
 
 TargetEngine::~TargetEngine() {
-  if (_initialized) {
-    delete _prog;
-    glDeleteBuffers(AIS_TRGT_ATTR_COUNT, _vbo_ids);
-    glDeleteBuffers(1, &_tbo_id);
-    glDeleteTextures(1, &_asset_texture_id);
-  }
+  delete _prog;
+  delete _asset_tex;
+  delete _selection_tex;
+
+  glDeleteBuffers(AIS_TRGT_ATTR_COUNT, _vbo_ids);
+  glDeleteBuffers(1, &_tbo_id);
 }
 
 int TargetEngine::getCurrentIndex() {
@@ -45,7 +60,6 @@ void TargetEngine::trySelect(QVector2D cursorCoords, float scale) {
   }
 }
 
-#include <QDateTime>
 
 void TargetEngine::onTailsTimer() {
   _trgtsMutex.lock();
@@ -66,6 +80,8 @@ void TargetEngine::onTailsTimer() {
 
 
 void TargetEngine::onTailsModeChanged(int mode, int minutes) {
+  Q_UNUSED(mode);
+
   if (_tailsTimer.isActive())
       _tailsTimer.stop();
 
@@ -124,37 +140,9 @@ void TargetEngine::deleteTarget(QString tag) {
 }
 
 
-bool TargetEngine::init(const QGLContext* context) {
-  Q_UNUSED(context);
-
-  if (_initialized) return false;
-
-  initializeGLFunctions(context);
-
-  _prog = new QGLShaderProgram();
-
-  glGenBuffers(1, &_tbo_id);
-  glGenBuffers(AIS_TRGT_ATTR_COUNT, _vbo_ids);
-
-  initShader();
-
-  initTexture("res//textures//targets//target.png", &_asset_texture_id);
-  initTexture("res//textures//targets//selection.png", &_selection_texture_id);
-
-  _initialized = true;
-  return _initialized;
-}
-
-
 void TargetEngine::initShader() {
-  // Overriding system locale until shaders are compiled
-  setlocale(LC_NUMERIC, "C");
-
-  _prog->addShaderFromSourceFile(QGLShader::Vertex, ":/res/shaders/trgt.vert.glsl");
-  _prog->addShaderFromSourceFile(QGLShader::Fragment, ":/res/shaders/trgt.frag.glsl");
-
-  //const GLchar* feedbackVaryings[] = { "screen_pos" };
-  //glTransformFeedbackVaryings(_prog->programId(), 1, feedbackVaryings, GL_SEPARATE_ATTRIBS);
+  _prog->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/trgt.vert.glsl");
+  _prog->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/trgt.frag.glsl");
 
   _prog->link();
   _prog->bind();
@@ -166,74 +154,32 @@ void TargetEngine::initShader() {
   _attr_locs[AIS_TRGT_ATTR_COURSE] = _prog->attributeLocation("course");
   _attr_locs[AIS_TRGT_ATTR_SPEED] = _prog->attributeLocation("speed");
 
+  _unif_locs[AIS_TRGT_UNIF_MVP] = _prog->uniformLocation("mvp_matrix");
   _unif_locs[AIS_TRGT_UNIF_CENTER] = _prog->uniformLocation("center");
   _unif_locs[AIS_TRGT_UNIF_SCALE] = _prog->uniformLocation("scale");
   _unif_locs[AIS_TRGT_UNIF_TYPE] = _prog->uniformLocation("type");
 
   _prog->release();
-
-  // Restore system locale
-  setlocale(LC_ALL, "");
 }
 
 
-void TargetEngine::draw(QVector2D world_coords, float scale) {
+void TargetEngine::draw(const QMatrix4x4& mvp_matrix, std::pair<float, float> coords, float scale) {
   _trgtsMutex.lock();
 
   _prog->bind();
 
   glUniform1f(_unif_locs[AIS_TRGT_UNIF_SCALE], scale);
-  glUniform2f(_unif_locs[AIS_TRGT_UNIF_CENTER], world_coords.x(), world_coords.y());
+  glUniform2f(_unif_locs[AIS_TRGT_UNIF_CENTER], coords.first, coords.second);
+  _prog->setUniformValue(_unif_locs[AIS_TRGT_UNIF_MVP], mvp_matrix);
 
   initBuffersTrgts("");
   bindBuffers();
 
   glUniform1f(_unif_locs[AIS_TRGT_UNIF_TYPE], 0);
 
-  // Transform feedback part
-  // Start
-//  glBindBuffer(GL_TRANSFORM_FEEDBACK_BUFFER , _tbo_id);
-//  glBufferData(GL_TRANSFORM_FEEDBACK_BUFFER , _targets.size()*4*2*sizeof(GLfloat), nullptr, GL_DYNAMIC_READ);
-//  glEnable(GL_RASTERIZER_DISCARD);
-//  glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, _tbo_id);
-//  glBeginTransformFeedback(GL_POINTS);
-//  glDrawArrays(GL_POINTS, 0,  _targets.size()*4);
-//  glEndTransformFeedback();
-
-//  GLfloat* feedback = new GLfloat[_targets.size()*4*2];
-//  glGetBufferSubData(GL_TRANSFORM_FEEDBACK_BUFFER, 0, _targets.size()*4*2*sizeof(GLfloat), feedback);
-
-//  qDebug() << "feedback";
-//  qDebug() << world_coords;
-//  qDebug() << scale;
-//  for (int i = 0; i < _targets.size(); i++) {
-//    QVector2D center(_targets[_targets.keys()[i]].Latitude, _targets[_targets.keys()[i]].Longtitude);
-//    qDebug() << center;
-
-//    float lat_rads = radians(world_coords.x());
-
-//    float y_m = -6378137*radians(center.x() - world_coords.x());
-//    float x_m = 6378137*cos(lat_rads)*radians(center.y() - world_coords.y());
-
-//    // screen position
-//    QVector2D pix_pos = QVector2D(x_m, y_m) / scale;
-//    qDebug() << pix_pos;
-
-//    qDebug() << feedback[8*i+0] << ": " << feedback[8*i+1];
-//    qDebug() << feedback[8*i+2] << ": " << feedback[8*i+3];
-//    qDebug() << feedback[8*i+4] << ": " << feedback[8*i+5];
-//    qDebug() << feedback[8*i+6] << ": " << feedback[8*i+7];
-//  }
-
-//  glDisable(GL_RASTERIZER_DISCARD);
-  // End
-  // Transform feedback part
-
-
-
   // Draw target marks
   glActiveTexture(GL_TEXTURE0);
-  glBindTexture(GL_TEXTURE_2D, _asset_texture_id);
+  glBindTexture(GL_TEXTURE_2D, _asset_tex->textureId());
   glDrawArrays(GL_QUADS, 0,  _targets.size()*4);
   glBindTexture(GL_TEXTURE_2D, 0);
 
@@ -247,19 +193,20 @@ void TargetEngine::draw(QVector2D world_coords, float scale) {
   glPushAttrib(GL_ENABLE_BIT);
   glLineStipple(1, 0xF0F0);
   glEnable(GL_LINE_STIPPLE);
+
   glUniform1f(_unif_locs[AIS_TRGT_UNIF_TYPE], 2);
   glDrawArrays(GL_LINES, 0, _targets.size()*4);
   glPopAttrib();
 
   glPointSize(5);
 
+
   // Draw tails++
-  if(_tailsTime)
-  {
-      int pCount = initBuffersTails();
-      bindBuffers();
-      glUniform1f(_unif_locs[AIS_TRGT_UNIF_TYPE], 3);
-      glDrawArrays(GL_POINTS, 0, pCount);
+  if (_tailsTime) {
+    int pCount = initBuffersTails();
+    bindBuffers();
+    glUniform1f(_unif_locs[AIS_TRGT_UNIF_TYPE], 3);
+    glDrawArrays(GL_POINTS, 0, pCount);
   }
 
 
@@ -270,7 +217,7 @@ void TargetEngine::draw(QVector2D world_coords, float scale) {
     glUniform1f(_unif_locs[AIS_TRGT_UNIF_TYPE], 0);
 
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, _selection_texture_id);
+    glBindTexture(GL_TEXTURE_2D, _selection_tex->textureId());
     glDrawArrays(GL_QUADS, 0,  4);
     glBindTexture(GL_TEXTURE_2D, 0);
   }
@@ -392,7 +339,20 @@ void TargetEngine::initBuffersTrgts(QString tag) {
   glBufferData(GL_ARRAY_BUFFER, speed.size()*sizeof(GLfloat), speed.data(), GL_DYNAMIC_DRAW);
 }
 
-void TargetEngine::initTexture(QString path, GLuint* tex_id) {
+QOpenGLTexture* TargetEngine::initTexture(QString path) {
+  QOpenGLTexture* tex = new QOpenGLTexture(QOpenGLTexture::Target2D);
+  QImage img(path);
+
+  tex->setMipLevels(1);
+  tex->setMinificationFilter(QOpenGLTexture::Nearest);
+  tex->setMagnificationFilter(QOpenGLTexture::Nearest);
+  tex->setWrapMode(QOpenGLTexture::Repeat);
+
+  tex->setData(img, QOpenGLTexture::DontGenerateMipMaps);
+
+  return tex;
+
+  /*
   glGenTextures(1, tex_id);
 
   glBindTexture(GL_TEXTURE_2D, *tex_id);
@@ -403,16 +363,16 @@ void TargetEngine::initTexture(QString path, GLuint* tex_id) {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
   QImage img(path);
-  img = QGLWidget::convertToGLFormat(img);
+  img = QOpenGLContext::convertToGLFormat(img);
 
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, img.width(), img.height()
                , 0, GL_RGBA, GL_UNSIGNED_BYTE, img.bits());
 
   glGenerateMipmap(GL_TEXTURE_2D);
   glBindTexture(GL_TEXTURE_2D, 0);
+  */
 }
 
 int TargetEngine::getTailsTime(void) {
     return _tailsTime;
 }
-*/

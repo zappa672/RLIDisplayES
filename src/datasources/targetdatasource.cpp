@@ -1,4 +1,3 @@
-/*
 #include "targetdatasource.h"
 
 #include <qmath.h>
@@ -13,8 +12,8 @@ TargetDataSource::TargetDataSource(QObject *parent) : QObject(parent) {
   RadarTarget trgt;
 
   trgt.Lost = false;
-  trgt.Latitude = 12.4200f;
-  trgt.Longtitude = -81.4900f;
+  trgt.Latitude = 15.1200f;
+  trgt.Longtitude = 145.6600f;
   trgt.Heading = 37.f;
   trgt.Rotation = 20.f;
   trgt.CourseOverGround = 37.f;
@@ -22,8 +21,8 @@ TargetDataSource::TargetDataSource(QObject *parent) : QObject(parent) {
 
   _targets.push_back(trgt);
 
-  trgt.Latitude = 12.4000f;
-  trgt.Longtitude = -81.7500f;
+  trgt.Latitude = 15.1500f;
+  trgt.Longtitude = 145.8600f;
   trgt.Heading = 123.f;
   trgt.Rotation = -20.f;
   trgt.CourseOverGround = 123.f;
@@ -31,8 +30,8 @@ TargetDataSource::TargetDataSource(QObject *parent) : QObject(parent) {
 
   _targets.push_back(trgt);
 
-  trgt.Latitude = 12.6000f;
-  trgt.Longtitude = -81.7300f;
+  trgt.Latitude = 15.0500f;
+  trgt.Longtitude = 145.4600f;
   trgt.Heading = 286.f;
   trgt.Rotation = 0.f;
   trgt.CourseOverGround = 286.f;
@@ -105,4 +104,3 @@ void TargetDataSource::onTailsModeChanged(const QByteArray mode) {
 
   emit tailsModeChanged(tail_mode, (tail_mode == TAILMODE_DOTS) ? tail_minutes : 0);
 }
-*/

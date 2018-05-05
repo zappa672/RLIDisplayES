@@ -16,5 +16,7 @@
         <file>shaders/chart_area.frag.glsl</file>
         <file>shaders/info.frag.glsl</file>
         <file>shaders/info.vert.glsl</file>
+        <file>shaders/trgt.vert.glsl</file>
+        <file>shaders/trgt.frag.glsl</file>
     </qresource>
 </RCC>

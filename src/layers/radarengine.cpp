@@ -130,7 +130,7 @@ void RadarEngine::clearData() {
   _last_drawn_peleng = _peleng_count - 1;
   _last_added_peleng = _peleng_count - 1;
 
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
+  //glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
