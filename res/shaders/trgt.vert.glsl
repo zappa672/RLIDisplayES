@@ -14,14 +14,16 @@ uniform float type;
 varying vec2 v_inner_texcoords;
 varying float v_type;
 
+const float EARTH_RAD_METERS = 6378137.0;
+
 void main() {
   float lat_rads = radians(center.x);
 
-  float y_m = -6378137.0 * radians(world_coords.x - center.x);
-  float x_m = 6378137.0 * cos(lat_rads)*radians(world_coords.y - center.y);
+  float y_m = -(EARTH_RAD_METERS / scale) * radians(world_coords.x - center.x);
+  float x_m =  (EARTH_RAD_METERS / scale) * cos(lat_rads) * radians(world_coords.y - center.y);
 
   // screen position
-  vec2 pix_pos = vec2(x_m, y_m) / scale;
+  vec2 pix_pos = vec2(x_m, y_m);
 
   float head_rad = radians(heading);
   float cog_rad = radians(course);
@@ -34,22 +36,22 @@ void main() {
   if (type == 0.0) {
     if (vertex_order == 0.0) {
       pix_pos = pix_pos + rot_mat_head*vec2(-16.0, -16.0);
-      v_inner_texcoords = vec2(0.0, 1.0);
+      v_inner_texcoords = vec2(0.0, 0.0);
     } else if (vertex_order == 1.0) {
       pix_pos = pix_pos + rot_mat_head*vec2(-16.0, 16.0);
-      v_inner_texcoords = vec2(0.0, 0.0);
+      v_inner_texcoords = vec2(0.0, 1.0);
     } else if (vertex_order == 2.0) {
       pix_pos = pix_pos + rot_mat_head*vec2(16.0, 16.0);
-      v_inner_texcoords = vec2(1.0, 0.0);
+      v_inner_texcoords = vec2(1.0, 1.0);
     } else if (vertex_order == 3.0) {
       pix_pos = pix_pos + rot_mat_head*vec2(16.0, -16.0);
-      v_inner_texcoords = vec2(1.0, 1.0);
+      v_inner_texcoords = vec2(1.0, 0.0);
     }
   } else if (type == 1.0 && heading >= 0.0) {
     if (vertex_order == 1.0 || vertex_order == 2.0)
-      pix_pos = pix_pos + rot_mat_head * vec2(0.0, -48.0);
+      pix_pos = pix_pos + rot_mat_head * vec2(0.0, -32.0);
     if (vertex_order == 3.0)
-      pix_pos = pix_pos + rot_mat_head * vec2(sign(rotation)*8.0, -48.0);
+      pix_pos = pix_pos + rot_mat_head * vec2(sign(rotation)*8.0, -32.0);
   } else if (type == 2.0) {
     if (vertex_order == 1.0)
       pix_pos = pix_pos + rot_mat_cog * vec2(0.0, -speed);
@@ -57,4 +59,5 @@ void main() {
 
   v_type = type;
   gl_Position = mvp_matrix  * vec4(pix_pos, 0.0, 1.0);
+  gl_PointSize = 5.0;
 }

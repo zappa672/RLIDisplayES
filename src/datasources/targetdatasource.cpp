@@ -12,8 +12,8 @@ TargetDataSource::TargetDataSource(QObject *parent) : QObject(parent) {
   RadarTarget trgt;
 
   trgt.Lost = false;
-  trgt.Latitude = 15.1200f;
-  trgt.Longtitude = 145.6600f;
+  trgt.Latitude = 15.4200f;
+  trgt.Longtitude = 145.7600f;
   trgt.Heading = 37.f;
   trgt.Rotation = 20.f;
   trgt.CourseOverGround = 37.f;
@@ -30,8 +30,8 @@ TargetDataSource::TargetDataSource(QObject *parent) : QObject(parent) {
 
   _targets.push_back(trgt);
 
-  trgt.Latitude = 15.0500f;
-  trgt.Longtitude = 145.4600f;
+  trgt.Latitude = 15.3500f;
+  trgt.Longtitude = 145.5600f;
   trgt.Heading = 286.f;
   trgt.Rotation = 0.f;
   trgt.CourseOverGround = 286.f;

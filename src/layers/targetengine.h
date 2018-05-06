@@ -78,7 +78,7 @@ private:
        , AIS_TRGT_UNIF_TYPE = 3
        , AIS_TRGT_UNIF_COUNT = 4 } ;
 
-  GLuint _tbo_id;
+  GLuint _ind_vbo_id;
   GLuint _vbo_ids[AIS_TRGT_ATTR_COUNT];
   GLuint _attr_locs[AIS_TRGT_ATTR_COUNT];
   GLuint _unif_locs[AIS_TRGT_UNIF_COUNT];

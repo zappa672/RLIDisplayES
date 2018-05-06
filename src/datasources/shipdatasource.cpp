@@ -23,9 +23,9 @@ void ShipDataSource::timerEvent(QTimerEvent* e) {
   QDateTime now = QDateTime::currentDateTime();
 
   //longtitude
-  position.first  = 15.123f + 0.25f * cos(_startTime.msecsTo(now)/30000.f);
+  position.first  = 15.123f + 0.25f * cos(_startTime.msecsTo(now)/60000.f);
   //latitude
-  position.second = 145.66f + 0.25f * sin(_startTime.msecsTo(now)/30000.f);
+  position.second = 145.66f + 0.25f * sin(_startTime.msecsTo(now)/60000.f);
 
   emit positionChanged(position);
 }

@@ -249,7 +249,7 @@ void RLIDisplayWidget::paintLayers() {
 
   QMatrix4x4 projection;
   projection.setToIdentity();
-  projection.ortho(0.f, width(), 0.f, height(), -1.f, 1.f);
+  projection.ortho(0.f, width(), height(), 0.f, -1.f, 1.f);
 
   QMatrix4x4 transform;
   transform.setToIdentity();

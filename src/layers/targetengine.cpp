@@ -19,7 +19,7 @@ TargetEngine::TargetEngine(QOpenGLContext* context, QObject* parent) : QObject(p
 
   _prog = new QOpenGLShaderProgram();
 
-  glGenBuffers(1, &_tbo_id);
+  glGenBuffers(1, &_ind_vbo_id);
   glGenBuffers(AIS_TRGT_ATTR_COUNT, _vbo_ids);
 
   initShader();
@@ -34,7 +34,7 @@ TargetEngine::~TargetEngine() {
   delete _selection_tex;
 
   glDeleteBuffers(AIS_TRGT_ATTR_COUNT, _vbo_ids);
-  glDeleteBuffers(1, &_tbo_id);
+  glDeleteBuffers(1, &_ind_vbo_id);
 }
 
 int TargetEngine::getCurrentIndex() {
@@ -177,11 +177,18 @@ void TargetEngine::draw(const QMatrix4x4& mvp_matrix, std::pair<float, float> co
 
   glUniform1f(_unif_locs[AIS_TRGT_UNIF_TYPE], 0);
 
+
   // Draw target marks
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, _asset_tex->textureId());
-  glDrawArrays(GL_QUADS, 0,  _targets.size()*4);
+
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ind_vbo_id);
+  glDrawElements(GL_TRIANGLES, 6*_targets.size(), GL_UNSIGNED_INT, (const GLvoid*)(0 * sizeof(GLuint)));
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
   glBindTexture(GL_TEXTURE_2D, 0);
+
+
 
   glLineWidth(2);
 
@@ -190,15 +197,15 @@ void TargetEngine::draw(const QMatrix4x4& mvp_matrix, std::pair<float, float> co
   glDrawArrays(GL_LINES, 0,  _targets.size()*4);
 
   // Draw target courses
-  glPushAttrib(GL_ENABLE_BIT);
-  glLineStipple(1, 0xF0F0);
-  glEnable(GL_LINE_STIPPLE);
+  // glPushAttrib(GL_ENABLE_BIT);
+  // glLineStipple(1, 0xF0F0);
+  // glEnable(GL_LINE_STIPPLE);
 
   glUniform1f(_unif_locs[AIS_TRGT_UNIF_TYPE], 2);
   glDrawArrays(GL_LINES, 0, _targets.size()*4);
-  glPopAttrib();
+  // glPopAttrib();
 
-  glPointSize(5);
+  // glPointSize(5);
 
 
   // Draw tails++
@@ -218,7 +225,7 @@ void TargetEngine::draw(const QMatrix4x4& mvp_matrix, std::pair<float, float> co
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, _selection_tex->textureId());
-    glDrawArrays(GL_QUADS, 0,  4);
+    glDrawArrays(GL_TRIANGLE_FAN, 0,  4);
     glBindTexture(GL_TEXTURE_2D, 0);
   }
 
@@ -293,6 +300,7 @@ int TargetEngine::initBuffersTails() {
 
 void TargetEngine::initBuffersTrgts(QString tag) {
   std::vector<GLfloat> point, order, heading, rotation, course, speed;
+  std::vector<GLuint> draw_indices;
 
   QList<QString> keys = _targets.keys();
 
@@ -310,7 +318,7 @@ void TargetEngine::initBuffersTrgts(QString tag) {
     }
   } else {
     for (int i = 0; i < 4; i++) {
-     order.push_back(i);
+      order.push_back(i);
       point.push_back(_targets[tag].Latitude);
       point.push_back(_targets[tag].Longtitude);
       heading.push_back(0);
@@ -337,6 +345,20 @@ void TargetEngine::initBuffersTrgts(QString tag) {
 
   glBindBuffer(GL_ARRAY_BUFFER, _vbo_ids[AIS_TRGT_ATTR_SPEED]);
   glBufferData(GL_ARRAY_BUFFER, speed.size()*sizeof(GLfloat), speed.data(), GL_DYNAMIC_DRAW);
+
+
+  for (GLuint i = 0; i < _targets.size(); i++) {
+    draw_indices.push_back(4*i);
+    draw_indices.push_back(4*i+1);
+    draw_indices.push_back(4*i+2);
+    draw_indices.push_back(4*i);
+    draw_indices.push_back(4*i+2);
+    draw_indices.push_back(4*i+3);
+  }
+
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ind_vbo_id);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6*_targets.size()*sizeof(GLuint), draw_indices.data(), GL_DYNAMIC_DRAW);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
 QOpenGLTexture* TargetEngine::initTexture(QString path) {
