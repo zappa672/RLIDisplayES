@@ -143,7 +143,6 @@ void ChartAreaEngine::draw(ChartShaders* shaders) {
 
 
 
-
 ChartLineEngine::ChartLineEngine(QOpenGLContext* context) : QOpenGLFunctions(context) {
   initializeOpenGLFunctions();
 
@@ -152,7 +151,7 @@ ChartLineEngine::ChartLineEngine(QOpenGLContext* context) : QOpenGLFunctions(con
   is_pattern_uniform = false;
   is_color_uniform = false;
 
-  glGenBuffers(MARK_ATTRIBUTES_COUNT, vbo_ids);
+  glGenBuffers(LINE_ATTRIBUTES_COUNT, vbo_ids);
   glGenBuffers(1, &_ind_vbo_id);
 }
 

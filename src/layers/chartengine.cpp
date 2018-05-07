@@ -72,7 +72,7 @@ void ChartEngine::setChart(S52Chart* chrt, S52References* ref) {
   clearChartData();
 
   setAreaLayers(chrt, ref);
-  //setLineLayers(chrt, ref);
+  setLineLayers(chrt, ref);
   setTextLayers(chrt, ref);
   setMarkLayers(chrt, ref);
   setSndgLayer(chrt, ref);
@@ -85,10 +85,8 @@ void ChartEngine::setChart(S52Chart* chrt, S52References* ref) {
 void ChartEngine::clearChartData() {
   for (ChartAreaEngine* engine : area_engines)
     engine->clearData();
-  /*
   for (ChartLineEngine* engine : line_engines)
     engine->clearData();
-  */
   for (ChartTextEngine* engine : text_engines)
     engine->clearData();
   for (ChartMarkEngine* engine : mark_engines)
@@ -112,7 +110,7 @@ void ChartEngine::setAreaLayers(S52Chart* chrt, S52References* ref) {
     area_engines[layer_name]->setData(layer, assets, ref, clds.order);
   }
 }
-/*
+
 void ChartEngine::setLineLayers(S52Chart* chrt, S52References* ref) {
   for (QString layer_name : chrt->getLineLayerNames()) {
     S52LineLayer* layer = chrt->getLineLayer(layer_name);
@@ -127,7 +125,7 @@ void ChartEngine::setLineLayers(S52Chart* chrt, S52References* ref) {
     line_engines[layer_name]->setData(layer, assets, ref, clds.order);
   }
 }
-*/
+
 void ChartEngine::setTextLayers(S52Chart* chrt, S52References* ref) {
   Q_UNUSED(ref);
 
@@ -211,7 +209,7 @@ void ChartEngine::draw(const QString& color_scheme) {
     transform.translate(_center_shift.x() + _fbo->width()/2.f, _center_shift.y() + _fbo->height()/2.f, 0.f);
 
     drawAreaLayers(projection*transform, color_scheme);
-    //drawLineLayers(projection*transform, color_scheme);
+    drawLineLayers(projection*transform, color_scheme);
     drawTextLayers(projection*transform);
     drawMarkLayers(projection*transform, color_scheme);
   }
@@ -260,7 +258,7 @@ void ChartEngine::drawAreaLayers(const QMatrix4x4& mvp_matrix, const QString& co
   prog->release();
 }
 
-/*
+
 void ChartEngine::drawLineLayers(const QMatrix4x4& mvp_matrix, const QString& color_scheme) {
   glClearDepthf(0.f);
   glClear(GL_DEPTH_BUFFER_BIT);
@@ -298,7 +296,7 @@ void ChartEngine::drawLineLayers(const QMatrix4x4& mvp_matrix, const QString& co
 
   prog->release();
 }
-*/
+
 
 void ChartEngine::drawTextLayers(const QMatrix4x4& mvp_matrix) {
   glClearDepthf(0.f);

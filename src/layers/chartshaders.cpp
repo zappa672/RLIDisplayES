@@ -20,59 +20,35 @@ ChartShaders::~ChartShaders() {
 
 
 GLuint ChartShaders::getAreaUniformLoc(unsigned int index) {
-  if (index < AREA_UNIFORMS_COUNT)
-    return area_unif_locs[index];
-
-  return 0;
+  return (index < AREA_UNIFORMS_COUNT) ? area_unif_locs[index] : 0;
 }
 
 GLuint ChartShaders::getAreaAttributeLoc(unsigned int index) {
-  if (index < AREA_ATTRIBUTES_COUNT)
-    return area_attr_locs[index];
-
-  return 0;
+  return (index < AREA_ATTRIBUTES_COUNT) ? area_attr_locs[index]: 0;
 }
 
 GLuint ChartShaders::getLineUniformLoc(unsigned int index) {
-  if (index < LINE_UNIFORMS_COUNT)
-    return line_unif_locs[index];
-
-  return 0;
+  return (index < LINE_UNIFORMS_COUNT) ? line_unif_locs[index] : 0;
 }
 
 GLuint ChartShaders::getLineAttributeLoc(unsigned int index) {
-  if (index < LINE_ATTRIBUTES_COUNT)
-    return line_attr_locs[index];
-
-  return 0;
+  return (index < LINE_ATTRIBUTES_COUNT) ? line_attr_locs[index]: 0;
 }
 
 GLuint ChartShaders::getTextUniformLoc(unsigned int index) {
-  if (index < TEXT_UNIFORMS_COUNT)
-    return text_unif_locs[index];
-
-  return 0;
+  return (index < TEXT_UNIFORMS_COUNT) ? text_unif_locs[index] : 0;
 }
 
 GLuint ChartShaders::getTextAttributeLoc(unsigned int index) {
-  if (index < TEXT_ATTRIBUTES_COUNT)
-    return text_attr_locs[index];
-
-  return 0;
+  return (index < TEXT_ATTRIBUTES_COUNT) ? text_attr_locs[index] : 0;
 }
 
 GLuint ChartShaders::getMarkUniformLoc(unsigned int index) {
-  if (index < MARK_UNIFORMS_COUNT)
-    return mark_unif_locs[index];
-
-  return 0;
+  return (index < MARK_UNIFORMS_COUNT) ? mark_unif_locs[index] : 0;
 }
 
 GLuint ChartShaders::getMarkAttributeLoc(unsigned int index) {
-  if (index < MARK_ATTRIBUTES_COUNT)
-    return mark_attr_locs[index];
-
-  return 0;
+  return (index < MARK_ATTRIBUTES_COUNT) ? mark_attr_locs[index] : 0;
 }
 
 
@@ -139,12 +115,12 @@ void ChartShaders::initChartTextProgram() {
   chart_text_program->link();
   chart_text_program->bind();
 
-  text_unif_locs[COMMON_UNIFORMS_NORTH]            = chart_text_program->uniformLocation("north");
-  text_unif_locs[COMMON_UNIFORMS_CENTER]           = chart_text_program->uniformLocation("center");
-  text_unif_locs[COMMON_UNIFORMS_SCALE]            = chart_text_program->uniformLocation("scale");
-  text_unif_locs[COMMON_UNIFORMS_PATTERN_TEX_ID]   = chart_text_program->uniformLocation("glyph_tex");
-  text_unif_locs[COMMON_UNIFORMS_MVP_MATRIX]       = chart_text_program->uniformLocation("mvp_matrix");
-  text_unif_locs[COMMON_UNIFORMS_DISPLAY_ORDER]    = chart_text_program->uniformLocation("display_order");
+  text_unif_locs[COMMON_UNIFORMS_NORTH]          = chart_text_program->uniformLocation("north");
+  text_unif_locs[COMMON_UNIFORMS_CENTER]         = chart_text_program->uniformLocation("center");
+  text_unif_locs[COMMON_UNIFORMS_SCALE]          = chart_text_program->uniformLocation("scale");
+  text_unif_locs[COMMON_UNIFORMS_PATTERN_TEX_ID] = chart_text_program->uniformLocation("glyph_tex");
+  text_unif_locs[COMMON_UNIFORMS_MVP_MATRIX]     = chart_text_program->uniformLocation("mvp_matrix");
+  text_unif_locs[COMMON_UNIFORMS_DISPLAY_ORDER]  = chart_text_program->uniformLocation("display_order");
 
   text_attr_locs[TEXT_ATTRIBUTES_COORDS]         = chart_text_program->attributeLocation("coords");
   text_attr_locs[TEXT_ATTRIBUTES_POINT_ORDER]    = chart_text_program->attributeLocation("point_order");

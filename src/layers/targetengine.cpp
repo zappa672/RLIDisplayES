@@ -347,7 +347,7 @@ void TargetEngine::initBuffersTrgts(QString tag) {
   glBufferData(GL_ARRAY_BUFFER, speed.size()*sizeof(GLfloat), speed.data(), GL_DYNAMIC_DRAW);
 
 
-  for (GLuint i = 0; i < _targets.size(); i++) {
+  for (int i = 0; i < _targets.size(); i++) {
     draw_indices.push_back(4*i);
     draw_indices.push_back(4*i+1);
     draw_indices.push_back(4*i+2);
