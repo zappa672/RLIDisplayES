@@ -4,41 +4,88 @@
 #define CIRCLE_RAY_COUNT 720
 #define MARK_RAY_COUNT 36
 
+#include <QVector>
+#include <QMap>
+
 #include <QOpenGLFunctions>
 #include <QOpenGLFramebufferObject>
+#include <QOpenGLFramebufferObjectFormat>
 #include <QOpenGLShaderProgram>
+
+#include "../common/rliconfig.h"
+#include "infofonts.h"
+
 
 
 class MaskEngine : public QObject, protected QOpenGLFunctions {
   Q_OBJECT
 public:
-  explicit MaskEngine (const QSize& sz, QOpenGLContext* context, QObject* parent = nullptr);
+  explicit MaskEngine (const QSize& sz, const RLICircleInfo& params, InfoFonts* fonts, QOpenGLContext* context, QObject* parent = nullptr);
   virtual ~MaskEngine ();
 
-  void resize(const QSize& sz);
+  void resize(const QSize& sz, const RLICircleInfo& params);
 
   inline GLuint textureId()   { return _fbo->texture(); }
 
-private:
+  inline void setAngleShift (float s)           { _angle_shift = s; }
+  inline void setCursorPos  (const QPoint& p)   { _cursor_pos = p; }
+
+  inline GLuint  getTextureId   ()   { return _fbo->texture(); }
+
+public slots:
   void update();
 
+private:
   void initBuffers();
   void initShader();
 
   void initRectBuffers();
+  void initLineBuffers();
+  void initTextBuffers();
   void initHoleBuffers();
 
+  void bindBuffers(GLuint* vbo_ids);
+  void setBuffers(GLuint* vbo_ids, int count, GLfloat* angles, GLfloat* chars, GLfloat* orders, GLfloat* shifts);
+
+  InfoFonts* _fonts;
+
+  float     _angle_shift;
+  float     _hole_radius;
+
+  QPointF   _hole_center;
+  QPointF   _cursor_pos;
+
+  QSizeF    _size;
+  QString   _font;
 
   QOpenGLFramebufferObject* _fbo;
   QOpenGLShaderProgram* _program;
 
-  enum { ATTR_POS = 0, ATTR_CLR= 1, ATTR_CNT = 2 } ;
-  enum { UNIF_MVP = 0, UNIF_CNT = 1 } ;
+  enum { MASK_ATTR_ANGLE = 0
+       , MASK_ATTR_CHAR_VAL = 1
+       , MASK_ATTR_ORDER = 2
+       , MASK_ATTR_SHIFT = 3
+       , MASK_ATTR_COUNT = 4 } ;
+  enum { MASK_UNIF_MVP = 0
+       , MASK_UNIF_ANGLE_SHIFT = 1
+       , MASK_UNIF_CIRCLE_RADIUS = 2
+       , MASK_UNIF_CIRCLE_POS = 3
+       , MASK_UNIF_CURSOR_POS = 4
+       , MASK_UNIF_COLOR = 5
+       , MASK_UNIF_FONT_SIZE = 6
+       , MASK_UNIF_GLYPH_TEX = 7
+       , MASK_UNIF_COUNT = 8 } ;
 
-  GLuint _rect_vbo_ids[ATTR_CNT];
-  GLuint _hole_vbo_ids[ATTR_CNT];
+  GLuint vbo_ids_mark  [MASK_ATTR_COUNT];
 
-  GLuint _unif_locs[UNIF_CNT];
-  GLuint _attr_locs[ATTR_CNT];
+  GLuint _ind_vbo_id_text;
+  GLuint vbo_ids_text  [MASK_ATTR_COUNT];
+  int _text_point_count;
+
+  GLuint vbo_ids_hole  [MASK_ATTR_COUNT];
+  int _hole_point_count;
+
+  GLuint _unif_locs[MASK_UNIF_COUNT];
+  GLuint _attr_locs[MASK_ATTR_COUNT];
 };
 #endif // MASKENGINE_H

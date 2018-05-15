@@ -126,5 +126,6 @@ void RadarPalette::updatePalette() {
   for (int i = 0; i < 16; i++)
     img.setPixel(0, i, qRgb(palette[i][0], palette[i][1], palette[i][2]));
 
+  tex->destroy();
   tex->setData(img, QOpenGLTexture::DontGenerateMipMaps);
 }

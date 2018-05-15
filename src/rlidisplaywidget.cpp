@@ -115,7 +115,7 @@ void RLIDisplayWidget::initializeGL() {
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Tails engine init finish";
 
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Mask engine init start";
-  _maskEngine = new MaskEngine(size(), context(), this);
+  _maskEngine = new MaskEngine(size(), layout->circle, _infoFonts, context(), this);
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Mask engine init finish";
 
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Chart engine init start";
@@ -185,7 +185,7 @@ void RLIDisplayWidget::resizeGL(int w, int h) {
   _tailsEngine->resizeTexture(layout->circle.radius);
   _chartEngine->resize(layout->circle.radius);
 
-  _maskEngine->resize(QSize(w, h));
+  _maskEngine->resize(QSize(w, h), layout->circle);
   _menuEngine->resize(QSize(w, h), layout->menu);
 }
 

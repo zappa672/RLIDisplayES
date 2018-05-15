@@ -78,6 +78,7 @@ MainWindow::~MainWindow() {
 
   delete _radar_ds;
   delete _ship_ds;
+  delete _target_ds;
 
   delete _gain_ctrl;
   delete _water_ctrl;

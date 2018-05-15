@@ -259,7 +259,7 @@
     </layout>
 
     <layout size="1920x1080">
-      <rli-circle x="800" y="540" radius="524" font="F8X8B" />
+      <rli-circle x="800" y="540" radius="514" font="F8X8B" />
       <menu x="-4" y="152" width="236" height="262" font="F12X14B" />
       <magnifier x="-10" y="155" width="224" height="224" />
 
