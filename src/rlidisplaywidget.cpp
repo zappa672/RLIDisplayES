@@ -32,6 +32,7 @@ RLIDisplayWidget::~RLIDisplayWidget() {
     delete _chartEngine;
     delete _menuEngine;
     delete _trgtEngine;
+    delete _ctrlEngine;
 
     delete _program;
   }
@@ -134,6 +135,10 @@ void RLIDisplayWidget::initializeGL() {
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Target engine init start";
   _trgtEngine = new TargetEngine(context(), this);
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Target engine init finish";
+
+  qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Controls engine init start";
+  _ctrlEngine = new ControlsEngine(context(), this);
+  qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Controls engine init finish";
 
   //-------------------------------------------------------------
 
@@ -256,6 +261,7 @@ void RLIDisplayWidget::paintLayers() {
   transform.translate(center.x(), center.y(), 0.f);
 
   _trgtEngine->draw(projection*transform, shipPos, scale);
+  _ctrlEngine->draw(projection*transform);
 
 
   drawRect(rect(), _maskEngine->textureId());

@@ -58,7 +58,8 @@ SOURCES     += \
     src/layers/chartsettingsmodel.cpp \
     src/layers/routeengine.cpp \
     src/layers/targetengine.cpp \
-    src/layers/infofonts.cpp
+    src/layers/infofonts.cpp \
+    src/layers/controlsengine.cpp
 
 HEADERS     += \
     src/mainwindow.h \
@@ -93,7 +94,8 @@ HEADERS     += \
     src/layers/chartsettingsmodel.h \
     src/layers/routeengine.h \
     src/layers/targetengine.h \
-    src/layers/infofonts.h
+    src/layers/infofonts.h \
+    src/layers/controlsengine.h
 
 FORMS       += \
     forms/mainwindow.ui \

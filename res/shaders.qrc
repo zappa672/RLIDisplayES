@@ -18,5 +18,7 @@
         <file>shaders/info.vert.glsl</file>
         <file>shaders/trgt.vert.glsl</file>
         <file>shaders/trgt.frag.glsl</file>
+        <file>shaders/ctrl.frag.glsl</file>
+        <file>shaders/ctrl.vert.glsl</file>
     </qresource>
 </RCC>

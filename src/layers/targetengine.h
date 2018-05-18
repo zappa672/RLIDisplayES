@@ -13,7 +13,6 @@
 #include <QOpenGLFunctions>
 #include <QOpenGLFramebufferObject>
 #include <QOpenGLShaderProgram>
-#include <QOpenGLVertexArrayObject>
 
 
 class TargetEngine : public QObject, protected QOpenGLFunctions {
