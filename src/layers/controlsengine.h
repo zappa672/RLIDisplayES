@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QPoint>
+#include <QColor>
 
 #include <QOpenGLTexture>
 #include <QOpenGLFunctions>
@@ -18,23 +19,30 @@ public:
 
   void draw(const QMatrix4x4& mvp_mat);
 
+  bool isCirclesVisible() { return _showCircles; }
+  bool isParallelLinesVisible() { return _showParallelLines; }
+
 signals:
 
 public slots:
   inline void setCursorPosition(QPoint pos) { _cursorPos = pos; }
+  inline void setCirclesVisible(bool val) { _showCircles = val; }
+  inline void setParallelLinesVisible(bool val) { _showParallelLines = val; }
 
 private:
   QPoint _cursorPos;
+
+  bool _showCircles;
+  bool _showParallelLines;
 
   void initShaders();
 
   void initCursorBuffers();
   void initCircleBuffers();
-  void initRayBuffers();
 
-  void drawCursor(const QMatrix4x4& mvp_mat);
-  void drawCircle(const QMatrix4x4& mvp_mat, float radius);
-  void drawRay(const QMatrix4x4& mvp_mat, float angle);
+  void drawCursor(const QColor& col);
+  void drawCircleSegment(const QColor& col, GLfloat radius, GLfloat min_angle = 0.f, GLfloat max_angle = 360.f);
+  void drawRaySegment(const QColor& col, GLfloat angle, GLfloat min_radius = 0.f, GLfloat max_radius = 2048.f, GLfloat shift = 0.f);
 
   // -------------------------------------------
   QOpenGLShaderProgram* _prog;
@@ -42,8 +50,9 @@ private:
        , CTRL_ATTR_RADIUS = 1
        , CTRL_ATTR_COUNT = 2 } ;
   enum { CTRL_UNIF_MVP = 0
-       , CTRL_UNIF_COLOR = 1
-       , CTRL_UNIF_COUNT = 2 } ;
+       , CTRL_UNIF_SHIFT = 1
+       , CTRL_UNIF_COLOR = 2
+       , CTRL_UNIF_COUNT = 3 } ;
 
   GLuint _attr_locs[CTRL_ATTR_COUNT];
   GLuint _unif_locs[CTRL_UNIF_COUNT];

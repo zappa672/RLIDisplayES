@@ -25,7 +25,7 @@ int main(int argc, char *argv[]) {
   if (args.contains("--help")) {
     qDebug() << "-p to setup peleng size (default: 800)";
     qDebug() << "-b to setup count of pelengs per circle (default: 4096)";
-    qDebug() << "-f to setup delay between frames in milliseconds (default: 50)";
+    qDebug() << "-f to setup delay between frames in milliseconds (default: 25)";
     qDebug() << "-d to setup delay between sending data blocks by radardatasource in milliseconds (default: 15)";
     qDebug() << "-s to setup size of data blocks to send in pelengs (default: 64)";
     qDebug() << "-w to setup rliwidget size (example: 1024x768, no default, depends on screen size)";
@@ -46,7 +46,7 @@ int main(int argc, char *argv[]) {
   if (args.contains("-f"))
     a.setProperty(PROPERTY_FRAME_DELAY, args[args.indexOf("-f") + 1].toInt());
   else
-    a.setProperty(PROPERTY_FRAME_DELAY, 50);
+    a.setProperty(PROPERTY_FRAME_DELAY, 25);
 
   if (args.contains("-d"))
     a.setProperty(PROPERTY_DATA_DELAY, args[args.indexOf("-d") + 1].toInt());

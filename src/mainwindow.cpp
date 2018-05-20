@@ -273,45 +273,45 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
 
     break;
 
-  //Под. имп. Помех
+  // Под. имп. Помех
   case Qt::Key_S:
     break;
-  //Меню
+  // Меню
   case Qt::Key_W:
     if(pressedKeys.contains(Qt::Key_B))
        wgtRLI->onConfigMenuToggled();
      else
        wgtRLI->onMenuToggled();
      break;
-  //Шкала +
+  // Шкала +
   case Qt::Key_Plus:  
     chartScale = RLIState::instance().chartScale();
     chartScale *= 0.95;
     RLIState::instance().onChartScaleChanged(chartScale);
     break;
-  //Шкала -
+  // Шкала -
   case Qt::Key_Minus:
     chartScale = RLIState::instance().chartScale();
     chartScale *= 1.05;
     RLIState::instance().onChartScaleChanged(chartScale);
     break;
-  //Вынос центра
+  // Вынос центра
   case Qt::Key_C:
     break;
-  //Скрытое меню
+  // Скрытое меню
   case Qt::Key_U:
     break;
-  //Следы точки
+  // Следы точки
   case Qt::Key_T:
     break;
-  //Выбор цели
+  // Выбор цели
   case Qt::Key_Up:
     wgtRLI->onUpToggled();
 //    shipPos = RLIState::instance().shipPosition();
 //    shipPos.first += 0.005;
 //    RLIState::instance().onShipPositionChanged(shipPos);
     break;
-  //ЛИД / ЛОД
+  // ЛИД / ЛОД
   case Qt::Key_Down:
     wgtRLI->onDownToggled();
 //    shipPos = RLIState::instance().shipPosition();
@@ -328,11 +328,11 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
 //    shipPos.second += 0.005;
 //    RLIState::instance().onShipPositionChanged(shipPos);
     break;
-  //Захват
+  // Захват
   case Qt::Key_Enter:
     wgtRLI->onEnterToggled();
     break;
-  //Захват
+  // Захват
   case Qt::Key_Return:
     wgtRLI->onEnterToggled();
     break;
@@ -340,8 +340,9 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
   case Qt::Key_Escape:
     wgtRLI->onBackToggled();
     break;
-  //Парал. Линии
+  // Парал. Линии
   case Qt::Key_Backslash:
+    wgtRLI->controlsEngine()->setParallelLinesVisible(!wgtRLI->controlsEngine()->isParallelLinesVisible());
     break;
   //Электронная лупа
   case Qt::Key_L:
@@ -388,6 +389,7 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
     break;
   //Вынос ВН/ВД
   case Qt::Key_Slash:
+    wgtRLI->controlsEngine()->setCirclesVisible(!wgtRLI->controlsEngine()->isCirclesVisible());
     break;
   }
 

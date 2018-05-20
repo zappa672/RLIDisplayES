@@ -36,7 +36,7 @@ public:
   inline InfoEngine*      infoEngine()    { return _infoEngine; }
   inline MenuEngine*      menuEngine()    { return _menuEngine; }
   inline TargetEngine*    targetEngine()  { return _trgtEngine; }
-  inline ControlsEngine*  controlEngine() { return _ctrlEngine; }
+  inline ControlsEngine*  controlsEngine() { return _ctrlEngine; }
 
   void toggleRadarTailsShift();
   float frameRate();
