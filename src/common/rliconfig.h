@@ -10,6 +10,7 @@
 
 class QXmlStreamReader;
 
+
 struct RLIPanelTableInfo {
   QMap<QString, QString> params;
   QVector<QMap<QString, QString>> columns;
@@ -71,6 +72,12 @@ private:
   // Singleton
   RLIConfig(RLIConfig const&) = delete;
   RLIConfig& operator= (RLIConfig const&) = delete;
+
+  void fixPositions(QString size_tag, RLILayout* layout);
+
+  void fixParams(QSize screen_size, QMap<QString, QString>* params);
+  template<typename P>
+  void fixPosition(QSizeF screen_size, QSizeF size, P& p);
 
   QMap<QString, QString> readXMLAttributes(QXmlStreamReader* xml);
   RLILayout* readLayout(QXmlStreamReader* xml);

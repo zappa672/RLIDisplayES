@@ -12,8 +12,8 @@
 #include <QOpenGLShaderProgram>
 
 #include "infofonts.h"
-#include "../common/rlistrings.h"
-#include "routeengine.h"
+#include "../../common/rlistrings.h"
+#include "../routeengine.h"
 
 
 class RLIMenuItem : public QObject {
@@ -169,8 +169,8 @@ class MenuEngine : public QObject, protected QOpenGLFunctions {
 public:
   enum MenuState { DISABLED, MAIN, CONFIG };
 
-  explicit MenuEngine  (const QSize& screen_size, const QMap<QString, QString>& params, QOpenGLContext* context, QObject* parent = 0);
-  virtual ~MenuEngine  ();
+  explicit MenuEngine(const QMap<QString, QString>& params, QOpenGLContext* context, QObject* parent = 0);
+  virtual ~MenuEngine();
 
   inline QPoint position() { return _position; }
   inline QSize size() { return _size; }
@@ -180,7 +180,7 @@ public:
 
   inline void setFonts(InfoFonts* fonts) { _fonts = fonts; }
 
-  void resize   (const QSize& screen_size, const QMap<QString, QString>& params);
+  void resize(const QMap<QString, QString>& params);
 
   inline MenuState state() { return _state; }
   inline bool visible() { return _state != DISABLED; }

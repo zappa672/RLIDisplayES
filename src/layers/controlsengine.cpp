@@ -42,6 +42,8 @@ void ControlsEngine::draw(const QMatrix4x4& mvp_mat) {
     drawCircleSegment(QColor(203, 67, 69, 255), 160.f);
     drawCircleSegment(QColor(203, 67, 69, 255), 240.f);
     drawCircleSegment(QColor(203, 67, 69, 255), 320.f);
+    drawCircleSegment(QColor(203, 67, 69, 255), 400.f);
+    drawCircleSegment(QColor(203, 67, 69, 255), 480.f);
   }
 
   // Визиры направления

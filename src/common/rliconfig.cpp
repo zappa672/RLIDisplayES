@@ -54,8 +54,11 @@ RLIConfig::RLIConfig(const QString& filename) {
       if (xml->name() == "layout") {
         QMap<QString, QString> attrs = readXMLAttributes(xml);
 
-        if (attrs.contains("size") && SIZE_RE.exactMatch(attrs["size"]))
-          _layouts.insert(attrs["size"], readLayout(xml));
+        if (attrs.contains("size") && SIZE_RE.exactMatch(attrs["size"])) {
+          RLILayout* layout = readLayout(xml);
+          fixPositions(attrs["size"], layout);
+          _layouts.insert(attrs["size"], layout);
+        }
       }
       break;
     default:
@@ -69,6 +72,35 @@ RLIConfig::RLIConfig(const QString& filename) {
 RLIConfig::~RLIConfig() {
   qDeleteAll(_layouts);
 }
+
+void RLIConfig::fixPositions(QString size_tag, RLILayout* layout) {
+  QStringList slsize = size_tag.split("x");
+  QSize screen_size(slsize[0].toInt(), slsize[1].toInt());
+
+  fixPosition<QPointF>(screen_size, QSizeF(0, 0), layout->circle.center);
+  fixParams(screen_size, &layout->menu);
+  fixParams(screen_size, &layout->magnifier);
+
+  for (QString panel : layout->panels.keys())
+    fixParams(screen_size, &layout->panels[panel].params);
+}
+
+void RLIConfig::fixParams(QSize screen_size, QMap<QString, QString>* params) {
+  QSize _size = QSize(params->value("width").toInt(), params->value("height").toInt());
+  QPoint _position = QPoint(params->value("x").toInt(), params->value("y").toInt());
+
+  fixPosition(screen_size, _size, _position);
+
+  params->operator []("x") = QString::number(_position.x());
+  params->operator []("y") = QString::number(_position.y());
+}
+
+template<typename P>
+void RLIConfig::fixPosition(QSizeF screen_size, QSizeF size, P& p) {
+  if (p.x() < 0) p.setX(p.x() + screen_size.width() + -size.width());
+  if (p.y() < 0) p.setY(p.y() + screen_size.height() + -size.height());
+}
+
 
 RLILayout* RLIConfig::readLayout(QXmlStreamReader* xml) {
   RLILayout* layout = new RLILayout;

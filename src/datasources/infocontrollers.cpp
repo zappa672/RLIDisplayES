@@ -24,29 +24,23 @@ InfoBlockController::InfoBlockController(QObject* parent) : QObject(parent) {
   dec = QTextCodec::codecForName("UTF8")->makeDecoder();
 }
 
-void InfoBlockController::resize(const QSize& size, const RLIPanelInfo& panelInfo) {
+void InfoBlockController::resize(const RLIPanelInfo& panelInfo) {
   if (_block == NULL)
     return;
 
   _block->clear();
-  setupBlock(_block, size, panelInfo);
+  setupBlock(_block, panelInfo);
 }
 
 void InfoBlockController::onLanguageChanged(int lang_id) {
   Q_UNUSED(lang_id);
 }
 
-void InfoBlockController::setupBlock(InfoBlock* b, const QSize& screen_size, const RLIPanelInfo& panelInfo) {
+void InfoBlockController::setupBlock(InfoBlock* b, const RLIPanelInfo& panelInfo) {
   _block = b;
 
   QPoint leftTop(panelInfo.params["x"].toInt(), panelInfo.params["y"].toInt());
   QSize size(panelInfo.params["width"].toInt(), panelInfo.params["height"].toInt());
-
-  if (leftTop.x() < 0) leftTop.setX(leftTop.x() + screen_size.width() - size.width());
-  if (leftTop.y() < 0) leftTop.setY(leftTop.y() + screen_size.height() - size.height());
-
-  //if (leftTop.x() < 0) leftTop.setX(leftTop.x() + screen_size.width());
-  //if (leftTop.y() < 0) leftTop.setY(leftTop.y() + screen_size.height());
 
   _block->setGeometry(QRect(leftTop, size));
 

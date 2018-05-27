@@ -14,7 +14,7 @@
 #include <QOpenGLShaderProgram>
 
 #include "infofonts.h"
-#include "../common/rlistrings.h"
+#include "../../common/rlistrings.h"
 
 enum TextAllign { INFOTEXT_ALLIGN_LEFT, INFOTEXT_ALLIGN_RIGHT, INFOTEXT_ALLIGN_CENTER };
 

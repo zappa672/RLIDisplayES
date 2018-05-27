@@ -13,11 +13,12 @@
 
 #include "datasources/radarscale.h"
 
-#include "layers/radarengine.h"
+#include "layers/radar/radarengine.h"
+#include "layers/chart/chartengine.h"
+#include "layers/info/infoengine.h"
+#include "layers/info/menuengine.h"
+#include "layers/magnifierengine.h"
 #include "layers/maskengine.h"
-#include "layers/chartengine.h"
-#include "layers/infoengine.h"
-#include "layers/menuengine.h"
 #include "layers/targetengine.h"
 #include "layers/controlsengine.h"
 
@@ -35,6 +36,7 @@ public:
   inline ChartEngine*     chartEngine()   { return _chartEngine; }
   inline InfoEngine*      infoEngine()    { return _infoEngine; }
   inline MenuEngine*      menuEngine()    { return _menuEngine; }
+  inline MagnifierEngine* magnifierEngine() { return _magnEngine; }
   inline TargetEngine*    targetEngine()  { return _trgtEngine; }
   inline ControlsEngine*  controlsEngine() { return _ctrlEngine; }
 
@@ -46,6 +48,7 @@ signals:
   void secondChanged();
 
 public slots:
+  void onMagnifierToggled();
   void onMenuToggled();
   void onConfigMenuToggled();
   void onUpToggled();
@@ -89,6 +92,7 @@ private:
   MenuEngine*       _menuEngine;
   TargetEngine*     _trgtEngine;
   ControlsEngine*   _ctrlEngine;
+  MagnifierEngine*  _magnEngine;
 
 
   QOpenGLShaderProgram* _program;

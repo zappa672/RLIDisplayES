@@ -47,19 +47,20 @@ SOURCES     += \
     src/s52/s52assets.cpp \
     src/s52/s52references.cpp \
     \
-    src/layers/infoengine.cpp \
-    src/layers/menuengine.cpp \
-    src/layers/radarengine.cpp \
-    src/layers/radarpalette.cpp \
-    src/layers/chartengine.cpp \
-    src/layers/chartlayers.cpp \
-    src/layers/chartshaders.cpp \
-    src/layers/maskengine.cpp \    
-    src/layers/chartsettingsmodel.cpp \
+    src/layers/info/infofonts.cpp \
+    src/layers/info/infoengine.cpp \
+    src/layers/info/menuengine.cpp \
+    src/layers/radar/radarengine.cpp \
+    src/layers/radar/radarpalette.cpp \
+    src/layers/chart/chartsettingsmodel.cpp \
+    src/layers/chart/chartengine.cpp \
+    src/layers/chart/chartlayers.cpp \
+    src/layers/chart/chartshaders.cpp \
+    src/layers/maskengine.cpp \        
     src/layers/routeengine.cpp \
-    src/layers/targetengine.cpp \
-    src/layers/infofonts.cpp \
-    src/layers/controlsengine.cpp
+    src/layers/targetengine.cpp \    
+    src/layers/controlsengine.cpp \
+    src/layers/magnifierengine.cpp
 
 HEADERS     += \
     src/mainwindow.h \
@@ -83,19 +84,20 @@ HEADERS     += \
     src/s52/s52assets.h \
     src/s52/s52references.h \
     \
-    src/layers/infoengine.h \
-    src/layers/menuengine.h \
-    src/layers/radarengine.h \
-    src/layers/radarpalette.h \
-    src/layers/chartengine.h \
-    src/layers/chartlayers.h \
-    src/layers/chartshaders.h \
-    src/layers/maskengine.h \
-    src/layers/chartsettingsmodel.h \
+    src/layers/info/infofonts.h \
+    src/layers/info/infoengine.h \
+    src/layers/info/menuengine.h \
+    src/layers/radar/radarengine.h \
+    src/layers/radar/radarpalette.h \
+    src/layers/chart/chartengine.h \
+    src/layers/chart/chartlayers.h \
+    src/layers/chart/chartshaders.h \
+    src/layers/chart/chartsettingsmodel.h \
+    src/layers/maskengine.h \    
     src/layers/routeengine.h \
-    src/layers/targetengine.h \
-    src/layers/infofonts.h \
-    src/layers/controlsengine.h
+    src/layers/targetengine.h \    
+    src/layers/controlsengine.h \
+    src/layers/magnifierengine.h
 
 FORMS       += \
     forms/mainwindow.ui \

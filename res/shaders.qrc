@@ -20,5 +20,7 @@
         <file>shaders/trgt.frag.glsl</file>
         <file>shaders/ctrl.frag.glsl</file>
         <file>shaders/ctrl.vert.glsl</file>
+        <file>shaders/magn.vert.glsl</file>
+        <file>shaders/magn.frag.glsl</file>
     </qresource>
 </RCC>

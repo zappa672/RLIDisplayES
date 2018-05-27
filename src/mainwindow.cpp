@@ -139,36 +139,36 @@ void MainWindow::resizeEvent(QResizeEvent* e) {
 
   const RLILayout* layout = RLIConfig::instance().currentLayout();
 
-  _gain_ctrl->resize(curSize, layout->panels["gain"]);
-  _water_ctrl->resize(curSize, layout->panels["water"]);
-  _rain_ctrl->resize(curSize, layout->panels["rain"]);
-  _apch_ctrl->resize(curSize, layout->panels["apch"]);
+  _gain_ctrl->resize(layout->panels["gain"]);
+  _water_ctrl->resize(layout->panels["water"]);
+  _rain_ctrl->resize(layout->panels["rain"]);
+  _apch_ctrl->resize(layout->panels["apch"]);
 
-  _rdtn_ctrl->resize(curSize, layout->panels["emission"]);
-  _curs_ctrl->resize(curSize, layout->panels["cursor"]);
-  _clck_ctrl->resize(curSize, layout->panels["clock"]);
-  _fps_ctrl->resize(curSize, layout->panels["fps"]);
-  _pstn_ctrl->resize(curSize, layout->panels["position"]);
-  _blnk_ctrl->resize(curSize, layout->panels["blank"]);
-  _crse_ctrl->resize(curSize, layout->panels["course"]);
-  _scle_ctrl->resize(curSize, layout->panels["scale"]);
+  _rdtn_ctrl->resize(layout->panels["emission"]);
+  _curs_ctrl->resize(layout->panels["cursor"]);
+  _clck_ctrl->resize(layout->panels["clock"]);
+  _fps_ctrl->resize(layout->panels["fps"]);
+  _pstn_ctrl->resize(layout->panels["position"]);
+  _blnk_ctrl->resize(layout->panels["blank"]);
+  _crse_ctrl->resize(layout->panels["course"]);
+  _scle_ctrl->resize(layout->panels["scale"]);
 
-  _lbl1_ctrl->resize(curSize, layout->panels["label1"]);
-  _lbl2_ctrl->resize(curSize, layout->panels["label2"]);
-  _lbl3_ctrl->resize(curSize, layout->panels["label3"]);
-  _lbl4_ctrl->resize(curSize, layout->panels["label4"]);
-  _lbl5_ctrl->resize(curSize, layout->panels["label5"]);
+  _lbl1_ctrl->resize(layout->panels["label1"]);
+  _lbl2_ctrl->resize(layout->panels["label2"]);
+  _lbl3_ctrl->resize(layout->panels["label3"]);
+  _lbl4_ctrl->resize(layout->panels["label4"]);
+  _lbl5_ctrl->resize(layout->panels["label5"]);
 
-  _band_lbl_ctrl->resize(curSize, layout->panels["band"]);
-  _dngr_ctrl->resize(curSize, layout->panels["danger"]);
+  _band_lbl_ctrl->resize(layout->panels["band"]);
+  _dngr_ctrl->resize(layout->panels["danger"]);
 
-  _tals_ctrl->resize(curSize, layout->panels["tails"]);
-  _dgdt_ctrl->resize(curSize, layout->panels["danger-details"]);
-  _vctr_ctrl->resize(curSize, layout->panels["vector"]);
-  _trgs_ctrl->resize(curSize, layout->panels["targets"]);
+  _tals_ctrl->resize(layout->panels["tails"]);
+  _dgdt_ctrl->resize(layout->panels["danger-details"]);
+  _vctr_ctrl->resize(layout->panels["vector"]);
+  _trgs_ctrl->resize(layout->panels["targets"]);
 
-  _vn_ctrl->resize(curSize, layout->panels["vn"]);
-  _vd_ctrl->resize(curSize, layout->panels["vd"]);
+  _vn_ctrl->resize(layout->panels["vn"]);
+  _vd_ctrl->resize(layout->panels["vd"]);
 }
 
 void MainWindow::timerEvent(QTimerEvent* e) {
@@ -231,7 +231,7 @@ void MainWindow::onRLIWidgetInitialized() {
 
 void MainWindow::setupInfoBlock(InfoBlockController* ctrl, const RLIPanelInfo& panelInfo) {
   InfoBlock* blck = wgtRLI->infoEngine()->addInfoBlock();
-  ctrl->setupBlock(blck, RLIConfig::instance().currentSize(), panelInfo);
+  ctrl->setupBlock(blck, panelInfo);
 
   connect(ctrl, SIGNAL(setRect(int, QRect)), blck, SLOT(setRect(int, QRect)));
   connect(ctrl, SIGNAL(setText(int, int, QByteArray)), blck, SLOT(setText(int, int, QByteArray)));
@@ -346,6 +346,7 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
     break;
   //Электронная лупа
   case Qt::Key_L:
+    wgtRLI->onMagnifierToggled();
     break;
   //Обзор
   case Qt::Key_X:

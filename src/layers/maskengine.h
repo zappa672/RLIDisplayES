@@ -13,7 +13,7 @@
 #include <QOpenGLShaderProgram>
 
 #include "../common/rliconfig.h"
-#include "infofonts.h"
+#include "info/infofonts.h"
 
 
 

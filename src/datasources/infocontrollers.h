@@ -9,17 +9,17 @@
 #include "../common/rliconfig.h"
 
 #include "../datasources/radarscale.h"
-#include "../layers/infoengine.h"
+#include "../layers/info/infoengine.h"
 //#include "../layers/targetengine.h"
 
 class InfoBlockController : public QObject {
   Q_OBJECT
 public:
   explicit InfoBlockController(QObject* parent = 0);
-  virtual void setupBlock(InfoBlock* b, const QSize& size, const RLIPanelInfo& panelInfo);
+  virtual void setupBlock(InfoBlock* b, const RLIPanelInfo& panelInfo);
 
 public slots:
-  virtual void resize(const QSize& size, const RLIPanelInfo& panelInfo);
+  virtual void resize(const RLIPanelInfo& panelInfo);
   virtual void onLanguageChanged(int lang_id);
 
 signals:

@@ -8,9 +8,9 @@
 
 #include "chartshaders.h"
 
-#include "../s52/s52chart.h"
-#include "../s52/s52assets.h"
-#include "../s52/s52references.h"
+#include "../../s52/s52chart.h"
+#include "../../s52/s52assets.h"
+#include "../../s52/s52references.h"
 
 
 class ChartAreaEngine : protected QOpenGLFunctions {

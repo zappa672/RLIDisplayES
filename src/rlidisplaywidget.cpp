@@ -31,6 +31,7 @@ RLIDisplayWidget::~RLIDisplayWidget() {
     delete _maskEngine;
     delete _chartEngine;
     delete _menuEngine;
+    delete _magnEngine;
     delete _trgtEngine;
     delete _ctrlEngine;
 
@@ -128,9 +129,13 @@ void RLIDisplayWidget::initializeGL() {
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Info engine init finish";
 
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Menu engine init start";
-  _menuEngine = new MenuEngine(size(), layout->menu, context(), this);
+  _menuEngine = new MenuEngine(layout->menu, context(), this);
   _menuEngine->setFonts(_infoFonts);
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Menu engine init finish";
+
+  qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Magnifier engine init start";
+  _magnEngine = new MagnifierEngine(layout->magnifier, context(), this);
+  qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Magnifier engine init finish";
 
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Target engine init start";
   _trgtEngine = new TargetEngine(context(), this);
@@ -191,7 +196,8 @@ void RLIDisplayWidget::resizeGL(int w, int h) {
   _chartEngine->resize(layout->circle.radius);
 
   _maskEngine->resize(QSize(w, h), layout->circle);
-  _menuEngine->resize(QSize(w, h), layout->menu);
+  _menuEngine->resize(layout->menu);
+  _magnEngine->resize(layout->magnifier);
 }
 
 float RLIDisplayWidget::frameRate() {
@@ -269,7 +275,10 @@ void RLIDisplayWidget::paintLayers() {
   for (int i = 0; i < _infoEngine->blockCount(); i++)
     drawRect(_infoEngine->blockGeometry(i), _infoEngine->blockTextId(i));
 
-  drawRect(QRect(_menuEngine->position(), _menuEngine->size()), _menuEngine->texture());  
+  drawRect(QRect(_menuEngine->position(), _menuEngine->size()), _menuEngine->texture());
+
+  if (_magnEngine->visible())
+    drawRect(QRect(_magnEngine->position(), _magnEngine->size()), _magnEngine->texture());
 }
 
 void RLIDisplayWidget::updateLayers() {
@@ -284,6 +293,7 @@ void RLIDisplayWidget::updateLayers() {
 
   _infoEngine->update(_infoFonts);
   _menuEngine->update();
+  _magnEngine->update();
 }
 
 void RLIDisplayWidget::drawRect(const QRectF& rect, GLuint textureId) {
@@ -323,6 +333,13 @@ void RLIDisplayWidget::drawRect(const QRectF& rect, GLuint textureId) {
   _program->release();
 }
 
+
+void RLIDisplayWidget::onMagnifierToggled() {
+  if (_menuEngine->visible())
+    return;
+
+  _magnEngine->setVisible(!_magnEngine->visible());
+}
 
 void RLIDisplayWidget::onMenuToggled() {
   if (_menuEngine->state() == MenuEngine::MAIN)
