@@ -35,6 +35,7 @@ public slots:
 
 private:
   void initShaders();
+  void initBorderBuffers();
 
   bool _visible;
   QPoint _position;
@@ -44,18 +45,18 @@ private:
   QOpenGLShaderProgram* _prog;
 
   // -----------------------------------------------
+
   enum { MAGN_ATTR_POSITION = 0
-       , MAGN_ATTR_ORDER = 1
-       , MAGN_ATTR_CHAR_VAL = 2
-       , MAGN_ATTR_COUNT = 3 } ;
+       , MAGN_ATTR_AMPLITUDE = 1
+       , MAGN_ATTR_COUNT = 2 } ;
   enum { MAGN_UNIF_MVP = 0
        , MAGN_UNIF_COLOR = 1
-       , MAGN_UNIF_SIZE = 2
+       , MAGN_UNIF_TEXTURE = 2
        , MAGN_UNIF_COUNT = 3 } ;
 
   GLuint _vbo_ids[MAGN_ATTR_COUNT];
   GLuint _attr_locs[MAGN_ATTR_COUNT];
-  GLuint _uniform_locs[MAGN_UNIF_COUNT];
+  GLuint _unif_locs[MAGN_UNIF_COUNT];
 };
 
 
