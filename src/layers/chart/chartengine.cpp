@@ -29,8 +29,8 @@ ChartEngine::ChartEngine(uint tex_radius, S52References* ref, QOpenGLContext* co
 ChartEngine::~ChartEngine() {
   for (ChartAreaEngine* engine : area_engines)
     delete engine;
-  //for (ChartLineEngine* engine : line_engines)
-  //  delete engine;
+  for (ChartLineEngine* engine : line_engines)
+    delete engine;
   for (ChartTextEngine* engine : text_engines)
     delete engine;
   for (ChartMarkEngine* engine : mark_engines)
