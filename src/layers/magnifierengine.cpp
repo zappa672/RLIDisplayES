@@ -10,7 +10,9 @@ MagnifierEngine::MagnifierEngine(const QMap<QString, QString>& params, QOpenGLCo
   _prog = new QOpenGLShaderProgram();
   _fbo = nullptr;
 
-  glGenBuffers(MAGN_ATTR_COUNT, _vbo_ids);
+  glGenBuffers(MAGN_ATTR_COUNT, _vbo_ids_border);
+  glGenBuffers(MAGN_ATTR_COUNT, _vbo_ids_radar);
+
   initShaders();
 
   resize(params);
@@ -19,7 +21,9 @@ MagnifierEngine::MagnifierEngine(const QMap<QString, QString>& params, QOpenGLCo
 MagnifierEngine::~MagnifierEngine() {
   delete _prog;
   delete _fbo;
-  glDeleteBuffers(MAGN_ATTR_COUNT, _vbo_ids);
+
+  glDeleteBuffers(MAGN_ATTR_COUNT, _vbo_ids_border);
+  glDeleteBuffers(MAGN_ATTR_COUNT, _vbo_ids_radar);
 }
 
 void MagnifierEngine::resize(const QMap<QString, QString>& params) {
@@ -31,9 +35,10 @@ void MagnifierEngine::resize(const QMap<QString, QString>& params) {
 
   _fbo = new QOpenGLFramebufferObject(_size);
   initBorderBuffers();
+  initRadarBuffers();
 }
 
-void MagnifierEngine::update() {
+void MagnifierEngine::update(GLuint amp_vbo_id, GLuint pal_tex_id, int pel_len, int pel_cnt, int min_pel, int min_rad) {
   if (!_visible)
     return;
 
@@ -46,25 +51,62 @@ void MagnifierEngine::update() {
 
   QMatrix4x4 projection;
   projection.setToIdentity();
-  projection.ortho(0.f, _size.width(), 0.f, _size.height(), -1.f, 1.f);
+  projection.ortho(0.f, _size.width(), _size.height(), 0.f, -1.f, 1.f);
 
   _prog->bind();
 
   _prog->setUniformValue(_unif_locs[MAGN_UNIF_MVP], projection);
-  glUniform4f(_unif_locs[MAGN_UNIF_COLOR], 1.0f, 0.0f, 0.0f, 1.0f);
+
+  drawBorder();
+  drawPelengs(amp_vbo_id, pal_tex_id, pel_len, pel_cnt, min_pel, min_rad);
+
+
+  _prog->release();
+  _fbo->release();
+}
+
+void MagnifierEngine::drawPelengs(GLuint amp_vbo_id, GLuint pal_tex_id, int pel_len, int pel_cnt, int min_pel, int min_rad) {
   glUniform1i(_unif_locs[MAGN_UNIF_TEXTURE], 0);
 
-  glBindBuffer(GL_ARRAY_BUFFER, _vbo_ids[MAGN_ATTR_POSITION]);
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, pal_tex_id);
+
+  for (int i = 0; i < _size.width() - 2; i++) {
+    glUniform4f(_unif_locs[MAGN_UNIF_COLOR], 1.0f*(i%2), 1.0f, 0.0f, 1.0f);
+
+    glBindBuffer(GL_ARRAY_BUFFER, _vbo_ids_radar[MAGN_ATTR_POSITION]);
+    glVertexAttribPointer(_attr_locs[MAGN_ATTR_POSITION], 2, GL_FLOAT, GL_FALSE, 0, (void*) (2 * (_size.height()-2) * i * sizeof(GLfloat)));
+    glEnableVertexAttribArray(_attr_locs[MAGN_ATTR_POSITION]);
+
+    int amp_shift = ((min_pel + i) % pel_cnt) * pel_len + min_rad;
+
+    glBindBuffer(GL_ARRAY_BUFFER, amp_vbo_id);
+    glVertexAttribPointer(_attr_locs[MAGN_ATTR_AMPLITUDE], 1, GL_FLOAT, GL_FALSE, 0, (void*) (amp_shift * sizeof(GLfloat)));
+    glEnableVertexAttribArray(_attr_locs[MAGN_ATTR_AMPLITUDE]);
+
+    glDrawArrays(GL_POINTS, 0, (_size.height()-2));
+  }
+
+  glBindTexture(GL_TEXTURE_2D, 0);
+
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+void MagnifierEngine::drawBorder() {
+  glUniform4f(_unif_locs[MAGN_UNIF_COLOR], 0.0f, 1.0f, 0.0f, 1.0f);
+  glUniform1i(_unif_locs[MAGN_UNIF_TEXTURE], 0);
+
+  glBindBuffer(GL_ARRAY_BUFFER, _vbo_ids_border[MAGN_ATTR_POSITION]);
   glVertexAttribPointer(_attr_locs[MAGN_ATTR_POSITION], 2, GL_FLOAT, GL_FALSE, 0, (void*) (0 * sizeof(GLfloat)));
   glEnableVertexAttribArray(_attr_locs[MAGN_ATTR_POSITION]);
 
   glVertexAttrib1f(_attr_locs[MAGN_ATTR_AMPLITUDE], -1);
   glDisableVertexAttribArray(_attr_locs[MAGN_ATTR_AMPLITUDE]);
 
+  glLineWidth(2.f);
   glDrawArrays(GL_LINE_LOOP, 0, 4);
 
-  _prog->release();
-  _fbo->release();
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 void MagnifierEngine::initShaders() {
@@ -86,12 +128,28 @@ void MagnifierEngine::initShaders() {
 void MagnifierEngine::initBorderBuffers() {
   QSizeF s(_size);
   GLfloat positions[] { 0.f, 0.f
-                      , 0.f, static_cast<GLfloat>(_size.height())
-                      , static_cast<GLfloat>(s.width()), static_cast<GLfloat>(s.height())
+                      , 0.f, static_cast<GLfloat>(_size.height()-1)
+                      , static_cast<GLfloat>(s.width()), static_cast<GLfloat>(s.height()-1)
                       , static_cast<GLfloat>(s.width()), 0.f };
 
-  glBindBuffer(GL_ARRAY_BUFFER, _vbo_ids[MAGN_ATTR_POSITION]);
+  glBindBuffer(GL_ARRAY_BUFFER, _vbo_ids_border[MAGN_ATTR_POSITION]);
   glBufferData(GL_ARRAY_BUFFER, 8*sizeof(GLfloat), positions, GL_STATIC_DRAW);
+
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+void MagnifierEngine::initRadarBuffers() {
+  std::vector<GLfloat> positions;
+
+  for (int i = 2; i < _size.width(); i++) {
+    for (int j = 1; j < _size.height()-1; j++) {
+      positions.push_back(i);
+      positions.push_back(j);
+    }
+  }
+
+  glBindBuffer(GL_ARRAY_BUFFER, _vbo_ids_radar[MAGN_ATTR_POSITION]);
+  glBufferData(GL_ARRAY_BUFFER, positions.size()*sizeof(GLfloat), positions.data(), GL_STATIC_DRAW);
 
   glBindBuffer(GL_ARRAY_BUFFER, 0);
 }

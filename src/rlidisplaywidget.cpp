@@ -293,7 +293,13 @@ void RLIDisplayWidget::updateLayers() {
 
   _infoEngine->update(_infoFonts);
   _menuEngine->update();
-  _magnEngine->update();
+
+  _magnEngine->update( _radarEngine->amplitutedesVboId()
+                     , _radarEngine->paletteTexId()
+                     , _radarEngine->pelengLength()
+                     , _radarEngine->pelengCount()
+                     , 90       // min_pel
+                     , 96 );    // min_rad
 }
 
 void RLIDisplayWidget::drawRect(const QRectF& rect, GLuint textureId) {
@@ -328,7 +334,7 @@ void RLIDisplayWidget::drawRect(const QRectF& rect, GLuint textureId) {
   glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
   glBindTexture(GL_TEXTURE_2D, 0);
-  //glBindBuffer(GL_ARRAY_BUFFER, 0);
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
 
   _program->release();
 }

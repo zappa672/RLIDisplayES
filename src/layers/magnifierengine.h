@@ -31,11 +31,15 @@ public:
 private slots:
 
 public slots:
-  void update();
+  void update(GLuint amp_vbo_id, GLuint pal_tex_id, int pel_len, int pel_cnt, int min_pel, int min_rad);
 
 private:
   void initShaders();
   void initBorderBuffers();
+  void initRadarBuffers();
+
+  void drawBorder();
+  void drawPelengs(GLuint amp_vbo_id, GLuint pal_tex_id, int pel_len, int pel_cnt, int min_pel, int min_rad);
 
   bool _visible;
   QPoint _position;
@@ -54,7 +58,8 @@ private:
        , MAGN_UNIF_TEXTURE = 2
        , MAGN_UNIF_COUNT = 3 } ;
 
-  GLuint _vbo_ids[MAGN_ATTR_COUNT];
+  GLuint _vbo_ids_border[MAGN_ATTR_COUNT];
+  GLuint _vbo_ids_radar[MAGN_ATTR_COUNT];
   GLuint _attr_locs[MAGN_ATTR_COUNT];
   GLuint _unif_locs[MAGN_UNIF_COUNT];
 };

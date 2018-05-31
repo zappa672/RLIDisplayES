@@ -20,7 +20,13 @@ public:
   virtual ~RadarEngine  ();
 
   inline QSize size() const      { return _fbo->size(); }
-  inline uint  textureId() const { return _fbo->texture(); }
+  inline GLuint textureId() const { return _fbo->texture(); }
+
+  inline GLuint amplitutedesVboId() const { return _vbo_ids[ATTR_AMP]; }
+  inline GLuint paletteTexId() const { return _palette->texture(); }
+
+  inline int pelengCount() const { return _peleng_count; }
+  inline int pelengLength() const { return _peleng_len; }
 
 public slots:
   void onBrightnessChanged(int br);
