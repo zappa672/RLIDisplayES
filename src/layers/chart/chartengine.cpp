@@ -31,8 +31,8 @@ ChartEngine::~ChartEngine() {
     delete engine;
   for (ChartLineEngine* engine : line_engines)
     delete engine;
-  for (ChartTextEngine* engine : text_engines)
-    delete engine;
+  //for (ChartTextEngine* engine : text_engines)
+  //  delete engine;
   for (ChartMarkEngine* engine : mark_engines)
     delete engine;
 
@@ -73,7 +73,7 @@ void ChartEngine::setChart(S52Chart* chrt, S52References* ref) {
 
   setAreaLayers(chrt, ref);
   setLineLayers(chrt, ref);
-  setTextLayers(chrt, ref);
+  //setTextLayers(chrt, ref);
   setMarkLayers(chrt, ref);
   setSndgLayer(chrt, ref);
 
@@ -87,8 +87,8 @@ void ChartEngine::clearChartData() {
     engine->clearData();
   for (ChartLineEngine* engine : line_engines)
     engine->clearData();
-  for (ChartTextEngine* engine : text_engines)
-    engine->clearData();
+  //for (ChartTextEngine* engine : text_engines)
+  //  engine->clearData();
   for (ChartMarkEngine* engine : mark_engines)
     engine->clearData();
 
@@ -126,6 +126,7 @@ void ChartEngine::setLineLayers(S52Chart* chrt, S52References* ref) {
   }
 }
 
+/*
 void ChartEngine::setTextLayers(S52Chart* chrt, S52References* ref) {
   Q_UNUSED(ref);
 
@@ -142,6 +143,7 @@ void ChartEngine::setTextLayers(S52Chart* chrt, S52References* ref) {
     text_engines[layer_name]->setData(layer, clds.order);
   }
 }
+*/
 
 void ChartEngine::setMarkLayers(S52Chart* chrt, S52References* ref) {
   for (QString layer_name : chrt->getMarkLayerNames()) {
@@ -210,7 +212,7 @@ void ChartEngine::draw(const QString& color_scheme) {
 
     drawAreaLayers(projection*transform, color_scheme);
     drawLineLayers(projection*transform, color_scheme);
-    drawTextLayers(projection*transform);
+    //drawTextLayers(projection*transform);
     drawMarkLayers(projection*transform, color_scheme);
   }
 
@@ -298,6 +300,7 @@ void ChartEngine::drawLineLayers(const QMatrix4x4& mvp_matrix, const QString& co
 }
 
 
+/*
 void ChartEngine::drawTextLayers(const QMatrix4x4& mvp_matrix) {
   glClearDepthf(0.f);
   glClear(GL_DEPTH_BUFFER_BIT);
@@ -327,6 +330,7 @@ void ChartEngine::drawTextLayers(const QMatrix4x4& mvp_matrix) {
 
   prog->release();
 }
+*/
 
 void ChartEngine::drawMarkLayers(const QMatrix4x4& mvp_matrix, const QString& color_scheme) {
   glClearDepthf(0.f);
