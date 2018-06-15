@@ -134,7 +134,7 @@ void RLIDisplayWidget::initializeGL() {
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Menu engine init finish";
 
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Magnifier engine init start";
-  _magnEngine = new MagnifierEngine(layout->magnifier, context(), this);
+  _magnEngine = new MagnifierEngine(layout->magn, context(), this);
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Magnifier engine init finish";
 
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Target engine init start";
@@ -190,14 +190,15 @@ void RLIDisplayWidget::resizeGL(int w, int h) {
   if (!_initialized)
     return;
 
-  const RLILayout* layout = RLIConfig::instance().currentLayout();
-  _radarEngine->resizeTexture(layout->circle.radius);
-  _tailsEngine->resizeTexture(layout->circle.radius);
-  _chartEngine->resize(layout->circle.radius);
+  const RLILayout* lot = RLIConfig::instance().currentLayout();
 
-  _maskEngine->resize(QSize(w, h), layout->circle);
-  _menuEngine->resize(layout->menu);
-  _magnEngine->resize(layout->magnifier);
+  _radarEngine->resizeTexture(lot->circle.radius);
+  _tailsEngine->resizeTexture(lot->circle.radius);
+  _chartEngine->resize(lot->circle.radius);
+
+  _maskEngine->resize(QSize(w, h), lot->circle);
+  _menuEngine->resize(lot->menu.size, lot->menu.position, lot->menu.params["font"]);
+  _magnEngine->resize(lot->magn.size);
 }
 
 float RLIDisplayWidget::frameRate() {
@@ -237,8 +238,7 @@ void RLIDisplayWidget::paintLayers() {
   glBlendEquation(GL_FUNC_ADD);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-  const RLILayout* layout = RLIConfig::instance().currentLayout();
-
+  const RLILayout* lot = RLIConfig::instance().currentLayout();
 
   std::pair<float, float> shipPos = RLIState::instance().shipPosition();
   float scale = RLIState::instance().chartScale();
@@ -250,13 +250,15 @@ void RLIDisplayWidget::paintLayers() {
 
   QPoint shift(_debug_radar_tails_shift, _debug_radar_tails_shift);
 
-  drawRect(QRect(layout->circle.boundRect.topLeft().toPoint(), _chartEngine->size()), _chartEngine->textureId());
-
-  drawRect(QRect(layout->circle.boundRect.topLeft().toPoint() + shift, _radarEngine->size()), _radarEngine->textureId());
-  drawRect(QRect(layout->circle.boundRect.topLeft().toPoint() - shift, _tailsEngine->size()), _tailsEngine->textureId());
 
 
-  QPointF center = layout->circle.center;
+  drawRect(QRect(lot->circle.boundRect.topLeft(), _chartEngine->size()), _chartEngine->textureId());
+
+  drawRect(QRect(lot->circle.boundRect.topLeft() + shift, _radarEngine->size()), _radarEngine->textureId());
+  drawRect(QRect(lot->circle.boundRect.topLeft() - shift, _tailsEngine->size()), _tailsEngine->textureId());
+
+
+  QPointF center = lot->circle.center;
 
   QMatrix4x4 projection;
   projection.setToIdentity();
@@ -275,10 +277,10 @@ void RLIDisplayWidget::paintLayers() {
   for (int i = 0; i < _infoEngine->blockCount(); i++)
     drawRect(_infoEngine->blockGeometry(i), _infoEngine->blockTextId(i));
 
-  drawRect(QRect(_menuEngine->position(), _menuEngine->size()), _menuEngine->texture());
+  drawRect(QRect(lot->menu.position, lot->menu.size), _menuEngine->texture());
 
   if (_magnEngine->visible())
-    drawRect(QRect(_magnEngine->position(), _magnEngine->size()), _magnEngine->texture());
+    drawRect(QRect(lot->magn.position, lot->magn.size), _magnEngine->texture());
 }
 
 void RLIDisplayWidget::updateLayers() {
@@ -340,6 +342,11 @@ void RLIDisplayWidget::drawRect(const QRectF& rect, GLuint textureId) {
 }
 
 
+
+
+
+
+
 void RLIDisplayWidget::onMagnifierToggled() {
   if (_menuEngine->visible())
     return;
@@ -379,4 +386,15 @@ void RLIDisplayWidget::onEnterToggled() {
 void RLIDisplayWidget::onBackToggled() {
   if (_menuEngine->visible())
     _menuEngine->onBack();
+}
+
+
+
+
+void RLIDisplayWidget::keyReleaseEvent(QKeyEvent *event) {
+  pressedKeys.remove(event->key());
+}
+
+void RLIDisplayWidget::keyPressEvent(QKeyEvent *event) {
+  pressedKeys.insert(event->key());
 }

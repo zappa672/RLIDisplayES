@@ -8,33 +8,7 @@
 
 const QRegExp SIZE_RE = QRegExp("^\\d{3,4}x\\d{3,4}$");
 
-void RLILayout::print() const {
-  qDebug() << "circle";
-  /*
-  for (QString attr : circle.keys())
-    qDebug() << "\t" << attr << ": " << circle[attr];
-  */
-
-  qDebug() << "menu";
-  for (QString attr : menu.keys())
-    qDebug() << "\t" << attr << ": " << menu[attr];
-
-  qDebug() << "magnifier";
-  for (QString attr : magnifier.keys())
-    qDebug() << "\t" << attr << ": " << magnifier[attr];
-
-  qDebug() << "panels";
-  for (QString panel_name : panels.keys()) {
-    qDebug() << "\t" << panel_name;
-    for (QString attr : panels[panel_name].params.keys())
-      qDebug() << "\t\t" << attr << ": " << panels[panel_name].params[attr];
-  }
-}
-
-
 RLIConfig::RLIConfig(const QString& filename) {
-  _showButtonPanel = false;
-
   QFile file(filename);
   file.open(QFile::ReadOnly);
 
@@ -43,22 +17,19 @@ RLIConfig::RLIConfig(const QString& filename) {
   while (!xml->atEnd()) {
     switch (xml->readNext()) {
     case QXmlStreamReader::StartElement:
-      if (xml->name() == "use-button-pannel")
-        _showButtonPanel = (xml->readElementText() == "true");
-
-      if (xml->name() == "default-layout") {
-        _defaultSize = xml->readElementText();
+      if (xml->name() == "layouts") {
+        QMap<QString, QString> attrs = readXMLAttributes(xml);
+        _defaultSize = attrs["default"];
         _currentSize = _defaultSize;
       }
 
       if (xml->name() == "layout") {
         QMap<QString, QString> attrs = readXMLAttributes(xml);
+        QSize sz = parseSize(attrs["size"]);
 
-        if (attrs.contains("size") && SIZE_RE.exactMatch(attrs["size"])) {
-          RLILayout* layout = readLayout(xml);
-          fixPositions(attrs["size"], layout);
-          _layouts.insert(attrs["size"], layout);
-        }
+        RLILayout* layout = readLayout(sz, xml);
+
+        _layouts.insert(attrs["size"], layout);
       }
       break;
     default:
@@ -73,66 +44,56 @@ RLIConfig::~RLIConfig() {
   qDeleteAll(_layouts);
 }
 
-void RLIConfig::fixPositions(QString size_tag, RLILayout* layout) {
-  QStringList slsize = size_tag.split("x");
-  QSize screen_size(slsize[0].toInt(), slsize[1].toInt());
-
-  fixPosition<QPointF>(screen_size, QSizeF(0, 0), layout->circle.center);
-  fixParams(screen_size, &layout->menu);
-  fixParams(screen_size, &layout->magnifier);
-
-  for (QString panel : layout->panels.keys())
-    fixParams(screen_size, &layout->panels[panel].params);
+QSize RLIConfig::parseSize(const QString& text) {
+  QStringList slsize = text.split("x");
+  return QSize(slsize[0].toInt(), slsize[1].toInt());
 }
 
-void RLIConfig::fixParams(QSize screen_size, QMap<QString, QString>* params) {
-  QSize _size = QSize(params->value("width").toInt(), params->value("height").toInt());
-  QPoint _position = QPoint(params->value("x").toInt(), params->value("y").toInt());
+QPoint RLIConfig::parsePoint(const QSize& scr_sz, const QSize& sz, const QString& text) {
+  QStringList slpoint = text.split(",");
+  int x = slpoint[0].replace("[^0-9]", "").toInt();
+  int y = slpoint[1].replace("[^0-9]", "").toInt();
 
-  fixPosition(screen_size, _size, _position);
+  if (x < 0) x += scr_sz.width()  - sz.width();
+  if (y < 0) y += scr_sz.height() - sz.height();
 
-  params->operator []("x") = QString::number(_position.x());
-  params->operator []("y") = QString::number(_position.y());
+  return QPoint(x, y);
 }
 
-template<typename P>
-void RLIConfig::fixPosition(QSizeF screen_size, QSizeF size, P& p) {
-  if (p.x() < 0) p.setX(p.x() + screen_size.width() + -size.width());
-  if (p.y() < 0) p.setY(p.y() + screen_size.height() + -size.height());
-}
-
-
-RLILayout* RLIConfig::readLayout(QXmlStreamReader* xml) {
+RLILayout* RLIConfig::readLayout(const QSize& scr_sz, QXmlStreamReader* xml) {
   RLILayout* layout = new RLILayout;
   QMap<QString, QString> params;
 
   while (!xml->atEnd()) {
     switch (xml->readNext()) {
     case QXmlStreamReader::StartElement:
-      if (xml->name() == "rli-circle") {
+      if (xml->name() == "circle") {
         params = readXMLAttributes(xml);
         RLICircleInfo cInfo;
 
-        cInfo.center = QPointF(params["x"].toFloat(), params["y"].toFloat());
-        cInfo.radius = params["radius"].toFloat();
+        cInfo.radius = params["radius"].toInt();
+        QSize rectSize(2*cInfo.radius-1, 2*cInfo.radius-1);
 
-        QPointF topLeft = cInfo.center - QPointF(cInfo.radius, cInfo.radius);
-        QSizeF rectSize(2*cInfo.radius-1, 2*cInfo.radius-1);
+        cInfo.center = parsePoint(scr_sz, rectSize, params["center"]);
+        QPoint topLeft = cInfo.center - QPoint(cInfo.radius, cInfo.radius);
 
-        cInfo.boundRect = QRectF(topLeft, rectSize);
+        cInfo.boundRect = QRect(topLeft, rectSize);
         cInfo.font = params["font"];
 
         layout->circle = cInfo;
       }
 
-      if (xml->name() == "menu")
-        layout->menu = readXMLAttributes(xml);
+      if (xml->name() == "menu") {
+        parsePanelAttributes(scr_sz, xml, &layout->menu);
+      }
 
-      if (xml->name() == "magnifier")
-        layout->magnifier = readXMLAttributes(xml);
+      if (xml->name() == "magnifier") {
+        parsePanelAttributes(scr_sz, xml, &layout->magn);
+      }
 
-      if (xml->name() == "panels")
-        layout->panels = readPanelLayouts(xml);
+      if (xml->name() == "panels") {
+        layout->panels = readPanelLayouts(scr_sz, xml);
+      }
 
       break;
     case QXmlStreamReader::EndElement:
@@ -172,7 +133,13 @@ RLIPanelTableInfo RLIConfig::readTableInfo(QXmlStreamReader* xml) {
   return tableInfo;
 }
 
-QMap<QString, RLIPanelInfo> RLIConfig::readPanelLayouts(QXmlStreamReader* xml) {
+void RLIConfig::parsePanelAttributes(const QSize& scr_sz, QXmlStreamReader* xml, RLIPanelInfo* panel) {
+  panel->params = readXMLAttributes(xml);
+  panel->size = parseSize(panel->params["size"]);
+  panel->position = parsePoint(scr_sz, panel->size, panel->params["pos"]);
+}
+
+QMap<QString, RLIPanelInfo> RLIConfig::readPanelLayouts(const QSize& scr_sz, QXmlStreamReader* xml) {
   QMap<QString, RLIPanelInfo> panels;
   RLIPanelInfo current_panel;
 
@@ -181,7 +148,7 @@ QMap<QString, RLIPanelInfo> RLIConfig::readPanelLayouts(QXmlStreamReader* xml) {
     case QXmlStreamReader::StartElement:
       if (xml->name() == "panel" || xml->name() == "value-bar" || xml->name() == "label") {
         current_panel.clear();
-        current_panel.params = readXMLAttributes(xml);
+        parsePanelAttributes(scr_sz, xml, &current_panel);
       }
 
       if (xml->name() == "text") {

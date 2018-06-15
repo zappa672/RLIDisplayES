@@ -97,7 +97,8 @@ HEADERS     += \
     src/layers/routeengine.h \
     src/layers/targetengine.h \    
     src/layers/controlsengine.h \
-    src/layers/magnifierengine.h
+    src/layers/magnifierengine.h \
+    src/common/rlilayout.h
 
 FORMS       += \
     forms/mainwindow.ui \
@@ -111,5 +112,5 @@ RESOURCES   += \
 OTHER_FILES += \
 
 DISTFILES += \
-    config.xml \
-    chart_disp_conf.xml
+    chart_disp_conf.xml \
+    layouts.xml

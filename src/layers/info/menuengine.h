@@ -13,6 +13,7 @@
 
 #include "infofonts.h"
 #include "../../common/rlistrings.h"
+#include "../../common/rliconfig.h"
 #include "../routeengine.h"
 
 
@@ -169,7 +170,7 @@ class MenuEngine : public QObject, protected QOpenGLFunctions {
 public:
   enum MenuState { DISABLED, MAIN, CONFIG };
 
-  explicit MenuEngine(const QMap<QString, QString>& params, QOpenGLContext* context, QObject* parent = 0);
+  explicit MenuEngine(const RLIPanelInfo& params, QOpenGLContext* context, QObject* parent = 0);
   virtual ~MenuEngine();
 
   inline QPoint position() { return _position; }
@@ -180,7 +181,7 @@ public:
 
   inline void setFonts(InfoFonts* fonts) { _fonts = fonts; }
 
-  void resize(const QMap<QString, QString>& params);
+  void resize(const QSize& sz, const QPoint &pos, const QString& font);
 
   inline MenuState state() { return _state; }
   inline bool visible() { return _state != DISABLED; }

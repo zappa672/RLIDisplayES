@@ -11,22 +11,22 @@
 #include <QOpenGLFramebufferObject>
 #include <QOpenGLShaderProgram>
 
+#include "../common/rliconfig.h"
+
 
 class MagnifierEngine : public QObject, protected QOpenGLFunctions {
   Q_OBJECT
 
 public:
-  explicit MagnifierEngine (const QMap<QString, QString>& params, QOpenGLContext* context, QObject* parent = 0);
+  explicit MagnifierEngine (const RLIPanelInfo& params, QOpenGLContext* context, QObject* parent = 0);
   virtual ~MagnifierEngine ();
 
   inline bool visible()     { return _visible; }
   inline void setVisible(bool val) { _visible = val; }
 
-  inline QPoint position()  { return _position; }
-  inline QSize  size()      { return _size; }
   inline GLuint texture()   { return _fbo->texture(); }
 
-  void resize (const QMap<QString, QString>& params);
+  void resize(const QSize& sz);
 
 private slots:
 
@@ -42,8 +42,6 @@ private:
   void drawPelengs(GLuint amp_vbo_id, GLuint pal_tex_id, int pel_len, int pel_cnt, int min_pel, int min_rad);
 
   bool _visible;
-  QPoint _position;
-  QSize _size;
 
   QOpenGLFramebufferObject* _fbo;
   QOpenGLShaderProgram* _prog;

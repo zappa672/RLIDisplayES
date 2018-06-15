@@ -38,12 +38,7 @@ void InfoBlockController::onLanguageChanged(int lang_id) {
 
 void InfoBlockController::setupBlock(InfoBlock* b, const RLIPanelInfo& panelInfo) {
   _block = b;
-
-  QPoint leftTop(panelInfo.params["x"].toInt(), panelInfo.params["y"].toInt());
-  QSize size(panelInfo.params["width"].toInt(), panelInfo.params["height"].toInt());
-
-  _block->setGeometry(QRect(leftTop, size));
-
+  _block->setGeometry(QRect(panelInfo.position, panelInfo.size));
   initBlock(panelInfo);
 }
 

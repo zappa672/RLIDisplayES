@@ -116,8 +116,9 @@ MainWindow::~MainWindow() {
   delete ui;
 }
 
-void MainWindow::resizeEvent(QResizeEvent* e) {
-  bool showButtonPanel = RLIConfig::instance().showButtonPanel();
+void MainWindow::resizeEvent(QResizeEvent* e) {  
+  bool showButtonPanel = qApp->property(PROPERTY_SHOW_BUTTON_PANEL).toBool();
+
   wgtButtonPanel->setVisible(showButtonPanel);
   wgtButtonPanel->move( width() - wgtButtonPanel->width(), 0 );
 
@@ -284,7 +285,7 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
        wgtRLI->onMenuToggled();
      break;
   // Шкала +
-  case Qt::Key_Plus:  
+  case Qt::Key_Plus:
     chartScale = RLIState::instance().chartScale();
     chartScale *= 0.95;
     RLIState::instance().onChartScaleChanged(chartScale);

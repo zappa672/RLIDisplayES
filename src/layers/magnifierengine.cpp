@@ -2,7 +2,7 @@
 
 #include <vector>
 
-MagnifierEngine::MagnifierEngine(const QMap<QString, QString>& params, QOpenGLContext* context, QObject* parent)
+MagnifierEngine::MagnifierEngine(const RLIPanelInfo& params, QOpenGLContext* context, QObject* parent)
   : QObject(parent), QOpenGLFunctions(context) {
   initializeOpenGLFunctions();
 
@@ -15,7 +15,7 @@ MagnifierEngine::MagnifierEngine(const QMap<QString, QString>& params, QOpenGLCo
 
   initShaders();
 
-  resize(params);
+  resize(params.size);
 }
 
 MagnifierEngine::~MagnifierEngine() {
@@ -26,14 +26,11 @@ MagnifierEngine::~MagnifierEngine() {
   glDeleteBuffers(MAGN_ATTR_COUNT, _vbo_ids_radar);
 }
 
-void MagnifierEngine::resize(const QMap<QString, QString>& params) {
-  _size = QSize(params["width"].toInt(), params["height"].toInt());
-  _position = QPoint(params["x"].toInt(), params["y"].toInt());
-
+void MagnifierEngine::resize(const QSize& sz) {
   if (_fbo != nullptr)
     delete _fbo;
 
-  _fbo = new QOpenGLFramebufferObject(_size);
+  _fbo = new QOpenGLFramebufferObject(sz);
   initBorderBuffers();
   initRadarBuffers();
 }
@@ -42,7 +39,7 @@ void MagnifierEngine::update(GLuint amp_vbo_id, GLuint pal_tex_id, int pel_len, 
   if (!_visible)
     return;
 
-  glViewport(0, 0, _size.width(), _size.height());
+  glViewport(0, 0, _fbo->width(), _fbo->height());
 
   _fbo->bind();
 
@@ -51,7 +48,7 @@ void MagnifierEngine::update(GLuint amp_vbo_id, GLuint pal_tex_id, int pel_len, 
 
   QMatrix4x4 projection;
   projection.setToIdentity();
-  projection.ortho(0.f, _size.width(), _size.height(), 0.f, -1.f, 1.f);
+  projection.ortho(0.f, _fbo->width(), _fbo->height(), 0.f, -1.f, 1.f);
 
   _prog->bind();
 
@@ -71,11 +68,11 @@ void MagnifierEngine::drawPelengs(GLuint amp_vbo_id, GLuint pal_tex_id, int pel_
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, pal_tex_id);
 
-  for (int i = 0; i < _size.width() - 2; i++) {
+  for (int i = 0; i < _fbo->width() - 2; i++) {
     glUniform4f(_unif_locs[MAGN_UNIF_COLOR], 1.0f*(i%2), 1.0f, 0.0f, 1.0f);
 
     glBindBuffer(GL_ARRAY_BUFFER, _vbo_ids_radar[MAGN_ATTR_POSITION]);
-    glVertexAttribPointer(_attr_locs[MAGN_ATTR_POSITION], 2, GL_FLOAT, GL_FALSE, 0, (void*) (2 * (_size.height()-2) * i * sizeof(GLfloat)));
+    glVertexAttribPointer(_attr_locs[MAGN_ATTR_POSITION], 2, GL_FLOAT, GL_FALSE, 0, (void*) (2 * (_fbo->height()-2) * i * sizeof(GLfloat)));
     glEnableVertexAttribArray(_attr_locs[MAGN_ATTR_POSITION]);
 
     int amp_shift = ((min_pel + i) % pel_cnt) * pel_len + min_rad;
@@ -84,7 +81,7 @@ void MagnifierEngine::drawPelengs(GLuint amp_vbo_id, GLuint pal_tex_id, int pel_
     glVertexAttribPointer(_attr_locs[MAGN_ATTR_AMPLITUDE], 1, GL_FLOAT, GL_FALSE, 0, (void*) (amp_shift * sizeof(GLfloat)));
     glEnableVertexAttribArray(_attr_locs[MAGN_ATTR_AMPLITUDE]);
 
-    glDrawArrays(GL_POINTS, 0, (_size.height()-2));
+    glDrawArrays(GL_POINTS, 0, (_fbo->height()-2));
   }
 
   glBindTexture(GL_TEXTURE_2D, 0);
@@ -126,11 +123,10 @@ void MagnifierEngine::initShaders() {
 }
 
 void MagnifierEngine::initBorderBuffers() {
-  QSizeF s(_size);
-  GLfloat positions[] { 0.f, 0.f
-                      , 0.f, static_cast<GLfloat>(_size.height()-1)
-                      , static_cast<GLfloat>(s.width()), static_cast<GLfloat>(s.height()-1)
-                      , static_cast<GLfloat>(s.width()), 0.f };
+  GLfloat positions[] { 0.f                 , 0.f
+                      , 0.f                 , _fbo->height()-1.f
+                      , _fbo->width()-0.f   , _fbo->height()-1.f
+                      , _fbo->width()-0.f   , 0.f                 };
 
   glBindBuffer(GL_ARRAY_BUFFER, _vbo_ids_border[MAGN_ATTR_POSITION]);
   glBufferData(GL_ARRAY_BUFFER, 8*sizeof(GLfloat), positions, GL_STATIC_DRAW);
@@ -141,8 +137,8 @@ void MagnifierEngine::initBorderBuffers() {
 void MagnifierEngine::initRadarBuffers() {
   std::vector<GLfloat> positions;
 
-  for (int i = 2; i < _size.width(); i++) {
-    for (int j = 1; j < _size.height()-1; j++) {
+  for (int i = 2; i < _fbo->width(); i++) {
+    for (int j = 1; j < _fbo->height()-1; j++) {
       positions.push_back(i);
       positions.push_back(j);
     }

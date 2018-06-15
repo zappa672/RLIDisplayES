@@ -173,7 +173,7 @@ RLIMenuItemFloat::RLIMenuItemFloat(char** name, float min, float max, float def)
 
 
 
-MenuEngine::MenuEngine(const QMap<QString, QString>& params, QOpenGLContext* context, QObject* parent)
+MenuEngine::MenuEngine(const RLIPanelInfo& params, QOpenGLContext* context, QObject* parent)
   : QObject(parent), QOpenGLFunctions(context)  {
 
   initializeOpenGLFunctions();
@@ -191,7 +191,7 @@ MenuEngine::MenuEngine(const QMap<QString, QString>& params, QOpenGLContext* con
   _dec = QTextCodec::codecForName("UTF8")->makeDecoder();
   _dec1 = QTextCodec::codecForName("cp866")->makeDecoder();
 
-  resize(params);
+  resize(params.size, params.position, params.params["font"]);
 
   glGenBuffers(INFO_ATTR_COUNT, _vbo_ids);
   initShader();
@@ -732,11 +732,10 @@ void MenuEngine::onBack() {
 }
 
 
-void MenuEngine::resize(const QMap<QString, QString>& params) {
-  _size = QSize(params["width"].toInt(), params["height"].toInt());
-  _position = QPoint(params["x"].toInt(), params["y"].toInt());
-
-  _font_tag = params["font"];
+void MenuEngine::resize(const QSize& sz, const QPoint &pos, const QString& font) {
+  _size = sz;
+  _position = pos;
+  _font_tag = font;
 
   if (_fbo != nullptr)
     delete _fbo;

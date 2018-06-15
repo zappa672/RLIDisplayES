@@ -23,6 +23,7 @@ int main(int argc, char *argv[]) {
   QStringList args = a.arguments();
 
   if (args.contains("--help")) {
+    qDebug() << "-bp to show debug buttons panel";
     qDebug() << "-p to setup peleng size (default: 800)";
     qDebug() << "-b to setup count of pelengs per circle (default: 4096)";
     qDebug() << "-f to setup delay between frames in milliseconds (default: 25)";
@@ -31,6 +32,11 @@ int main(int argc, char *argv[]) {
     qDebug() << "-w to setup rliwidget size (example: 1024x768, no default, depends on screen size)";
     return 0;
   }
+
+  if (args.contains("-bp"))
+    a.setProperty(PROPERTY_SHOW_BUTTON_PANEL, true);
+  else
+    a.setProperty(PROPERTY_SHOW_BUTTON_PANEL, false);
 
 
   if (args.contains("-p"))

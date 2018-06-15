@@ -61,10 +61,15 @@ protected slots:
   void resizeGL(int w, int h);
   void paintGL();
 
+  void keyReleaseEvent(QKeyEvent *event);
+  void keyPressEvent(QKeyEvent *event);
+
 private slots:
   void onNewChartAvailable(const QString& name);
 
 private:
+  QSet<int> pressedKeys;
+
   bool _initialized;
 
   QMutex frameRateMutex;

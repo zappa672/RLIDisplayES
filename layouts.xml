@@ -1,0 +1,636 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layouts default="1920x1080">
+  <layout size="1280x1024">
+    <circle center="512,512" radius="480" font="F8X8B" />
+    <menu pos="-4,152" size="236x262" font="F12X14B" />
+    <magnifier pos="-10,155" size="224x224" />
+
+    <panels>
+      <value-bar name="gain"      pos="4,4"     size="151x21"   bar_width="50"  font="F12X14B" />
+      <value-bar name="water"     pos="4,29"    size="151x21"   bar_width="50"  font="F12X14B" />
+      <value-bar name="rain"      pos="4,54"    size="151x21"   bar_width="50"  font="F12X14B" />
+      <value-bar name="apch"      pos="4,79"    size="151x21"   bar_width="50"  font="F12X14B" />
+      <value-bar name="emission"  pos="159,4"   size="163x21"   bar_width="50"  font="F12X14B" />
+
+      <label name="label5"    pos="4,104"     size="102x20"   font="F12X14B" />
+      <label name="band"      pos="4,128"     size="102x20"   font="F12X14B" />
+      <label name="label1"    pos="-244,44"   size="112x20"   font="F12X14B" />
+      <label name="label2"    pos="-244,68"   size="112x20"   font="F12X14B" />
+      <label name="label3"    pos="-244,92"   size="112x20"   font="F12X14B" />
+      <label name="label4"    pos="-244,-68"  size="96x32"    font="F16X28B" />
+
+      <panel name="fps" pos="4,152" size="102x22">
+        <text name="label" rect="5x5x92x14" allign="left"   font="F12X14B" />
+        <text name="value" rect="5x5x92x14" allign="right"  font="F12X14B" />
+      </panel>
+
+      <!-- rect="left_x_top_x_width_x_height" -->
+      <panel name="scale" pos="-244,4" size="236x36">
+        <text name="scale1"   rect="5x5x80x28"      allign="center"   font="F16X28B" />
+        <text name="slash"    rect="85x5x16x28"     allign="center"   font="F16X28B" />
+        <text name="scale2"   rect="101x16x70x14"   allign="center"   font="F14X14B" />
+        <text name="units"    rect="176x12x56x14"   allign="center"   font="F14X14B" />
+        <rect name="splitter" rect="174x0x1x36" />
+      </panel>
+
+      <panel name="vn" pos="4,-4" size="140x66">
+        <text name="header" rect="0x6x132x14" allign="center" font="F12X14B" />
+        <table name="table" top="28" row_height="18">
+          <column left="4"    width="36" allign="left"  font="F12X14B" />
+          <column left="40"   width="60" allign="right" font="F12X14B" />
+          <column left="100"  width="36" allign="left"  font="F8X14B" />
+        </table>
+      </panel>
+
+      <panel name="vd" pos="-244,-4" size="140x52">
+        <text name="header" rect="0x6x132x14" allign="center" font="F12X14B" />
+        <table name="table" top="28" row_height="18">
+          <column left="4"    width="90" allign="right" font="F12X14B" />
+          <column left="100"  width="40" allign="left"  font="F8X14B" />
+        </table>
+      </panel>
+
+      <panel name="course" pos="-4,4" size="236x38">
+        <table name="table" top="4" row_height="18">
+          <column left="4"    width="116" allign="left"   font="F12X14B" />
+          <column left="120"  width="60"  allign="right"  font="F12X14B" />
+          <column left="186"  width="36"  allign="left"   font="F8X14B" />
+        </table>
+      </panel>
+
+      <panel name="position" pos="-4,46" size="236x38">
+        <table name="table" top="4" row_height="18">
+          <column left="4"    width="116" allign="left"   font="F12X14B" />
+          <column left="120"  width="112" allign="right"  font="F12X14B" />
+        </table>
+      </panel>
+
+      <panel name="blank" pos="-4,88" size="236x38">
+      </panel>
+
+      <panel name="clock" pos="-4,130" size="236x18">
+        <text name="label" rect="4x4x80x14" allign="center" font="F12X14B" />
+        <text name="time" rect="120x4x96x14" allign="center" font="F12X14B" />
+      </panel>
+
+      <panel name="danger" pos="-4,-330" size="236x20">
+        <text name="label" rect="0x0x236x20" allign="center" font="F12X14B" />
+      </panel>
+
+      <panel name="tails" pos="-4,-306" size="236x20">
+        <table name="table" top="3" row_height="18">
+          <column left="4" width="116" allign="left" font="F12X14B" />
+          <column left="120" width="60" allign="right" font="F12X14B" />
+          <column left="186" width="36" allign="left" font="F8X14B" />
+        </table>
+      </panel>
+
+      <panel name="danger-details" pos="-4,-264" size="236x38">
+        <table name="table" top="3" row_height="18">
+          <column left="4" width="116" allign="left" font="F12X14B" />
+          <column left="120" width="60" allign="right" font="F12X14B" />
+          <column left="186" width="36" allign="left" font="F8X14B" />
+        </table>
+      </panel>
+
+      <panel name="vector" pos="-4,-240" size="236x20">
+        <table name="table" top="3" row_height="18">
+          <column left="4" width="116" allign="left" font="F12X14B" />
+          <column left="120" width="60" allign="right" font="F12X14B" />
+          <column left="186" width="36" allign="left" font="F8X14B" />
+        </table>
+      </panel>
+
+      <panel name="targets" pos="-4,-68" size="236x168">
+        <rect name="header-middle" rect="118x0x1x20" />
+        <rect name="header-bottom" rect="0x20x236x1" />
+
+        <text name="header" rect="4x4x228x14" allign="left" font="F12X14B" />
+        <text name="current-target" rect="4x4x110x14" allign="right" font="F12X14B" />
+        <text name="target-count" rect="4x4x228x14" allign="right" font="F12X14B" />
+
+        <table name="table" top="24" row_height="18">
+          <column left="4" width="116" allign="left" font="F12X14B" />
+          <column left="120" width="60" allign="right" font="F12X14B" />
+          <column left="186" width="36" allign="left" font="F8X14B" />
+        </table>
+      </panel>
+
+      <panel name="cursor" pos="-4,-4" size="236x60">
+        <text name="header" rect="0x4x236x14" allign="center" font="F12X14B" />
+        <table name="table" top="24" row_height="18">
+          <column left="4" width="116" allign="left" font="F12X14B" />
+          <column left="120" width="60" allign="right" font="F12X14B" />
+          <column left="186" width="36" allign="left" font="F8X14B" />
+        </table>
+      </panel>
+    </panels>
+  </layout>
+
+  <layout size="1440x1080">
+    <circle center="540,540" radius="500" font="F8X8B" />
+    <menu pos="-4,152" size="236x262" font="F12X14B" />
+    <magnifier pos="-10,155" size="224x224" />
+
+    <panels>
+      <value-bar name="gain"      pos="4,4"     size="151x21"   bar_width="50"  font="F12X14B" />
+      <value-bar name="water"     pos="4,29"    size="151x21"   bar_width="50"  font="F12X14B" />
+      <value-bar name="rain"      pos="4,54"    size="151x21"   bar_width="50"  font="F12X14B" />
+      <value-bar name="apch"      pos="4,79"    size="151x21"   bar_width="50"  font="F12X14B" />
+      <value-bar name="emission"  pos="159,4"   size="163x21"   bar_width="50"  font="F12X14B" />
+
+      <label name="label5"    pos="4,104"     size="102x20"   font="F12X14B" />
+      <label name="band"      pos="4,128"     size="102x20"   font="F12X14B" />
+      <label name="label1"    pos="-244,44"   size="112x20"   font="F12X14B" />
+      <label name="label2"    pos="-244,68"   size="112x20"   font="F12X14B" />
+      <label name="label3"    pos="-244,92"   size="112x20"   font="F12X14B" />
+      <label name="label4"    pos="-244,-68"  size="96x32"    font="F16X28B" />
+
+      <panel name="fps" pos="4,152" size="102x22">
+        <text name="label" rect="5x5x92x14" allign="left"   font="F12X14B" />
+        <text name="value" rect="5x5x92x14" allign="right"  font="F12X14B" />
+      </panel>
+
+      <!-- rect="left_x_top_x_width_x_height" -->
+      <panel name="scale" pos="-244,4" size="236x36">
+        <text name="scale1"   rect="5x5x80x28"      allign="center"   font="F16X28B" />
+        <text name="slash"    rect="85x5x16x28"     allign="center"   font="F16X28B" />
+        <text name="scale2"   rect="101x16x70x14"   allign="center"   font="F14X14B" />
+        <text name="units"    rect="176x12x56x14"   allign="center"   font="F14X14B" />
+        <rect name="splitter" rect="174x0x1x36" />
+      </panel>
+
+      <panel name="vn" pos="4,-4" size="140x66">
+        <text name="header" rect="0x6x132x14" allign="center" font="F12X14B" />
+        <table name="table" top="28" row_height="18">
+          <column left="4"    width="36" allign="left"  font="F12X14B" />
+          <column left="40"   width="60" allign="right" font="F12X14B" />
+          <column left="100"  width="36" allign="left"  font="F8X14B" />
+        </table>
+      </panel>
+
+      <panel name="vd" pos="-244,-4" size="140x52">
+        <text name="header" rect="0x6x132x14" allign="center" font="F12X14B" />
+        <table name="table" top="28" row_height="18">
+          <column left="4"    width="90" allign="right" font="F12X14B" />
+          <column left="100"  width="40" allign="left"  font="F8X14B" />
+        </table>
+      </panel>
+
+      <panel name="course" pos="-4,4" size="236x38">
+        <table name="table" top="4" row_height="18">
+          <column left="4"    width="116" allign="left"   font="F12X14B" />
+          <column left="120"  width="60"  allign="right"  font="F12X14B" />
+          <column left="186"  width="36"  allign="left"   font="F8X14B" />
+        </table>
+      </panel>
+
+      <panel name="position" pos="-4,46" size="236x38">
+        <table name="table" top="4" row_height="18">
+          <column left="4"    width="116" allign="left"   font="F12X14B" />
+          <column left="120"  width="112" allign="right"  font="F12X14B" />
+        </table>
+      </panel>
+
+      <panel name="blank" pos="-4,88" size="236x38">
+      </panel>
+
+      <panel name="clock" pos="-4,130" size="236x18">
+        <text name="label" rect="4x4x80x14" allign="center" font="F12X14B" />
+        <text name="time" rect="120x4x96x14" allign="center" font="F12X14B" />
+      </panel>
+
+      <panel name="danger" pos="-4,-330" size="236x20">
+        <text name="label" rect="0x0x236x20" allign="center" font="F12X14B" />
+      </panel>
+
+      <panel name="tails" pos="-4,-306" size="236x20">
+        <table name="table" top="3" row_height="18">
+          <column left="4" width="116" allign="left" font="F12X14B" />
+          <column left="120" width="60" allign="right" font="F12X14B" />
+          <column left="186" width="36" allign="left" font="F8X14B" />
+        </table>
+      </panel>
+
+      <panel name="danger-details" pos="-4,-264" size="236x38">
+        <table name="table" top="3" row_height="18">
+          <column left="4" width="116" allign="left" font="F12X14B" />
+          <column left="120" width="60" allign="right" font="F12X14B" />
+          <column left="186" width="36" allign="left" font="F8X14B" />
+        </table>
+      </panel>
+
+      <panel name="vector" pos="-4,-240" size="236x20">
+        <table name="table" top="3" row_height="18">
+          <column left="4" width="116" allign="left" font="F12X14B" />
+          <column left="120" width="60" allign="right" font="F12X14B" />
+          <column left="186" width="36" allign="left" font="F8X14B" />
+        </table>
+      </panel>
+
+      <panel name="targets" pos="-4,-68" size="236x168">
+        <rect name="header-middle" rect="118x0x1x20" />
+        <rect name="header-bottom" rect="0x20x236x1" />
+
+        <text name="header" rect="4x4x228x14" allign="left" font="F12X14B" />
+        <text name="current-target" rect="4x4x110x14" allign="right" font="F12X14B" />
+        <text name="target-count" rect="4x4x228x14" allign="right" font="F12X14B" />
+
+        <table name="table" top="24" row_height="18">
+          <column left="4" width="116" allign="left" font="F12X14B" />
+          <column left="120" width="60" allign="right" font="F12X14B" />
+          <column left="186" width="36" allign="left" font="F8X14B" />
+        </table>
+      </panel>
+
+      <panel name="cursor" pos="-4,-4" size="236x60">
+        <text name="header" rect="0x4x236x14" allign="center" font="F12X14B" />
+        <table name="table" top="24" row_height="18">
+          <column left="4" width="116" allign="left" font="F12X14B" />
+          <column left="120" width="60" allign="right" font="F12X14B" />
+          <column left="186" width="36" allign="left" font="F8X14B" />
+        </table>
+      </panel>
+    </panels>
+  </layout>
+
+  <layout size="1920x1080">
+    <circle center="800,540" radius="514" font="F8X8B" />
+    <menu pos="-4,152" size="236x262" font="F12X14B" />
+    <magnifier pos="-10,155" size="224x224" />
+
+    <panels>
+      <value-bar name="gain"      pos="4,4"     size="151x21"   bar_width="50"  font="F12X14B" />
+      <value-bar name="water"     pos="4,29"    size="151x21"   bar_width="50"  font="F12X14B" />
+      <value-bar name="rain"      pos="4,54"    size="151x21"   bar_width="50"  font="F12X14B" />
+      <value-bar name="apch"      pos="4,79"    size="151x21"   bar_width="50"  font="F12X14B" />
+      <value-bar name="emission"  pos="159,4"   size="163x21"   bar_width="50"  font="F12X14B" />
+
+      <label name="label5"    pos="4,104"     size="102x20"   font="F12X14B" />
+      <label name="band"      pos="4,128"     size="102x20"   font="F12X14B" />
+      <label name="label1"    pos="-244,44"   size="112x20"   font="F12X14B" />
+      <label name="label2"    pos="-244,68"   size="112x20"   font="F12X14B" />
+      <label name="label3"    pos="-244,92"   size="112x20"   font="F12X14B" />
+      <label name="label4"    pos="-244,-68"  size="96x32"    font="F16X28B" />
+
+      <panel name="fps" pos="4,152" size="102x22">
+        <text name="label" rect="5x5x92x14" allign="left"   font="F12X14B" />
+        <text name="value" rect="5x5x92x14" allign="right"  font="F12X14B" />
+      </panel>
+
+      <!-- rect="left_x_top_x_width_x_height" -->
+      <panel name="scale" pos="-244,4" size="236x36">
+        <text name="scale1"   rect="5x5x80x28"      allign="center"   font="F16X28B" />
+        <text name="slash"    rect="85x5x16x28"     allign="center"   font="F16X28B" />
+        <text name="scale2"   rect="101x16x70x14"   allign="center"   font="F14X14B" />
+        <text name="units"    rect="176x12x56x14"   allign="center"   font="F14X14B" />
+        <rect name="splitter" rect="174x0x1x36" />
+      </panel>
+
+      <panel name="vn" pos="4,-4" size="140x66">
+        <text name="header" rect="0x6x132x14" allign="center" font="F12X14B" />
+        <table name="table" top="28" row_height="18">
+          <column left="4"    width="36" allign="left"  font="F12X14B" />
+          <column left="40"   width="60" allign="right" font="F12X14B" />
+          <column left="100"  width="36" allign="left"  font="F8X14B" />
+        </table>
+      </panel>
+
+      <panel name="vd" pos="-244,-4" size="140x52">
+        <text name="header" rect="0x6x132x14" allign="center" font="F12X14B" />
+        <table name="table" top="28" row_height="18">
+          <column left="4"    width="90" allign="right" font="F12X14B" />
+          <column left="100"  width="40" allign="left"  font="F8X14B" />
+        </table>
+      </panel>
+
+      <panel name="course" pos="-4,4" size="236x38">
+        <table name="table" top="4" row_height="18">
+          <column left="4"    width="116" allign="left"   font="F12X14B" />
+          <column left="120"  width="60"  allign="right"  font="F12X14B" />
+          <column left="186"  width="36"  allign="left"   font="F8X14B" />
+        </table>
+      </panel>
+
+      <panel name="position" pos="-4,46" size="236x38">
+        <table name="table" top="4" row_height="18">
+          <column left="4"    width="116" allign="left"   font="F12X14B" />
+          <column left="120"  width="112" allign="right"  font="F12X14B" />
+        </table>
+      </panel>
+
+      <panel name="blank" pos="-4,88" size="236x38">
+      </panel>
+
+      <panel name="clock" pos="-4,130" size="236x18">
+        <text name="label" rect="4x4x80x14" allign="center" font="F12X14B" />
+        <text name="time" rect="120x4x96x14" allign="center" font="F12X14B" />
+      </panel>
+
+      <panel name="danger" pos="-4,-330" size="236x20">
+        <text name="label" rect="0x0x236x20" allign="center" font="F12X14B" />
+      </panel>
+
+      <panel name="tails" pos="-4,-306" size="236x20">
+        <table name="table" top="3" row_height="18">
+          <column left="4" width="116" allign="left" font="F12X14B" />
+          <column left="120" width="60" allign="right" font="F12X14B" />
+          <column left="186" width="36" allign="left" font="F8X14B" />
+        </table>
+      </panel>
+
+      <panel name="danger-details" pos="-4,-264" size="236x38">
+        <table name="table" top="3" row_height="18">
+          <column left="4" width="116" allign="left" font="F12X14B" />
+          <column left="120" width="60" allign="right" font="F12X14B" />
+          <column left="186" width="36" allign="left" font="F8X14B" />
+        </table>
+      </panel>
+
+      <panel name="vector" pos="-4,-240" size="236x20">
+        <table name="table" top="3" row_height="18">
+          <column left="4" width="116" allign="left" font="F12X14B" />
+          <column left="120" width="60" allign="right" font="F12X14B" />
+          <column left="186" width="36" allign="left" font="F8X14B" />
+        </table>
+      </panel>
+
+      <panel name="targets" pos="-4,-68" size="236x168">
+        <rect name="header-middle" rect="118x0x1x20" />
+        <rect name="header-bottom" rect="0x20x236x1" />
+
+        <text name="header" rect="4x4x228x14" allign="left" font="F12X14B" />
+        <text name="current-target" rect="4x4x110x14" allign="right" font="F12X14B" />
+        <text name="target-count" rect="4x4x228x14" allign="right" font="F12X14B" />
+
+        <table name="table" top="24" row_height="18">
+          <column left="4" width="116" allign="left" font="F12X14B" />
+          <column left="120" width="60" allign="right" font="F12X14B" />
+          <column left="186" width="36" allign="left" font="F8X14B" />
+        </table>
+      </panel>
+
+      <panel name="cursor" pos="-4,-4" size="236x60">
+        <text name="header" rect="0x4x236x14" allign="center" font="F12X14B" />
+        <table name="table" top="24" row_height="18">
+          <column left="4" width="116" allign="left" font="F12X14B" />
+          <column left="120" width="60" allign="right" font="F12X14B" />
+          <column left="186" width="36" allign="left" font="F8X14B" />
+        </table>
+      </panel>
+    </panels>
+  </layout>
+
+  <layout size="1024x768">
+    <circle center="404,384" radius="360" font="F8X8B" />
+    <menu pos="-4,152" size="236x262" font="F12X14B" />
+    <magnifier pos="-10,155" size="224x224" />
+
+    <panels>
+      <value-bar name="gain"      pos="4,4"     size="151x21"   bar_width="50"  font="F12X14B" />
+      <value-bar name="water"     pos="4,29"    size="151x21"   bar_width="50"  font="F12X14B" />
+      <value-bar name="rain"      pos="4,54"    size="151x21"   bar_width="50"  font="F12X14B" />
+      <value-bar name="apch"      pos="4,79"    size="151x21"   bar_width="50"  font="F12X14B" />
+      <value-bar name="emission"  pos="159,4"   size="163x21"   bar_width="50"  font="F12X14B" />
+
+      <label name="label5"    pos="4,104"     size="102x20"   font="F12X14B" />
+      <label name="band"      pos="4,128"     size="102x20"   font="F12X14B" />
+      <label name="label1"    pos="-244,44"   size="112x20"   font="F12X14B" />
+      <label name="label2"    pos="-244,68"   size="112x20"   font="F12X14B" />
+      <label name="label3"    pos="-244,92"   size="112x20"   font="F12X14B" />
+      <label name="label4"    pos="-244,-68"  size="96x32"    font="F16X28B" />
+
+      <panel name="fps" pos="4,152" size="102x22">
+        <text name="label" rect="5x5x92x14" allign="left"   font="F12X14B" />
+        <text name="value" rect="5x5x92x14" allign="right"  font="F12X14B" />
+      </panel>
+
+      <!-- rect="left_x_top_x_width_x_height" -->
+      <panel name="scale" pos="-244,4" size="236x36">
+        <text name="scale1"   rect="5x5x80x28"      allign="center"   font="F16X28B" />
+        <text name="slash"    rect="85x5x16x28"     allign="center"   font="F16X28B" />
+        <text name="scale2"   rect="101x16x70x14"   allign="center"   font="F14X14B" />
+        <text name="units"    rect="176x12x56x14"   allign="center"   font="F14X14B" />
+        <rect name="splitter" rect="174x0x1x36" />
+      </panel>
+
+      <panel name="vn" pos="4,-4" size="140x66">
+        <text name="header" rect="0x6x132x14" allign="center" font="F12X14B" />
+        <table name="table" top="28" row_height="18">
+          <column left="4"    width="36" allign="left"  font="F12X14B" />
+          <column left="40"   width="60" allign="right" font="F12X14B" />
+          <column left="100"  width="36" allign="left"  font="F8X14B" />
+        </table>
+      </panel>
+
+      <panel name="vd" pos="-244,-4" size="140x52">
+        <text name="header" rect="0x6x132x14" allign="center" font="F12X14B" />
+        <table name="table" top="28" row_height="18">
+          <column left="4"    width="90" allign="right" font="F12X14B" />
+          <column left="100"  width="40" allign="left"  font="F8X14B" />
+        </table>
+      </panel>
+
+      <panel name="course" pos="-4,4" size="236x38">
+        <table name="table" top="4" row_height="18">
+          <column left="4"    width="116" allign="left"   font="F12X14B" />
+          <column left="120"  width="60"  allign="right"  font="F12X14B" />
+          <column left="186"  width="36"  allign="left"   font="F8X14B" />
+        </table>
+      </panel>
+
+      <panel name="position" pos="-4,46" size="236x38">
+        <table name="table" top="4" row_height="18">
+          <column left="4"    width="116" allign="left"   font="F12X14B" />
+          <column left="120"  width="112" allign="right"  font="F12X14B" />
+        </table>
+      </panel>
+
+      <panel name="blank" pos="-4,88" size="236x38">
+      </panel>
+
+      <panel name="clock" pos="-4,130" size="236x18">
+        <text name="label" rect="4x4x80x14" allign="center" font="F12X14B" />
+        <text name="time" rect="120x4x96x14" allign="center" font="F12X14B" />
+      </panel>
+
+      <panel name="danger" pos="-4,-330" size="236x20">
+        <text name="label" rect="0x0x236x20" allign="center" font="F12X14B" />
+      </panel>
+
+      <panel name="tails" pos="-4,-306" size="236x20">
+        <table name="table" top="3" row_height="18">
+          <column left="4" width="116" allign="left" font="F12X14B" />
+          <column left="120" width="60" allign="right" font="F12X14B" />
+          <column left="186" width="36" allign="left" font="F8X14B" />
+        </table>
+      </panel>
+
+      <panel name="danger-details" pos="-4,-264" size="236x38">
+        <table name="table" top="3" row_height="18">
+          <column left="4" width="116" allign="left" font="F12X14B" />
+          <column left="120" width="60" allign="right" font="F12X14B" />
+          <column left="186" width="36" allign="left" font="F8X14B" />
+        </table>
+      </panel>
+
+      <panel name="vector" pos="-4,-240" size="236x20">
+        <table name="table" top="3" row_height="18">
+          <column left="4" width="116" allign="left" font="F12X14B" />
+          <column left="120" width="60" allign="right" font="F12X14B" />
+          <column left="186" width="36" allign="left" font="F8X14B" />
+        </table>
+      </panel>
+
+      <panel name="targets" pos="-4,-68" size="236x168">
+        <rect name="header-middle" rect="118x0x1x20" />
+        <rect name="header-bottom" rect="0x20x236x1" />
+
+        <text name="header" rect="4x4x228x14" allign="left" font="F12X14B" />
+        <text name="current-target" rect="4x4x110x14" allign="right" font="F12X14B" />
+        <text name="target-count" rect="4x4x228x14" allign="right" font="F12X14B" />
+
+        <table name="table" top="24" row_height="18">
+          <column left="4" width="116" allign="left" font="F12X14B" />
+          <column left="120" width="60" allign="right" font="F12X14B" />
+          <column left="186" width="36" allign="left" font="F8X14B" />
+        </table>
+      </panel>
+
+      <panel name="cursor" pos="-4,-4" size="236x60">
+        <text name="header" rect="0x4x236x14" allign="center" font="F12X14B" />
+        <table name="table" top="24" row_height="18">
+          <column left="4" width="116" allign="left" font="F12X14B" />
+          <column left="120" width="60" allign="right" font="F12X14B" />
+          <column left="186" width="36" allign="left" font="F8X14B" />
+        </table>
+      </panel>
+    </panels>
+  </layout>
+
+  <layout size="1366x768">
+    <circle center="536,384" radius="360" font="F8X8B" />
+    <menu pos="-4,152" size="236x262" font="F12X14B" />
+    <magnifier pos="-10,155" size="224x224" />
+
+    <panels>
+      <value-bar name="gain"      pos="4,4"     size="151x21"   bar_width="50"  font="F12X14B" />
+      <value-bar name="water"     pos="4,29"    size="151x21"   bar_width="50"  font="F12X14B" />
+      <value-bar name="rain"      pos="4,54"    size="151x21"   bar_width="50"  font="F12X14B" />
+      <value-bar name="apch"      pos="4,79"    size="151x21"   bar_width="50"  font="F12X14B" />
+      <value-bar name="emission"  pos="159,4"   size="163x21"   bar_width="50"  font="F12X14B" />
+
+      <label name="label5"    pos="4,104"     size="102x20"   font="F12X14B" />
+      <label name="band"      pos="4,128"     size="102x20"   font="F12X14B" />
+      <label name="label1"    pos="-244,44"   size="112x20"   font="F12X14B" />
+      <label name="label2"    pos="-244,68"   size="112x20"   font="F12X14B" />
+      <label name="label3"    pos="-244,92"   size="112x20"   font="F12X14B" />
+      <label name="label4"    pos="-244,-68"  size="96x32"    font="F16X28B" />
+
+      <panel name="fps" pos="4,152" size="102x22">
+        <text name="label" rect="5x5x92x14" allign="left"   font="F12X14B" />
+        <text name="value" rect="5x5x92x14" allign="right"  font="F12X14B" />
+      </panel>
+
+      <!-- rect="left_x_top_x_width_x_height" -->
+      <panel name="scale" pos="-244,4" size="236x36">
+        <text name="scale1"   rect="5x5x80x28"      allign="center"   font="F16X28B" />
+        <text name="slash"    rect="85x5x16x28"     allign="center"   font="F16X28B" />
+        <text name="scale2"   rect="101x16x70x14"   allign="center"   font="F14X14B" />
+        <text name="units"    rect="176x12x56x14"   allign="center"   font="F14X14B" />
+        <rect name="splitter" rect="174x0x1x36" />
+      </panel>
+
+      <panel name="vn" pos="4,-4" size="140x66">
+        <text name="header" rect="0x6x132x14" allign="center" font="F12X14B" />
+        <table name="table" top="28" row_height="18">
+          <column left="4"    width="36" allign="left"  font="F12X14B" />
+          <column left="40"   width="60" allign="right" font="F12X14B" />
+          <column left="100"  width="36" allign="left"  font="F8X14B" />
+        </table>
+      </panel>
+
+      <panel name="vd" pos="-244,-4" size="140x52">
+        <text name="header" rect="0x6x132x14" allign="center" font="F12X14B" />
+        <table name="table" top="28" row_height="18">
+          <column left="4"    width="90" allign="right" font="F12X14B" />
+          <column left="100"  width="40" allign="left"  font="F8X14B" />
+        </table>
+      </panel>
+
+      <panel name="course" pos="-4,4" size="236x38">
+        <table name="table" top="4" row_height="18">
+          <column left="4"    width="116" allign="left"   font="F12X14B" />
+          <column left="120"  width="60"  allign="right"  font="F12X14B" />
+          <column left="186"  width="36"  allign="left"   font="F8X14B" />
+        </table>
+      </panel>
+
+      <panel name="position" pos="-4,46" size="236x38">
+        <table name="table" top="4" row_height="18">
+          <column left="4"    width="116" allign="left"   font="F12X14B" />
+          <column left="120"  width="112" allign="right"  font="F12X14B" />
+        </table>
+      </panel>
+
+      <panel name="blank" pos="-4,88" size="236x38">
+      </panel>
+
+      <panel name="clock" pos="-4,130" size="236x18">
+        <text name="label" rect="4x4x80x14" allign="center" font="F12X14B" />
+        <text name="time" rect="120x4x96x14" allign="center" font="F12X14B" />
+      </panel>
+
+      <panel name="danger" pos="-4,-330" size="236x20">
+        <text name="label" rect="0x0x236x20" allign="center" font="F12X14B" />
+      </panel>
+
+      <panel name="tails" pos="-4,-306" size="236x20">
+        <table name="table" top="3" row_height="18">
+          <column left="4" width="116" allign="left" font="F12X14B" />
+          <column left="120" width="60" allign="right" font="F12X14B" />
+          <column left="186" width="36" allign="left" font="F8X14B" />
+        </table>
+      </panel>
+
+      <panel name="danger-details" pos="-4,-264" size="236x38">
+        <table name="table" top="3" row_height="18">
+          <column left="4" width="116" allign="left" font="F12X14B" />
+          <column left="120" width="60" allign="right" font="F12X14B" />
+          <column left="186" width="36" allign="left" font="F8X14B" />
+        </table>
+      </panel>
+
+      <panel name="vector" pos="-4,-240" size="236x20">
+        <table name="table" top="3" row_height="18">
+          <column left="4" width="116" allign="left" font="F12X14B" />
+          <column left="120" width="60" allign="right" font="F12X14B" />
+          <column left="186" width="36" allign="left" font="F8X14B" />
+        </table>
+      </panel>
+
+      <panel name="targets" pos="-4,-68" size="236x168">
+        <rect name="header-middle" rect="118x0x1x20" />
+        <rect name="header-bottom" rect="0x20x236x1" />
+
+        <text name="header" rect="4x4x228x14" allign="left" font="F12X14B" />
+        <text name="current-target" rect="4x4x110x14" allign="right" font="F12X14B" />
+        <text name="target-count" rect="4x4x228x14" allign="right" font="F12X14B" />
+
+        <table name="table" top="24" row_height="18">
+          <column left="4" width="116" allign="left" font="F12X14B" />
+          <column left="120" width="60" allign="right" font="F12X14B" />
+          <column left="186" width="36" allign="left" font="F8X14B" />
+        </table>
+      </panel>
+
+      <panel name="cursor" pos="-4,-4" size="236x60">
+        <text name="header" rect="0x4x236x14" allign="center" font="F12X14B" />
+        <table name="table" top="24" row_height="18">
+          <column left="4" width="116" allign="left" font="F12X14B" />
+          <column left="120" width="60" allign="right" font="F12X14B" />
+          <column left="186" width="36" allign="left" font="F8X14B" />
+        </table>
+      </panel>
+    </panels>
+</layouts>
