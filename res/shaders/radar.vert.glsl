@@ -1,6 +1,5 @@
 uniform mat4 mvp_matrix;
 
-//attribute vec2 position;
 attribute float position;
 attribute float amplitude;
 
@@ -15,10 +14,11 @@ void main() {
 
   float angle = radians((360.0 * peleng_index) / peleng_count);
 
-  float x = radius * sin(angle);
+  float x =  radius * sin(angle);
   float y = -radius * cos(angle);
 
   gl_Position = mvp_matrix * vec4(x, y, -amplitude, 1.0);
-
+  if (length(gl_Position.xy) > 1.005)
+    gl_Position = vec4(0.0, 0.0, 0.0, 0.0);
   v_amp = amplitude;
 }

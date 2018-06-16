@@ -1,4 +1,4 @@
-varying float	v_color_index;
+varying float v_color_index;
 varying vec2	v_tex_dim;
 varying vec2	v_tex_orig;
 varying vec2	v_texcoords;
