@@ -1,11 +1,11 @@
+uniform sampler2D pattern_tex;
+uniform sampler2D color_table_tex;
+
 varying float v_color_index;
 varying vec2	v_tex_dim;
 varying vec2	v_tex_orig;
 varying vec2	v_texcoords;
 varying vec2	v_inner_texcoords;
-
-uniform sampler2D pattern_tex;
-uniform sampler2D color_table_tex;
 
 void main() {
   vec2 texcoords = (v_tex_orig + (fract(v_inner_texcoords) * v_tex_dim)) / v_texcoords;

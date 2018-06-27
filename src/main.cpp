@@ -31,7 +31,7 @@ int main(int argc, char *argv[]) {
     qDebug() << "-s to setup size of data blocks to send in pelengs (default: 64)";
     qDebug() << "-w to setup rliwidget size (example: 1024x768, no default, depends on screen size)";
     return 0;
-  }
+  }  
 
   if (args.contains("-bp"))
     a.setProperty(PROPERTY_SHOW_BUTTON_PANEL, true);

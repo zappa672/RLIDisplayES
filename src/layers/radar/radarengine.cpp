@@ -1,4 +1,5 @@
 #include "radarengine.h"
+#include "../../common/properties.h"
 
 #include <QFile>
 #include <QMatrix4x4>
@@ -46,8 +47,8 @@ void RadarEngine::onBrightnessChanged(int br) {
 
 
 void RadarEngine::initShader() {
-  _program->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/radar.vert.glsl");
-  _program->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/radar.frag.glsl");
+  _program->addShaderFromSourceFile(QOpenGLShader::Vertex, SHADERS_PATH + "radar.vert.glsl");
+  _program->addShaderFromSourceFile(QOpenGLShader::Fragment, SHADERS_PATH + "radar.frag.glsl");
   _program->link();
   _program->bind();
 
@@ -56,6 +57,7 @@ void RadarEngine::initShader() {
   _unif_locs[UNIF_THR] = _program->uniformLocation("threashold");
   _unif_locs[UNIF_PLN] = _program->uniformLocation("peleng_length");
   _unif_locs[UNIF_PCN] = _program->uniformLocation("peleng_count");
+  _unif_locs[UNIF_FBR] = _program->uniformLocation("fbo_radius");
 
   _attr_locs[ATTR_POS] = _program->attributeLocation("position");
   _attr_locs[ATTR_AMP] = _program->attributeLocation("amplitude");
@@ -161,11 +163,9 @@ void RadarEngine::clearTexture() {
 
   _fbo->bind();
 
-  glClearColor(1.f, 1.f, 1.f, 0.f);
-  glClear(GL_COLOR_BUFFER_BIT);
-
   glClearDepthf(0.f);
-  glClear(GL_DEPTH_BUFFER_BIT);
+  glClearColor(1.f, 1.f, 1.f, 0.f);  
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   _fbo->release();
 }
@@ -219,6 +219,7 @@ void RadarEngine::updateTexture() {
 
   glUniform1f(_unif_locs[UNIF_PLN], _peleng_len);
   glUniform1f(_unif_locs[UNIF_PCN], _peleng_count);
+  glUniform1f(_unif_locs[UNIF_FBR], _fbo->width() / 2.f);
 
   if (first_peleng_to_draw <= last_peleng_to_draw) {
     drawPelengs(first_peleng_to_draw, last_peleng_to_draw);

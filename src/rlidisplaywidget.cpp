@@ -167,8 +167,8 @@ void RLIDisplayWidget::initializeGL() {
 }
 
 void RLIDisplayWidget::initShaders() {
-  _program->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/main.vert.glsl");
-  _program->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/main.frag.glsl");
+  _program->addShaderFromSourceFile(QOpenGLShader::Vertex, SHADERS_PATH + "main.vert.glsl");
+  _program->addShaderFromSourceFile(QOpenGLShader::Fragment, SHADERS_PATH + "main.frag.glsl");
 
   _program->link();
   _program->bind();

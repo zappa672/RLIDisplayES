@@ -1,4 +1,5 @@
 #include "magnifierengine.h"
+#include "../common/properties.h"
 
 #include <vector>
 
@@ -107,8 +108,8 @@ void MagnifierEngine::drawBorder() {
 }
 
 void MagnifierEngine::initShaders() {
-  _prog->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/magn.vert.glsl");
-  _prog->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/magn.frag.glsl");
+  _prog->addShaderFromSourceFile(QOpenGLShader::Vertex, SHADERS_PATH + "magn.vert.glsl");
+  _prog->addShaderFromSourceFile(QOpenGLShader::Fragment, SHADERS_PATH + "magn.frag.glsl");
   _prog->link();
   _prog->bind();
 

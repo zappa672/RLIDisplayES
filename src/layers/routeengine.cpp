@@ -1,5 +1,6 @@
 /*
 #include "routeengine.h"
+#include "../../common/properties.h"
 
 RouteEngine::RouteEngine(QObject* parent) : QObject(parent), QGLFunctions(), _routes(200) {
   _initialized = false;
@@ -103,8 +104,8 @@ void RouteEngine::initShader() {
   // Overriding system locale until shaders are compiled
   setlocale(LC_NUMERIC, "C");
 
-  _prog->addShaderFromSourceFile(QGLShader::Vertex, ":/res/shaders/route.vert.glsl");
-  _prog->addShaderFromSourceFile(QGLShader::Fragment, ":/res/shaders/route.frag.glsl");
+  _prog->addShaderFromSourceFile(QGLShader::Vertex, SHADERS_PATH + "route.vert.glsl");
+  _prog->addShaderFromSourceFile(QGLShader::Fragment, SHADERS_PATH + "route.frag.glsl");
 
   _prog->link();
   _prog->bind();

@@ -1,5 +1,6 @@
 #include "maskengine.h"
 
+#include "../common/properties.h"
 #include "../common/rliconfig.h"
 
 static double const PI = acos(-1);
@@ -129,8 +130,8 @@ void MaskEngine::update() {
 
 
 void MaskEngine::initShader() {
-  _program->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/mask.vert.glsl");
-  _program->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/mask.frag.glsl");
+  _program->addShaderFromSourceFile(QOpenGLShader::Vertex, SHADERS_PATH + "mask.vert.glsl");
+  _program->addShaderFromSourceFile(QOpenGLShader::Fragment, SHADERS_PATH + "mask.frag.glsl");
   _program->link();
   _program->bind();
 

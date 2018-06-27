@@ -1,4 +1,5 @@
 #include "menuengine.h"
+#include "../../common/properties.h"
 
 #include <QColor>
 
@@ -964,8 +965,8 @@ void MenuEngine::drawText(const QByteArray& text, int line, TextAllignement alig
 
 
 void MenuEngine::initShader() {
-  _prog->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/info.vert.glsl");
-  _prog->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/info.frag.glsl");
+  _prog->addShaderFromSourceFile(QOpenGLShader::Vertex, SHADERS_PATH + "info.vert.glsl");
+  _prog->addShaderFromSourceFile(QOpenGLShader::Fragment, SHADERS_PATH + "info.frag.glsl");
   _prog->link();
   _prog->bind();
 

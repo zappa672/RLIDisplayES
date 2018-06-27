@@ -60,7 +60,8 @@ SOURCES     += \
     src/layers/routeengine.cpp \
     src/layers/targetengine.cpp \    
     src/layers/controlsengine.cpp \
-    src/layers/magnifierengine.cpp
+    src/layers/magnifierengine.cpp \
+    src/layers/info/infoblock.cpp
 
 HEADERS     += \
     src/mainwindow.h \
@@ -98,7 +99,8 @@ HEADERS     += \
     src/layers/targetengine.h \    
     src/layers/controlsengine.h \
     src/layers/magnifierengine.h \
-    src/common/rlilayout.h
+    src/common/rlilayout.h \
+    src/layers/info/infoblock.h
 
 FORMS       += \
     forms/mainwindow.ui \

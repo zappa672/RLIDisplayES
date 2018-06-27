@@ -1,9 +1,15 @@
 #ifndef PROPERTIES_H
 #define PROPERTIES_H
 
+#include <QOpenGLFunctions>
 #include <QObject>
 #include <QString>
 
+#if defined(GL_ES_VERSION_3_0) && GL_ES_VERSION_3_0
+static QString SHADERS_PATH = ":/shaders/es/";
+#else
+static QString SHADERS_PATH = ":/shaders/core/";
+#endif
 
 // Application property names
 static char* PROPERTY_SHOW_BUTTON_PANEL = "PROPERTY_SHOW_BUTTON_PANEL";

@@ -1,5 +1,6 @@
 #include "targetengine.h"
 
+#include "../common/properties.h"
 #include "../common/rlimath.h"
 
 #include <QImage>
@@ -141,8 +142,8 @@ void TargetEngine::deleteTarget(QString tag) {
 
 
 void TargetEngine::initShader() {
-  _prog->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/trgt.vert.glsl");
-  _prog->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/trgt.frag.glsl");
+  _prog->addShaderFromSourceFile(QOpenGLShader::Vertex, SHADERS_PATH + "trgt.vert.glsl");
+  _prog->addShaderFromSourceFile(QOpenGLShader::Fragment, SHADERS_PATH + "trgt.frag.glsl");
 
   _prog->link();
   _prog->bind();

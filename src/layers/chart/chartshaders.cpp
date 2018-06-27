@@ -1,4 +1,5 @@
 #include "chartshaders.h"
+#include "../../common/properties.h"
 
 ChartShaders::ChartShaders(QOpenGLContext* context) : QOpenGLFunctions(context) {
   initializeOpenGLFunctions();
@@ -56,8 +57,8 @@ GLuint ChartShaders::getMarkAttributeLoc(unsigned int index) {
 void ChartShaders::initChartAreaProgram() {
   chart_area_program = new QOpenGLShaderProgram();
 
-  chart_area_program->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/chart_area.vert.glsl");
-  chart_area_program->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/chart_area.frag.glsl");
+  chart_area_program->addShaderFromSourceFile(QOpenGLShader::Vertex, SHADERS_PATH + "chart_area.vert.glsl");
+  chart_area_program->addShaderFromSourceFile(QOpenGLShader::Fragment, SHADERS_PATH + "chart_area.frag.glsl");
   chart_area_program->link();
   chart_area_program->bind();
 
@@ -82,8 +83,8 @@ void ChartShaders::initChartAreaProgram() {
 void ChartShaders::initChartLineProgram() {
   chart_line_program = new QOpenGLShaderProgram();
 
-  chart_line_program->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/chart_line.vert.glsl");
-  chart_line_program->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/chart_line.frag.glsl");
+  chart_line_program->addShaderFromSourceFile(QOpenGLShader::Vertex, SHADERS_PATH + "chart_line.vert.glsl");
+  chart_line_program->addShaderFromSourceFile(QOpenGLShader::Fragment, SHADERS_PATH + "chart_line.frag.glsl");
   chart_line_program->link();
   chart_line_program->bind();
 
@@ -110,8 +111,8 @@ void ChartShaders::initChartLineProgram() {
 void ChartShaders::initChartTextProgram() {
   chart_text_program = new QOpenGLShaderProgram();
 
-  chart_text_program->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/chart_text.vert.glsl");
-  chart_text_program->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/chart_text.frag.glsl");
+  chart_text_program->addShaderFromSourceFile(QOpenGLShader::Vertex, SHADERS_PATH + "chart_text.vert.glsl");
+  chart_text_program->addShaderFromSourceFile(QOpenGLShader::Fragment, SHADERS_PATH + "chart_text.frag.glsl");
   chart_text_program->link();
   chart_text_program->bind();
 
@@ -133,8 +134,8 @@ void ChartShaders::initChartTextProgram() {
 void ChartShaders::initChartMarkProgram() {
   chart_mark_program = new QOpenGLShaderProgram();
 
-  chart_mark_program->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/chart_mark.vert.glsl");
-  chart_mark_program->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/chart_mark.frag.glsl");
+  chart_mark_program->addShaderFromSourceFile(QOpenGLShader::Vertex, SHADERS_PATH + "chart_mark.vert.glsl");
+  chart_mark_program->addShaderFromSourceFile(QOpenGLShader::Fragment, SHADERS_PATH + "chart_mark.frag.glsl");
   chart_mark_program->link();
   chart_mark_program->bind();
 

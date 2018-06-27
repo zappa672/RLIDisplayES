@@ -66,7 +66,7 @@ private:
   // OpenGL program attributres enum
   enum { ATTR_POS = 0, ATTR_AMP = 1, ATTR_CNT = 2 } ;
   // OpenGL program uniforms enum
-  enum { UNIF_MVP = 0, UNIF_TEX = 1, UNIF_THR = 2, UNIF_PLN = 3, UNIF_PCN = 4, UNIF_CNT = 5 } ;
+  enum { UNIF_MVP = 0, UNIF_TEX = 1, UNIF_THR = 2, UNIF_PLN = 3, UNIF_PCN = 4, UNIF_FBR = 5, UNIF_CNT = 6 } ;
 
   GLuint _vbo_ids[ATTR_CNT];
   // OpenGL program uniforms locations

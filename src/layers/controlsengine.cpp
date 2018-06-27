@@ -1,4 +1,5 @@
 #include "controlsengine.h"
+#include "../common/properties.h"
 
 #include <vector>
 
@@ -71,8 +72,8 @@ void ControlsEngine::draw(const QMatrix4x4& mvp_mat) {
 }
 
 void ControlsEngine::initShaders() {
-  _prog->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/ctrl.vert.glsl");
-  _prog->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/ctrl.frag.glsl");
+  _prog->addShaderFromSourceFile(QOpenGLShader::Vertex, SHADERS_PATH + "ctrl.vert.glsl");
+  _prog->addShaderFromSourceFile(QOpenGLShader::Fragment, SHADERS_PATH + "ctrl.frag.glsl");
 
   _prog->link();
   _prog->bind();
