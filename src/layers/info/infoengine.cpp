@@ -1,3 +1,6 @@
+/*
+
+
 #include "infoengine.h"
 #include "../../common/properties.h"
 
@@ -207,3 +210,5 @@ void InfoEngine::initShaders() {
 
   _prog->release();
 }
+
+*/

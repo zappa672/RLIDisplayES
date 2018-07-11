@@ -1,3 +1,5 @@
+/*
+
 #include "infocontrollers.h"
 #include "../mainwindow.h"
 
@@ -373,23 +375,22 @@ void TailsController::onTailsModeChanged(int mode, int minutes) {
 
   _minutes = minutes;
 
-  /*
-  if (mode == TargetDataSource::TAILMODE_OFF)
-    _minutes = 0;
+//  if (mode == TargetDataSource::TAILMODE_OFF)
+//    _minutes = 0;
 
-  QByteArray smode;
-  QString mins;
-  for (int i = 0; i < RLI_LANG_COUNT; i++) {
-    smode = (mode == TargetDataSource::TAILMODE_DOTS) ? RLIStrings::nDot[i] : RLIStrings::nTrl[i];
+//  QByteArray smode;
+//  QString mins;
+//  for (int i = 0; i < RLI_LANG_COUNT; i++) {
+//    smode = (mode == TargetDataSource::TAILMODE_DOTS) ? RLIStrings::nDot[i] : RLIStrings::nTrl[i];
 
-    if (_minutes <= 0)
-      mins.sprintf("%s", RLIStrings::nOff[i]);
-    else
-      mins.sprintf("%d", _minutes);
+//    if (_minutes <= 0)
+//      mins.sprintf("%s", RLIStrings::nOff[i]);
+//    else
+//      mins.sprintf("%d", _minutes);
 
-    _block->setText(_mode_text_id, i, enc->fromUnicode(dec->toUnicode(smode)));
-    _block->setText(_min_text_id, i, enc->fromUnicode(dec->toUnicode(mins.toLocal8Bit())));
-  }*/
+//    _block->setText(_mode_text_id, i, enc->fromUnicode(dec->toUnicode(smode)));
+//    _block->setText(_min_text_id, i, enc->fromUnicode(dec->toUnicode(mins.toLocal8Bit())));
+//  }
 }
 
 void TailsController::initBlock(const RLIPanelInfo& panelInfo) {
@@ -526,24 +527,24 @@ void TargetsController::onTargetCountChanged(int count) {
   emit setText(_cnt_text_id, RLI_LANG_ENGLISH, cnt);
   emit setText(_cnt_text_id, RLI_LANG_RUSSIAN, cnt);
 }
-/*
-void TargetsController::updateTarget(const QString& tag, const RadarTarget& trgt) {
-  if (_trg_text_id == -1)
-    return;
 
-  _target = trgt;
-  QByteArray taga = tag.toLatin1();
-  QByteArray coga = QString::number(trgt.CourseOverGround).left(6).toLatin1();
-  QByteArray soga = QString::number(trgt.SpeedOverGround).left(6).toLatin1();
+//void TargetsController::updateTarget(const QString& tag, const RadarTarget& trgt) {
+//  if (_trg_text_id == -1)
+//    return;
 
-  emit setText(_trg_text_id, RLI_LANG_ENGLISH, taga);
-  emit setText(_trg_text_id, RLI_LANG_RUSSIAN, taga);
-  emit setText(_cog_text_id, RLI_LANG_ENGLISH, coga);
-  emit setText(_cog_text_id, RLI_LANG_RUSSIAN, coga);
-  emit setText(_sog_text_id, RLI_LANG_ENGLISH, soga);
-  emit setText(_sog_text_id, RLI_LANG_RUSSIAN, soga);
+//  _target = trgt;
+//  QByteArray taga = tag.toLatin1();
+//  QByteArray coga = QString::number(trgt.CourseOverGround).left(6).toLatin1();
+//  QByteArray soga = QString::number(trgt.SpeedOverGround).left(6).toLatin1();
+
+//  emit setText(_trg_text_id, RLI_LANG_ENGLISH, taga);
+//  emit setText(_trg_text_id, RLI_LANG_RUSSIAN, taga);
+//  emit setText(_cog_text_id, RLI_LANG_ENGLISH, coga);
+//  emit setText(_cog_text_id, RLI_LANG_RUSSIAN, coga);
+//  emit setText(_sog_text_id, RLI_LANG_ENGLISH, soga);
+//  emit setText(_sog_text_id, RLI_LANG_RUSSIAN, soga);
 }
-*/
+
 void TargetsController::initBlock(const RLIPanelInfo& panelInfo) {
   _block->setBackColor(INFO_BACKGRD_COLOR);
   _block->setBorder(1, INFO_BORDER_COLOR);
@@ -868,3 +869,4 @@ void FpsController::initBlock(const RLIPanelInfo& panelInfo) {
   _val_text_id = _block->addText(t);
 }
 
+*/

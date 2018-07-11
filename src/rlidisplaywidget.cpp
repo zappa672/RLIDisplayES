@@ -10,13 +10,17 @@
 #include "common/rliconfig.h"
 #include "common/properties.h"
 
+#include "common/rlistrings.h"
+
 RLIDisplayWidget::RLIDisplayWidget(QWidget *parent) : QOpenGLWidget(parent) {
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "RLIDisplayWidget construction start";
+
+  qRegisterMetaType<RLIString>("RLIString");
 
   _initialized = false;
   _debug_radar_tails_shift = 0;
 
-  setMouseTracking(true);  
+  setMouseTracking(true);
 
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "RLIDisplayWidget construction finish";
 }
@@ -124,9 +128,11 @@ void RLIDisplayWidget::initializeGL() {
   _chartEngine = new ChartEngine(circle_radius, _chart_mngr->refs(), context(), this);
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Chart engine init finish";
 
+  /*
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Info engine init start";
   _infoEngine = new InfoEngine(context(), this);
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Info engine init finish";
+  */
 
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Menu engine init start";
   _menuEngine = new MenuEngine(layout->menu, context(), this);
@@ -162,8 +168,8 @@ void RLIDisplayWidget::initializeGL() {
   connect(_chart_mngr, SIGNAL(new_chart_available(QString)), SLOT(onNewChartAvailable(QString)));
 
   connect(_menuEngine, SIGNAL(radarBrightnessChanged(int)), _radarEngine, SLOT(onBrightnessChanged(int)));
-  connect(_menuEngine, SIGNAL(languageChanged(QByteArray)), _menuEngine, SLOT(onLanguageChanged(QByteArray)));
-  connect(_menuEngine, SIGNAL(languageChanged(QByteArray)), _infoEngine, SLOT(onLanguageChanged(QByteArray)));
+  connect(_menuEngine, SIGNAL(languageChanged(RLIString)), _menuEngine, SLOT(onLanguageChanged(RLIString)));
+  //connect(_menuEngine, SIGNAL(languageChanged(QByteArray)), _infoEngine, SLOT(onLanguageChanged(QByteArray)));
 }
 
 void RLIDisplayWidget::initShaders() {
@@ -274,8 +280,10 @@ void RLIDisplayWidget::paintLayers() {
 
   drawRect(rect(), _maskEngine->textureId());
 
+  /*
   for (int i = 0; i < _infoEngine->blockCount(); i++)
     drawRect(_infoEngine->blockGeometry(i), _infoEngine->blockTextId(i));
+  */
 
   drawRect(QRect(lot->menu.position, lot->menu.size), _menuEngine->texture());
 
@@ -293,7 +301,8 @@ void RLIDisplayWidget::updateLayers() {
   QString colorScheme = _chart_mngr->refs()->getColorScheme();
   _chartEngine->update(shipPosition, chartScale , 0.f,  QPoint(0.f, 0.f), colorScheme);
 
-  _infoEngine->update(_infoFonts);
+  //_infoEngine->update(_infoFonts);
+
   _menuEngine->update();
 
   _magnEngine->update( _radarEngine->amplitutedesVboId()
@@ -355,6 +364,9 @@ void RLIDisplayWidget::onMagnifierToggled() {
 }
 
 void RLIDisplayWidget::onMenuToggled() {
+  if (_magnEngine->visible())
+    return;
+
   if (_menuEngine->state() == MenuEngine::MAIN)
     _menuEngine->setState(MenuEngine::DISABLED);
   else
@@ -362,6 +374,9 @@ void RLIDisplayWidget::onMenuToggled() {
 }
 
 void RLIDisplayWidget::onConfigMenuToggled() {
+  if (_magnEngine->visible())
+    return;
+
   if (_menuEngine->state() == MenuEngine::CONFIG)
     _menuEngine->setState(MenuEngine::DISABLED);
   else
@@ -388,13 +403,3 @@ void RLIDisplayWidget::onBackToggled() {
     _menuEngine->onBack();
 }
 
-
-
-
-void RLIDisplayWidget::keyReleaseEvent(QKeyEvent *event) {
-  pressedKeys.remove(event->key());
-}
-
-void RLIDisplayWidget::keyPressEvent(QKeyEvent *event) {
-  pressedKeys.insert(event->key());
-}

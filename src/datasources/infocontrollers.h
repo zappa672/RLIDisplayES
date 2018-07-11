@@ -1,3 +1,5 @@
+/*
+
 #ifndef INFOCONTROLLERS_H
 #define INFOCONTROLLERS_H
 
@@ -375,3 +377,6 @@ private:
 };
 
 #endif // INFOCONTROLLERS_H
+
+
+*/

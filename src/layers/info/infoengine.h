@@ -1,3 +1,5 @@
+/*
+
 #ifndef INFOENGINE_H
 #define INFOENGINE_H
 
@@ -69,3 +71,5 @@ private:
 };
 
 #endif // INFOENGINE_H
+
+*/

@@ -39,7 +39,7 @@ protected slots:
   void onRLIWidgetInitialized();
 
 private:
-  void setupInfoBlock(InfoBlockController* ctrl, const RLIPanelInfo& panelInfo);
+  //void setupInfoBlock(InfoBlockController* ctrl, const RLIPanelInfo& panelInfo);
 
   Ui::MainWindow *ui;
 
@@ -53,6 +53,7 @@ private:
   RLIControlWidget* wgtButtonPanel;
 
   // Контроллеры инфоблоков
+  /*
   ValueBarController* _gain_ctrl;
   ValueBarController* _water_ctrl;
   ValueBarController* _rain_ctrl;
@@ -83,6 +84,7 @@ private:
 
   VnController* _vn_ctrl;
   VdController* _vd_ctrl;
+  */
 };
 
 #endif // MAINWINDOW_H

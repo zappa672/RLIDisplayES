@@ -12,168 +12,6 @@ const QColor MENU_BORDER_COLOR        (0x40, 0xFC, 0x00);
 const QColor MENU_BACKGRD_COLOR       (0x00, 0x00, 0x00);
 
 
-RLIMenuItem::RLIMenuItem(char** name, QObject* parent) : QObject(parent) {
-  _enabled = true;
-  _locked = false;
-
-  _enc = QTextCodec::codecForName("cp866")->makeEncoder();
-  _dec = QTextCodec::codecForName("UTF8")->makeDecoder();
-
-  for (int i = 0; i < RLI_LANG_COUNT; i++) {
-    _name[i] = _enc->fromUnicode(_dec->toUnicode(name[i]));
-  }
-}
-
-
-RLIMenuItemMenu::RLIMenuItemMenu(char** name, RLIMenuItemMenu* parent) : RLIMenuItem(name, parent) {
-  _type = MENU;
-  _parent = parent;
-}
-
-
-
-RLIMenuItemMenu::~RLIMenuItemMenu() {
-  qDeleteAll(_items);
-}
-
-
-
-RLIMenuItemAction::RLIMenuItemAction(char** name, QObject* parent) : RLIMenuItem(name, parent) {
-  _type = ACTION;
-}
-
-void RLIMenuItemAction::action() {
-  emit triggered();
-}
-
-
-
-RLIMenuItemList::RLIMenuItemList(char** name, int def_ind, QObject* parent)
-  : RLIMenuItem(name, parent) {
-  _type = LIST;
-  _index = def_ind;
-}
-
-void RLIMenuItemList::addVariant(char** values) {
-  for (int i = 0; i < RLI_LANG_COUNT; i++) {
-    _variants[i] << _enc->fromUnicode(_dec->toUnicode(values[i]));
-  }
-}
-
-void RLIMenuItemList::up() {
-  if (_index < _variants[RLI_LANG_RUSSIAN].size() - 1) {
-    _index++;
-    emit valueChanged(_variants[RLI_LANG_RUSSIAN][_index]);
-  }
-}
-
-void RLIMenuItemList::down() {
-  if (_index > 0) {
-    _index--;
-    emit valueChanged(_variants[RLI_LANG_RUSSIAN][_index]);
-  }
-}
-
-
-
-RLIMenuItemInt::RLIMenuItemInt(char** name, int min, int max, int def, QObject* parent)
-  : RLIMenuItem(name, parent) {
-  _type = INT;
-
-  _min = min;
-  _max = max;
-  _value = def;
-
-  _change_start_time = QDateTime::currentDateTime().addSecs(-1);
-  _last_change_time = QDateTime::currentDateTime().addSecs(-1);
-
-  _delta=1;
-}
-
-void RLIMenuItemInt::up() {
-  if (_value < _max) {
-    adjustDelta();
-
-    _value += _delta;
-
-    if (_value > _max)
-      _value = _max;
-
-    emit valueChanged(_value);
-  }
-}
-
-void RLIMenuItemInt::down() {
-  if (_value > _min) {
-    adjustDelta();
-
-    _value -= _delta;
-
-    if (_value < _min)
-      _value = _min;
-
-    emit valueChanged(_value);
-  }
-}
-
-int RLIMenuItemInt::setValue(int val) {
-  if((val < _min) || (val > _max))
-    return -2;
-
-  _value = val;
-  return 0;
-}
-
-int RLIMenuItemInt::setValue(QByteArray val) {
-  int  res;
-  bool ok = false;
-
-  res = val.toInt(&ok);
-  if(!ok)
-      return -1;
-  if((res < _min) || (res > _max))
-      return -2;
-  _value = res;
-
-  return 0;
-}
-
-void RLIMenuItemInt::adjustDelta() {
-  QDateTime currentTime = QDateTime::currentDateTime();
-
-  if (currentTime > _last_change_time.addSecs(1)) {
-    _last_change_time = currentTime;
-    _change_start_time = currentTime;
-    _delta = 1;
-  } else {
-    if (_change_start_time.msecsTo(currentTime) > 5000) {
-      _delta = 100;
-    } else if (_change_start_time.msecsTo(currentTime) > 3000) {
-      _delta = 10;
-    } else {
-      _delta = 1;
-    }
-
-    _last_change_time = currentTime;
-  }
-}
-
-
-
-
-RLIMenuItemFloat::RLIMenuItemFloat(char** name, float min, float max, float def) : RLIMenuItem(name) {
-  _type = FLOAT;
-  _min = min;
-  _max = max;
-  _value = def;
-  _step = 0.2f;
-}
-
-
-
-
-
-
 MenuEngine::MenuEngine(const RLIPanelInfo& params, QOpenGLContext* context, QObject* parent)
   : QObject(parent), QOpenGLFunctions(context)  {
 
@@ -187,10 +25,6 @@ MenuEngine::MenuEngine(const RLIPanelInfo& params, QOpenGLContext* context, QObj
   _fbo = nullptr;
 
   _lang = RLI_LANG_RUSSIAN;
-
-  _enc = QTextCodec::codecForName("cp866")->makeEncoder();
-  _dec = QTextCodec::codecForName("UTF8")->makeDecoder();
-  _dec1 = QTextCodec::codecForName("cp866")->makeDecoder();
 
   resize(params.size, params.position, params.params["font"]);
 
@@ -207,154 +41,154 @@ MenuEngine::MenuEngine(const RLIPanelInfo& params, QOpenGLContext* context, QObj
 }
 
 void MenuEngine::initCnfgMenuTree() {
-  RLIMenuItemMenu* m1 = new RLIMenuItemMenu(RLIStrings::nMenu1, NULL);
+  RLIMenuItemMenu* m1 = new RLIMenuItemMenu(RLI_STR_MENU_1, NULL);
 
   // --------------------------
-  RLIMenuItemMenu* m10 = new RLIMenuItemMenu(RLIStrings::nMenu10, m1);
+  RLIMenuItemMenu* m10 = new RLIMenuItemMenu(RLI_STR_MENU_10, m1);
   m1->add_item(m10);
 
-  RLIMenuItemList* i100 = new RLIMenuItemList(RLIStrings::nMenu100, 4);
-  i100->addVariant(RLIStrings::logSignal[0]);
-  i100->addVariant(RLIStrings::logSignal[1]);
-  i100->addVariant(RLIStrings::logSignal[2]);
-  i100->addVariant(RLIStrings::logSignal[3]);
-  i100->addVariant(RLIStrings::logSignal[4]);
-  i100->addVariant(RLIStrings::logSignal[5]);
-  i100->addVariant(RLIStrings::logSignal[6]);
-  i100->addVariant(RLIStrings::logSignal[7]);
+  RLIMenuItemList* i100 = new RLIMenuItemList(RLI_STR_MENU_100, 4);
+  i100->addVariant(RLI_STR_ARRAY_LOG_SIGNAL_200_MINUS);
+  i100->addVariant(RLI_STR_ARRAY_LOG_SIGNAL_500_MINUS);
+  i100->addVariant(RLI_STR_ARRAY_LOG_SIGNAL_COD_MINUS);
+  i100->addVariant(RLI_STR_ARRAY_LOG_SIGNAL_NMEA);
+  i100->addVariant(RLI_STR_ARRAY_LOG_SIGNAL_COD_PLUS);
+  i100->addVariant(RLI_STR_ARRAY_LOG_SIGNAL_500_PLUS);
+  i100->addVariant(RLI_STR_ARRAY_LOG_SIGNAL_200_PLUS);
+  i100->addVariant(RLI_STR_ARRAY_LOG_SIGNAL_GPS);
   m10->add_item(static_cast<RLIMenuItem*>(i100));
 
-  RLIMenuItemInt* i101 = new RLIMenuItemInt(RLIStrings::nMenu101, 0, 255, 0);
+  RLIMenuItemInt* i101 = new RLIMenuItemInt(RLI_STR_MENU_101, 0, 255, 0);
   m10->add_item(static_cast<RLIMenuItem*>(i101));
 
-  RLIMenuItemFloat* i102 = new RLIMenuItemFloat(RLIStrings::nMenu102, -179.9f, 179.9f, 0.f);
+  RLIMenuItemFloat* i102 = new RLIMenuItemFloat(RLI_STR_MENU_102, -179.9f, 179.9f, 0.f);
   m10->add_item(static_cast<RLIMenuItem*>(i102));
 
-  RLIMenuItemFloat* i103 = new RLIMenuItemFloat(RLIStrings::nMenu103, 0.f, 359.9f, 0.f);
+  RLIMenuItemFloat* i103 = new RLIMenuItemFloat(RLI_STR_MENU_103, 0.f, 359.9f, 0.f);
   m10->add_item(static_cast<RLIMenuItem*>(i103));
 
-  RLIMenuItemFloat* i104 = new RLIMenuItemFloat(RLIStrings::nMenu104, 0.f, 359.9f, 0.f);
+  RLIMenuItemFloat* i104 = new RLIMenuItemFloat(RLI_STR_MENU_104, 0.f, 359.9f, 0.f);
   m10->add_item(static_cast<RLIMenuItem*>(i104));
 
-  RLIMenuItemList* i105 = new RLIMenuItemList(RLIStrings::nMenu105, 0);
-  i105->addVariant(RLIStrings::bandArray[0]);
-  i105->addVariant(RLIStrings::bandArray[1]);
-  i105->addVariant(RLIStrings::bandArray[2]);
+  RLIMenuItemList* i105 = new RLIMenuItemList(RLI_STR_MENU_105, 0);
+  i105->addVariant(RLI_STR_ARRAY_BAND_X);
+  i105->addVariant(RLI_STR_ARRAY_BAND_S);
+  i105->addVariant(RLI_STR_ARRAY_BAND_K);
   m10->add_item(static_cast<RLIMenuItem*>(i105));
-  connect(i105, SIGNAL(valueChanged(QByteArray)), this, SIGNAL(bandModeChanged(QByteArray)), Qt::QueuedConnection);
+  connect(i105, SIGNAL(valueChanged(RLIString)), this, SIGNAL(bandModeChanged(RLIString)), Qt::QueuedConnection);
 
-  RLIMenuItemList* i106 = new RLIMenuItemList(RLIStrings::nMenu106, 0);
-  i106->addVariant(RLIStrings::OffOnArray[0]);
-  i106->addVariant(RLIStrings::OffOnArray[1]);
+  RLIMenuItemList* i106 = new RLIMenuItemList(RLI_STR_MENU_106, 0);
+  i106->addVariant(RLI_STR_ARRAY_OFFON_OFF);
+  i106->addVariant(RLI_STR_ARRAY_OFFON_ON);
   m10->add_item(static_cast<RLIMenuItem*>(i106));
 
-  RLIMenuItemInt* i107 = new RLIMenuItemInt(RLIStrings::nMenu107, 25, 100, 80);
+  RLIMenuItemInt* i107 = new RLIMenuItemInt(RLI_STR_MENU_107, 25, 100, 80);
   m10->add_item(static_cast<RLIMenuItem*>(i107));
 
 
   // --------------------------
-  RLIMenuItemMenu* m11 = new RLIMenuItemMenu(RLIStrings::nMenu11, m1);
+  RLIMenuItemMenu* m11 = new RLIMenuItemMenu(RLI_STR_MENU_11, m1);
   m1->add_item(m11);
 
-  RLIMenuItemFloat* i110 = new RLIMenuItemFloat(RLIStrings::nMenu110, -5.f, 5.f, -4.4f);
+  RLIMenuItemFloat* i110 = new RLIMenuItemFloat(RLI_STR_MENU_110, -5.f, 5.f, -4.4f);
   m11->add_item(static_cast<RLIMenuItem*>(i110));
 
-  RLIMenuItemInt* i111 = new RLIMenuItemInt(RLIStrings::nMenu111, 1, 255, 170);
+  RLIMenuItemInt* i111 = new RLIMenuItemInt(RLI_STR_MENU_111, 1, 255, 170);
   m11->add_item(static_cast<RLIMenuItem*>(i111));
 
-  RLIMenuItemInt* i112 = new RLIMenuItemInt(RLIStrings::nMenu112, -2048, 2048, 0);
+  RLIMenuItemInt* i112 = new RLIMenuItemInt(RLI_STR_MENU_112, -2048, 2048, 0);
   m11->add_item(static_cast<RLIMenuItem*>(i112));
   connect(i112, SIGNAL(valueChanged(int)), this, SIGNAL(analogZeroChanged(int)), Qt::QueuedConnection);
   analogZeroItem = i112;
 
-  RLIMenuItemInt* i113 = new RLIMenuItemInt(RLIStrings::nMenu113, 1, 255, 25);
+  RLIMenuItemInt* i113 = new RLIMenuItemInt(RLI_STR_MENU_113, 1, 255, 25);
   m11->add_item(static_cast<RLIMenuItem*>(i113));
 
-  RLIMenuItemInt* i114 = new RLIMenuItemInt(RLIStrings::nMenu114, 0, 255, 18);
+  RLIMenuItemInt* i114 = new RLIMenuItemInt(RLI_STR_MENU_114, 0, 255, 18);
   m11->add_item(static_cast<RLIMenuItem*>(i114));
 
-  RLIMenuItemInt* i115 = new RLIMenuItemInt(RLIStrings::nMenu115, 0, 255, 16);
+  RLIMenuItemInt* i115 = new RLIMenuItemInt(RLI_STR_MENU_115, 0, 255, 16);
   m11->add_item(static_cast<RLIMenuItem*>(i115));
 
-  RLIMenuItemInt* i116 = new RLIMenuItemInt(RLIStrings::nMenu116, 0, 4096, 100);
+  RLIMenuItemInt* i116 = new RLIMenuItemInt(RLI_STR_MENU_116, 0, 4096, 100);
   m11->add_item(static_cast<RLIMenuItem*>(i116));
 
-  RLIMenuItemInt* i117 = new RLIMenuItemInt(RLIStrings::nMenu117, 0, 255, 30);
+  RLIMenuItemInt* i117 = new RLIMenuItemInt(RLI_STR_MENU_117, 0, 255, 30);
   m11->add_item(static_cast<RLIMenuItem*>(i117));
 
-  RLIMenuItemInt* i118 = new RLIMenuItemInt(RLIStrings::nMenu118, -20, 20, -2);
+  RLIMenuItemInt* i118 = new RLIMenuItemInt(RLI_STR_MENU_118, -20, 20, -2);
   m11->add_item(static_cast<RLIMenuItem*>(i118));
 
-  RLIMenuItemInt* i119 = new RLIMenuItemInt(RLIStrings::nMenu119, -20, 20, -2);
+  RLIMenuItemInt* i119 = new RLIMenuItemInt(RLI_STR_MENU_119, -20, 20, -2);
   m11->add_item(static_cast<RLIMenuItem*>(i119));
 
-  RLIMenuItemInt* i1110 = new RLIMenuItemInt(RLIStrings::nMenu1110, -20, 20, 0);
+  RLIMenuItemInt* i1110 = new RLIMenuItemInt(RLI_STR_MENU_11A, -20, 20, 0);
   m11->add_item(static_cast<RLIMenuItem*>(i1110));
 
   // --------------------------
-  RLIMenuItemMenu* m12 = new RLIMenuItemMenu(RLIStrings::nMenu12, m1);
+  RLIMenuItemMenu* m12 = new RLIMenuItemMenu(RLI_STR_MENU_12, m1);
   m1->add_item(m12);
 
-  RLIMenuItemList* i120 = new RLIMenuItemList(RLIStrings::nMenu120, 0);
-  i120->addVariant(RLIStrings::OffOnArray[0]);
-  i120->addVariant(RLIStrings::OffOnArray[1]);
+  RLIMenuItemList* i120 = new RLIMenuItemList(RLI_STR_MENU_120, 0);
+  i120->addVariant(RLI_STR_ARRAY_OFFON_OFF);
+  i120->addVariant(RLI_STR_ARRAY_OFFON_ON);
   m12->add_item(static_cast<RLIMenuItem*>(i120));
 
-  RLIMenuItemList* i121 = new RLIMenuItemList(RLIStrings::nMenu121, 0);
-  i121->addVariant(RLIStrings::OffOnArray[0]);
-  i121->addVariant(RLIStrings::OffOnArray[1]);
+  RLIMenuItemList* i121 = new RLIMenuItemList(RLI_STR_MENU_121, 0);
+  i121->addVariant(RLI_STR_ARRAY_OFFON_OFF);
+  i121->addVariant(RLI_STR_ARRAY_OFFON_ON);
   m12->add_item(static_cast<RLIMenuItem*>(i121));
 
-  RLIMenuItemList* i122 = new RLIMenuItemList(RLIStrings::nMenu122, 0);
-  i122->addVariant(RLIStrings::OffOnArray[0]);
-  i122->addVariant(RLIStrings::OffOnArray[1]);
+  RLIMenuItemList* i122 = new RLIMenuItemList(RLI_STR_MENU_122, 0);
+  i122->addVariant(RLI_STR_ARRAY_OFFON_OFF);
+  i122->addVariant(RLI_STR_ARRAY_OFFON_ON);
   m12->add_item(static_cast<RLIMenuItem*>(i122));
 
-  RLIMenuItemList* i123 = new RLIMenuItemList(RLIStrings::nMenu123, 0);
-  i123->addVariant(RLIStrings::OffOnArray[0]);
-  i123->addVariant(RLIStrings::OffOnArray[1]);
+  RLIMenuItemList* i123 = new RLIMenuItemList(RLI_STR_MENU_123, 0);
+  i123->addVariant(RLI_STR_ARRAY_OFFON_OFF);
+  i123->addVariant(RLI_STR_ARRAY_OFFON_ON);
   m12->add_item(static_cast<RLIMenuItem*>(i123));
 
-  RLIMenuItemList* i124 = new RLIMenuItemList(RLIStrings::nMenu124, 0);
-  i124->addVariant(RLIStrings::OffOnArray[0]);
-  i124->addVariant(RLIStrings::OffOnArray[1]);
+  RLIMenuItemList* i124 = new RLIMenuItemList(RLI_STR_MENU_124, 0);
+  i124->addVariant(RLI_STR_ARRAY_OFFON_OFF);
+  i124->addVariant(RLI_STR_ARRAY_OFFON_ON);
   m12->add_item(static_cast<RLIMenuItem*>(i124));
 
-  RLIMenuItemList* i125 = new RLIMenuItemList(RLIStrings::nMenu125, 0);
-  i125->addVariant(RLIStrings::OffOnArray[0]);
-  i125->addVariant(RLIStrings::OffOnArray[1]);
+  RLIMenuItemList* i125 = new RLIMenuItemList(RLI_STR_MENU_125, 0);
+  i125->addVariant(RLI_STR_ARRAY_OFFON_OFF);
+  i125->addVariant(RLI_STR_ARRAY_OFFON_ON);
   m12->add_item(static_cast<RLIMenuItem*>(i125));
 
-  RLIMenuItemList* i126 = new RLIMenuItemList(RLIStrings::nMenu126, 0);
-  i126->addVariant(RLIStrings::OffOnArray[0]);
-  i126->addVariant(RLIStrings::OffOnArray[1]);
+  RLIMenuItemList* i126 = new RLIMenuItemList(RLI_STR_MENU_126, 0);
+  i126->addVariant(RLI_STR_ARRAY_OFFON_OFF);
+  i126->addVariant(RLI_STR_ARRAY_OFFON_ON);
   m12->add_item(static_cast<RLIMenuItem*>(i126));
 
-  RLIMenuItemList* i127 = new RLIMenuItemList(RLIStrings::nMenu127, 0);
-  i127->addVariant(RLIStrings::OffOnArray[0]);
-  i127->addVariant(RLIStrings::OffOnArray[1]);
+  RLIMenuItemList* i127 = new RLIMenuItemList(RLI_STR_MENU_127, 0);
+  i127->addVariant(RLI_STR_ARRAY_OFFON_OFF);
+  i127->addVariant(RLI_STR_ARRAY_OFFON_ON);
   m12->add_item(static_cast<RLIMenuItem*>(i127));
 
   // --------------------------
-  RLIMenuItemMenu* m13 = new RLIMenuItemMenu(RLIStrings::nMenu13, m1);
+  RLIMenuItemMenu* m13 = new RLIMenuItemMenu(RLI_STR_MENU_13, m1);
   m1->add_item(m13);
 
-  RLIMenuItemList* i130 = new RLIMenuItemList(RLIStrings::nMenu130, 1);
-  i130->addVariant(RLIStrings::OffOnArray[0]);
-  i130->addVariant(RLIStrings::OffOnArray[1]);
+  RLIMenuItemList* i130 = new RLIMenuItemList(RLI_STR_MENU_130, 1);
+  i130->addVariant(RLI_STR_ARRAY_OFFON_OFF);
+  i130->addVariant(RLI_STR_ARRAY_OFFON_ON);
   m13->add_item(static_cast<RLIMenuItem*>(i130));
 
-  RLIMenuItemList* i131 = new RLIMenuItemList(RLIStrings::nMenu131, 1);
-  i131->addVariant(RLIStrings::OffOnArray[0]);
-  i131->addVariant(RLIStrings::OffOnArray[1]);
+  RLIMenuItemList* i131 = new RLIMenuItemList(RLI_STR_MENU_131, 1);
+  i131->addVariant(RLI_STR_ARRAY_OFFON_OFF);
+  i131->addVariant(RLI_STR_ARRAY_OFFON_ON);
   m13->add_item(static_cast<RLIMenuItem*>(i131));
 
-  RLIMenuItemList* i132 = new RLIMenuItemList(RLIStrings::nMenu132, 1);
-  i132->addVariant(RLIStrings::OffOnArray[0]);
-  i132->addVariant(RLIStrings::OffOnArray[1]);
+  RLIMenuItemList* i132 = new RLIMenuItemList(RLI_STR_MENU_132, 1);
+  i132->addVariant(RLI_STR_ARRAY_OFFON_OFF);
+  i132->addVariant(RLI_STR_ARRAY_OFFON_ON);
   m13->add_item(static_cast<RLIMenuItem*>(i132));
 
-  RLIMenuItemInt* i133 = new RLIMenuItemInt(RLIStrings::nMenu133, 4800, 38400, 4800);
+  RLIMenuItemInt* i133 = new RLIMenuItemInt(RLI_STR_MENU_133, 4800, 38400, 4800);
   m11->add_item(static_cast<RLIMenuItem*>(i133));
 
 
@@ -364,244 +198,244 @@ void MenuEngine::initCnfgMenuTree() {
 
 
 void MenuEngine::initMainMenuTree() {
-  RLIMenuItemMenu* m0 = new RLIMenuItemMenu(RLIStrings::nMenu0, NULL);
+  RLIMenuItemMenu* m0 = new RLIMenuItemMenu(RLI_STR_MENU_0, NULL);
 
   // --------------------------
-  RLIMenuItemMenu* m00 = new RLIMenuItemMenu(RLIStrings::nMenu00, m0);
+  RLIMenuItemMenu* m00 = new RLIMenuItemMenu(RLI_STR_MENU_00, m0);
   m0->add_item(m00);
 
-  RLIMenuItemInt* i000 = new RLIMenuItemInt(RLIStrings::nMenu000, 0, 255, 255);
+  RLIMenuItemInt* i000 = new RLIMenuItemInt(RLI_STR_MENU_000, 0, 255, 255);
   connect(i000, SIGNAL(valueChanged(int)), this, SIGNAL(radarBrightnessChanged(int)));
   m00->add_item(static_cast<RLIMenuItem*>(i000));
 
-  RLIMenuItemInt* i001 = new RLIMenuItemInt(RLIStrings::nMenu001, 0, 255, 255);
+  RLIMenuItemInt* i001 = new RLIMenuItemInt(RLI_STR_MENU_001, 0, 255, 255);
   m00->add_item(static_cast<RLIMenuItem*>(i001));
 
-  RLIMenuItemInt* i002 = new RLIMenuItemInt(RLIStrings::nMenu002, 0, 255, 255);
+  RLIMenuItemInt* i002 = new RLIMenuItemInt(RLI_STR_MENU_002, 0, 255, 255);
   m00->add_item(static_cast<RLIMenuItem*>(i002));
 
-  RLIMenuItemInt* i003 = new RLIMenuItemInt(RLIStrings::nMenu003, 0, 255, 255);
+  RLIMenuItemInt* i003 = new RLIMenuItemInt(RLI_STR_MENU_003, 0, 255, 255);
   m00->add_item(static_cast<RLIMenuItem*>(i003));
 
-  RLIMenuItemInt* i004 = new RLIMenuItemInt(RLIStrings::nMenu004, 0, 255, 255);
+  RLIMenuItemInt* i004 = new RLIMenuItemInt(RLI_STR_MENU_004, 0, 255, 255);
   m00->add_item(static_cast<RLIMenuItem*>(i004));
 
-  RLIMenuItemInt* i005 = new RLIMenuItemInt(RLIStrings::nMenu005, 0, 255, 255);
+  RLIMenuItemInt* i005 = new RLIMenuItemInt(RLI_STR_MENU_005, 0, 255, 255);
   m00->add_item(static_cast<RLIMenuItem*>(i005));
 
-  RLIMenuItemInt* i006 = new RLIMenuItemInt(RLIStrings::nMenu006, 0, 255, 255);
+  RLIMenuItemInt* i006 = new RLIMenuItemInt(RLI_STR_MENU_006, 0, 255, 255);
   m00->add_item(static_cast<RLIMenuItem*>(i006));
 
-  RLIMenuItemInt* i007 = new RLIMenuItemInt(RLIStrings::nMenu007, 0, 255, 255);
+  RLIMenuItemInt* i007 = new RLIMenuItemInt(RLI_STR_MENU_007, 0, 255, 255);
   m00->add_item(static_cast<RLIMenuItem*>(i007));
 
-  RLIMenuItemList* i008 = new RLIMenuItemList(RLIStrings::nMenu008, 0);
-  i008->addVariant(RLIStrings::dayArray[0]);
-  i008->addVariant(RLIStrings::dayArray[1]);
+  RLIMenuItemList* i008 = new RLIMenuItemList(RLI_STR_MENU_008, 0);
+  i008->addVariant(RLI_STR_ARRAY_DAY_DAY);
+  i008->addVariant(RLI_STR_ARRAY_DAY_NIGHT);
   m00->add_item(static_cast<RLIMenuItem*>(i008));
 
 
   // --------------------------
-  RLIMenuItemMenu* m01 = new RLIMenuItemMenu(RLIStrings::nMenu01, m0);
+  RLIMenuItemMenu* m01 = new RLIMenuItemMenu(RLI_STR_MENU_01, m0);
   m0->add_item(m01);
 
-  RLIMenuItemFloat* i010 = new RLIMenuItemFloat(RLIStrings::nMenu010, 0.01f, 8.f, 2.f);
+  RLIMenuItemFloat* i010 = new RLIMenuItemFloat(RLI_STR_MENU_010, 0.01f, 8.f, 2.f);
   m01->add_item(static_cast<RLIMenuItem*>(i010));
 
-  RLIMenuItemInt* i011 = new RLIMenuItemInt(RLIStrings::nMenu011, 5, 60, 30);
+  RLIMenuItemInt* i011 = new RLIMenuItemInt(RLI_STR_MENU_011, 5, 60, 30);
   m01->add_item(static_cast<RLIMenuItem*>(i011));
 
-  RLIMenuItemInt* i012 = new RLIMenuItemInt(RLIStrings::nMenu012, 5, 60, 30);
+  RLIMenuItemInt* i012 = new RLIMenuItemInt(RLI_STR_MENU_012, 5, 60, 30);
   m01->add_item(static_cast<RLIMenuItem*>(i012));
 
-  RLIMenuItemList* i013 = new RLIMenuItemList(RLIStrings::nMenu013, 0);
-  i013->addVariant(RLIStrings::trackArray[0]);
-  i013->addVariant(RLIStrings::trackArray[1]);
-  i013->addVariant(RLIStrings::trackArray[2]);
-  i013->addVariant(RLIStrings::trackArray[3]);
-  i013->addVariant(RLIStrings::trackArray[4]);
+  RLIMenuItemList* i013 = new RLIMenuItemList(RLI_STR_MENU_013, 0);
+  i013->addVariant(RLI_STR_ARRAY_TRACK_1);
+  i013->addVariant(RLI_STR_ARRAY_TRACK_2);
+  i013->addVariant(RLI_STR_ARRAY_TRACK_3);
+  i013->addVariant(RLI_STR_ARRAY_TRACK_6);
+  i013->addVariant(RLI_STR_ARRAY_TRACK_12);
   m01->add_item(static_cast<RLIMenuItem*>(i013));
-  connect(i013, SIGNAL(valueChanged(QByteArray)), this, SIGNAL(tailsModeChanged(QByteArray)), Qt::QueuedConnection);
+  connect(i013, SIGNAL(valueChanged(RLIString)), this, SIGNAL(tailsModeChanged(RLIString)), Qt::QueuedConnection);
 
-  RLIMenuItemList* i014 = new RLIMenuItemList(RLIStrings::nMenu014, 1);
-  i014->addVariant(RLIStrings::OffOnArray[0]);
-  i014->addVariant(RLIStrings::OffOnArray[1]);
+  RLIMenuItemList* i014 = new RLIMenuItemList(RLI_STR_MENU_014, 1);
+  i014->addVariant(RLI_STR_ARRAY_OFFON_OFF);
+  i014->addVariant(RLI_STR_ARRAY_OFFON_ON);
   m01->add_item(static_cast<RLIMenuItem*>(i014));
 
-  RLIMenuItemAction* i015 = new RLIMenuItemAction(RLIStrings::nMenu015);
+  RLIMenuItemAction* i015 = new RLIMenuItemAction(RLI_STR_MENU_015);
   i015->setLocked(true);
   m01->add_item(static_cast<RLIMenuItem*>(i015));
 
-  RLIMenuItemAction* i016 = new RLIMenuItemAction(RLIStrings::nMenu016);
+  RLIMenuItemAction* i016 = new RLIMenuItemAction(RLI_STR_MENU_016);
   i016->setLocked(true);
   m01->add_item(static_cast<RLIMenuItem*>(i016));
 
-  RLIMenuItemList* i017 = new RLIMenuItemList(RLIStrings::nMenu017, 0);
-  i017->addVariant(RLIStrings::tvecApArray[0]);
-  i017->addVariant(RLIStrings::tvecApArray[1]);
+  RLIMenuItemList* i017 = new RLIMenuItemList(RLI_STR_MENU_017, 0);
+  i017->addVariant(RLI_STR_ARRAY_TVEC_AP_WATER);
+  i017->addVariant(RLI_STR_ARRAY_TVEC_AP_GRND);
   i017->setLocked(true);
   m01->add_item(static_cast<RLIMenuItem*>(i017));
 
 
   // --------------------------
-  RLIMenuItemMenu* m02 = new RLIMenuItemMenu(RLIStrings::nMenu02, m0);
+  RLIMenuItemMenu* m02 = new RLIMenuItemMenu(RLI_STR_MENU_02, m0);
   m0->add_item(m02);
 
-  RLIMenuItemInt* i020 = new RLIMenuItemInt(RLIStrings::nMenu020, 0, 255, 5);
+  RLIMenuItemInt* i020 = new RLIMenuItemInt(RLI_STR_MENU_020, 0, 255, 5);
   m02->add_item(static_cast<RLIMenuItem*>(i020));
 
-  RLIMenuItemList* i021 = new RLIMenuItemList(RLIStrings::nMenu021, 0);
-  i021->addVariant(RLIStrings::vdArray[0]);
-  i021->addVariant(RLIStrings::vdArray[1]);
+  RLIMenuItemList* i021 = new RLIMenuItemList(RLI_STR_MENU_021, 0);
+  i021->addVariant(RLI_STR_ARRAY_VD_KM);
+  i021->addVariant(RLI_STR_ARRAY_VD_NM);
   m02->add_item(static_cast<RLIMenuItem*>(i021));
 
-  RLIMenuItemList* i022 = new RLIMenuItemList(RLIStrings::nMenu022, 0);
-  i022->addVariant(RLIStrings::speedArray[0]);
-  i022->addVariant(RLIStrings::speedArray[1]);
+  RLIMenuItemList* i022 = new RLIMenuItemList(RLI_STR_MENU_022, 0);
+  i022->addVariant(RLI_STR_ARRAY_SPEED_MAN);
+  i022->addVariant(RLI_STR_ARRAY_SPEED_LOG);
   m02->add_item(static_cast<RLIMenuItem*>(i022));
 
-  RLIMenuItemFloat* i023 = new RLIMenuItemFloat(RLIStrings::nMenu023, 0.f, 90.f, 5.f);
+  RLIMenuItemFloat* i023 = new RLIMenuItemFloat(RLI_STR_MENU_023, 0.f, 90.f, 5.f);
   m02->add_item(i023);
 
-  RLIMenuItemList* i024 = new RLIMenuItemList(RLIStrings::nMenu024, 2);
-  i024->addVariant(RLIStrings::devStabArray[0]);
-  i024->addVariant(RLIStrings::devStabArray[1]);
-  i024->addVariant(RLIStrings::devStabArray[2]);
-  i024->addVariant(RLIStrings::devStabArray[3]);
+  RLIMenuItemList* i024 = new RLIMenuItemList(RLI_STR_MENU_024, 2);
+  i024->addVariant(RLI_STR_ARRAY_DEV_STAB_ATER);
+  i024->addVariant(RLI_STR_ARRAY_DEV_STAB_GPS);
+  i024->addVariant(RLI_STR_ARRAY_DEV_STAB_DLG);
+  i024->addVariant(RLI_STR_ARRAY_DEV_STAB_L_G_W);
   m02->add_item(i024);
 
-  RLIMenuItemInt* i025 = new RLIMenuItemInt(RLIStrings::nMenu025, 0, 90, 0);
+  RLIMenuItemInt* i025 = new RLIMenuItemInt(RLI_STR_MENU_025, 0, 90, 0);
   m02->add_item(i025);
 
-  RLIMenuItemList* i026 = new RLIMenuItemList(RLIStrings::nMenu026, 1);
-  i026->addVariant(RLIStrings::langArray[0]);
-  i026->addVariant(RLIStrings::langArray[1]);
-  connect(i026, SIGNAL(valueChanged(QByteArray)), this, SIGNAL(languageChanged(QByteArray)), Qt::QueuedConnection);
+  RLIMenuItemList* i026 = new RLIMenuItemList(RLI_STR_MENU_026, 1);
+  i026->addVariant(RLI_STR_ARRAY_LANG_ENGL);
+  i026->addVariant(RLI_STR_ARRAY_LANG_RUS);
+  connect(i026, SIGNAL(valueChanged(RLIString)), this, SIGNAL(languageChanged(RLIString)), Qt::QueuedConnection);
   m02->add_item(i026);
 
-  RLIMenuItemFloat* i027 = new RLIMenuItemFloat(RLIStrings::nMenu027, 0.f, 359.9f, 0.f);
+  RLIMenuItemFloat* i027 = new RLIMenuItemFloat(RLI_STR_MENU_027, 0.f, 359.9f, 0.f);
   m02->add_item(i027);
 
-  RLIMenuItemInt* i028 = new RLIMenuItemInt(RLIStrings::nMenu028, 1, 100, 1);
+  RLIMenuItemInt* i028 = new RLIMenuItemInt(RLI_STR_MENU_028, 1, 100, 1);
   m02->add_item(i028);
 
-  RLIMenuItemInt* i029 = new RLIMenuItemInt(RLIStrings::nMenu029, 1, 100, 1);
+  RLIMenuItemInt* i029 = new RLIMenuItemInt(RLI_STR_MENU_029, 1, 100, 1);
   i029->setLocked(true);
   m02->add_item(i029);
 
-  RLIMenuItemList* i02A = new RLIMenuItemList(RLIStrings::nMenu02A, 0);
-  i02A->addVariant(RLIStrings::OffOnArray[0]);
-  i02A->addVariant(RLIStrings::OffOnArray[1]);
+  RLIMenuItemList* i02A = new RLIMenuItemList(RLI_STR_MENU_02A, 0);
+  i02A->addVariant(RLI_STR_ARRAY_OFFON_OFF);
+  i02A->addVariant(RLI_STR_ARRAY_OFFON_ON);
   m02->add_item(i02A);
 
 
   // --------------------------
-  RLIMenuItemMenu* m03 = new RLIMenuItemMenu(RLIStrings::nMenu03, m0);
+  RLIMenuItemMenu* m03 = new RLIMenuItemMenu(RLI_STR_MENU_03, m0);
   m0->add_item(m03);
 
-  RLIMenuItemInt* i030 = new RLIMenuItemInt(RLIStrings::nMenu030, 1, 2, 1);
+  RLIMenuItemInt* i030 = new RLIMenuItemInt(RLI_STR_MENU_030, 1, 2, 1);
   m03->add_item(static_cast<RLIMenuItem*>(i030));
 
-  RLIMenuItemList* i031 = new RLIMenuItemList(RLIStrings::nMenu031, 0);
-  i031->addVariant(RLIStrings::OffOnArray[0]);
-  i031->addVariant(RLIStrings::OffOnArray[1]);
-  connect(i031, SIGNAL(valueChanged(const QByteArray)), this, SIGNAL(simulationChanged(QByteArray)), Qt::QueuedConnection);
+  RLIMenuItemList* i031 = new RLIMenuItemList(RLI_STR_MENU_031, 0);
+  i031->addVariant(RLI_STR_ARRAY_OFFON_OFF);
+  i031->addVariant(RLI_STR_ARRAY_OFFON_ON);
+  connect(i031, SIGNAL(valueChanged(RLIString)), this, SIGNAL(simulationChanged(RLIString)), Qt::QueuedConnection);
   m03->add_item(static_cast<RLIMenuItem*>(i031));
 
-  RLIMenuItemList* i032 = new RLIMenuItemList(RLIStrings::nMenu032, 1);
-  i032->addVariant(RLIStrings::OffOnArray[0]);
-  i032->addVariant(RLIStrings::OffOnArray[1]);
+  RLIMenuItemList* i032 = new RLIMenuItemList(RLI_STR_MENU_032, 1);
+  i032->addVariant(RLI_STR_ARRAY_OFFON_OFF);
+  i032->addVariant(RLI_STR_ARRAY_OFFON_ON);
   m03->add_item(static_cast<RLIMenuItem*>(i032));
 
-  RLIMenuItemList* i033 = new RLIMenuItemList(RLIStrings::nMenu033, 1);
-  i033->addVariant(RLIStrings::OffOnArray[0]);
-  i033->addVariant(RLIStrings::OffOnArray[1]);
+  RLIMenuItemList* i033 = new RLIMenuItemList(RLI_STR_MENU_033, 1);
+  i033->addVariant(RLI_STR_ARRAY_OFFON_OFF);
+  i033->addVariant(RLI_STR_ARRAY_OFFON_ON);
   m03->add_item(static_cast<RLIMenuItem*>(i033));
 
-  RLIMenuItemFloat* i034 = new RLIMenuItemFloat(RLIStrings::nMenu034, 0.f, 3.f, 0.f);
+  RLIMenuItemFloat* i034 = new RLIMenuItemFloat(RLI_STR_MENU_034, 0.f, 3.f, 0.f);
   m03->add_item(static_cast<RLIMenuItem*>(i034));
 
-  RLIMenuItemList* i035 = new RLIMenuItemList(RLIStrings::nMenu035, 0);
-  i035->addVariant(RLIStrings::YesNoArray[0]);
-  i035->addVariant(RLIStrings::YesNoArray[1]);
+  RLIMenuItemList* i035 = new RLIMenuItemList(RLI_STR_MENU_035, 0);
+  i035->addVariant(RLI_STR_ARRAY_YESNO_YES);
+  i035->addVariant(RLI_STR_ARRAY_YESNO_NO);
   m03->add_item(static_cast<RLIMenuItem*>(i035));
 
-  RLIMenuItemList* i036 = new RLIMenuItemList(RLIStrings::nMenu036, 1);
-  i036->addVariant(RLIStrings::YesNoArray[0]);
-  i036->addVariant(RLIStrings::YesNoArray[1]);
+  RLIMenuItemList* i036 = new RLIMenuItemList(RLI_STR_MENU_036, 1);
+  i036->addVariant(RLI_STR_ARRAY_YESNO_YES);
+  i036->addVariant(RLI_STR_ARRAY_YESNO_NO);
   i036->setEnabled(false);
   m03->add_item(static_cast<RLIMenuItem*>(i036));
 
-  RLIMenuItemList* i037 = new RLIMenuItemList(RLIStrings::nMenu037, 1);
-  i037->addVariant(RLIStrings::YesNoArray[0]);
-  i037->addVariant(RLIStrings::YesNoArray[1]);
+  RLIMenuItemList* i037 = new RLIMenuItemList(RLI_STR_MENU_037, 1);
+  i037->addVariant(RLI_STR_ARRAY_YESNO_YES);
+  i037->addVariant(RLI_STR_ARRAY_YESNO_NO);
   i037->setEnabled(false);
   m03->add_item(static_cast<RLIMenuItem*>(i037));
 
-  RLIMenuItemList* i038 = new RLIMenuItemList(RLIStrings::nMenu038, 1);
-  i038->addVariant(RLIStrings::YesNoArray[0]);
-  i038->addVariant(RLIStrings::YesNoArray[1]);
+  RLIMenuItemList* i038 = new RLIMenuItemList(RLI_STR_MENU_038, 1);
+  i038->addVariant(RLI_STR_ARRAY_YESNO_YES);
+  i038->addVariant(RLI_STR_ARRAY_YESNO_NO);
   i038->setEnabled(false);
   m03->add_item(static_cast<RLIMenuItem*>(i038));
 
 
   // --------------------------
-  RLIMenuItemMenu* m04 = new RLIMenuItemMenu(RLIStrings::nMenu04, m0);
+  RLIMenuItemMenu* m04 = new RLIMenuItemMenu(RLI_STR_MENU_04, m0);
   m0->add_item(m04);
 
-  RLIMenuItemInt* i040 = new RLIMenuItemInt(RLIStrings::nMenu040, 1, 4, 1);
+  RLIMenuItemInt* i040 = new RLIMenuItemInt(RLI_STR_MENU_040, 1, 4, 1);
   m04->add_item(static_cast<RLIMenuItem*>(i040));
   routeLoaderItem = i040;
 
-  RLIMenuItemInt* i041 = new RLIMenuItemInt(RLIStrings::nMenu041, 0, 10, 1);
+  RLIMenuItemInt* i041 = new RLIMenuItemInt(RLI_STR_MENU_041, 0, 10, 1);
   m04->add_item(static_cast<RLIMenuItem*>(i041));
 
-  RLIMenuItemAction* i042 = new RLIMenuItemAction(RLIStrings::nMenu042);
+  RLIMenuItemAction* i042 = new RLIMenuItemAction(RLI_STR_MENU_042);
   i042->setLocked(true);
   m04->add_item(static_cast<RLIMenuItem*>(i042));
 
-  RLIMenuItemInt* i043 = new RLIMenuItemInt(RLIStrings::nMenu043, 40, 1000, 200);
+  RLIMenuItemInt* i043 = new RLIMenuItemInt(RLI_STR_MENU_043, 40, 1000, 200);
   m04->add_item(static_cast<RLIMenuItem*>(i043));
 
-  RLIMenuItemAction* i044 = new RLIMenuItemAction(RLIStrings::nMenu044);
+  RLIMenuItemAction* i044 = new RLIMenuItemAction(RLI_STR_MENU_044);
   m04->add_item(static_cast<RLIMenuItem*>(i044));
   routeEditItem = i044;
 
-  RLIMenuItemInt* i045 = new RLIMenuItemInt(RLIStrings::nMenu045, 0, 10, 1);
+  RLIMenuItemInt* i045 = new RLIMenuItemInt(RLI_STR_MENU_045, 0, 10, 1);
   m04->add_item(static_cast<RLIMenuItem*>(i045));
 
-  RLIMenuItemList* i046 = new RLIMenuItemList(RLIStrings::nMenu046, 0);
-  i046->addVariant(RLIStrings::nameSymb[0]);
-  i046->addVariant(RLIStrings::nameSymb[1]);
-  i046->addVariant(RLIStrings::nameSymb[2]);
-  i046->addVariant(RLIStrings::nameSymb[3]);
-  i046->addVariant(RLIStrings::nameSymb[4]);
+  RLIMenuItemList* i046 = new RLIMenuItemList(RLI_STR_MENU_046, 0);
+  i046->addVariant(RLI_STR_ARRAY_NAME_SYMB_BUOY);
+  i046->addVariant(RLI_STR_ARRAY_NAME_SYMB_MILESTONE);
+  i046->addVariant(RLI_STR_ARRAY_NAME_SYMB_UNDERWATER_DAMAGE);
+  i046->addVariant(RLI_STR_ARRAY_NAME_SYMB_ANCHORAGE);
+  i046->addVariant(RLI_STR_ARRAY_NAME_SYMB_COASTAL_LANDMARK);
   m04->add_item(static_cast<RLIMenuItem*>(i046));
 
-  RLIMenuItemInt* i047 = new RLIMenuItemInt(RLIStrings::nMenu047, 1, 4, 1);
+  RLIMenuItemInt* i047 = new RLIMenuItemInt(RLI_STR_MENU_047, 1, 4, 1);
   m04->add_item(static_cast<RLIMenuItem*>(i047));
   routeSaverItem = i047;
 
 
   // --------------------------
-  RLIMenuItemMenu* m05 = new RLIMenuItemMenu(RLIStrings::nMenu05, m0);
+  RLIMenuItemMenu* m05 = new RLIMenuItemMenu(RLI_STR_MENU_05, m0);
   m0->add_item(m05);
 
-  RLIMenuItemList* i050 = new RLIMenuItemList(RLIStrings::nMenu050, 0);
-  i050->addVariant(RLIStrings::nameSign[0]);
-  i050->addVariant(RLIStrings::nameSign[1]);
-  i050->addVariant(RLIStrings::nameSign[2]);
+  RLIMenuItemList* i050 = new RLIMenuItemList(RLI_STR_MENU_050, 0);
+  i050->addVariant(RLI_STR_ARRAY_NAME_SIGN_UNINDENT);
+  i050->addVariant(RLI_STR_ARRAY_NAME_SIGN_FRIENDLY);
+  i050->addVariant(RLI_STR_ARRAY_NAME_SIGN_ENEMY);
   m05->add_item(static_cast<RLIMenuItem*>(i050));
 
-  RLIMenuItemList* i051 = new RLIMenuItemList(RLIStrings::nMenu051, 0);
-  i051->addVariant(RLIStrings::nameRecog[0]);
-  i051->addVariant(RLIStrings::nameRecog[1]);
-  i051->addVariant(RLIStrings::nameRecog[2]);
+  RLIMenuItemList* i051 = new RLIMenuItemList(RLI_STR_MENU_051, 0);
+  i051->addVariant(RLI_STR_ARRAY_NAME_RECOG_OFF);
+  i051->addVariant(RLI_STR_ARRAY_NAME_RECOG_ROUND);
+  i051->addVariant(RLI_STR_ARRAY_NAME_RECOG_SECT);
   m05->add_item(static_cast<RLIMenuItem*>(i051));
 
-  RLIMenuItemList* i052 = new RLIMenuItemList(RLIStrings::nMenu052, 0);
-  i052->addVariant(RLIStrings::OffOnArray[0]);
-  i052->addVariant(RLIStrings::OffOnArray[1]);
+  RLIMenuItemList* i052 = new RLIMenuItemList(RLI_STR_MENU_052, 0);
+  i052->addVariant(RLI_STR_ARRAY_OFFON_OFF);
+  i052->addVariant(RLI_STR_ARRAY_OFFON_ON);
   m05->add_item(static_cast<RLIMenuItem*>(i052));
 
   // --------------------------
@@ -629,6 +463,7 @@ void MenuEngine::setState(MenuState state) {
       _menu = _cnfg_menu;
       break;
   }
+
   _selected_line = 1;
   _need_update = true;
   _last_action_time = QDateTime::currentDateTime();
@@ -638,20 +473,14 @@ void MenuEngine::onAnalogZeroChanged(int val) {
   analogZeroItem->setValue(val);
 }
 
-void MenuEngine::onLanguageChanged(const QByteArray& lang) {
-  QString lang_str = _dec1->toUnicode(lang);
+void MenuEngine::onLanguageChanged(RLIString lang_str) {
+  if (lang_str == RLI_STR_ARRAY_LANG_ENGL)
+    _lang = RLI_LANG_ENGLISH;
 
-  if (_lang == RLI_LANG_RUSSIAN && (lang_str == _dec->toUnicode(RLIStrings::nEng[RLI_LANG_RUSSIAN])
-                             || lang_str == _dec->toUnicode(RLIStrings::nEng[RLI_LANG_ENGLISH]))) {
-      _lang = RLI_LANG_ENGLISH;
-      _need_update = true;
-  }
+  if (lang_str == RLI_STR_ARRAY_LANG_RUS)
+    _lang = RLI_LANG_RUSSIAN;
 
-  if (_lang == RLI_LANG_ENGLISH && (lang_str == _dec->toUnicode(RLIStrings::nRus[RLI_LANG_ENGLISH])
-                             || lang_str == _dec->toUnicode(RLIStrings::nRus[RLI_LANG_RUSSIAN]))) {
-      _lang = RLI_LANG_RUSSIAN;
-      _need_update = true;
-  }
+  _need_update = true;
 }
 
 void MenuEngine::onUp() {

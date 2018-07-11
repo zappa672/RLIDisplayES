@@ -61,7 +61,9 @@ SOURCES     += \
     src/layers/targetengine.cpp \    
     src/layers/controlsengine.cpp \
     src/layers/magnifierengine.cpp \
-    src/layers/info/infoblock.cpp
+    src/layers/info/infoblock.cpp \
+    src/common/rlisttrings.cpp \
+    src/layers/info/menuitem.cpp
 
 HEADERS     += \
     src/mainwindow.h \
@@ -100,7 +102,9 @@ HEADERS     += \
     src/layers/controlsengine.h \
     src/layers/magnifierengine.h \
     src/common/rlilayout.h \
-    src/layers/info/infoblock.h
+    src/layers/info/infoblock.h \
+    src/common/rlistringnames.h \
+    src/layers/info/menuitem.h
 
 FORMS       += \
     forms/mainwindow.ui \

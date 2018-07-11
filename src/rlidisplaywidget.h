@@ -34,7 +34,7 @@ public:
   inline RadarEngine*     radarEngine()   { return _radarEngine; }
   inline RadarEngine*     tailsEngine()   { return _tailsEngine; }
   inline ChartEngine*     chartEngine()   { return _chartEngine; }
-  inline InfoEngine*      infoEngine()    { return _infoEngine; }
+  //inline InfoEngine*      infoEngine()    { return _infoEngine; }
   inline MenuEngine*      menuEngine()    { return _menuEngine; }
   inline MagnifierEngine* magnifierEngine() { return _magnEngine; }
   inline TargetEngine*    targetEngine()  { return _trgtEngine; }
@@ -60,9 +60,6 @@ protected slots:
   void initializeGL();
   void resizeGL(int w, int h);
   void paintGL();
-
-  void keyReleaseEvent(QKeyEvent *event);
-  void keyPressEvent(QKeyEvent *event);
 
 private slots:
   void onNewChartAvailable(const QString& name);
@@ -93,7 +90,7 @@ private:
   RadarEngine*      _radarEngine;
   RadarEngine*      _tailsEngine;
   ChartEngine*      _chartEngine;
-  InfoEngine*       _infoEngine;
+  //InfoEngine*       _infoEngine;
   MenuEngine*       _menuEngine;
   TargetEngine*     _trgtEngine;
   ControlsEngine*   _ctrlEngine;

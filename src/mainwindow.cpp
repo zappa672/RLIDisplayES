@@ -26,7 +26,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
   connect(_ship_ds, SIGNAL(positionChanged(std::pair<float,float>))
          ,&RLIState::instance(), SLOT(onShipPositionChanged(std::pair<float,float>)));
 
-  _gain_ctrl = new ValueBarController(RLIStrings::nGain, 255, this);
+  /*_gain_ctrl = new ValueBarController(RLIStrings::nGain, 255, this);
   connect(this, SIGNAL(gainChanged(int)), _gain_ctrl, SLOT(onValueChanged(int)));
   connect(wgtButtonPanel, SIGNAL(gainChanged(int)), _gain_ctrl, SLOT(onValueChanged(int)));
 
@@ -70,6 +70,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
   _vn_ctrl = new VnController(this);
   _vd_ctrl = new VdController(this);
+  */
 }
 
 MainWindow::~MainWindow() {
@@ -80,6 +81,7 @@ MainWindow::~MainWindow() {
   delete _ship_ds;
   delete _target_ds;
 
+  /*
   delete _gain_ctrl;
   delete _water_ctrl;
   delete _rain_ctrl;
@@ -112,6 +114,7 @@ MainWindow::~MainWindow() {
 
   delete _vn_ctrl;
   delete _vd_ctrl;
+  */
 
   delete ui;
 }
@@ -140,6 +143,7 @@ void MainWindow::resizeEvent(QResizeEvent* e) {
 
   const RLILayout* layout = RLIConfig::instance().currentLayout();
 
+  /*
   _gain_ctrl->resize(layout->panels["gain"]);
   _water_ctrl->resize(layout->panels["water"]);
   _rain_ctrl->resize(layout->panels["rain"]);
@@ -170,13 +174,14 @@ void MainWindow::resizeEvent(QResizeEvent* e) {
 
   _vn_ctrl->resize(layout->panels["vn"]);
   _vd_ctrl->resize(layout->panels["vd"]);
+  */
 }
 
 void MainWindow::timerEvent(QTimerEvent* e) {
   Q_UNUSED(e);
-
+  /*
   _fps_ctrl->setFpsVal(wgtRLI->frameRate());
-
+  */
   wgtRLI->update();
 }
 
@@ -198,6 +203,7 @@ void MainWindow::onRLIWidgetInitialized() {
 
   const RLILayout* layout = RLIConfig::instance().currentLayout();
 
+  /*
   setupInfoBlock(_gain_ctrl, layout->panels["gain"]);
   setupInfoBlock(_water_ctrl, layout->panels["water"]);
   setupInfoBlock(_rain_ctrl, layout->panels["rain"]);
@@ -228,8 +234,10 @@ void MainWindow::onRLIWidgetInitialized() {
 
   setupInfoBlock(_vn_ctrl, layout->panels["vn"]);
   setupInfoBlock(_vd_ctrl, layout->panels["vd"]);
+  */
 }
 
+/*
 void MainWindow::setupInfoBlock(InfoBlockController* ctrl, const RLIPanelInfo& panelInfo) {
   InfoBlock* blck = wgtRLI->infoEngine()->addInfoBlock();
   ctrl->setupBlock(blck, panelInfo);
@@ -237,7 +245,7 @@ void MainWindow::setupInfoBlock(InfoBlockController* ctrl, const RLIPanelInfo& p
   connect(ctrl, SIGNAL(setRect(int, QRect)), blck, SLOT(setRect(int, QRect)));
   connect(ctrl, SIGNAL(setText(int, int, QByteArray)), blck, SLOT(setText(int, int, QByteArray)));
 }
-
+*/
 
 
 void MainWindow::keyReleaseEvent(QKeyEvent *event) {
@@ -245,13 +253,14 @@ void MainWindow::keyReleaseEvent(QKeyEvent *event) {
 }
 
 void MainWindow::keyPressEvent(QKeyEvent *event) {
-  std::pair<float, float> shipPos;
-  Qt::KeyboardModifiers mod_keys = event->modifiers();
+  //std::pair<float, float> shipPos;
+  //Qt::KeyboardModifiers mod_keys = event->modifiers();
 
   float chartScale;
 
   switch(event->key()) {
   case Qt::Key_PageUp:
+    /*
     if (mod_keys & Qt::ControlModifier)
       emit gainChanged(qMin(_gain_ctrl->value() + 5, 255));
 
@@ -260,9 +269,10 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
 
     if (mod_keys & Qt::ShiftModifier)
       emit rainChanged(qMin(_rain_ctrl->value() + 5, 255));
-
+    */
     break;
   case Qt::Key_PageDown:
+    /*
     if (mod_keys & Qt::ControlModifier)
       emit gainChanged(qMin(_gain_ctrl->value() - 5, 255));
 
@@ -271,7 +281,7 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
 
     if (mod_keys & Qt::ShiftModifier)
       emit rainChanged(qMin(_rain_ctrl->value() - 5, 255));
-
+    */
     break;
 
   // Под. имп. Помех

@@ -1,3 +1,4 @@
+/*
 #include "infoblock.h"
 
 #include <QDebug>
@@ -47,4 +48,4 @@ void InfoBlock::setGeometry(const QRect& r) {
   delete _fbo;
   _fbo = new QOpenGLFramebufferObject(_geometry.size());
 }
-
+*/

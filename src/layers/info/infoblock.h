@@ -1,3 +1,5 @@
+/*
+
 #ifndef INFOBLOCK_H
 #define INFOBLOCK_H
 
@@ -88,3 +90,5 @@ private:
 
 
 #endif // INFOBLOCK_H
+
+*/

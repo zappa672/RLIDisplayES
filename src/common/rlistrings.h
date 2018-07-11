@@ -1,14 +1,162 @@
 #ifndef RLISTRINGS_H
 #define RLISTRINGS_H
 
+#include <QMap>
+#include <QVector>
 #include <QByteArray>
+#include <QTextEncoder>
 
-enum RLILang { RLI_LANG_FIRST = 0, RLI_LANG_ENGLISH = 0, RLI_LANG_RUSSIAN = 1, RLI_LANG_LAST = 1, RLI_LANG_COUNT = 2 };
+#include "rlistringnames.h"
 
+enum RLILang {
+  RLI_LANG_ENGLISH = 0,
+  RLI_LANG_RUSSIAN = 1,
+  RLI_LANG_COUNT = 2
+};
+
+class RLIStrings {
+public:
+  static RLIStrings& instance() {
+    static RLIStrings instance;
+    return instance;
+  }
+
+  const QByteArray string(RLILang lang, RLIString name) const { return _strings[name][lang]; }
+  const QTextEncoder* encoder() const { return _encoder; }
+
+private:
+  RLIStrings(void);
+  ~RLIStrings(void);
+
+  // Singleton
+  RLIStrings(RLIStrings const&) = delete;
+  RLIStrings& operator= (RLIStrings const&) = delete;
+
+  QTextEncoder* _encoder;
+  void addString(RLIString name, QVector<QString> vals);
+
+  QMap<RLIString, QVector<QByteArray>> _strings;
+};
+
+
+/*
 namespace RLIStrings {
   static char* nBlank[2] =   { "",	"" };
   static char* nEng[2] =     { "ENG",	"АНГЛ" };
   static char* nRus[2] =     { "RUS",	"РУС" };
+
+  // для главного меню
+  static char* nMenu0[2] =   { "MAIN MENU", "ГЛАВНОЕ МЕНЮ" };
+
+  static char* nMenu00[2] =  { "BRIGHTNESS", "ЯРКОСТЬ" };
+  static char* nMenu01[2] =  { "AUTO PLOTTING", "АВТОПРОКЛАДКА" };
+  static char* nMenu02[2] =  { "SETTINGS", "УСТАНОВКИ" };
+  static char* nMenu03[2] =  { "RADAR TEST", "КОНТРОЛЬ" };
+  static char* nMenu04[2] =  { "MAP", "КАРТА" };
+  static char* nMenu05[2] =  { "RECOGNITION", "ОПОЗНАВАНИЕ" };
+
+  static char* nMenu000[2] = { "RADAR PICTURE", "РЛ ВИДЕО " };
+  static char* nMenu001[2] = { "MEASURES", "ИЗМЕРИТ СРЕДСТВА" };
+  static char* nMenu002[2] = { "FCC", "МД" };
+  static char* nMenu003[2] = { "PLOT SYMBOLS", "СИМВОЛЫ АРП" };
+  static char* nMenu004[2] = { "TAILS", "СЛЕДЫ" };
+  static char* nMenu005[2] = { "SCREEN PANEL", "ПАНЕЛЬ" };
+  static char* nMenu006[2] = { "CONTROL PANEL", "ПУЛЬТ" };
+  static char* nMenu007[2] = { "MAP", "КАРТА" };
+  static char* nMenu008[2] = { "DAY/NIGHT", "ДЕНЬ/НОЧЬ" };
+
+  static char* nMenu010[2] = { "CPA  LIMIT nm", "ОПАСН ДКС миль" };
+  static char* nMenu011[2] = { "TCPA LIMITmin", "ОПАСН ВКС  мин" };
+  static char* nMenu012[2] = { "VECTORS    min", "ВЕКТОРЫ    мин" };
+  static char* nMenu013[2] = { "TAILS/PNT min", "СЛЕДЫ/ТЧК  мин" };
+  static char* nMenu014[2] = { "NUMBER TARGET", "НОМЕРА ЦЕЛЕЙ" };
+  static char* nMenu015[2] = { "AZ DELETE", "СБРОС ЗОНЫ" };
+  static char* nMenu016[2] = { "AZ SETTING", "УСТАН ЗОНЫ" };
+  static char* nMenu017[2] = { "TRUE VECTOR", "ЛИД" };
+
+  static char* nMenu020[2] = { "TUNE", "РПЧ" };
+  static char* nMenu021[2] = { "CHANGE VRM", "СМЕНА ВД" };
+  static char* nMenu022[2] = { "SPEED DEVICE", "ДАТЧИК СКОР" };
+  static char* nMenu023[2] = { "MAN SPD kts ", "СК  РУЧ  уз " };
+  static char* nMenu024[2] = { "STAB SYSTEM", "ДАТЧИК СТАБ" };
+  static char* nMenu025[2] = { "TIMER min", "ТАЙМЕР мин" };
+  static char* nMenu026[2] = { "LANGUAGE", "ЯЗЫК" };
+  static char* nMenu027[2] = { "GYRO ALIGN", "СОГЛАС ГИРО" };
+  static char* nMenu028[2] = { "DANGER DPT m","ОПАС ГЛУБ м" };
+  static char* nMenu029[2] = { "ANCHORAGE m", "ЯКОРНАЯ СТ м" };
+  static char* nMenu02A[2] = { "STAB NOISE", "ШУМ СТАБ" };
+
+  static char* nMenu030[2] = { "STROBE AT", "СТРОБ АС" };
+  static char* nMenu031[2] = { "TARGETS SIMUL", "ИМИТАЦИЯ ЦЕЛИ" };
+  static char* nMenu032[2] = { "PERFORM MON", "ЭП" };
+  static char* nMenu033[2] = { "PEAK POWER", "КИМ" };
+  static char* nMenu034[2] = { "MAGNETRON", "ТОК МАГНЕТР" };
+  static char* nMenu035[2] = { "DISP TRIG", "ЗАПУСК И" };
+  static char* nMenu036[2] = { "RADAR VIDEO", "РЛ ВИДЕО" };
+  static char* nMenu037[2] = { "AZ PULSE", "КУА" };
+  static char* nMenu038[2] = { "HEAD PULSE", "ОК" };
+
+  static char* nMenu040[2] = { "CALL ROUTE №", "ВЫЗОВ КАРТЫ №" };
+  static char* nMenu041[2] = { "TAILS/PNT", "СЛЕДЫ/ТЧК" };
+  static char* nMenu042[2] = { "-------------------", "-------------------" };
+  static char* nMenu043[2] = { "FARWATER m", "ФАРВАТЕР м" };
+  static char* nMenu044[2] = { "LINE OF A ROUTE", "ЛИНИЯ МАРШРУТА" };
+  static char* nMenu045[2] = { "POINT NUMBER", "НОМЕР ТОЧКИ" };
+  static char* nMenu046[2] = { "SYMBOLS", "СИМВОЛЫ" };
+  static char* nMenu047[2] = { "RECORDING MAP №", "ЗАПИСЬ КАРТЫ №" };
+
+  static char* nMenu050[2] = { "SIGN", "ПРИЗНАК" };
+  static char* nMenu051[2] = { "REQUEST", "ЗАПРОС" };
+  static char* nMenu052[2] = { "ABORT EMIS", "ЗАПРЕТ ИЗЛУЧ" };
+
+
+
+  // для меню конфигурация
+  static char* nMenu1[2] =   { "CONFIG", "КОНФИГУРАЦИЯ" };
+
+  static char* nMenu10[2] =  { "TUNINGS", "НАСТРОЙКИ" };
+
+  static char* nMenu100[2] =  { "LOG SIGNAL", "СИГНАЛ ЛАГА" };
+  static char* nMenu101[2] =  { "RANGE CCN", "КОР ДАЛЬН" };
+  static char* nMenu102[2] =  { "BEARING CCN", "КОР НАПР" };
+  static char* nMenu103[2] =  { "BEGIN TR OFF", "НАЧ ОТКЛ ПП" };
+  static char* nMenu104[2] =  { "END TR OFF", "КОН ОТКЛ ПП" };
+  static char* nMenu105[2] =  { "BAND    ", "ДИАПАЗОН" };
+  static char* nMenu106[2] =  { "GRAPH AFC", "ГРАФИК АПЧ" };
+  static char* nMenu107[2] =  { "MASTER BRIGHTN", "ОБЩАЯ ЯРКОСТЬ" };
+
+  static char* nMenu11[2] =  { "TUNINGS PIKO", "НАСТРОЙКИ ПИКО" };
+
+  static char* nMenu110[2] =  { "MAX VIDEO", "ДИН ДИАП ВС" };
+  static char* nMenu111[2] =  { "TOP MARGIN", "ОГРАН ВЕРХОВ" };
+  static char* nMenu112[2] =  { "ANALOG ZERO", "АНАЛОГ 0 ВС" };
+  static char* nMenu113[2] =  { "NOISE MARGIN", "ОГРАН ШУМОВ" };
+  static char* nMenu114[2] =  { "TRESH AT", "ПОРОГ АС" };
+  static char* nMenu115[2] =  { "TRESH AT", "ПОРОГ СЛЕДОВ" };
+  static char* nMenu116[2] =  { "THRESH ZONE", "ПОРОГ ЗОНЫ" };
+  static char* nMenu117[2] =  { "THRESH ACCUM", "ПОР ЯРК НАКОП" };
+  static char* nMenu118[2] =  { "DELTA ARPA 6", "ДЕЛЬТА САРП 6" };
+  static char* nMenu119[2] =  { "DELTA ZONE 6", "ДЕЛЬТА ЗОНЫ 6" };
+  static char* nMenu1110[2] =  { "DELTA ZONE 12", "ДЕЛЬТА ЗОНЫ 12" };
+
+  static char* nMenu12[2] =  { "NMEA ACCEPT", "ПРИЕМ NMEA" };
+
+  static char* nMenu120[2] =  { "GGA ", "GGA " };
+  static char* nMenu121[2] =  { "ZDA ", "ZDA " };
+  static char* nMenu122[2] =  { "VTG ", "VTG " };
+  static char* nMenu123[2] =  { "DPT ", "DPT " };
+  static char* nMenu124[2] =  { "DBT ", "DBT " };
+  static char* nMenu125[2] =  { "VBW ", "VBW " };
+  static char* nMenu126[2] =  { "VHW ", "VHW " };
+  static char* nMenu127[2] =  { "RMC ", "RMC " };
+
+  static char* nMenu13[2] =  { "NMEA TRANSM", "ПЕРЕДАЧА NMEA" };
+
+  static char* nMenu130[2] =  { "TTM", "TTM" };
+  static char* nMenu131[2] =  { "VHW", "VHW" };
+  static char* nMenu132[2] =  { "RSD", "RSD" };
+  static char* nMenu133[2] =  { "BAUDRATE", "СК ОБМЕНА" };
+
 
   static char* nEmsn[2] =    { "EMISSION",	"ИЗЛУЧЕНИЕ" };
   static char* nGrad[2] =    { "°   ",	"°   " };
@@ -97,69 +245,7 @@ namespace RLIStrings {
   static char* nEcho[2] =    { "DEPTH", "ГЛУБИНА" };
   static char* nMetrs[2] =   { "METRS", "МЕТРЫ" };
 
-  // для главного меню
-  static char* nMenu0[2] =   { "MAIN MENU", "ГЛАВНОЕ МЕНЮ" };
 
-  static char* nMenu00[2] =  { "BRIGHTNESS", "ЯРКОСТЬ" };
-  static char* nMenu01[2] =  { "AUTO PLOTTING", "АВТОПРОКЛАДКА" };
-  static char* nMenu02[2] =  { "SETTINGS", "УСТАНОВКИ" };
-  static char* nMenu03[2] =  { "RADAR TEST", "КОНТРОЛЬ" };
-  static char* nMenu04[2] =  { "MAP", "КАРТА" };
-  static char* nMenu05[2] =  { "RECOGNITION", "ОПОЗНАВАНИЕ" };
-
-  static char* nMenu000[2] = { "RADAR PICTURE", "РЛ ВИДЕО " };
-  static char* nMenu001[2] = { "MEASURES", "ИЗМЕРИТ СРЕДСТВА" };
-  static char* nMenu002[2] = { "FCC", "МД" };
-  static char* nMenu003[2] = { "PLOT SYMBOLS", "СИМВОЛЫ АРП" };
-  static char* nMenu004[2] = { "TAILS", "СЛЕДЫ" };
-  static char* nMenu005[2] = { "SCREEN PANEL", "ПАНЕЛЬ" };
-  static char* nMenu006[2] = { "CONTROL PANEL", "ПУЛЬТ" };
-  static char* nMenu007[2] = { "MAP", "КАРТА" };
-  static char* nMenu008[2] = { "DAY/NIGHT", "ДЕНЬ/НОЧЬ" };
-
-  static char* nMenu010[2] = { "CPA  LIMIT nm", "ОПАСН ДКС миль" };
-  static char* nMenu011[2] = { "TCPA LIMITmin", "ОПАСН ВКС  мин" };
-  static char* nMenu012[2] = { "VECTORS    min", "ВЕКТОРЫ    мин" };
-  static char* nMenu013[2] = { "TAILS/PNT min", "СЛЕДЫ/ТЧК  мин" };
-  static char* nMenu014[2] = { "NUMBER TARGET", "НОМЕРА ЦЕЛЕЙ" };
-  static char* nMenu015[2] = { "AZ DELETE", "СБРОС ЗОНЫ" };
-  static char* nMenu016[2] = { "AZ SETTING", "УСТАН ЗОНЫ" };
-  static char* nMenu017[2] = { "TRUE VECTOR", "ЛИД" };
-
-  static char* nMenu020[2] = { "TUNE", "РПЧ" };
-  static char* nMenu021[2] = { "CHANGE VRM", "СМЕНА ВД" };
-  static char* nMenu022[2] = { "SPEED DEVICE", "ДАТЧИК СКОР" };
-  static char* nMenu023[2] = { "MAN SPD kts ", "СК  РУЧ  уз " };
-  static char* nMenu024[2] = { "STAB SYSTEM", "ДАТЧИК СТАБ" };
-  static char* nMenu025[2] = { "TIMER min", "ТАЙМЕР мин" };
-  static char* nMenu026[2] = { "LANGUAGE", "ЯЗЫК" };
-  static char* nMenu027[2] = { "GYRO ALIGN", "СОГЛАС ГИРО" };
-  static char* nMenu028[2] = { "DANGER DPT m","ОПАС ГЛУБ м" };
-  static char* nMenu029[2] = { "ANCHORAGE m", "ЯКОРНАЯ СТ м" };
-  static char* nMenu02A[2] = { "STAB NOISE", "ШУМ СТАБ" };
-
-  static char* nMenu030[2] = { "STROBE AT", "СТРОБ АС" };
-  static char* nMenu031[2] = { "TARGETS SIMUL", "ИМИТАЦИЯ ЦЕЛИ" };
-  static char* nMenu032[2] = { "PERFORM MON", "ЭП" };
-  static char* nMenu033[2] = { "PEAK POWER", "КИМ" };
-  static char* nMenu034[2] = { "MAGNETRON", "ТОК МАГНЕТР" };
-  static char* nMenu035[2] = { "DISP TRIG", "ЗАПУСК И" };
-  static char* nMenu036[2] = { "RADAR VIDEO", "РЛ ВИДЕО" };
-  static char* nMenu037[2] = { "AZ PULSE", "КУА" };
-  static char* nMenu038[2] = { "HEAD PULSE", "ОК" };
-
-  static char* nMenu040[2] = { "CALL ROUTE №", "ВЫЗОВ КАРТЫ №" };
-  static char* nMenu041[2] = { "TAILS/PNT", "СЛЕДЫ/ТЧК" };
-  static char* nMenu042[2] = { "-------------------", "-------------------" };
-  static char* nMenu043[2] = { "FARWATER m", "ФАРВАТЕР м" };
-  static char* nMenu044[2] = { "LINE OF A ROUTE", "ЛИНИЯ МАРШРУТА" };
-  static char* nMenu045[2] = { "POINT NUMBER", "НОМЕР ТОЧКИ" };
-  static char* nMenu046[2] = { "SYMBOLS", "СИМВОЛЫ" };
-  static char* nMenu047[2] = { "RECORDING MAP №", "ЗАПИСЬ КАРТЫ №" };
-
-  static char* nMenu050[2] = { "SIGN", "ПРИЗНАК" };
-  static char* nMenu051[2] = { "REQUEST", "ЗАПРОС" };
-  static char* nMenu052[2] = { "ABORT EMIS", "ЗАПРЕТ ИЗЛУЧ" }; 
 
   // выбор день/ночь
   static char* dayArray[2][2] = { { "NIGHT", "НОЧЬ" }
@@ -220,51 +306,7 @@ namespace RLIStrings {
                                 , { "ENEMY", "ЧУЖОЙ" } };
 
 
-  // для меню конфигурация
-  static char* nMenu1[2] =   { "CONFIG", "КОНФИГУРАЦИЯ" };
 
-  static char* nMenu10[2] =  { "TUNINGS", "НАСТРОЙКИ" };
-
-  static char* nMenu100[2] =  { "LOG SIGNAL", "СИГНАЛ ЛАГА" };
-  static char* nMenu101[2] =  { "RANGE CCN", "КОР ДАЛЬН" };
-  static char* nMenu102[2] =  { "BEARING CCN", "КОР НАПР" };
-  static char* nMenu103[2] =  { "BEGIN TR OFF", "НАЧ ОТКЛ ПП" };
-  static char* nMenu104[2] =  { "END TR OFF", "КОН ОТКЛ ПП" };
-  static char* nMenu105[2] =  { "BAND    ", "ДИАПАЗОН" };
-  static char* nMenu106[2] =  { "GRAPH AFC", "ГРАФИК АПЧ" };
-  static char* nMenu107[2] =  { "MASTER BRIGHTN", "ОБЩАЯ ЯРКОСТЬ" };
-
-  static char* nMenu11[2] =  { "TUNINGS PIKO", "НАСТРОЙКИ ПИКО" };
-
-  static char* nMenu110[2] =  { "MAX VIDEO", "ДИН ДИАП ВС" };
-  static char* nMenu111[2] =  { "TOP MARGIN", "ОГРАН ВЕРХОВ" };
-  static char* nMenu112[2] =  { "ANALOG ZERO", "АНАЛОГ 0 ВС" };
-  static char* nMenu113[2] =  { "NOISE MARGIN", "ОГРАН ШУМОВ" };
-  static char* nMenu114[2] =  { "TRESH AT", "ПОРОГ АС" };
-  static char* nMenu115[2] =  { "TRESH AT", "ПОРОГ СЛЕДОВ" };
-  static char* nMenu116[2] =  { "THRESH ZONE", "ПОРОГ ЗОНЫ" };
-  static char* nMenu117[2] =  { "THRESH ACCUM", "ПОР ЯРК НАКОП" };
-  static char* nMenu118[2] =  { "DELTA ARPA 6", "ДЕЛЬТА САРП 6" };
-  static char* nMenu119[2] =  { "DELTA ZONE 6", "ДЕЛЬТА ЗОНЫ 6" };
-  static char* nMenu1110[2] =  { "DELTA ZONE 12", "ДЕЛЬТА ЗОНЫ 12" };
-
-  static char* nMenu12[2] =  { "NMEA ACCEPT", "ПРИЕМ NMEA" };
-
-  static char* nMenu120[2] =  { "GGA ", "GGA " };
-  static char* nMenu121[2] =  { "ZDA ", "ZDA " };
-  static char* nMenu122[2] =  { "VTG ", "VTG " };
-  static char* nMenu123[2] =  { "DPT ", "DPT " };
-  static char* nMenu124[2] =  { "DBT ", "DBT " };
-  static char* nMenu125[2] =  { "VBW ", "VBW " };
-  static char* nMenu126[2] =  { "VHW ", "VHW " };
-  static char* nMenu127[2] =  { "RMC ", "RMC " };
-
-  static char* nMenu13[2] =  { "NMEA TRANSM", "ПЕРЕДАЧА NMEA" };
-
-  static char* nMenu130[2] =  { "TTM", "TTM" };
-  static char* nMenu131[2] =  { "VHW", "VHW" };
-  static char* nMenu132[2] =  { "RSD", "RSD" };
-  static char* nMenu133[2] =  { "BAUDRATE", "СК ОБМЕНА" };
 
 
 
@@ -283,5 +325,5 @@ namespace RLIStrings {
                                  , { "S", "S" }
                                  , { "K", "K" } };
 }
-
+*/
 #endif // RLISTRINGS_H

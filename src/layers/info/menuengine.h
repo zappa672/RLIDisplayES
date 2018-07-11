@@ -4,164 +4,17 @@
 #include <QDebug>
 #include <QDateTime>
 #include <QByteArray>
-#include <QTextEncoder>
-#include <QTextDecoder>
 
 #include <QOpenGLFunctions>
 #include <QOpenGLFramebufferObject>
 #include <QOpenGLShaderProgram>
 
 #include "infofonts.h"
+#include "menuitem.h"
+
 #include "../../common/rlistrings.h"
 #include "../../common/rliconfig.h"
 #include "../routeengine.h"
-
-
-class RLIMenuItem : public QObject {
-  Q_OBJECT
-public:
-  RLIMenuItem(char** name, QObject* parent = 0);
-
-  virtual QByteArray name(int lang_id) { return _name[lang_id]; }
-  virtual QByteArray value(int lang_id) { Q_UNUSED(lang_id); return QByteArray(); }
-  virtual int setValue(QByteArray val) {Q_UNUSED(val); return -1; }
-
-  inline bool enabled() { return _enabled; }
-  inline void setEnabled(bool val) { _enabled = val; }
-
-  inline bool locked() { return _locked; }
-  inline void setLocked(bool val) { _locked = val; }
-
-  virtual void up() { }
-  virtual void down() { }
-  virtual void action() { }
-
-  enum RLI_MENU_ITEM_TYPE { MENU, LIST, INT, FLOAT, ACTION};
-
-  virtual RLI_MENU_ITEM_TYPE type() { return _type; }
-
-protected:
-  RLI_MENU_ITEM_TYPE _type;
-
-  QTextEncoder* _enc;
-  QTextDecoder* _dec;
-
-  bool _enabled;
-  bool _locked;
-
-private:
-  QByteArray _name[RLI_LANG_COUNT];
-};
-
-
-class RLIMenuItemAction : public RLIMenuItem {
-  Q_OBJECT
-public:
-  RLIMenuItemAction(char** name, QObject* parent = 0);
-  ~RLIMenuItemAction() {}
-
-  void action();
-
-signals:
-  void triggered();
-
-private:
-};
-
-
-class RLIMenuItemMenu : public RLIMenuItem {
-public:
-  RLIMenuItemMenu(char** name, RLIMenuItemMenu* parent);
-  ~RLIMenuItemMenu();
-
-  inline QByteArray value(int lang_id) { Q_UNUSED(lang_id); return QByteArray(); }
-
-  inline RLIMenuItemMenu* parent()      { return _parent; }
-  inline RLIMenuItem*     item(int i)   { return _items[i]; }
-  inline int              item_count()  { return _items.size(); }
-  inline void add_item(RLIMenuItem* i)  { _items.push_back(i); }
-
-private:
-  RLIMenuItemMenu* _parent;
-  QVector<RLIMenuItem*> _items;
-};
-
-
-class RLIMenuItemList : public RLIMenuItem {
-  Q_OBJECT
-public:
-  RLIMenuItemList(char** name, int def_ind, QObject* parent = 0);
-  ~RLIMenuItemList() {}
-
-  inline QByteArray value(int lang_id) { return _variants[lang_id][_index]; }
-  void addVariant(char** values);
-
-  void up();
-  void down();
-
-signals:
-  void valueChanged(const QByteArray);
-
-private:
-  int _index;
-  QVector<QByteArray> _variants[RLI_LANG_COUNT];
-};
-
-
-class RLIMenuItemInt : public RLIMenuItem {
-    Q_OBJECT
-public:
-  RLIMenuItemInt(char** name, int min, int max, int def, QObject* parent = 0);
-  ~RLIMenuItemInt() {}
-
-  inline QByteArray value(int lang_id) { Q_UNUSED(lang_id); return QString::number(_value).toLatin1(); }
-  inline int intValue() { return _value; }
-  inline int minValue() { return _min; }
-  inline int maxValue() { return _max; }
-
-  void up();
-  void down();
-
-public slots:
-  int setValue(int val);
-  int setValue(QByteArray val);
-
-signals:
-  void valueChanged(int);
-
-private:
-  void adjustDelta();
-
-  QDateTime _change_start_time;
-  QDateTime _last_change_time;
-
-  int _delta;
-
-  int _value;
-  int _min, _max;
-};
-
-
-class RLIMenuItemFloat : public RLIMenuItem {
-public:
-  RLIMenuItemFloat(char** name, float min, float max, float def);
-  ~RLIMenuItemFloat() { }
-
-  inline QByteArray value(int lang_id) { Q_UNUSED(lang_id); return QString::number(_value).left(5).toLatin1(); }
-  inline float fltValue() { return _value; }
-  inline float minValue() { return _min; }
-  inline float maxValue() { return _max; }
-
-  inline void up() { if (_value + _step < _max) _value += _step; }
-  inline void down() { if (_value - _step > _min) _value -= _step; }
-
-private:
-  float _value;
-  float _step;
-  float _min, _max;
-};
-
-
 
 
 class MenuEngine : public QObject, protected QOpenGLFunctions {
@@ -184,13 +37,12 @@ public:
   void resize(const QSize& sz, const QPoint &pos, const QString& font);
 
   inline MenuState state() { return _state; }
-  inline bool visible() { return _state != DISABLED; }
-  inline QByteArray toQByteArray(const char* str) { return _enc->fromUnicode(_dec->toUnicode(str)); }
+  inline bool visible() { return _state != DISABLED; }  
 
 signals:
-  void languageChanged(const QByteArray& lang);
+  void languageChanged(RLIString lang_str);
   void radarBrightnessChanged(int br);
-  void simulationChanged(const QByteArray& sim);
+  void simulationChanged(RLIString lang_str);
 
   void startRouteEdit();
   void finishRouteEdit();
@@ -199,12 +51,12 @@ signals:
   void loadRoute(int index);
 
   void analogZeroChanged(int val);
-  void tailsModeChanged(const QByteArray& val);
-  void bandModeChanged(const QByteArray& val);
+  void tailsModeChanged(RLIString lang_str);
+  void bandModeChanged(RLIString lang_str);
 
 public slots:
   void setState(MenuState state);
-  void onLanguageChanged(const QByteArray& lang);
+  void onLanguageChanged(RLIString lang_str);
 
   void update();
 
@@ -256,9 +108,6 @@ private:
 
   InfoFonts* _fonts;
   RLILang _lang;
-  QTextEncoder* _enc;
-  QTextDecoder* _dec;
-  QTextDecoder* _dec1;
 
   QOpenGLFramebufferObject* _fbo;
   QOpenGLShaderProgram* _prog;
