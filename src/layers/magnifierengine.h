@@ -11,14 +11,14 @@
 #include <QOpenGLFramebufferObject>
 #include <QOpenGLShaderProgram>
 
-#include "../common/rliconfig.h"
+#include "../common/rlilayout.h"
 
 
 class MagnifierEngine : public QObject, protected QOpenGLFunctions {
   Q_OBJECT
 
 public:
-  explicit MagnifierEngine (const RLIPanelInfo& params, QOpenGLContext* context, QObject* parent = 0);
+  explicit MagnifierEngine (const RLIMagnifierLayout& layout, QOpenGLContext* context, QObject* parent = 0);
   virtual ~MagnifierEngine ();
 
   inline bool visible()     { return _visible; }
@@ -26,7 +26,7 @@ public:
 
   inline GLuint texture()   { return _fbo->texture(); }
 
-  void resize(const QSize& sz);
+  void resize(const RLIMagnifierLayout& params);
 
 private slots:
 

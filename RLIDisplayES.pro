@@ -32,7 +32,6 @@ SOURCES     += \
     src/rlidisplaywidget.cpp \
     \
     src/common/properties.cpp \
-    src/common/rliconfig.cpp \
     src/common/triangulate.cpp \
     src/common/rlimath.cpp \
     \
@@ -63,7 +62,8 @@ SOURCES     += \
     src/layers/magnifierengine.cpp \
     src/layers/info/infoblock.cpp \
     src/common/rlisttrings.cpp \
-    src/layers/info/menuitem.cpp
+    src/layers/info/menuitem.cpp \
+    src/common/rlilayout.cpp
 
 HEADERS     += \
     src/mainwindow.h \
@@ -71,7 +71,6 @@ HEADERS     += \
     src/rlidisplaywidget.h \
     \
     src/common/properties.h \
-    src/common/rliconfig.h \
     src/common/triangulate.h \
     src/common/rlimath.h \
     src/common/rlistrings.h \
@@ -118,5 +117,5 @@ RESOURCES   += \
 OTHER_FILES += \
 
 DISTFILES += \
-    chart_disp_conf.xml \
-    layouts.xml
+    layouts.xml \
+    chart_disp_conf.xml

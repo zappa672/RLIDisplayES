@@ -3,7 +3,7 @@
 
 #include <vector>
 
-MagnifierEngine::MagnifierEngine(const RLIPanelInfo& params, QOpenGLContext* context, QObject* parent)
+MagnifierEngine::MagnifierEngine(const RLIMagnifierLayout& layout, QOpenGLContext* context, QObject* parent)
   : QObject(parent), QOpenGLFunctions(context) {
   initializeOpenGLFunctions();
 
@@ -16,7 +16,7 @@ MagnifierEngine::MagnifierEngine(const RLIPanelInfo& params, QOpenGLContext* con
 
   initShaders();
 
-  resize(params.size);
+  resize(layout);
 }
 
 MagnifierEngine::~MagnifierEngine() {
@@ -27,11 +27,12 @@ MagnifierEngine::~MagnifierEngine() {
   glDeleteBuffers(MAGN_ATTR_COUNT, _vbo_ids_radar);
 }
 
-void MagnifierEngine::resize(const QSize& sz) {
+void MagnifierEngine::resize(const RLIMagnifierLayout& layout) {
   if (_fbo != nullptr)
     delete _fbo;
 
-  _fbo = new QOpenGLFramebufferObject(sz);
+  _fbo = new QOpenGLFramebufferObject(layout.geometry.size());
+
   initBorderBuffers();
   initRadarBuffers();
 }

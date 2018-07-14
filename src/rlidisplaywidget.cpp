@@ -7,9 +7,7 @@
 #include <QDateTime>
 #include <QApplication>
 
-#include "common/rliconfig.h"
 #include "common/properties.h"
-
 #include "common/rlistrings.h"
 
 RLIDisplayWidget::RLIDisplayWidget(QWidget *parent) : QOpenGLWidget(parent) {
@@ -20,13 +18,15 @@ RLIDisplayWidget::RLIDisplayWidget(QWidget *parent) : QOpenGLWidget(parent) {
   _initialized = false;
   _debug_radar_tails_shift = 0;
 
-  setMouseTracking(true);
+  _chart_mngr = new ChartManager(this);
+  _layout_manager = new RLILayoutManager("layouts.xml");
 
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "RLIDisplayWidget construction finish";
 }
 
 RLIDisplayWidget::~RLIDisplayWidget() {
   delete _chart_mngr;
+  delete _layout_manager;
 
   if (_initialized) {
     delete _infoFonts;
@@ -95,15 +95,13 @@ void RLIDisplayWidget::initializeGL() {
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_TEXTURE_2D);
 
-  _program = new QOpenGLShaderProgram(this);
-  _chart_mngr = new ChartManager(this);
 
-  const RLILayout* layout = RLIConfig::instance().currentLayout();
+  _program = new QOpenGLShaderProgram(this);
 
   uint peleng_size         = qApp->property(PROPERTY_PELENG_SIZE).toInt();
   uint bearings_per_cycle  = qApp->property(PROPERTY_BEARINGS_PER_CYCLE).toInt();
 
-  uint circle_radius = layout->circle.radius;
+  uint circle_radius = _layout_manager->circleLayout().radius;
 
   // Layers initialization
   //-------------------------------------------------------------
@@ -121,7 +119,7 @@ void RLIDisplayWidget::initializeGL() {
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Tails engine init finish";
 
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Mask engine init start";
-  _maskEngine = new MaskEngine(size(), layout->circle, _infoFonts, context(), this);
+  _maskEngine = new MaskEngine(size(), _layout_manager->circleLayout(), _infoFonts, context(), this);
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Mask engine init finish";
 
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Chart engine init start";
@@ -135,12 +133,12 @@ void RLIDisplayWidget::initializeGL() {
   */
 
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Menu engine init start";
-  _menuEngine = new MenuEngine(layout->menu, context(), this);
+  _menuEngine = new MenuEngine(_layout_manager->menuLayout(), context(), this);
   _menuEngine->setFonts(_infoFonts);
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Menu engine init finish";
 
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Magnifier engine init start";
-  _magnEngine = new MagnifierEngine(layout->magn, context(), this);
+  _magnEngine = new MagnifierEngine(_layout_manager->magnifierLayout(), context(), this);
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Magnifier engine init finish";
 
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Target engine init start";
@@ -196,16 +194,24 @@ void RLIDisplayWidget::resizeGL(int w, int h) {
   if (!_initialized)
     return;
 
-  const RLILayout* lot = RLIConfig::instance().currentLayout();
+  QSize curr_size = _layout_manager->currentSize();
+  _layout_manager->resize(QSize(w, h));
+  QSize new_size = _layout_manager->currentSize();
 
-  _radarEngine->resizeTexture(lot->circle.radius);
-  _tailsEngine->resizeTexture(lot->circle.radius);
-  _chartEngine->resize(lot->circle.radius);
+  if (curr_size == new_size)
+    return;
 
-  _maskEngine->resize(QSize(w, h), lot->circle);
-  _menuEngine->resize(lot->menu.size, lot->menu.position, lot->menu.params["font"]);
-  _magnEngine->resize(lot->magn.size);
+  int circle_radius = _layout_manager->circleLayout().radius;
+
+  _radarEngine->resizeTexture(circle_radius);
+  _tailsEngine->resizeTexture(circle_radius);
+  _chartEngine->resize(circle_radius);
+
+  _maskEngine->resize(QSize(w, h), _layout_manager->circleLayout());
+  _menuEngine->resize(_layout_manager->menuLayout());
+  _magnEngine->resize(_layout_manager->magnifierLayout());
 }
+
 
 float RLIDisplayWidget::frameRate() {
   if (frameTimes.size() < 2)
@@ -217,6 +223,7 @@ float RLIDisplayWidget::frameRate() {
 
   return 1000.f / (f.msecsTo(l) / count);
 }
+
 
 void RLIDisplayWidget::paintGL() {  
   QDateTime time = QDateTime::currentDateTime();
@@ -237,6 +244,7 @@ void RLIDisplayWidget::paintGL() {
   glFlush();
 }
 
+
 void RLIDisplayWidget::paintLayers() {
   glEnable(GL_BLEND);
   glDisable(GL_DEPTH_TEST);
@@ -244,27 +252,28 @@ void RLIDisplayWidget::paintLayers() {
   glBlendEquation(GL_FUNC_ADD);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-  const RLILayout* lot = RLIConfig::instance().currentLayout();
 
   std::pair<float, float> shipPos = RLIState::instance().shipPosition();
   float scale = RLIState::instance().chartScale();
+
 
   glViewport(0, 0, width(), height());
 
   glClearColor(0.f, 0.f, 0.f, 1.f);
   glClear(GL_COLOR_BUFFER_BIT);
 
+
   QPoint shift(_debug_radar_tails_shift, _debug_radar_tails_shift);
+  QPoint topLeft = _layout_manager->circleLayout().bounding_rect.topLeft();
 
 
+  drawRect(QRect(topLeft, _chartEngine->size()), _chartEngine->textureId());
 
-  drawRect(QRect(lot->circle.boundRect.topLeft(), _chartEngine->size()), _chartEngine->textureId());
-
-  drawRect(QRect(lot->circle.boundRect.topLeft() + shift, _radarEngine->size()), _radarEngine->textureId());
-  drawRect(QRect(lot->circle.boundRect.topLeft() - shift, _tailsEngine->size()), _tailsEngine->textureId());
+  drawRect(QRect(topLeft + shift, _radarEngine->size()), _radarEngine->textureId());
+  drawRect(QRect(topLeft - shift, _tailsEngine->size()), _tailsEngine->textureId());
 
 
-  QPointF center = lot->circle.center;
+  QPointF center = _layout_manager->circleLayout().center;
 
   QMatrix4x4 projection;
   projection.setToIdentity();
@@ -285,11 +294,12 @@ void RLIDisplayWidget::paintLayers() {
     drawRect(_infoEngine->blockGeometry(i), _infoEngine->blockTextId(i));
   */
 
-  drawRect(QRect(lot->menu.position, lot->menu.size), _menuEngine->texture());
+  drawRect(_layout_manager->menuLayout().geometry, _menuEngine->texture());
 
   if (_magnEngine->visible())
-    drawRect(QRect(lot->magn.position, lot->magn.size), _magnEngine->texture());
+    drawRect(_layout_manager->magnifierLayout().geometry, _magnEngine->texture());
 }
+
 
 void RLIDisplayWidget::updateLayers() {
   _radarEngine->updateTexture();
@@ -312,6 +322,7 @@ void RLIDisplayWidget::updateLayers() {
                      , 90       // min_pel
                      , 96 );    // min_rad
 }
+
 
 void RLIDisplayWidget::drawRect(const QRectF& rect, GLuint textureId) {
   GLfloat vertices[] =  { static_cast<float>(rect.left()),  static_cast<float>(rect.bottom())

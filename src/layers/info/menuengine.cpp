@@ -12,7 +12,7 @@ const QColor MENU_BORDER_COLOR        (0x40, 0xFC, 0x00);
 const QColor MENU_BACKGRD_COLOR       (0x00, 0x00, 0x00);
 
 
-MenuEngine::MenuEngine(const RLIPanelInfo& params, QOpenGLContext* context, QObject* parent)
+MenuEngine::MenuEngine(const RLIMenuLayout& layout, QOpenGLContext* context, QObject* parent)
   : QObject(parent), QOpenGLFunctions(context)  {
 
   initializeOpenGLFunctions();
@@ -26,7 +26,7 @@ MenuEngine::MenuEngine(const RLIPanelInfo& params, QOpenGLContext* context, QObj
 
   _lang = RLI_LANG_RUSSIAN;
 
-  resize(params.size, params.position, params.params["font"]);
+  resize(layout);
 
   glGenBuffers(INFO_ATTR_COUNT, _vbo_ids);
   initShader();
@@ -562,10 +562,10 @@ void MenuEngine::onBack() {
 }
 
 
-void MenuEngine::resize(const QSize& sz, const QPoint &pos, const QString& font) {
-  _size = sz;
-  _position = pos;
-  _font_tag = font;
+void MenuEngine::resize(const RLIMenuLayout& layout) {
+  _size = layout.geometry.size();
+  _position = layout.geometry.topLeft();
+  _font_tag = layout.font;
 
   if (_fbo != nullptr)
     delete _fbo;

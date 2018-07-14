@@ -1,11 +1,11 @@
 #include "maskengine.h"
 
 #include "../common/properties.h"
-#include "../common/rliconfig.h"
+#include "../common/rlilayout.h"
 
 static double const PI = acos(-1);
 
-MaskEngine::MaskEngine(const QSize& sz, const RLICircleInfo& params, InfoFonts* fonts, QOpenGLContext* context, QObject* parent)
+MaskEngine::MaskEngine(const QSize& sz, const RLICircleLayout& layout, InfoFonts* fonts, QOpenGLContext* context, QObject* parent)
   : QObject(parent), QOpenGLFunctions(context) {
 
   initializeOpenGLFunctions();
@@ -24,7 +24,7 @@ MaskEngine::MaskEngine(const QSize& sz, const RLICircleInfo& params, InfoFonts* 
   _hole_point_count = 362;
 
   initShader();
-  resize(sz, params);
+  resize(sz, layout);
 }
 
 MaskEngine::~MaskEngine() {
@@ -36,14 +36,14 @@ MaskEngine::~MaskEngine() {
   delete _program;
 }
 
-void MaskEngine::resize(const QSize& sz, const RLICircleInfo& params) {
+void MaskEngine::resize(const QSize& sz, const RLICircleLayout& layout) {
   if (_fbo != nullptr && sz == _fbo->size())
      return;
 
   _size = sz;
-  _font = params.font;
-  _hole_radius = params.radius;
-  _hole_center = params.center;
+  _font = layout.font;
+  _hole_radius = layout.radius;
+  _hole_center = layout.center;
   _cursor_pos = _hole_center;
 
   delete _fbo;

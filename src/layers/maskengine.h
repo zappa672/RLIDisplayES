@@ -12,7 +12,7 @@
 #include <QOpenGLFramebufferObjectFormat>
 #include <QOpenGLShaderProgram>
 
-#include "../common/rliconfig.h"
+#include "../common/rlilayout.h"
 #include "info/infofonts.h"
 
 
@@ -20,10 +20,10 @@
 class MaskEngine : public QObject, protected QOpenGLFunctions {
   Q_OBJECT
 public:
-  explicit MaskEngine (const QSize& sz, const RLICircleInfo& params, InfoFonts* fonts, QOpenGLContext* context, QObject* parent = nullptr);
+  explicit MaskEngine (const QSize& sz, const RLICircleLayout& layout, InfoFonts* fonts, QOpenGLContext* context, QObject* parent = nullptr);
   virtual ~MaskEngine ();
 
-  void resize(const QSize& sz, const RLICircleInfo& params);
+  void resize(const QSize& sz, const RLICircleLayout& layout);
 
   inline GLuint textureId()   { return _fbo->texture(); }
 

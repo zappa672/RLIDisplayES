@@ -13,7 +13,7 @@
 #include "menuitem.h"
 
 #include "../../common/rlistrings.h"
-#include "../../common/rliconfig.h"
+#include "../../common/rlilayout.h"
 #include "../routeengine.h"
 
 
@@ -23,7 +23,7 @@ class MenuEngine : public QObject, protected QOpenGLFunctions {
 public:
   enum MenuState { DISABLED, MAIN, CONFIG };
 
-  explicit MenuEngine(const RLIPanelInfo& params, QOpenGLContext* context, QObject* parent = 0);
+  explicit MenuEngine(const RLIMenuLayout& layout, QOpenGLContext* context, QObject* parent = 0);
   virtual ~MenuEngine();
 
   inline QPoint position() { return _position; }
@@ -34,7 +34,7 @@ public:
 
   inline void setFonts(InfoFonts* fonts) { _fonts = fonts; }
 
-  void resize(const QSize& sz, const QPoint &pos, const QString& font);
+  void resize(const RLIMenuLayout& layout);
 
   inline MenuState state() { return _state; }
   inline bool visible() { return _state != DISABLED; }  

@@ -6,7 +6,7 @@
 #include <QScreen>
 #include <QSize>
 
-#include "common/rliconfig.h"
+#include "common/rlilayout.h"
 #include "common/properties.h"
 
 #define RLI_THREADS_NUM 6 // Required number of threads in global QThreadPool

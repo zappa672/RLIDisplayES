@@ -11,6 +11,7 @@
 
 #include "s52/chartmanager.h"
 
+#include "common/rlilayout.h"
 #include "datasources/radarscale.h"
 
 #include "layers/radar/radarengine.h"
@@ -30,15 +31,15 @@ public:
   explicit RLIDisplayWidget(QWidget *parent = 0);
   ~RLIDisplayWidget();
 
-  inline MaskEngine*      maskEngine()    { return _maskEngine; }
-  inline RadarEngine*     radarEngine()   { return _radarEngine; }
-  inline RadarEngine*     tailsEngine()   { return _tailsEngine; }
-  inline ChartEngine*     chartEngine()   { return _chartEngine; }
-  //inline InfoEngine*      infoEngine()    { return _infoEngine; }
-  inline MenuEngine*      menuEngine()    { return _menuEngine; }
+  inline MaskEngine*      maskEngine()      { return _maskEngine; }
+  inline RadarEngine*     radarEngine()     { return _radarEngine; }
+  inline RadarEngine*     tailsEngine()     { return _tailsEngine; }
+  inline ChartEngine*     chartEngine()     { return _chartEngine; }
+  //inline InfoEngine*      infoEngine()      { return _infoEngine; }
+  inline MenuEngine*      menuEngine()      { return _menuEngine; }
   inline MagnifierEngine* magnifierEngine() { return _magnEngine; }
-  inline TargetEngine*    targetEngine()  { return _trgtEngine; }
-  inline ControlsEngine*  controlsEngine() { return _ctrlEngine; }
+  inline TargetEngine*    targetEngine()    { return _trgtEngine; }
+  inline ControlsEngine*  controlsEngine()  { return _ctrlEngine; }
 
   void toggleRadarTailsShift();
   float frameRate();
@@ -83,6 +84,7 @@ private:
   void drawRect(const QRectF& rect, GLuint textureId);
 
   ChartManager* _chart_mngr;
+  RLILayoutManager* _layout_manager;
 
   InfoFonts*    _infoFonts;
 
