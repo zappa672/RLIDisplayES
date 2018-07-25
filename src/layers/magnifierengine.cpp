@@ -32,6 +32,7 @@ void MagnifierEngine::resize(const RLIMagnifierLayout& layout) {
     delete _fbo;
 
   _fbo = new QOpenGLFramebufferObject(layout.geometry.size());
+  _geometry = layout.geometry;
 
   initBorderBuffers();
   initRadarBuffers();

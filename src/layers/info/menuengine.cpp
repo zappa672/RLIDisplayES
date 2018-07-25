@@ -563,14 +563,13 @@ void MenuEngine::onBack() {
 
 
 void MenuEngine::resize(const RLIMenuLayout& layout) {
-  _size = layout.geometry.size();
-  _position = layout.geometry.topLeft();
+  _geometry = layout.geometry;
   _font_tag = layout.font;
 
   if (_fbo != nullptr)
     delete _fbo;
 
-  _fbo = new QOpenGLFramebufferObject(_size);
+  _fbo = new QOpenGLFramebufferObject(_geometry.size());
 
   _need_update = true;
 }
@@ -582,7 +581,7 @@ void MenuEngine::update() {
   if (!_need_update)
     return;
 
-  glViewport(0, 0, _size.width(), _size.height());
+  glViewport(0, 0, _geometry.width(), _geometry.height());
 
   glEnable(GL_BLEND);
 
@@ -594,25 +593,25 @@ void MenuEngine::update() {
 
   QMatrix4x4 projection;
   projection.setToIdentity();
-  projection.ortho(0.f, _size.width(), 0.f, _size.height(), -1.f, 1.f);
+  projection.ortho(0.f, _geometry.width(), 0.f, _geometry.height(), -1.f, 1.f);
 
   _prog->bind();
 
   _prog->setUniformValue(_uniform_locs[INFO_UNIF_MVP], projection);
 
   // Border
-  drawRect(QRect(QPoint(0, 0), QSize(_size.width(), 1)), MENU_BORDER_COLOR);
-  drawRect(QRect(QPoint(0, 0), QSize(1, _size.height())), MENU_BORDER_COLOR);
-  drawRect(QRect(QPoint(0, _size.height()-1), QSize(_size.width(), 1)), MENU_BORDER_COLOR);
-  drawRect(QRect(QPoint(_size.width()-1, 0), QSize(1, _size.height())), MENU_BORDER_COLOR);
+  drawRect(QRect(QPoint(0, 0), QSize(_geometry.width(), 1)), MENU_BORDER_COLOR);
+  drawRect(QRect(QPoint(0, 0), QSize(1, _geometry.height())), MENU_BORDER_COLOR);
+  drawRect(QRect(QPoint(0, _geometry.height()-1), QSize(_geometry.width(), 1)), MENU_BORDER_COLOR);
+  drawRect(QRect(QPoint(_geometry.width()-1, 0), QSize(1, _geometry.height())), MENU_BORDER_COLOR);
 
   if (_menu != NULL) {
     QSize font_size = _fonts->getFontSize(_font_tag);
 
     // Header separator
-    drawRect(QRect(QPoint(0, font_size.height() + 6), QSize(_size.width(), 1)), MENU_BORDER_COLOR);
+    drawRect(QRect(QPoint(0, font_size.height() + 6), QSize(_geometry.width(), 1)), MENU_BORDER_COLOR);
     // Footer separator
-    drawRect(QRect(QPoint(0, _size.height() - font_size.height() - 6), QSize(_size.width(), 1)), MENU_BORDER_COLOR);
+    drawRect(QRect(QPoint(0, _geometry.height() - font_size.height() - 6), QSize(_geometry.width(), 1)), MENU_BORDER_COLOR);
 
     // Header
     drawText(_menu->name(_lang), 0, ALIGN_CENTER, MENU_TEXT_STATIC_COLOR);
@@ -663,7 +662,7 @@ void MenuEngine::drawSelection() {
     col = MENU_TEXT_STATIC_COLOR;
 
   QPoint anchor = QPoint(2, 2+_selected_line*(6+font_size.height()));
-  QSize  size = QSize(_size.width() - 4, font_size.height() + 4);
+  QSize  size = QSize(_geometry.width() - 4, font_size.height() + 4);
 
   drawRect(QRect(anchor, QSize(size.width(), 1)), col);
   drawRect(QRect(anchor, QSize(1, size.height())), col);
@@ -740,13 +739,13 @@ void MenuEngine::drawText(const QByteArray& text, int line, TextAllignement alig
 
   switch (align) {
     case ALIGN_CENTER:
-      anchor.setX(_size.width()/2 - text.size()*font_size.width()/2);
+      anchor.setX(_geometry.width()/2 - text.size()*font_size.width()/2);
       break;
     case ALIGN_LEFT:
       anchor.setX(4);
       break;
     case ALIGN_RIGHT:
-      anchor.setX(_size.width() - 4 - text.size()*font_size.width());
+      anchor.setX(_geometry.width() - 4 - text.size()*font_size.width());
       break;
     default:
       return;

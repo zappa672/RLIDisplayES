@@ -1,3 +1,69 @@
+#ifndef INFOENGINE_H
+#define INFOENGINE_H
+
+#include <QRect>
+#include <QColor>
+#include <QVector>
+#include <QDebug>
+
+#include <QOpenGLFunctions>
+#include <QOpenGLFramebufferObject>
+#include <QOpenGLShaderProgram>
+
+#include "infofonts.h"
+#include "infoblock.h"
+#include "../../common/rlilayout.h"
+#include "../../common/rlistrings.h"
+
+
+class InfoEngine : public QObject, protected QOpenGLFunctions {
+  Q_OBJECT
+
+public:
+  explicit InfoEngine (RLILayout* layout, QOpenGLContext* context, QObject* parent = nullptr);
+  virtual ~InfoEngine ();
+
+  void resize(RLILayout* layout);
+  inline const QMap<QString, InfoBlock*>& blocks() { return _blocks; }
+  void update(InfoFonts* fonts);
+
+public slots:
+  //void onLanguageChanged(const QByteArray& lang);
+
+private:
+  void updateBlock(InfoBlock* b, InfoFonts* fonts);
+
+  inline void drawText(const InfoText& text, InfoFonts* fonts);
+  inline void drawRect(const QRect& rect, const QColor& col);
+
+  RLILang _lang;
+  bool _full_update;
+
+  QMap<QString, InfoBlock*> _blocks;
+
+  void initShaders();
+
+  // Info shader program
+  QOpenGLShaderProgram* _prog;
+
+  // -----------------------------------------------
+  enum { INFO_ATTR_POSITION = 0
+       , INFO_ATTR_ORDER = 1
+       , INFO_ATTR_CHAR_VAL = 2
+       , INFO_ATTR_COUNT = 3 } ;
+  enum { INFO_UNIF_MVP = 0
+       , INFO_UNIF_COLOR = 1
+       , INFO_UNIF_SIZE = 2
+       , INFO_UNIF_COUNT = 3 } ;
+
+  GLuint _vbo_ids[INFO_ATTR_COUNT];
+  GLuint _attr_locs[INFO_ATTR_COUNT];
+  GLuint _uniform_locs[INFO_UNIF_COUNT];
+};
+
+#endif // INFOENGINE_H
+
+
 /*
 
 #ifndef INFOENGINE_H

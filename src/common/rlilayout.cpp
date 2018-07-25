@@ -60,30 +60,10 @@ void RLILayoutManager::resize(const QSize& size) {
   _currentSize = best;
 }
 
-RLICircleLayout RLILayoutManager::circleLayout() {
-  return _layouts[_currentSize].circle;
+QColor RLILayoutManager::parseColor(const QString& txt) const {
+  QStringList slsize = txt.split(",");
+  return QColor(slsize[0].toInt(), slsize[1].toInt(), slsize[2].toInt(), slsize[3].toInt());
 }
-
-RLIMenuLayout RLILayoutManager::menuLayout() {
-  return _layouts[_currentSize].menu;
-}
-
-RLIMagnifierLayout RLILayoutManager::magnifierLayout() {
-  return _layouts[_currentSize].magnifier;
-}
-
-RLILabelLayout RLILayoutManager::labelLayout(const QString& name) {
-  return _layouts[_currentSize].labels.value(name, _layouts[_currentSize].labels[name]);
-}
-
-RLIValueBarLayout RLILayoutManager::valueBarLayout(const QString& name) {
-  return _layouts[_currentSize].value_bars.value(name, _layouts[_currentSize].value_bars[name]);
-}
-
-RLIInfoPanelLayout RLILayoutManager::panelLayout(const QString& name) {
-  return _layouts[_currentSize].panels.value(name, _layouts[_currentSize].panels[name]);
-}
-
 
 QSize RLILayoutManager::parseSize(const QString& text) const {
   QStringList slsize = text.split("x");
@@ -214,8 +194,8 @@ RLILabelLayout RLILayoutManager::readLabelLayout(const QSize& scrn_sz, QXmlStrea
   RLILabelLayout layout;
   auto attrs = readXMLAttributes(xml);
 
-  QPoint pos = parsePoint(scrn_sz, scrn_sz, attrs["pos"]);
   QSize size = parseSize(attrs["size"]);
+  QPoint pos = parsePoint(scrn_sz, size, attrs["pos"]);
 
   layout.name = attrs["name"];
   layout.geometry = QRect(pos, size);
@@ -228,8 +208,8 @@ RLIValueBarLayout RLILayoutManager::readValueBarLayout(const QSize& scrn_sz, QXm
   RLIValueBarLayout layout;
   auto attrs = readXMLAttributes(xml);
 
-  QPoint pos = parsePoint(scrn_sz, scrn_sz, attrs["pos"]);
   QSize size = parseSize(attrs["size"]);
+  QPoint pos = parsePoint(scrn_sz, size, attrs["pos"]);
 
   layout.name = attrs["name"];
   layout.geometry = QRect(pos, size);
@@ -244,11 +224,14 @@ RLIInfoPanelLayout RLILayoutManager::readInfoPanelLayout(const QSize& scrn_sz, Q
   RLIInfoPanelLayout layout;
   auto attrs = readXMLAttributes(xml);
 
-  QPoint pos = parsePoint(scrn_sz, scrn_sz, attrs["pos"]);
   QSize size = parseSize(attrs["size"]);
+  QPoint pos = parsePoint(scrn_sz, size, attrs["pos"]);
 
   layout.name = attrs["name"];
   layout.geometry = QRect(pos, size);
+  layout.border_width = attrs["border_width"].toInt();
+  layout.border_color = parseColor(attrs["border_color"]);
+  layout.back_color = parseColor(attrs["back_color"]);
 
   while (!xml->atEnd()) {
     switch (xml->readNext()) {
@@ -286,6 +269,7 @@ RLIInfoTextLayout RLILayoutManager::readInfoTextLayout(QXmlStreamReader* xml) {
   layout.bounding_rect = parseRect(attrs["rect"]);
   layout.allign = parseAllign(attrs["allign"]);
   layout.font_tag = attrs["font"];
+  layout.color = parseColor(attrs["color"]);
 
   return layout;
 }
@@ -296,6 +280,7 @@ RLIInfoRectLayout RLILayoutManager::readInfoRectLayout(QXmlStreamReader* xml) {
 
   layout.name = attrs["name"];
   layout.rect = parseRect(attrs["rect"]);
+  layout.color = parseColor(attrs["color"]);
 
   return layout;
 }
@@ -337,6 +322,7 @@ RLIInfoTableColumnLayout RLILayoutManager::readInfoTableColumnLayout(QXmlStreamR
   layout.width = attrs["width"].toInt();
   layout.allign = parseAllign(attrs["allign"]);
   layout.font_tag = attrs["font"];
+  layout.color = parseColor(attrs["color"]);
 
   return layout;
 }

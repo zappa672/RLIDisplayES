@@ -21,6 +21,7 @@ public:
   explicit MagnifierEngine (const RLIMagnifierLayout& layout, QOpenGLContext* context, QObject* parent = 0);
   virtual ~MagnifierEngine ();
 
+  inline QRect geometry()   { return _geometry; }
   inline bool visible()     { return _visible; }
   inline void setVisible(bool val) { _visible = val; }
 
@@ -43,6 +44,7 @@ private:
 
   bool _visible;
 
+  QRect _geometry;
   QOpenGLFramebufferObject* _fbo;
   QOpenGLShaderProgram* _prog;
 

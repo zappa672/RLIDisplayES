@@ -30,12 +30,14 @@ struct RLIInfoTextLayout {
   QRect   bounding_rect;
   RLITextAllign allign;
   QString font_tag;
+  QColor color;
 };
 
 struct RLIInfoTableColumnLayout {
   int left, width;
   RLITextAllign allign;
   QString font_tag;
+  QColor color;
 };
 
 struct RLIInfoTableLayout {
@@ -62,6 +64,9 @@ struct RLIValueBarLayout {
 struct RLIInfoPanelLayout {
   QString name;
   QRect geometry;
+  int border_width;
+  QColor back_color;
+  QColor border_color;
 
   QMap<QString, RLIInfoTextLayout> texts;
   QMap<QString, RLIInfoRectLayout> rects;
@@ -114,13 +119,7 @@ public:
   QSize currentSize();
   void resize(const QSize& size);
 
-  RLICircleLayout circleLayout();
-  RLIMenuLayout menuLayout();
-  RLIMagnifierLayout magnifierLayout();
-
-  RLILabelLayout labelLayout(const QString& name);
-  RLIValueBarLayout valueBarLayout(const QString& name);
-  RLIInfoPanelLayout panelLayout(const QString& name);
+  inline RLILayout* layout() { return &_layouts[_currentSize]; }
 
 private:
   QMap<QString, RLILayout> _layouts;
@@ -128,6 +127,7 @@ private:
 
   QMap<QString, QString> readXMLAttributes(QXmlStreamReader* xml);
 
+  QColor              parseColor          (const QString& txt) const;
   QSize               parseSize           (const QString& txt) const;
   QPoint              parsePoint          (const QSize& scrn_sz, const QSize& sz, const QString& txt) const;
   QRect               parseRect           (const QString& txt) const;

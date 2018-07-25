@@ -26,8 +26,7 @@ public:
   explicit MenuEngine(const RLIMenuLayout& layout, QOpenGLContext* context, QObject* parent = 0);
   virtual ~MenuEngine();
 
-  inline QPoint position() { return _position; }
-  inline QSize size() { return _size; }
+  inline QRect geometry() { return _geometry; }
   inline GLuint texture() { return _fbo->texture(); }
 
   //inline void setRouteEngine(RouteEngine* e) { _routeEngine = e; }
@@ -84,8 +83,7 @@ private:
 
   MenuState _state;
 
-  QPoint _position;
-  QSize _size;
+  QRect _geometry;
 
   QString _font_tag;
   QDateTime _last_action_time;

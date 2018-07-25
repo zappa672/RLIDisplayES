@@ -2,8 +2,8 @@
 #define RLISTRINGNAMES_H
 
 enum RLIString {
-
-    RLI_STR_BLANK
+    RLI_STR_NONE
+  , RLI_STR_BLANK
 
   , RLI_STR_MENU_0
 

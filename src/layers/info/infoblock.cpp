@@ -1,14 +1,14 @@
-/*
 #include "infoblock.h"
 
 #include <QDebug>
 #include <QDateTime>
 
-InfoBlock::InfoBlock(QOpenGLContext* context, QObject* parent) : QObject(parent), QOpenGLFunctions(context)  {
+InfoBlock::InfoBlock(const RLIInfoPanelLayout& layout, QOpenGLContext* context) : QOpenGLFunctions(context)  {
   initializeOpenGLFunctions();
 
   clear();
-  _fbo = new QOpenGLFramebufferObject(_geometry.size());
+  _fbo = nullptr;
+  resize(layout);
 
   _need_update = false;
 }
@@ -17,23 +17,27 @@ InfoBlock::~InfoBlock() {
   delete _fbo;
 }
 
-void InfoBlock::setRect(int rectId, const QRect& r) {
-  if (rectId < _rects.size())
-    _rects[rectId].rect = r;
 
-  _need_update = true;
+void InfoBlock::setRect(int rectId, const QRect& rect) {
+  _rects[rectId].geometry = rect;
 }
 
-void InfoBlock::setText(int textId, int lang_id, const QByteArray& str) {
-  if (textId < _texts.size())
-    _texts[textId].str[lang_id] = str;
-
-  _need_update = true;
+void InfoBlock::setText(int textId, RLIString str) {
+  _texts[textId].string = str;
+  _texts[textId].value.clear();
 }
+
+void InfoBlock::setText(int textId, const QByteArray& val) {
+  _texts[textId].string = RLI_STR_NONE;
+  _texts[textId].value = val;
+}
+
+
+
 
 void InfoBlock::clear() {
-  _geometry = QRect(0, 0, 1, 1);
-  _back_color = QColor(1, 1, 1, 0);
+  _geometry     = QRect(0, 0, 1, 1);
+  _back_color   = QColor(1, 1, 1, 0);
   _border_color = QColor(1, 1, 1, 0);
   _border_width = 0;
 
@@ -41,11 +45,18 @@ void InfoBlock::clear() {
   _rects.clear();
 }
 
-void InfoBlock::setGeometry(const QRect& r) {
-  _geometry = r;
-  _need_update = true;
+void InfoBlock::resize(const RLIInfoPanelLayout& layout) {
+  qDebug() << "InfoBlock::resize" << layout.name << layout.geometry;
 
-  delete _fbo;
-  _fbo = new QOpenGLFramebufferObject(_geometry.size());
+  if (_fbo == nullptr || layout.geometry.size() != _fbo->size()) {
+    delete _fbo;
+    _fbo = new QOpenGLFramebufferObject(layout.geometry.size());
+  }
+
+  _geometry     = layout.geometry;
+  _back_color   = layout.back_color;
+  _border_color = layout.border_color;
+  _border_width = layout.border_width;
+
+  _need_update = true;
 }
-*/

@@ -1,5 +1,3 @@
-/*
-
 #ifndef INFOBLOCK_H
 #define INFOBLOCK_H
 
@@ -8,71 +6,70 @@
 #include <QVector>
 #include <QDebug>
 
-#include <QTextEncoder>
-#include <QTextDecoder>
-
 #include <QOpenGLFunctions>
 #include <QOpenGLFramebufferObject>
 #include <QOpenGLShaderProgram>
 
 #include "infofonts.h"
+#include "../../common/rlilayout.h"
 #include "../../common/rlistrings.h"
 
-enum TextAllign { INFOTEXT_ALLIGN_LEFT, INFOTEXT_ALLIGN_RIGHT, INFOTEXT_ALLIGN_CENTER };
-
-struct InfoRect {
-  QColor col;
-  QRect  rect;
+struct InfoRect {  
+  QColor color;
+  QRect  geometry;
 };
 
 struct InfoText {
-  QByteArray str[RLI_LANG_COUNT];
-  QString font_tag;
-  QColor color;
-  QRect rect;
-  TextAllign allign;
+  RLIString   string;
+  QByteArray  value;
 
-  InfoText() { allign = INFOTEXT_ALLIGN_LEFT; }
+  QString font_tag;
+  QColor  color;
+  QRect   geometry;
+  RLITextAllign allign;
+
+  InfoText() {
+    string = RLI_STR_NONE;
+    allign = RLI_ALLIGN_CENTER;
+  }
 };
 
 
-
-
-class InfoBlock : public QObject, protected QOpenGLFunctions {
-  Q_OBJECT
+class InfoBlock : protected QOpenGLFunctions {
 
 public:
-
-  explicit InfoBlock(QOpenGLContext* context, QObject* parent = nullptr);
+  explicit InfoBlock(const RLIInfoPanelLayout& , QOpenGLContext* context);
   virtual ~InfoBlock();
 
   void clear();
+  void resize(const RLIInfoPanelLayout& layout);
 
-  void setGeometry(const QRect& r);
-  inline const QRect& geometry()            { return _geometry; }
-  void setBackColor(const QColor& c)        { _back_color = c; _need_update = true; }
-  inline const QColor& backColor()          { return _back_color; }
-  void setBorder(int w, const QColor& c)    { _border_width = w; _border_color = c; _need_update = true; }
-  inline const QColor& borderColor()        { return _border_color; }
-  inline int borderWidth()                  { return _border_width; }
 
-  inline bool needUpdate()                  { return _need_update; }
-  inline void discardUpdate()               { _need_update = false; }
+  inline const QVector<InfoRect>& rectangles() { return _rects; }
+  inline const QVector<InfoText>& texts()      { return _texts; }
 
-  int addRect(const InfoRect& t)            { _rects.push_back(t); _need_update = true; return _rects.size() - 1; }
-  int addText(const InfoText& t)            { _texts.push_back(t); _need_update = true; return _texts.size() - 1; }
 
-  inline int rectCount()                    { return _rects.size(); }
-  inline const InfoRect& getRect(int i)     { return _rects[i]; }
-  inline int textCount()                    { return _texts.size(); }
-  inline const InfoText& getText(int i)     { return _texts[i]; }
+  inline const QRect& geometry()              { return _geometry; }
 
-  inline GLuint texture()                   { return _fbo->texture(); }
-  QOpenGLFramebufferObject* fbo()           { return _fbo; }
+  inline bool needUpdate()                    { return _need_update; }
+  inline void clearUpdate()                   { _need_update = false; }
 
-public slots:
+  inline void setBackColor(const QColor& c)   { _back_color = c; _need_update = true; }
+  inline const QColor& backColor()            { return _back_color; }
+
+  inline void setBorderWidth(int w)           { _border_width = w; _need_update = true; }
+  inline int borderWidth()                    { return _border_width; }
+
+  inline void setBorderColor(const QColor& c) { _border_color = c; _need_update = true; }
+  inline const QColor& borderColor()          { return _border_color; }
+
+
+  QOpenGLFramebufferObject* fbo()             { return _fbo; }
+
+
   void setRect(int rectId, const QRect& r);
-  void setText(int textId, int lang_id, const QByteArray& str);
+  void setText(int textId, RLIString str);
+  void setText(int textId, const QByteArray& val);
 
 private:
   QVector<InfoRect> _rects;
@@ -80,15 +77,12 @@ private:
 
   QRect   _geometry;
   QColor  _back_color;
-  QColor  _border_color;
   int     _border_width;
-  bool    _need_update;
+  QColor  _border_color;
 
-  // Framebuffer vars
+  bool    _need_update;
   QOpenGLFramebufferObject* _fbo;
 };
 
 
 #endif // INFOBLOCK_H
-
-*/

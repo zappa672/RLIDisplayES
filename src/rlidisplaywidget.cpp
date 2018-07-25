@@ -65,18 +65,18 @@ void RLIDisplayWidget::debugInfo() {
   qDebug() << "Renderer: " << (const char*) glGetString(GL_RENDERER);
   qDebug() << "OpenGL: " << (const char*) glGetString(GL_VERSION);
   qDebug() << "Shaders: " << (const char*) glGetString(GL_SHADING_LANGUAGE_VERSION);
-  /*
-  qDebug() << "";
-  qDebug() << "Extensions: ";
-  QString exts((const char*) glGetString(GL_EXTENSIONS));
-  for (QString ext : exts.split(" "))
-     qDebug() << "\t" << ext;
-  qDebug() << "";
-  */
-  int val;
-  glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &val);
-  qDebug() << "Max texture image units: " << val;
-  qDebug() << "";
+
+//  qDebug() << "";
+//  qDebug() << "Extensions: ";
+//  QString exts((const char*) glGetString(GL_EXTENSIONS));
+//  for (QString ext : exts.split(" "))
+//     qDebug() << "\t" << ext;
+//  qDebug() << "";
+
+//  int val;
+//  glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &val);
+//  qDebug() << "Max texture image units: " << val;
+//  qDebug() << "";
 }
 
 void RLIDisplayWidget::initializeGL() {
@@ -101,7 +101,7 @@ void RLIDisplayWidget::initializeGL() {
   uint peleng_size         = qApp->property(PROPERTY_PELENG_SIZE).toInt();
   uint bearings_per_cycle  = qApp->property(PROPERTY_BEARINGS_PER_CYCLE).toInt();
 
-  uint circle_radius = _layout_manager->circleLayout().radius;
+  uint circle_radius = _layout_manager->layout()->circle.radius;
 
   // Layers initialization
   //-------------------------------------------------------------
@@ -119,26 +119,24 @@ void RLIDisplayWidget::initializeGL() {
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Tails engine init finish";
 
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Mask engine init start";
-  _maskEngine = new MaskEngine(size(), _layout_manager->circleLayout(), _infoFonts, context(), this);
+  _maskEngine = new MaskEngine(size(), _layout_manager->layout()->circle, _infoFonts, context(), this);
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Mask engine init finish";
 
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Chart engine init start";
   _chartEngine = new ChartEngine(circle_radius, _chart_mngr->refs(), context(), this);
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Chart engine init finish";
 
-  /*
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Info engine init start";
-  _infoEngine = new InfoEngine(context(), this);
+  _infoEngine = new InfoEngine(_layout_manager->layout(), context(), this);
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Info engine init finish";
-  */
 
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Menu engine init start";
-  _menuEngine = new MenuEngine(_layout_manager->menuLayout(), context(), this);
+  _menuEngine = new MenuEngine(_layout_manager->layout()->menu, context(), this);
   _menuEngine->setFonts(_infoFonts);
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Menu engine init finish";
 
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Magnifier engine init start";
-  _magnEngine = new MagnifierEngine(_layout_manager->magnifierLayout(), context(), this);
+  _magnEngine = new MagnifierEngine(_layout_manager->layout()->magnifier, context(), this);
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Magnifier engine init finish";
 
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Target engine init start";
@@ -201,15 +199,16 @@ void RLIDisplayWidget::resizeGL(int w, int h) {
   if (curr_size == new_size)
     return;
 
-  int circle_radius = _layout_manager->circleLayout().radius;
+  int circle_radius = _layout_manager->layout()->circle.radius;
 
   _radarEngine->resizeTexture(circle_radius);
   _tailsEngine->resizeTexture(circle_radius);
   _chartEngine->resize(circle_radius);
 
-  _maskEngine->resize(QSize(w, h), _layout_manager->circleLayout());
-  _menuEngine->resize(_layout_manager->menuLayout());
-  _magnEngine->resize(_layout_manager->magnifierLayout());
+  _maskEngine->resize(QSize(w, h), _layout_manager->layout()->circle);
+  _menuEngine->resize(_layout_manager->layout()->menu);
+  _magnEngine->resize(_layout_manager->layout()->magnifier);
+  _infoEngine->resize(_layout_manager->layout());
 }
 
 
@@ -264,7 +263,7 @@ void RLIDisplayWidget::paintLayers() {
 
 
   QPoint shift(_debug_radar_tails_shift, _debug_radar_tails_shift);
-  QPoint topLeft = _layout_manager->circleLayout().bounding_rect.topLeft();
+  QPoint topLeft = _layout_manager->layout()->circle.bounding_rect.topLeft();
 
 
   drawRect(QRect(topLeft, _chartEngine->size()), _chartEngine->textureId());
@@ -273,7 +272,7 @@ void RLIDisplayWidget::paintLayers() {
   drawRect(QRect(topLeft - shift, _tailsEngine->size()), _tailsEngine->textureId());
 
 
-  QPointF center = _layout_manager->circleLayout().center;
+  QPointF center = _layout_manager->layout()->circle.center;
 
   QMatrix4x4 projection;
   projection.setToIdentity();
@@ -289,15 +288,13 @@ void RLIDisplayWidget::paintLayers() {
 
   drawRect(rect(), _maskEngine->textureId());
 
-  /*
-  for (int i = 0; i < _infoEngine->blockCount(); i++)
-    drawRect(_infoEngine->blockGeometry(i), _infoEngine->blockTextId(i));
-  */
+  for (InfoBlock* block : _infoEngine->blocks())
+    drawRect(block->geometry(), block->fbo()->texture());
 
-  drawRect(_layout_manager->menuLayout().geometry, _menuEngine->texture());
+  drawRect(_menuEngine->geometry(), _menuEngine->texture());
 
   if (_magnEngine->visible())
-    drawRect(_layout_manager->magnifierLayout().geometry, _magnEngine->texture());
+    drawRect(_magnEngine->geometry(), _magnEngine->texture());
 }
 
 
@@ -311,7 +308,7 @@ void RLIDisplayWidget::updateLayers() {
   QString colorScheme = _chart_mngr->refs()->getColorScheme();
   _chartEngine->update(shipPosition, chartScale , 0.f,  QPoint(0.f, 0.f), colorScheme);
 
-  //_infoEngine->update(_infoFonts);
+  _infoEngine->update(_infoFonts);
 
   _menuEngine->update();
 
