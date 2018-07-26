@@ -165,7 +165,7 @@ void RLIDisplayWidget::initializeGL() {
 
   connect(_menuEngine, SIGNAL(radarBrightnessChanged(int)), _radarEngine, SLOT(onBrightnessChanged(int)));
   connect(_menuEngine, SIGNAL(languageChanged(RLIString)), _menuEngine, SLOT(onLanguageChanged(RLIString)));
-  //connect(_menuEngine, SIGNAL(languageChanged(QByteArray)), _infoEngine, SLOT(onLanguageChanged(QByteArray)));
+  connect(_menuEngine, SIGNAL(languageChanged(RLIString)), _infoEngine, SLOT(onLanguageChanged(RLIString)));
 }
 
 void RLIDisplayWidget::initShaders() {

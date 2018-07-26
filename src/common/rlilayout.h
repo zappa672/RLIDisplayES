@@ -42,23 +42,10 @@ struct RLIInfoTableColumnLayout {
 
 struct RLIInfoTableLayout {
   QString name;
-  int top, row_height;
+  int row_count, top, row_height;
   QVector<RLIInfoTableColumnLayout> columns;
 
   inline void insertColumn(const RLIInfoTableColumnLayout& layout) { columns.push_back(layout); }
-};
-
-struct RLILabelLayout {
-  QString name;
-  QRect geometry;
-  QString font_tag;
-};
-
-struct RLIValueBarLayout {
-  QString name;
-  QRect geometry;
-  QString font_tag;
-  int bar_width;
 };
 
 struct RLIInfoPanelLayout {
@@ -100,12 +87,7 @@ struct RLILayout {
   RLIMenuLayout       menu;
   RLIMagnifierLayout  magnifier;
 
-  QMap<QString, RLILabelLayout> labels;
-  QMap<QString, RLIValueBarLayout> value_bars;
   QMap<QString, RLIInfoPanelLayout> panels;
-
-  inline void insertLabel(const RLILabelLayout& layout) { labels.insert(layout.name, layout); }
-  inline void insertValueBar(const RLIValueBarLayout& layout) { value_bars.insert(layout.name, layout); }
   inline void insertPanel(const RLIInfoPanelLayout& layout) { panels.insert(layout.name, layout); }
 };
 
@@ -139,8 +121,6 @@ private:
   RLIMenuLayout       readMenuLayout      (const QSize& scrn_sz, QXmlStreamReader* xml);
   RLIMagnifierLayout  readMagnifierLayout (const QSize& scrn_sz, QXmlStreamReader* xml);
 
-  RLILabelLayout      readLabelLayout     (const QSize& scrn_sz, QXmlStreamReader* xml);
-  RLIValueBarLayout   readValueBarLayout  (const QSize& scrn_sz, QXmlStreamReader* xml);
   RLIInfoPanelLayout  readInfoPanelLayout (const QSize& scrn_sz, QXmlStreamReader* xml);
 
   RLIInfoTextLayout         readInfoTextLayout        (QXmlStreamReader* xml);

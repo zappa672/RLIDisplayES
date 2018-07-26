@@ -28,13 +28,43 @@ public:
   void update(InfoFonts* fonts);
 
 public slots:
-  //void onLanguageChanged(const QByteArray& lang);
+  void onLanguageChanged(RLIString lang_str);
 
 private:
   void updateBlock(InfoBlock* b, InfoFonts* fonts);
 
   inline void drawText(const InfoText& text, InfoFonts* fonts);
   inline void drawRect(const QRect& rect, const QColor& col);
+
+  void initBlocks();
+
+  void initBlockGain();
+  void initBlockWater();
+  void initBlockRain();
+  void initBlockApch();
+  void initBlockEmission();
+
+  void initBlockLabel5();
+  void initBlockBand();
+  void initBlockLabel1();
+  void initBlockLabel2();
+  void initBlockLabel3();
+  void initBlockLabel4();
+
+  void initBlockFps();
+  void initBlockScale();
+  void initBlockVn();
+  void initBlockVd();
+  void initBlockCourse();
+  void initBlockPosition();
+  void initBlockBlank();
+  void initBlockClock();
+  void initBlockDanger();
+  void initBlockTails();
+  void initBlockDetails();
+  void initBlockVector();
+  void initBlockTargets();
+  void initBlockCursor();
 
   RLILang _lang;
   bool _full_update;

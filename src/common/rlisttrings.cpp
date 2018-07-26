@@ -198,6 +198,7 @@ RLIStrings::RLIStrings() {
   addString( RLI_STR_GRAD_RB,     { "°RB",	"°ПБ" } );
 
   addString( RLI_STR_TIME,        { "TIME", "ВРЕМЯ" } );
+  addString( RLI_STR_FPS,         { "FPS", "КАДР/С"});
 
   // для маршрута
   addString( RLI_STR_GO_TO_RP,    { "GO TO RP", "ИДЕМ НА МТ" } );

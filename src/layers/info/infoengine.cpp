@@ -16,6 +16,7 @@ InfoEngine::InfoEngine(RLILayout* layout, QOpenGLContext* context, QObject* pare
 
   glGenBuffers(INFO_ATTR_COUNT, _vbo_ids);
   initShaders();
+  initBlocks();
 }
 
 InfoEngine::~InfoEngine() {
@@ -47,6 +48,7 @@ void InfoEngine::initShaders() {
   _prog->release();
 }
 
+
 void InfoEngine::update(InfoFonts* fonts) {
   glEnable(GL_BLEND);
 
@@ -73,8 +75,6 @@ void InfoEngine::update(InfoFonts* fonts) {
 
   _full_update = false;
 }
-
-
 
 void InfoEngine::updateBlock(InfoBlock* b, InfoFonts* fonts) {
   QColor bckCol = b->backColor();
@@ -197,26 +197,274 @@ void InfoEngine::drawRect(const QRect& rect, const QColor& col) {
   glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }
 
+void InfoEngine::onLanguageChanged(RLIString lang_str) {
+  if (lang_str == RLI_STR_ARRAY_LANG_ENGL)
+    _lang = RLI_LANG_ENGLISH;
 
+  if (lang_str == RLI_STR_ARRAY_LANG_RUS)
+    _lang = RLI_LANG_RUSSIAN;
 
-/*
-
-
-
-void InfoEngine::onLanguageChanged(const QByteArray& lang) {
-  QString lang_str = decCP866->toUnicode(lang);
-
-  if (_lang == RLI_LANG_RUSSIAN && (lang_str == decUTF8->toUnicode(RLIStrings::nEng[RLI_LANG_RUSSIAN])
-                                 || lang_str == decUTF8->toUnicode(RLIStrings::nEng[RLI_LANG_ENGLISH]))) {
-      _lang = RLI_LANG_ENGLISH;
-      _full_update = true;
-  }
-
-  if (_lang == RLI_LANG_ENGLISH && (lang_str == decUTF8->toUnicode(RLIStrings::nRus[RLI_LANG_ENGLISH])
-                                 || lang_str == decUTF8->toUnicode(RLIStrings::nRus[RLI_LANG_RUSSIAN]))) {
-      _lang = RLI_LANG_RUSSIAN;
-      _full_update = true;
-  }
+  _full_update = true;
 }
 
-*/
+
+
+
+void InfoEngine::initBlocks() {
+  initBlockGain();
+  initBlockWater();
+  initBlockRain();
+  initBlockApch();
+  initBlockEmission();
+
+  initBlockLabel5();
+  initBlockBand();
+  initBlockLabel1();
+  initBlockLabel2();
+  initBlockLabel3();
+  initBlockLabel4();
+
+  initBlockFps();
+  initBlockScale();
+  initBlockVn();
+  initBlockVd();
+  initBlockCourse();
+  initBlockPosition();
+  initBlockBlank();
+  initBlockClock();
+  initBlockDanger();
+  initBlockTails();
+  initBlockDetails();
+  initBlockVector();
+  initBlockTargets();
+  initBlockCursor();
+}
+
+
+void InfoEngine::initBlockGain() {
+  _blocks["gain"]->setText("text", RLI_STR_GAIN);
+  QRect bar = _blocks["gain"]->rectangles()["bar"].geometry;
+  bar.setWidth(40);
+  _blocks["gain"]->setRect("bar", bar);
+}
+
+void InfoEngine::initBlockWater() {
+  _blocks["water"]->setText("text", RLI_STR_WATER);
+  QRect bar = _blocks["water"]->rectangles()["bar"].geometry;
+  bar.setWidth(30);
+  _blocks["water"]->setRect("bar", bar);
+}
+
+void InfoEngine::initBlockRain() {
+  _blocks["rain"]->setText("text", RLI_STR_RAIN);
+  QRect bar = _blocks["rain"]->rectangles()["bar"].geometry;
+  bar.setWidth(20);
+  _blocks["rain"]->setRect("bar", bar);
+}
+
+void InfoEngine::initBlockApch() {
+  _blocks["apch"]->setText("text", RLI_STR_AFC);
+  QRect bar = _blocks["apch"]->rectangles()["bar"].geometry;
+  bar.setWidth(0);
+  _blocks["apch"]->setRect("bar", bar);
+}
+
+void InfoEngine::initBlockEmission() {
+  _blocks["emission"]->setText("text", RLI_STR_EMISSION);
+  QRect bar = _blocks["emission"]->rectangles()["bar"].geometry;
+  bar.setWidth(49);
+  _blocks["emission"]->setRect("bar", bar);
+}
+
+
+//<panel name="label5" pos="4,104" size="102x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+//  <text name="text" rect="0x0x102x20" allign="center" font="F12X14B" color="0,252,252,255" />
+//</panel>
+void InfoEngine::initBlockLabel5() {
+
+}
+
+//<panel name="band" pos="4,128" size="102x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+//  <text name="text" rect="0x0x102x20" allign="center" font="F12X14B" color="0,252,252,255" />
+//</panel>
+void InfoEngine::initBlockBand() {
+
+}
+
+//<panel name="label1" pos="-244,44" size="112x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+//  <text name="text" rect="0x0x112x20" allign="center" font="F12X14B" color="0,252,252,255" />
+//</panel>
+void InfoEngine::initBlockLabel1() {
+
+}
+
+//<panel name="label2" pos="-244,68" size="112x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+//  <text name="text" rect="0x0x112x20" allign="center" font="F12X14B" color="0,252,252,255" />
+//</panel>
+void InfoEngine::initBlockLabel2() {
+
+}
+
+//<panel name="label3" pos="-244,92" size="112x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+//  <text name="text" rect="0x0x112x20" allign="center" font="F12X14B" color="0,252,252,255" />
+//</panel>
+void InfoEngine::initBlockLabel3() {
+
+}
+
+//<panel name="label4" pos="-244,-68" size="96x32" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+//  <text name="text" rect="0x0x112x20" allign="center" font="F16X28B" color="0,252,252,255" />
+//</panel>
+void InfoEngine::initBlockLabel4() {
+
+}
+
+
+void InfoEngine::initBlockFps() {
+  _blocks["fps"]->setText("label", RLI_STR_FPS);
+  _blocks["fps"]->setText("value", QString::number(0).toLatin1());
+}
+
+//<!-- rect="left_x_top_x_width_x_height" -->
+//<panel name="scale" pos="-244,4" size="236x36" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+//  <rect name="splitter" rect="174x0x1x36" color="64,252,0,255" />
+//  <!-- /////////////////////////////////////////////////////////// -->
+//  <text name="scale1" rect="5x5x80x28"    allign="center" font="F16X28B" color="252,252,84,255" />  <!-- dynamic text color -->
+//  <text name="slash"  rect="85x5x16x28"   allign="center" font="F16X28B" color="252,252,84,255" />  <!-- dynamic text color -->
+//  <text name="scale2" rect="101x16x70x14" allign="center" font="F14X14B" color="252,252,84,255" />  <!-- dynamic text color -->
+//  <text name="units"  rect="176x12x56x14" allign="center" font="F14X14B" color="0,252,252,255"  />  <!-- static text color -->
+//</panel>
+void InfoEngine::initBlockScale() {
+
+}
+
+//<panel name="vn" pos="4,-4" size="140x66" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+//  <text name="header" rect="0x6x132x14" allign="center" font="F12X14B" color="0,252,252,255" /> <!-- static text color -->
+//  <!-- /////////////////////////////////////////////////////////// -->
+//  <table name="table" row_count="2" top="28" row_height="18" >
+//    <column left="4"    width="36" allign="left"  font="F12X14B"  color="0,252,252,255"   />  <!-- static text color -->
+//    <column left="40"   width="60" allign="right" font="F12X14B"  color="252,252,84,255"  />  <!-- dynamic text color -->
+//    <column left="100"  width="36" allign="left"  font="F8X14B"   color="0,252,252,255"   />  <!-- static text color -->
+//  </table>
+//</panel>
+void InfoEngine::initBlockVn() {
+
+}
+
+//<panel name="vd" pos="-244,-4" size="140x52" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+//  <text name="header" rect="0x6x132x14" allign="center" font="F12X14B" color="0,252,252,255" /> <!-- static text color -->
+//  <!-- /////////////////////////////////////////////////////////// -->
+//  <table name="table" row_count="1" top="28" row_height="18" >
+//    <column left="4"    width="90" allign="right" font="F12X14B"  color="0,252,252,255"   />   <!-- static text color -->
+//    <column left="100"  width="40" allign="left"  font="F8X14B"   color="252,252,84,255"  />   <!-- dynamic text color -->
+//  </table>
+//</panel>
+void InfoEngine::initBlockVd() {
+
+}
+
+//<panel name="course" pos="-4,4" size="236x38" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+//  <table name="table" row_count="2" top="4" row_height="18" >
+//    <column left="4"    width="116" allign="left"   font="F12X14B" color="0,252,252,255"  />  <!-- static text color -->
+//    <column left="120"  width="60"  allign="right"  font="F12X14B" color="252,252,84,255" />  <!-- dynamic text color -->
+//    <column left="186"  width="36"  allign="left"   font="F8X14B"  color="0,252,252,255"  />  <!-- static text color -->
+//  </table>
+//</panel>
+void InfoEngine::initBlockCourse() {
+
+}
+
+//<panel name="position" pos="-4,46" size="236x38" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+//  <table name="table" row_count="2" top="4" row_height="18" >
+//    <column left="4"    width="116" allign="left"   font="F12X14B" color="0,252,252,255"  />  <!-- static text color -->
+//    <column left="120"  width="112" allign="right"  font="F12X14B" color="252,252,84,255" />  <!-- dynamic text color -->
+//  </table>
+//</panel>
+void InfoEngine::initBlockPosition() {
+
+}
+
+//<panel name="blank" pos="-4,88" size="236x38" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+//</panel>
+void InfoEngine::initBlockBlank() {
+
+}
+
+//<panel name="clock" pos="-4,130" size="236x18" border_width="0" border_color="0,0,0,255" back_color="0,0,0,0" >
+//  <text name="label"  rect="4x4x80x14"    allign="center" font="F12X14B" color="0,252,252,255"  />  <!-- static text color -->
+//  <text name="time"   rect="120x4x96x14"  allign="center" font="F12X14B" color="252,252,84,255" />  <!-- dynamic text color -->
+//</panel>
+void InfoEngine::initBlockClock() {
+
+}
+
+//<panel name="danger" pos="-4,-330" size="236x20" border_width="0" border_color="0,0,0,255" back_color="252,252,84,255" >
+//  <text name="label" rect="0x0x236x20" allign="center" font="F12X14B" color="0,0,0,255"  />
+//</panel>
+void InfoEngine::initBlockDanger() {
+
+}
+
+//<panel name="tails" pos="-4,-306" size="236x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+//  <table name="table" row_count="1" top="3" row_height="18" >
+//    <column left="4"   width="116" allign="left"  font="F12X14B" color="0,252,252,255"  />  <!-- static text color -->
+//    <column left="120" width="60"  allign="right" font="F12X14B" color="252,252,84,255" />  <!-- dynamic text color -->
+//    <column left="186" width="36"  allign="left"  font="F8X14B"  color="0,252,252,255"  />  <!-- static text color -->
+//  </table>
+//</panel>
+void InfoEngine::initBlockTails() {
+
+}
+
+//<panel name="danger-details" pos="-4,-264" size="236x38" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+//  <table name="table" row_count="2" top="3" row_height="18" >
+//    <column left="4"   width="116" allign="left"  font="F12X14B" color="0,252,252,255"  />  <!-- static text color -->
+//    <column left="120" width="60"  allign="right" font="F12X14B" color="252,252,84,255" />  <!-- dynamic text color -->
+//    <column left="186" width="36"  allign="left"  font="F8X14B"  color="0,252,252,255"  />  <!-- static text color -->
+//  </table>
+//</panel>
+void InfoEngine::initBlockDetails() {
+
+}
+
+//<panel name="vector" pos="-4,-240" size="236x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+//  <table name="table" row_count="1" top="3" row_height="18" >
+//    <column left="4"   width="116" allign="left"  font="F12X14B"  color="0,252,252,255"  />  <!-- static text color -->
+//    <column left="120" width="60"  allign="right" font="F12X14B"  color="252,252,84,255" />  <!-- dynamic text color -->
+//    <column left="186" width="36"  allign="left"  font="F8X14B"   color="0,252,252,255"  />  <!-- static text color -->
+//  </table>
+//</panel>
+void InfoEngine::initBlockVector() {
+
+}
+
+//<panel name="targets" pos="-4,-68" size="236x168" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+//  <rect name="header-middle" rect="118x0x1x20" color="64,252,0,255" />
+//  <rect name="header-bottom" rect="0x20x236x1" color="64,252,0,255" />
+//  <!-- /////////////////////////////////////////////////////////// -->
+//  <text name="header"         rect="4x4x228x14" allign="left"   font="F12X14B" color="0,252,252,255"  />  <!-- static text color -->
+//  <text name="current-target" rect="4x4x110x14" allign="right"  font="F12X14B" color="252,252,84,255" />  <!-- dynamic text color -->
+//  <text name="target-count"   rect="4x4x228x14" allign="right"  font="F12X14B" color="252,252,84,255" />  <!-- dynamic text color -->
+//  <!-- /////////////////////////////////////////////////////////// -->
+//  <table name="table" row_count="8" top="24" row_height="18" >
+//    <column left="4"   width="116" allign="left"  font="F12X14B" color="0,252,252,255"  />  <!-- static text color -->
+//    <column left="120" width="60"  allign="right" font="F12X14B" color="252,252,84,255" />  <!-- dynamic text color -->
+//    <column left="186" width="36"  allign="left"  font="F8X14B"  color="0,252,252,255"  />  <!-- static text color -->
+//  </table>
+//</panel>
+void InfoEngine::initBlockTargets() {
+
+}
+
+//<panel name="cursor" pos="-4,-4" size="236x60" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+//  <text name="header" rect="0x4x236x14" allign="center" font="F12X14B" color="0,252,252,255"  />  <!-- static text color -->
+//  <!-- /////////////////////////////////////////////////////////// -->
+//  <table name="table" row_count="2" top="24" row_height="18" >
+//    <column left="4"   width="116" allign="left"  font="F12X14B" color="0,252,252,255"  />  <!-- static text color -->
+//    <column left="120" width="60"  allign="right" font="F12X14B" color="252,252,84,255" />  <!-- dynamic text color -->
+//    <column left="186" width="36"  allign="left"  font="F8X14B"  color="0,252,252,255"  />  <!-- static text color -->
+//  </table>
+//</panel>
+void InfoEngine::initBlockCursor() {
+
+}

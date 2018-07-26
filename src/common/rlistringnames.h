@@ -184,6 +184,7 @@ enum RLIString {
   , RLI_STR_GRAD_RB
 
   , RLI_STR_TIME
+  , RLI_STR_FPS
 
   // для маршрута
   , RLI_STR_GO_TO_RP

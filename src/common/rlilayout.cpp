@@ -124,12 +124,6 @@ RLILayout RLILayoutManager::readLayout(const QSize& scrn_sz, QXmlStreamReader* x
       if (xml->name() == "magnifier")
         layout.magnifier = readMagnifierLayout(scrn_sz, xml);
 
-      if (xml->name() == "label")
-        layout.insertLabel(readLabelLayout(scrn_sz, xml));
-
-      if (xml->name() == "value-bar")
-        layout.insertValueBar(readValueBarLayout(scrn_sz, xml));
-
       if (xml->name() == "panel")
         layout.insertPanel(readInfoPanelLayout(scrn_sz, xml));
       break;
@@ -185,36 +179,6 @@ RLIMagnifierLayout RLILayoutManager::readMagnifierLayout(const QSize& scrn_sz, Q
   QPoint pos = parsePoint(scrn_sz, size, attrs["pos"]);
 
   layout.geometry = QRect(pos, size);
-
-  return layout;
-}
-
-
-RLILabelLayout RLILayoutManager::readLabelLayout(const QSize& scrn_sz, QXmlStreamReader* xml) {
-  RLILabelLayout layout;
-  auto attrs = readXMLAttributes(xml);
-
-  QSize size = parseSize(attrs["size"]);
-  QPoint pos = parsePoint(scrn_sz, size, attrs["pos"]);
-
-  layout.name = attrs["name"];
-  layout.geometry = QRect(pos, size);
-  layout.font_tag = attrs["font"];
-
-  return layout;
-}
-
-RLIValueBarLayout RLILayoutManager::readValueBarLayout(const QSize& scrn_sz, QXmlStreamReader* xml) {
-  RLIValueBarLayout layout;
-  auto attrs = readXMLAttributes(xml);
-
-  QSize size = parseSize(attrs["size"]);
-  QPoint pos = parsePoint(scrn_sz, size, attrs["pos"]);
-
-  layout.name = attrs["name"];
-  layout.geometry = QRect(pos, size);
-  layout.font_tag = attrs["font"];
-  layout.bar_width = attrs["bar_width"].toInt();
 
   return layout;
 }
@@ -292,6 +256,7 @@ RLIInfoTableLayout RLILayoutManager::readInfoTableLayout(QXmlStreamReader* xml) 
   layout.name = attrs["name"];
   layout.top = attrs["top"].toInt();
   layout.row_height = attrs["row_height"].toInt();
+  layout.row_count = attrs["row_count"].toInt();
 
   while (!xml->atEnd()) {
     switch (xml->readNext()) {
