@@ -1,5 +1,7 @@
 #include "infoengine.h"
 
+#include <QTime>
+
 #include "../../common/properties.h"
 
 
@@ -29,6 +31,7 @@ InfoEngine::~InfoEngine() {
 void InfoEngine::resize(RLILayout* layout) {
   for (const QString& name : _blocks.keys())
     _blocks[name]->resize(layout->panels[name]);
+  initBlocks();
 }
 
 void InfoEngine::initShaders() {
@@ -244,7 +247,7 @@ void InfoEngine::initBlocks() {
 void InfoEngine::initBlockGain() {
   _blocks["gain"]->setText("text", RLI_STR_GAIN);
   QRect bar = _blocks["gain"]->rectangles()["bar"].geometry;
-  bar.setWidth(40);
+  bar.setWidth(1);
   _blocks["gain"]->setRect("bar", bar);
 }
 
@@ -277,46 +280,28 @@ void InfoEngine::initBlockEmission() {
 }
 
 
-//<panel name="label5" pos="4,104" size="102x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
-//  <text name="text" rect="0x0x102x20" allign="center" font="F12X14B" color="0,252,252,255" />
-//</panel>
 void InfoEngine::initBlockLabel5() {
-
+  _blocks["label5"]->setText("text", RLI_STR_PP12p);
 }
 
-//<panel name="band" pos="4,128" size="102x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
-//  <text name="text" rect="0x0x102x20" allign="center" font="F12X14B" color="0,252,252,255" />
-//</panel>
 void InfoEngine::initBlockBand() {
-
+  _blocks["band"]->setText("text", RLI_STR_S_BAND);
 }
 
-//<panel name="label1" pos="-244,44" size="112x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
-//  <text name="text" rect="0x0x112x20" allign="center" font="F12X14B" color="0,252,252,255" />
-//</panel>
 void InfoEngine::initBlockLabel1() {
-
+  _blocks["label1"]->setText("text", RLI_STR_NORTH);
 }
 
-//<panel name="label2" pos="-244,68" size="112x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
-//  <text name="text" rect="0x0x112x20" allign="center" font="F12X14B" color="0,252,252,255" />
-//</panel>
 void InfoEngine::initBlockLabel2() {
-
+  _blocks["label2"]->setText("text", RLI_STR_RM);
 }
 
-//<panel name="label3" pos="-244,92" size="112x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
-//  <text name="text" rect="0x0x112x20" allign="center" font="F12X14B" color="0,252,252,255" />
-//</panel>
 void InfoEngine::initBlockLabel3() {
-
+  _blocks["label3"]->setText("text", RLI_STR_WATER);
 }
 
-//<panel name="label4" pos="-244,-68" size="96x32" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
-//  <text name="text" rect="0x0x112x20" allign="center" font="F16X28B" color="0,252,252,255" />
-//</panel>
 void InfoEngine::initBlockLabel4() {
-
+  _blocks["label4"]->setText("text", RLI_STR_LOD);
 }
 
 
@@ -325,117 +310,84 @@ void InfoEngine::initBlockFps() {
   _blocks["fps"]->setText("value", QString::number(0).toLatin1());
 }
 
-//<!-- rect="left_x_top_x_width_x_height" -->
-//<panel name="scale" pos="-244,4" size="236x36" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
-//  <rect name="splitter" rect="174x0x1x36" color="64,252,0,255" />
-//  <!-- /////////////////////////////////////////////////////////// -->
-//  <text name="scale1" rect="5x5x80x28"    allign="center" font="F16X28B" color="252,252,84,255" />  <!-- dynamic text color -->
-//  <text name="slash"  rect="85x5x16x28"   allign="center" font="F16X28B" color="252,252,84,255" />  <!-- dynamic text color -->
-//  <text name="scale2" rect="101x16x70x14" allign="center" font="F14X14B" color="252,252,84,255" />  <!-- dynamic text color -->
-//  <text name="units"  rect="176x12x56x14" allign="center" font="F14X14B" color="0,252,252,255"  />  <!-- static text color -->
-//</panel>
+
 void InfoEngine::initBlockScale() {
-
+  _blocks["scale"]->setText("scale1", QByteArray("0.125"));
+  _blocks["scale"]->setText("slash", QByteArray("/"));
+  _blocks["scale"]->setText("scale2", QByteArray("0.025"));
+  _blocks["scale"]->setText("units", RLI_STR_NM);
 }
 
-//<panel name="vn" pos="4,-4" size="140x66" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
-//  <text name="header" rect="0x6x132x14" allign="center" font="F12X14B" color="0,252,252,255" /> <!-- static text color -->
-//  <!-- /////////////////////////////////////////////////////////// -->
-//  <table name="table" row_count="2" top="28" row_height="18" >
-//    <column left="4"    width="36" allign="left"  font="F12X14B"  color="0,252,252,255"   />  <!-- static text color -->
-//    <column left="40"   width="60" allign="right" font="F12X14B"  color="252,252,84,255"  />  <!-- dynamic text color -->
-//    <column left="100"  width="36" allign="left"  font="F8X14B"   color="0,252,252,255"   />  <!-- static text color -->
-//  </table>
-//</panel>
 void InfoEngine::initBlockVn() {
+  _blocks["vn"]->setText("header", RLI_STR_EBL);
 
+  _blocks["vn"]->setText("table_0_0", RLI_STR_B);
+  _blocks["vn"]->setText("table_0_1", QByteArray("0.00"));
+  _blocks["vn"]->setText("table_0_2", RLI_STR_DEGREE_SIGN);
+
+  _blocks["vn"]->setText("table_1_0", RLI_STR_CU);
+  _blocks["vn"]->setText("table_1_1", QByteArray("0.00"));
+  _blocks["vn"]->setText("table_1_2", RLI_STR_GRAD_RB);
 }
 
-//<panel name="vd" pos="-244,-4" size="140x52" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
-//  <text name="header" rect="0x6x132x14" allign="center" font="F12X14B" color="0,252,252,255" /> <!-- static text color -->
-//  <!-- /////////////////////////////////////////////////////////// -->
-//  <table name="table" row_count="1" top="28" row_height="18" >
-//    <column left="4"    width="90" allign="right" font="F12X14B"  color="0,252,252,255"   />   <!-- static text color -->
-//    <column left="100"  width="40" allign="left"  font="F8X14B"   color="252,252,84,255"  />   <!-- dynamic text color -->
-//  </table>
-//</panel>
 void InfoEngine::initBlockVd() {
+  _blocks["vd"]->setText("header", RLI_STR_VRM);
 
+  _blocks["vd"]->setText("table_0_0", QByteArray("0.00"));
+  _blocks["vd"]->setText("table_0_1", RLI_STR_NM);
 }
 
-//<panel name="course" pos="-4,4" size="236x38" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
-//  <table name="table" row_count="2" top="4" row_height="18" >
-//    <column left="4"    width="116" allign="left"   font="F12X14B" color="0,252,252,255"  />  <!-- static text color -->
-//    <column left="120"  width="60"  allign="right"  font="F12X14B" color="252,252,84,255" />  <!-- dynamic text color -->
-//    <column left="186"  width="36"  allign="left"   font="F8X14B"  color="0,252,252,255"  />  <!-- static text color -->
-//  </table>
-//</panel>
 void InfoEngine::initBlockCourse() {
+  _blocks["course"]->setText("table_0_0", RLI_STR_GYRO_HDG);
+  _blocks["course"]->setText("table_0_1", QByteArray("0"));
+  _blocks["course"]->setText("table_0_2", RLI_STR_DEGREE_SIGN);
 
+  _blocks["course"]->setText("table_1_0", RLI_STR_MAN_SPD);
+  _blocks["course"]->setText("table_1_1", QByteArray("0"));
+  _blocks["course"]->setText("table_1_2", RLI_STR_NM);
 }
 
-//<panel name="position" pos="-4,46" size="236x38" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
-//  <table name="table" row_count="2" top="4" row_height="18" >
-//    <column left="4"    width="116" allign="left"   font="F12X14B" color="0,252,252,255"  />  <!-- static text color -->
-//    <column left="120"  width="112" allign="right"  font="F12X14B" color="252,252,84,255" />  <!-- dynamic text color -->
-//  </table>
-//</panel>
 void InfoEngine::initBlockPosition() {
+  _blocks["position"]->setText("table_0_0", RLI_STR_LAT);
+  _blocks["position"]->setText("table_0_1", RLI_STR_BLANK);
 
+  _blocks["position"]->setText("table_1_0", RLI_STR_LON);
+  _blocks["position"]->setText("table_1_1", RLI_STR_BLANK);
 }
 
-//<panel name="blank" pos="-4,88" size="236x38" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
-//</panel>
 void InfoEngine::initBlockBlank() {
 
 }
 
-//<panel name="clock" pos="-4,130" size="236x18" border_width="0" border_color="0,0,0,255" back_color="0,0,0,0" >
-//  <text name="label"  rect="4x4x80x14"    allign="center" font="F12X14B" color="0,252,252,255"  />  <!-- static text color -->
-//  <text name="time"   rect="120x4x96x14"  allign="center" font="F12X14B" color="252,252,84,255" />  <!-- dynamic text color -->
-//</panel>
 void InfoEngine::initBlockClock() {
-
+  _blocks["clock"]->setText("label", RLI_STR_TIME);
+  _blocks["clock"]->setText("time", QTime::currentTime().toString().toLocal8Bit());
 }
 
-//<panel name="danger" pos="-4,-330" size="236x20" border_width="0" border_color="0,0,0,255" back_color="252,252,84,255" >
-//  <text name="label" rect="0x0x236x20" allign="center" font="F12X14B" color="0,0,0,255"  />
-//</panel>
 void InfoEngine::initBlockDanger() {
-
+  _blocks["danger"]->setText("label", RLI_STR_DANGER_TRG);
 }
 
-//<panel name="tails" pos="-4,-306" size="236x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
-//  <table name="table" row_count="1" top="3" row_height="18" >
-//    <column left="4"   width="116" allign="left"  font="F12X14B" color="0,252,252,255"  />  <!-- static text color -->
-//    <column left="120" width="60"  allign="right" font="F12X14B" color="252,252,84,255" />  <!-- dynamic text color -->
-//    <column left="186" width="36"  allign="left"  font="F8X14B"  color="0,252,252,255"  />  <!-- static text color -->
-//  </table>
-//</panel>
 void InfoEngine::initBlockTails() {
-
+  _blocks["tails"]->setText("table_0_0", RLI_STR_TAILS);
+  _blocks["tails"]->setText("table_0_1", RLI_STR_OFF);
+  _blocks["tails"]->setText("table_0_2", RLI_STR_MIN);
 }
 
-//<panel name="danger-details" pos="-4,-264" size="236x38" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
-//  <table name="table" row_count="2" top="3" row_height="18" >
-//    <column left="4"   width="116" allign="left"  font="F12X14B" color="0,252,252,255"  />  <!-- static text color -->
-//    <column left="120" width="60"  allign="right" font="F12X14B" color="252,252,84,255" />  <!-- dynamic text color -->
-//    <column left="186" width="36"  allign="left"  font="F8X14B"  color="0,252,252,255"  />  <!-- static text color -->
-//  </table>
-//</panel>
 void InfoEngine::initBlockDetails() {
+  _blocks["danger-details"]->setText("table_0_0", RLI_STR_CPA);
+  _blocks["danger-details"]->setText("table_0_1", QByteArray("0"));
+  _blocks["danger-details"]->setText("table_0_2", RLI_STR_NM);
 
+  _blocks["danger-details"]->setText("table_1_0", RLI_STR_TCPA_LIMIT);
+  _blocks["danger-details"]->setText("table_1_1", QByteArray("0"));
+  _blocks["danger-details"]->setText("table_1_2", RLI_STR_MIN);
 }
 
-//<panel name="vector" pos="-4,-240" size="236x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
-//  <table name="table" row_count="1" top="3" row_height="18" >
-//    <column left="4"   width="116" allign="left"  font="F12X14B"  color="0,252,252,255"  />  <!-- static text color -->
-//    <column left="120" width="60"  allign="right" font="F12X14B"  color="252,252,84,255" />  <!-- dynamic text color -->
-//    <column left="186" width="36"  allign="left"  font="F8X14B"   color="0,252,252,255"  />  <!-- static text color -->
-//  </table>
-//</panel>
 void InfoEngine::initBlockVector() {
-
+  _blocks["vector"]->setText("table_0_0", RLI_STR_VECTOR);
+  _blocks["vector"]->setText("table_0_1", QByteArray("20"));
+  _blocks["vector"]->setText("table_0_2", RLI_STR_MIN);
 }
 
 //<panel name="targets" pos="-4,-68" size="236x168" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
@@ -453,18 +405,51 @@ void InfoEngine::initBlockVector() {
 //  </table>
 //</panel>
 void InfoEngine::initBlockTargets() {
+  _blocks["targets"]->setText("header", RLI_STR_TRG_ALL);
+  _blocks["targets"]->setText("current-target", QByteArray("1"));
+  _blocks["targets"]->setText("target-count", QByteArray("4"));
 
+  _blocks["targets"]->setText("table_0_0", RLI_STR_BEARING);
+  _blocks["targets"]->setText("table_0_1", QByteArray("0.00"));
+  _blocks["targets"]->setText("table_0_2", RLI_STR_DEGREE_SIGN);
+
+  _blocks["targets"]->setText("table_1_0", RLI_STR_RANGE);
+  _blocks["targets"]->setText("table_1_1", QByteArray("0.00"));
+  _blocks["targets"]->setText("table_1_2", RLI_STR_NM);
+
+  _blocks["targets"]->setText("table_2_0", RLI_STR_COURSE_W);
+  _blocks["targets"]->setText("table_2_1", QByteArray("0.00"));
+  _blocks["targets"]->setText("table_2_2", RLI_STR_DEGREE_SIGN);
+
+  _blocks["targets"]->setText("table_3_0", RLI_STR_SPEED_W);
+  _blocks["targets"]->setText("table_3_1", QByteArray("0.00"));
+  _blocks["targets"]->setText("table_3_2", RLI_STR_KTS);
+
+  _blocks["targets"]->setText("table_4_0", RLI_STR_CPA);
+  _blocks["targets"]->setText("table_4_1", QByteArray("0.00"));
+  _blocks["targets"]->setText("table_4_2", RLI_STR_NM);
+
+  _blocks["targets"]->setText("table_5_0", RLI_STR_TCPA);
+  _blocks["targets"]->setText("table_5_1", QByteArray("0.00"));
+  _blocks["targets"]->setText("table_5_2", RLI_STR_MIN);
+
+  _blocks["targets"]->setText("table_6_0", RLI_STR_DCC);
+  _blocks["targets"]->setText("table_6_1", QByteArray("0.00"));
+  _blocks["targets"]->setText("table_6_2", RLI_STR_NM);
+
+  _blocks["targets"]->setText("table_7_0", RLI_STR_TCC);
+  _blocks["targets"]->setText("table_7_1", QByteArray("0.00"));
+  _blocks["targets"]->setText("table_7_2", RLI_STR_MIN);
 }
 
-//<panel name="cursor" pos="-4,-4" size="236x60" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
-//  <text name="header" rect="0x4x236x14" allign="center" font="F12X14B" color="0,252,252,255"  />  <!-- static text color -->
-//  <!-- /////////////////////////////////////////////////////////// -->
-//  <table name="table" row_count="2" top="24" row_height="18" >
-//    <column left="4"   width="116" allign="left"  font="F12X14B" color="0,252,252,255"  />  <!-- static text color -->
-//    <column left="120" width="60"  allign="right" font="F12X14B" color="252,252,84,255" />  <!-- dynamic text color -->
-//    <column left="186" width="36"  allign="left"  font="F8X14B"  color="0,252,252,255"  />  <!-- static text color -->
-//  </table>
-//</panel>
 void InfoEngine::initBlockCursor() {
+  _blocks["cursor"]->setText("header", RLI_STR_CURSOR);
 
+  _blocks["cursor"]->setText("table_0_0", RLI_STR_BEARING);
+  _blocks["cursor"]->setText("table_0_1", QByteArray("0.00"));
+  _blocks["cursor"]->setText("table_0_2", RLI_STR_DEGREE_SIGN);
+
+  _blocks["cursor"]->setText("table_1_0", RLI_STR_RANGE);
+  _blocks["cursor"]->setText("table_1_1", QByteArray("0.00"));
+  _blocks["cursor"]->setText("table_1_2", RLI_STR_NM);
 }

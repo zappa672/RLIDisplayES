@@ -19,11 +19,13 @@ InfoBlock::~InfoBlock() {
 
 void InfoBlock::setRect(QString rectId, const QRect& rect) {
   _rects[rectId].geometry = rect;
+  _need_update = true;
 }
 
 void InfoBlock::setText(QString textId, RLIString str) {
   _texts[textId].string = str;
   _texts[textId].value.clear();
+  _need_update = true;
 }
 
 void InfoBlock::setText(QString textId, const QByteArray& val) {

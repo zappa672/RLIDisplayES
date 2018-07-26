@@ -39,7 +39,6 @@ SOURCES     += \
     src/datasources/radardatasource.cpp \
     src/datasources/shipdatasource.cpp \
     src/datasources/targetdatasource.cpp \
-    src/datasources/infocontrollers.cpp \
     \
     src/s52/chartmanager.cpp \
     src/s52/s52chart.cpp \
@@ -75,7 +74,6 @@ HEADERS     += \
     src/common/rlimath.h \
     src/common/rlistrings.h \
     \
-    src/datasources/infocontrollers.h \
     src/datasources/radarscale.h \
     src/datasources/radardatasource.h \
     src/datasources/targetdatasource.h \
