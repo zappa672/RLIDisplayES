@@ -28,7 +28,12 @@ public:
   void update(InfoFonts* fonts);
 
 public slots:
+  void secondChanged();
+  void setFps(int fps);
+
   void onLanguageChanged(RLIString lang_str);
+
+
 
 private:
   void updateBlock(InfoBlock* b, InfoFonts* fonts);

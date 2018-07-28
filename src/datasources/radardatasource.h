@@ -1,8 +1,6 @@
 #ifndef RADARDATASOURCE_H
 #define RADARDATASOURCE_H
 
-#include "radarscale.h"
-
 #include <stdint.h>
 #include <QObject>
 #include <QtConcurrent/QtConcurrentRun>
@@ -35,8 +33,6 @@ private:
   GLfloat* file_amps1[2];
   GLfloat* file_amps2[2];
   uint  file_curr;
-
-  RadarScale* _radar_scale;
 
   uint _peleng_size;
   uint _bearings_per_cycle;

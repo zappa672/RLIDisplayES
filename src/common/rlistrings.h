@@ -22,7 +22,7 @@ public:
   }
 
   const QByteArray string(RLILang lang, RLIString name) const { return _strings[name][lang]; }
-  const QTextEncoder* encoder() const { return _encoder; }
+  QTextEncoder* encoder() const { return _encoder; }
 
 private:
   RLIStrings(void);

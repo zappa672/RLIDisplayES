@@ -19,7 +19,6 @@ void qSleep(int ms) {
 
 RadarDataSource::RadarDataSource(QObject* parent) : QObject(parent) {
   finish_flag = true;
-  _radar_scale = new RadarScale();
 
   _peleng_size         = qApp->property(PROPERTY_PELENG_SIZE).toInt();
   _bearings_per_cycle  = qApp->property(PROPERTY_BEARINGS_PER_CYCLE).toInt();

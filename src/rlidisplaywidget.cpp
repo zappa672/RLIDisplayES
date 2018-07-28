@@ -19,7 +19,7 @@ RLIDisplayWidget::RLIDisplayWidget(QWidget *parent) : QOpenGLWidget(parent) {
   _debug_radar_tails_shift = 0;
 
   _chart_mngr = new ChartManager(this);
-  _layout_manager = new RLILayoutManager("layouts.xml");
+  _layout_manager = new RLILayoutManager("layouts.xml");  
 
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "RLIDisplayWidget construction finish";
 }
@@ -224,15 +224,18 @@ float RLIDisplayWidget::frameRate() {
 }
 
 
-void RLIDisplayWidget::paintGL() {  
+void RLIDisplayWidget::paintGL() {
   QDateTime time = QDateTime::currentDateTime();
 
   if (frameTimes.size() == 0 || frameTimes.last().time().second() != time.time().second())
-    emit secondChanged();
+    _infoEngine->secondChanged();
 
   frameTimes.push_back(time);
   while (frameTimes.size() > 20)
     frameTimes.removeFirst();
+
+  _infoEngine->setFps(frameRate());
+
 
   if (!_initialized)
     return;
@@ -251,9 +254,6 @@ void RLIDisplayWidget::paintLayers() {
   glBlendEquation(GL_FUNC_ADD);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-
-  std::pair<float, float> shipPos = RLIState::instance().shipPosition();
-  float scale = RLIState::instance().chartScale();
 
 
   glViewport(0, 0, width(), height());
@@ -282,7 +282,7 @@ void RLIDisplayWidget::paintLayers() {
   transform.setToIdentity();
   transform.translate(center.x(), center.y(), 0.f);
 
-  _trgtEngine->draw(projection*transform, shipPos, scale);
+  _trgtEngine->draw(projection*transform, _state);
   _ctrlEngine->draw(projection*transform);
 
 
@@ -302,16 +302,10 @@ void RLIDisplayWidget::updateLayers() {
   _radarEngine->updateTexture();
   _tailsEngine->updateTexture();
 
-  std::pair<float, float> shipPosition = RLIState::instance().shipPosition();
-  float chartScale = RLIState::instance().chartScale();
-
   QString colorScheme = _chart_mngr->refs()->getColorScheme();
-  _chartEngine->update(shipPosition, chartScale , 0.f,  QPoint(0.f, 0.f), colorScheme);
-
+  _chartEngine->update(_state, colorScheme);
   _infoEngine->update(_infoFonts);
-
   _menuEngine->update();
-
   _magnEngine->update( _radarEngine->amplitutedesVboId()
                      , _radarEngine->paletteTexId()
                      , _radarEngine->pelengLength()
@@ -361,53 +355,188 @@ void RLIDisplayWidget::drawRect(const QRectF& rect, GLuint textureId) {
 
 
 
-
-
-
-void RLIDisplayWidget::onMagnifierToggled() {
-  if (_menuEngine->visible())
-    return;
-
-  _magnEngine->setVisible(!_magnEngine->visible());
+void RLIDisplayWidget::keyReleaseEvent(QKeyEvent *event) {
+  pressedKeys.remove(event->key());
+  QOpenGLWidget::keyReleaseEvent(event);
 }
 
-void RLIDisplayWidget::onMenuToggled() {
-  if (_magnEngine->visible())
-    return;
+void RLIDisplayWidget::keyPressEvent(QKeyEvent *event) {
 
-  if (_menuEngine->state() == MenuEngine::MAIN)
-    _menuEngine->setState(MenuEngine::DISABLED);
-  else
-    _menuEngine->setState(MenuEngine::MAIN);
+  switch(event->key()) {
+  case Qt::Key_PageUp:
+    /*
+    if (mod_keys & Qt::ControlModifier)
+      emit gainChanged(qMin(_gain_ctrl->value() + 5, 255));
+
+    if (mod_keys & Qt::AltModifier)
+      emit waterChanged(qMin(_water_ctrl->value() + 5, 255));
+
+    if (mod_keys & Qt::ShiftModifier)
+      emit rainChanged(qMin(_rain_ctrl->value() + 5, 255));
+    */
+    break;
+
+  case Qt::Key_PageDown:
+    /*
+    if (mod_keys & Qt::ControlModifier)
+      emit gainChanged(qMin(_gain_ctrl->value() - 5, 255));
+
+    if (mod_keys & Qt::AltModifier)
+      emit waterChanged(qMin(_water_ctrl->value() - 5, 255));
+
+    if (mod_keys & Qt::ShiftModifier)
+      emit rainChanged(qMin(_rain_ctrl->value() - 5, 255));
+    */
+    break;
+
+  // Под. имп. Помех
+  case Qt::Key_S:
+    break;
+
+  // Меню
+  case Qt::Key_W:
+    if(pressedKeys.contains(Qt::Key_B)) {
+      if (_magnEngine->visible())
+        return;
+
+      if (_menuEngine->state() == MenuEngine::CONFIG)
+        _menuEngine->setState(MenuEngine::DISABLED);
+      else
+        _menuEngine->setState(MenuEngine::CONFIG);
+     } else {
+      if (_magnEngine->visible())
+        return;
+
+      if (_menuEngine->state() == MenuEngine::MAIN)
+        _menuEngine->setState(MenuEngine::DISABLED);
+      else
+        _menuEngine->setState(MenuEngine::MAIN);
+     }
+     break;
+
+  // Шкала +
+  case Qt::Key_Plus:
+    _state.setChartScale( 0.95 * _state.chartScale() );
+    break;
+
+  // Шкала -
+  case Qt::Key_Minus:
+    _state.setChartScale( 1.05 * _state.chartScale() );
+    break;
+
+  // Вынос центра
+  case Qt::Key_C:
+    break;
+
+  // Скрытое меню
+  case Qt::Key_U:
+    break;
+
+  // Следы точки
+  case Qt::Key_T:
+    break;
+
+  // Выбор цели
+  case Qt::Key_Up:
+    if (_menuEngine->visible())
+      _menuEngine->onUp();
+    break;
+
+  // ЛИД / ЛОД
+  case Qt::Key_Down:
+    if (_menuEngine->visible())
+      _menuEngine->onDown();
+    break;
+
+  case Qt::Key_Left:
+    break;
+
+  case Qt::Key_Right:
+    break;
+
+  // Захват
+  case Qt::Key_Enter:
+    if (_menuEngine->visible())
+      _menuEngine->onEnter();
+    break;
+
+  //Сброс
+  case Qt::Key_Escape:
+    if (_menuEngine->visible())
+      _menuEngine->onBack();
+    break;
+
+  // Парал. Линии
+  case Qt::Key_Backslash:
+    _ctrlEngine->setParallelLinesVisible(!_ctrlEngine->isParallelLinesVisible());
+    break;
+
+  //Электронная лупа
+  case Qt::Key_L:
+    if (!_menuEngine->visible())
+      _magnEngine->setVisible(!_magnEngine->visible());
+    break;
+
+  //Обзор
+  case Qt::Key_X:
+    toggleRadarTailsShift();
+    break;
+
+  //Узкий / Шир.
+  case Qt::Key_Greater:
+    break;
+
+  //Накоп. Видео
+  case Qt::Key_V:
+    break;
+
+  //Сброс АС
+  case Qt::Key_Q:
+    break;
+
+  //Манёвр
+  case Qt::Key_M:
+    break;
+
+  //Курс / Север / Курс стаб
+  case Qt::Key_H:
+    break;
+
+  //ИД / ОД
+  case Qt::Key_R:
+    break;
+
+  //НКД
+  case Qt::Key_D:
+    break;
+
+  //Карта (Маршрут)
+  case Qt::Key_A:
+    break;
+
+  //Выбор
+  case Qt::Key_G:
+    break;
+
+  //Стоп-кадр
+  case Qt::Key_F:
+    break;
+
+  //Откл. Звука
+  case Qt::Key_B:
+    break;
+
+  //Откл. ОК
+  case Qt::Key_K:
+    break;
+
+  //Вынос ВН/ВД
+  case Qt::Key_Slash:
+    _ctrlEngine->setCirclesVisible(!_ctrlEngine->isCirclesVisible());
+    break;
+
+  }
+
+  pressedKeys.insert(event->key());
+  QOpenGLWidget::keyPressEvent(event);
 }
-
-void RLIDisplayWidget::onConfigMenuToggled() {
-  if (_magnEngine->visible())
-    return;
-
-  if (_menuEngine->state() == MenuEngine::CONFIG)
-    _menuEngine->setState(MenuEngine::DISABLED);
-  else
-    _menuEngine->setState(MenuEngine::CONFIG);
-}
-
-void RLIDisplayWidget::onUpToggled() {
-  if (_menuEngine->visible())
-    _menuEngine->onUp();
-}
-
-void RLIDisplayWidget::onDownToggled() {
-  if (_menuEngine->visible())
-    _menuEngine->onDown();
-}
-
-void RLIDisplayWidget::onEnterToggled() {
-  if (_menuEngine->visible())
-    _menuEngine->onEnter();
-}
-
-void RLIDisplayWidget::onBackToggled() {
-  if (_menuEngine->visible())
-    _menuEngine->onBack();
-}
-

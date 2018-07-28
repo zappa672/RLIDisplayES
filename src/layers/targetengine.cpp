@@ -164,12 +164,13 @@ void TargetEngine::initShader() {
 }
 
 
-void TargetEngine::draw(const QMatrix4x4& mvp_matrix, std::pair<float, float> coords, float scale) {
+void TargetEngine::draw(const QMatrix4x4& mvp_matrix, const RLIState& state) {
   _trgtsMutex.lock();
 
   _prog->bind();
 
-  glUniform1f(_unif_locs[AIS_TRGT_UNIF_SCALE], scale);
+  auto coords = state.shipPosition();
+  glUniform1f(_unif_locs[AIS_TRGT_UNIF_SCALE], state.chartScale());
   glUniform2f(_unif_locs[AIS_TRGT_UNIF_CENTER], coords.first, coords.second);
   _prog->setUniformValue(_unif_locs[AIS_TRGT_UNIF_MVP], mvp_matrix);
 

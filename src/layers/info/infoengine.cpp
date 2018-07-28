@@ -305,10 +305,16 @@ void InfoEngine::initBlockLabel4() {
 }
 
 
+
 void InfoEngine::initBlockFps() {
   _blocks["fps"]->setText("label", RLI_STR_FPS);
-  _blocks["fps"]->setText("value", QString::number(0).toLatin1());
+  _blocks["fps"]->setText("value", QByteArray("0"));
 }
+
+void InfoEngine::setFps(int fps) {
+  _blocks["fps"]->setText("value", QString::number(fps).toLocal8Bit());
+}
+
 
 
 void InfoEngine::initBlockScale() {
@@ -359,10 +365,17 @@ void InfoEngine::initBlockBlank() {
 
 }
 
+
 void InfoEngine::initBlockClock() {
   _blocks["clock"]->setText("label", RLI_STR_TIME);
   _blocks["clock"]->setText("time", QTime::currentTime().toString().toLocal8Bit());
 }
+
+void InfoEngine::secondChanged() {
+  _blocks["clock"]->setText("time", QTime::currentTime().toString().toLocal8Bit());
+}
+
+
 
 void InfoEngine::initBlockDanger() {
   _blocks["danger"]->setText("label", RLI_STR_DANGER_TRG);

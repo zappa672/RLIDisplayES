@@ -12,7 +12,7 @@
 #include "s52/chartmanager.h"
 
 #include "common/rlilayout.h"
-#include "datasources/radarscale.h"
+#include "common/rlistate.h"
 
 #include "layers/radar/radarengine.h"
 #include "layers/chart/chartengine.h"
@@ -46,16 +46,12 @@ public:
 
 signals:
   void initialized();
-  void secondChanged();
 
-public slots:
-  void onMagnifierToggled();
-  void onMenuToggled();
-  void onConfigMenuToggled();
-  void onUpToggled();
-  void onDownToggled();
-  void onEnterToggled();
-  void onBackToggled();
+public slots:  
+  void keyReleaseEvent(QKeyEvent *event);
+  void keyPressEvent(QKeyEvent *event);
+
+  inline void onShipPositionChanged(std::pair<float,float> pos) { _state.setShipPosition(pos); }
 
 protected slots:
   void initializeGL();
@@ -70,10 +66,10 @@ private:
 
   bool _initialized;
 
+  int _debug_radar_tails_shift;
+
   QMutex frameRateMutex;
   QQueue<QDateTime> frameTimes;
-
-  int _debug_radar_tails_shift;
 
   void debugInfo();
   void initShaders();
@@ -83,6 +79,7 @@ private:
 
   void drawRect(const QRectF& rect, GLuint textureId);
 
+  RLIState _state;
   ChartManager* _chart_mngr;
   RLILayoutManager* _layout_manager;
 

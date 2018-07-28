@@ -27,15 +27,10 @@ protected slots:
   void resizeEvent(QResizeEvent* e);
   void timerEvent(QTimerEvent* e);
 
-  void keyReleaseEvent(QKeyEvent *event);
-  void keyPressEvent(QKeyEvent *event);
-
   void onRLIWidgetInitialized();
 
 private:
   Ui::MainWindow *ui;
-
-  QSet<int> pressedKeys;
 
   RadarDataSource*    _radar_ds;
   ShipDataSource*     _ship_ds;

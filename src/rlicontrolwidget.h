@@ -2,6 +2,7 @@
 #define RLICONTROLWIDGET_H
 
 #include <QWidget>
+#include <QKeyEvent>
 
 namespace Ui {
   class RLIControlWidget;
@@ -12,7 +13,7 @@ class RLIControlWidget : public QWidget
   Q_OBJECT
 
 public:
-  explicit RLIControlWidget(QWidget *parent = 0);
+  explicit RLIControlWidget(QObject* reciever, QWidget *parent = 0);
   ~RLIControlWidget();
 
 private slots:
@@ -56,6 +57,35 @@ private slots:
   void on_btnOnOff5_clicked();
   void on_btnOnOff6_clicked();
 
+
+  void on_btnRLI1_released();
+  void on_btnRLI2_released();
+  void on_btnRLI3_released();
+  void on_btnRLI4_released();
+
+  void on_btnTrace1_released();
+  void on_btnTrace2_released();
+  void on_btnTrace3_released();
+  void on_btnTrace4_released();
+  void on_btnTrace5_released();
+  void on_btnTrace6_released();
+  void on_btnMenu_released();
+  void on_btnConfigMenu_released();
+  void on_btnMagnifier_released();
+
+  void on_btnMode1_released();
+  void on_btnMode2_released();
+  void on_btnMode3_released();
+  void on_btnModeDec_released();
+  void on_btnModeInc_released();
+
+  void on_btnOnOff1_released();
+  void on_btnOnOff2_released();
+  void on_btnOnOff3_released();
+  void on_btnOnOff4_released();
+  void on_btnOnOff5_released();
+  void on_btnOnOff6_released();
+
 signals:
   void vdChanged(float val);
   void vnChanged(float val);
@@ -67,7 +97,8 @@ signals:
   void closeApp();
 
 private:
-  void postKeyEvent(int key);
+  QObject* _reciever;
+  void postKeyEvent(QEvent::Type type, int key);
 
   int _vn_pos;
   int _vd_pos;

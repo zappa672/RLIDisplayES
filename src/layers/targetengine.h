@@ -1,6 +1,7 @@
 #ifndef TARGETENGINE_H
 #define TARGETENGINE_H
 
+#include "../common/rlistate.h"
 #include "../datasources/targetdatasource.h"
 
 #include <QPoint>
@@ -22,7 +23,7 @@ public:
   explicit TargetEngine(QOpenGLContext* context, QObject* parent = 0);
   virtual ~TargetEngine();
 
-  void draw(const QMatrix4x4& mvp_matrix, std::pair<float, float> coords, float scale);
+  void draw(const QMatrix4x4& mvp_matrix, const RLIState& state);
 
   int getTailsTime(void);
   int getCurrentIndex();

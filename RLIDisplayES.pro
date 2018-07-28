@@ -31,11 +31,12 @@ SOURCES     += \
     src/rlicontrolwidget.cpp \
     src/rlidisplaywidget.cpp \
     \
-    src/common/properties.cpp \
+    src/common/radarscale.cpp \
     src/common/triangulate.cpp \
     src/common/rlimath.cpp \
-    \
-    src/datasources/radarscale.cpp \
+    src/common/rlisttrings.cpp \
+    src/common/rlilayout.cpp \
+    \    
     src/datasources/radardatasource.cpp \
     src/datasources/shipdatasource.cpp \
     src/datasources/targetdatasource.cpp \
@@ -59,22 +60,23 @@ SOURCES     += \
     src/layers/targetengine.cpp \    
     src/layers/controlsengine.cpp \
     src/layers/magnifierengine.cpp \
-    src/layers/info/infoblock.cpp \
-    src/common/rlisttrings.cpp \
+    src/layers/info/infoblock.cpp \    
     src/layers/info/menuitem.cpp \
-    src/common/rlilayout.cpp
+    src/common/rlistate.cpp
 
 HEADERS     += \
     src/mainwindow.h \
     src/rlicontrolwidget.h \
     src/rlidisplaywidget.h \
     \
+    src/common/radarscale.h \
     src/common/properties.h \
     src/common/triangulate.h \
     src/common/rlimath.h \
+    src/common/rlilayout.h \
     src/common/rlistrings.h \
-    \
-    src/datasources/radarscale.h \
+    src/common/rlistringnames.h \
+    \    
     src/datasources/radardatasource.h \
     src/datasources/targetdatasource.h \
     src/datasources/shipdatasource.h \
@@ -98,10 +100,9 @@ HEADERS     += \
     src/layers/targetengine.h \    
     src/layers/controlsengine.h \
     src/layers/magnifierengine.h \
-    src/common/rlilayout.h \
     src/layers/info/infoblock.h \
-    src/common/rlistringnames.h \
-    src/layers/info/menuitem.h
+    src/layers/info/menuitem.h \
+    src/common/rlistate.h
 
 FORMS       += \
     forms/mainwindow.ui \
@@ -117,3 +118,4 @@ OTHER_FILES += \
 DISTFILES += \
     layouts.xml \
     chart_disp_conf.xml
+

@@ -31,6 +31,7 @@ void InfoBlock::setText(QString textId, RLIString str) {
 void InfoBlock::setText(QString textId, const QByteArray& val) {
   _texts[textId].string = RLI_STR_NONE;
   _texts[textId].value = val;
+  _need_update = true;
 }
 
 

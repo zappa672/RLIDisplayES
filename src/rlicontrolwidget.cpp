@@ -13,7 +13,8 @@ typedef uint32_t u_int32_t;
 #define TRIGGERED_SLIDER_MAX 90
 #define TRIGGERED_SLIDER_DEFAULT 0
 
-RLIControlWidget::RLIControlWidget(QWidget *parent) : QWidget(parent), ui(new Ui::RLIControlWidget) {
+RLIControlWidget::RLIControlWidget(QObject* reciever, QWidget *parent) : QWidget(parent), ui(new Ui::RLIControlWidget) {
+  _reciever = reciever;
   ui->setupUi(this);
 
   ui->sldGain->setMinimum(0);
@@ -87,79 +88,82 @@ void RLIControlWidget::on_btnClose_clicked() {
 
 
 
-void RLIControlWidget::postKeyEvent(int key) {
-  QKeyEvent* e = new QKeyEvent(QEvent::KeyPress, key, Qt::NoModifier);
-  qApp->postEvent(parent(), e);
+
+void RLIControlWidget::postKeyEvent(QEvent::Type type, int key) {
+  QKeyEvent* e = new QKeyEvent(type, key, Qt::NoModifier);
+  qApp->postEvent(_reciever, e);
 }
+
+
 
 /* ---- */
 //Обзор
 void RLIControlWidget::on_btnRLI1_clicked() {
-  postKeyEvent(Qt::Key_X);
+  postKeyEvent(QEvent::KeyPress, Qt::Key_X);
 }
 
 //Узкий / Шир.
 void RLIControlWidget::on_btnRLI2_clicked() {
-  postKeyEvent(Qt::Key_Greater);
+  postKeyEvent(QEvent::KeyPress, Qt::Key_Greater);
 }
 
 //Накоп. Видео
 void RLIControlWidget::on_btnRLI3_clicked() {
-  postKeyEvent(Qt::Key_V);
+  postKeyEvent(QEvent::KeyPress, Qt::Key_V);
 }
 
 //Подав. имп. Помех
 void RLIControlWidget::on_btnRLI4_clicked() {
-  postKeyEvent(Qt::Key_S);
+  postKeyEvent(QEvent::KeyPress, Qt::Key_S);
 }
 /* ---- */
 
 /* ---- */
 //Сброс
 void RLIControlWidget::on_btnTrace1_clicked() {
-  postKeyEvent(Qt::Key_Escape);
+  postKeyEvent(QEvent::KeyPress, Qt::Key_Escape);
 }
 
 //Следы точки
 void RLIControlWidget::on_btnTrace2_clicked() {
-  postKeyEvent(Qt::Key_T);
+  postKeyEvent(QEvent::KeyPress, Qt::Key_T);
 }
 
 //Манёвр
 void RLIControlWidget::on_btnTrace3_clicked() {
-  postKeyEvent(Qt::Key_M);
+  postKeyEvent(QEvent::KeyPress, Qt::Key_M);
 }
 
 //Выбор цели
 void RLIControlWidget::on_btnTrace4_clicked() {
-  postKeyEvent(Qt::Key_Up);
+  postKeyEvent(QEvent::KeyPress, Qt::Key_Up);
 }
 
 //ЛИД / ЛОД
 void RLIControlWidget::on_btnTrace5_clicked() {
-  postKeyEvent(Qt::Key_Down);
+  postKeyEvent(QEvent::KeyPress, Qt::Key_Down);
 }
 
 //Захват
 void RLIControlWidget::on_btnTrace6_clicked() {
-  postKeyEvent(Qt::Key_Enter);
+  postKeyEvent(QEvent::KeyPress, Qt::Key_Enter);
 }
 /* ---- */
 
 /* ---- */
 //Меню
 void RLIControlWidget::on_btnMenu_clicked() {
-  postKeyEvent(Qt::Key_W);
+  postKeyEvent(QEvent::KeyPress, Qt::Key_W);
 }
 
 //Скрытое меню
 void RLIControlWidget::on_btnConfigMenu_clicked() {
-  postKeyEvent(Qt::Key_U);
+  postKeyEvent(QEvent::KeyPress, Qt::Key_U);
 }
 
 //Электронная лупа
 void RLIControlWidget::on_btnMagnifier_clicked() {
-  postKeyEvent(Qt::Key_L);
+  postKeyEvent(QEvent::KeyPress, Qt::Key_L);
 }
 /* ---- */
 
@@ -167,27 +171,27 @@ void RLIControlWidget::on_btnMagnifier_clicked() {
 /* ---- */
 //Курс / Север / Курс стаб
 void RLIControlWidget::on_btnMode1_clicked() {
-  postKeyEvent(Qt::Key_H);
+  postKeyEvent(QEvent::KeyPress, Qt::Key_H);
 }
 
 //ИД / ОД
 void RLIControlWidget::on_btnMode2_clicked() {
-  postKeyEvent(Qt::Key_R);
+  postKeyEvent(QEvent::KeyPress, Qt::Key_R);
 }
 
 //Вынос центра
 void RLIControlWidget::on_btnMode3_clicked() {
-  postKeyEvent(Qt::Key_C);
+  postKeyEvent(QEvent::KeyPress, Qt::Key_C);
 }
 
 //Шкала -
 void RLIControlWidget::on_btnModeDec_clicked() {
-  postKeyEvent(Qt::Key_Minus);
+  postKeyEvent(QEvent::KeyPress, Qt::Key_Minus);
 }
 
 //Шкала +
 void RLIControlWidget::on_btnModeInc_clicked() {
-  postKeyEvent(Qt::Key_Plus);
+  postKeyEvent(QEvent::KeyPress, Qt::Key_Plus);
 }
 /* ---- */
 
@@ -198,27 +202,27 @@ void RLIControlWidget::on_btnOnOff1_clicked() {
 
 //Карта (Маршрут)
 void RLIControlWidget::on_btnOnOff2_clicked() {
-  postKeyEvent(Qt::Key_A);
+  postKeyEvent(QEvent::KeyPress, Qt::Key_A);
 }
 
 //Парал. Линии
 void RLIControlWidget::on_btnOnOff3_clicked() {
-  postKeyEvent(Qt::Key_Backslash);
+  postKeyEvent(QEvent::KeyPress, Qt::Key_Backslash);
 }
 
 //Откл. Звука
 void RLIControlWidget::on_btnOnOff4_clicked() {
-  postKeyEvent(Qt::Key_B);
+  postKeyEvent(QEvent::KeyPress, Qt::Key_B);
 }
 
 //Откл. ОК
 void RLIControlWidget::on_btnOnOff5_clicked() {
-  postKeyEvent(Qt::Key_K);
+  postKeyEvent(QEvent::KeyPress, Qt::Key_K);
 }
 
 //Вынос ВН/ВД
 void RLIControlWidget::on_btnOnOff6_clicked() {
-  postKeyEvent(Qt::Key_Slash);
+  postKeyEvent(QEvent::KeyPress, Qt::Key_Slash);
 }
 /* ---- */
 
@@ -253,3 +257,133 @@ void RLIControlWidget::on_btnOnOff6_clicked() {
 + Захват                      ENTER
 + Парал. Линии                \
 */
+
+/* ---- */
+//Обзор
+void RLIControlWidget::on_btnRLI1_released() {
+  postKeyEvent(QEvent::KeyRelease, Qt::Key_X);
+}
+
+//Узкий / Шир.
+void RLIControlWidget::on_btnRLI2_released() {
+  postKeyEvent(QEvent::KeyRelease, Qt::Key_Greater);
+}
+
+//Накоп. Видео
+void RLIControlWidget::on_btnRLI3_released() {
+  postKeyEvent(QEvent::KeyRelease, Qt::Key_V);
+}
+
+//Подав. имп. Помех
+void RLIControlWidget::on_btnRLI4_released() {
+  postKeyEvent(QEvent::KeyRelease, Qt::Key_S);
+}
+/* ---- */
+
+/* ---- */
+//Сброс
+void RLIControlWidget::on_btnTrace1_released() {
+  postKeyEvent(QEvent::KeyRelease, Qt::Key_Escape);
+}
+
+//Следы точки
+void RLIControlWidget::on_btnTrace2_released() {
+  postKeyEvent(QEvent::KeyRelease, Qt::Key_T);
+}
+
+//Манёвр
+void RLIControlWidget::on_btnTrace3_released() {
+  postKeyEvent(QEvent::KeyRelease, Qt::Key_M);
+}
+
+//Выбор цели
+void RLIControlWidget::on_btnTrace4_released() {
+  postKeyEvent(QEvent::KeyRelease, Qt::Key_Up);
+}
+
+//ЛИД / ЛОД
+void RLIControlWidget::on_btnTrace5_released() {
+  postKeyEvent(QEvent::KeyRelease, Qt::Key_Down);
+}
+
+//Захват
+void RLIControlWidget::on_btnTrace6_released() {
+  postKeyEvent(QEvent::KeyRelease, Qt::Key_Enter);
+}
+/* ---- */
+
+/* ---- */
+//Меню
+void RLIControlWidget::on_btnMenu_released() {
+  postKeyEvent(QEvent::KeyRelease, Qt::Key_W);
+}
+
+//Скрытое меню
+void RLIControlWidget::on_btnConfigMenu_released() {
+  postKeyEvent(QEvent::KeyRelease, Qt::Key_U);
+}
+
+//Электронная лупа
+void RLIControlWidget::on_btnMagnifier_released() {
+  postKeyEvent(QEvent::KeyRelease, Qt::Key_L);
+}
+/* ---- */
+
+
+/* ---- */
+//Курс / Север / Курс стаб
+void RLIControlWidget::on_btnMode1_released() {
+  postKeyEvent(QEvent::KeyRelease, Qt::Key_H);
+}
+
+//ИД / ОД
+void RLIControlWidget::on_btnMode2_released() {
+  postKeyEvent(QEvent::KeyRelease, Qt::Key_R);
+}
+
+//Вынос центра
+void RLIControlWidget::on_btnMode3_released() {
+  postKeyEvent(QEvent::KeyRelease, Qt::Key_C);
+}
+
+//Шкала -
+void RLIControlWidget::on_btnModeDec_released() {
+  postKeyEvent(QEvent::KeyRelease, Qt::Key_Minus);
+}
+
+//Шкала +
+void RLIControlWidget::on_btnModeInc_released() {
+  postKeyEvent(QEvent::KeyRelease, Qt::Key_Plus);
+}
+/* ---- */
+
+/* ---- */
+void RLIControlWidget::on_btnOnOff1_released() {
+
+}
+
+//Карта (Маршрут)
+void RLIControlWidget::on_btnOnOff2_released() {
+  postKeyEvent(QEvent::KeyRelease, Qt::Key_A);
+}
+
+//Парал. Линии
+void RLIControlWidget::on_btnOnOff3_released() {
+  postKeyEvent(QEvent::KeyRelease, Qt::Key_Backslash);
+}
+
+//Откл. Звука
+void RLIControlWidget::on_btnOnOff4_released() {
+  postKeyEvent(QEvent::KeyRelease, Qt::Key_B);
+}
+
+//Откл. ОК
+void RLIControlWidget::on_btnOnOff5_released() {
+  postKeyEvent(QEvent::KeyRelease, Qt::Key_K);
+}
+
+//Вынос ВН/ВД
+void RLIControlWidget::on_btnOnOff6_released() {
+  postKeyEvent(QEvent::KeyRelease, Qt::Key_Slash);
+}
+/* ---- */

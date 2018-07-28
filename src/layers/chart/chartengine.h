@@ -9,6 +9,8 @@
 #include <QOpenGLShaderProgram>
 #include <QOpenGLVertexArrayObject>
 
+#include "../../common/rlistate.h"
+
 #include "../../s52/s52assets.h"
 #include "../../s52/s52chart.h"
 #include "../../s52/s52references.h"
@@ -28,9 +30,10 @@ public:
   inline QSize size() { return _fbo->size(); }
 
   void setChart(S52Chart* chrt, S52References* ref);
-  void update(std::pair<float, float> center, float scale, float angle, QPoint center_shift, const QString& color_scheme);
+  void update(const RLIState& state, const QString& color_scheme);
 
   inline GLuint textureId() { return _fbo->texture(); }
+  //inline void forceUpdate() { _force_update = true; }
 
 private:
   void clearChartData();
