@@ -98,7 +98,7 @@ public:
   RLIMenuItemInt(RLIString name, int min, int max, int def, QObject* parent = 0);
   ~RLIMenuItemInt() {}
 
-  inline QByteArray value(RLILang lang) { Q_UNUSED(lang); return QString::number(_value).toLatin1(); }
+  inline QByteArray value(RLILang lang) { Q_UNUSED(lang); return QString::number(_value).toLocal8Bit(); }
   inline int intValue() { return _value; }
   inline int minValue() { return _min; }
   inline int maxValue() { return _max; }
@@ -131,7 +131,7 @@ public:
   RLIMenuItemFloat(RLIString name, float min, float max, float def);
   ~RLIMenuItemFloat() { }
 
-  inline QByteArray value(RLILang lang) { Q_UNUSED(lang); return QString::number(_value).left(5).toLatin1(); }
+  inline QByteArray value(RLILang lang) { Q_UNUSED(lang); return QString::number(_value).left(5).toLocal8Bit(); }
   inline float fltValue() { return _value; }
   inline float minValue() { return _min; }
   inline float maxValue() { return _max; }

@@ -14,6 +14,7 @@
 #include "infoblock.h"
 #include "../../common/rlilayout.h"
 #include "../../common/rlistrings.h"
+#include "../targetengine.h"
 
 
 class InfoEngine : public QObject, protected QOpenGLFunctions {
@@ -28,12 +29,12 @@ public:
   void update(InfoFonts* fonts);
 
 public slots:
+  void onLanguageChanged(RLIString lang_str);
   void secondChanged();
   void setFps(int fps);
-
-  void onLanguageChanged(RLIString lang_str);
-
-
+  void onPositionChanged(const std::pair<float, float>& position);
+  void onTargetCountChanged(int count);
+  void onSelectedTargetUpdated(const QString& tag, const RadarTarget& trgt);
 
 private:
   void updateBlock(InfoBlock* b, InfoFonts* fonts);

@@ -16,10 +16,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
   _ship_ds = new ShipDataSource(this);
   _target_ds = new TargetDataSource(this);
 
-  _radar_ds->start();
-  _ship_ds->start();
-  _target_ds->start();
-
   wgtRLI->setFocusPolicy(Qt::StrongFocus);
   wgtRLI->setFocus();
 }
@@ -62,20 +58,13 @@ void MainWindow::timerEvent(QTimerEvent* e) {
 }
 
 void MainWindow::onRLIWidgetInitialized() {
-  connect( _radar_ds, SIGNAL(updateData(uint,uint,GLfloat*))
-         , wgtRLI->radarEngine(), SLOT(updateData(uint,uint,GLfloat*)));
+  wgtRLI->setupRadarDataSource(_radar_ds);
+  wgtRLI->setupTargetDataSource(_target_ds);
+  wgtRLI->setupShipDataSource(_ship_ds);
 
-  connect( _radar_ds, SIGNAL(updateData2(uint,uint,GLfloat*))
-         , wgtRLI->tailsEngine(), SLOT(updateData(uint,uint,GLfloat*)));
-
-  qRegisterMetaType<RadarTarget>("RadarTarget");
-  connect(_target_ds, SIGNAL(updateTarget(QString, RadarTarget))
-         , wgtRLI->targetEngine(), SLOT(updateTarget(QString, RadarTarget)));
-
-
-  connect(_ship_ds, SIGNAL(positionChanged(std::pair<float,float>))
-         ,wgtRLI, SLOT(onShipPositionChanged(std::pair<float,float>)));
-
+  _radar_ds->start();
+  _ship_ds->start();
+  _target_ds->start();
 
   int frame = qApp->property(PROPERTY_FRAME_DELAY).toInt();
   startTimer(frame, Qt::CoarseTimer);

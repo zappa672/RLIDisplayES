@@ -25,18 +25,21 @@ public:
 
   void draw(const QMatrix4x4& mvp_matrix, const RLIState& state);
 
-  int getTailsTime(void);
-  int getCurrentIndex();
+  inline int targetCount() const { return _targets.size(); }
+  inline const QString& selectedTag() const { return _selected; }
+  inline RadarTarget selectedTrgt() const { return _targets.value(_selected); }
 
 signals:
   void targetCountChanged(int count);
   void selectedTargetUpdated(const QString& tag, const RadarTarget& trgt);
 
+protected slots:
+  void timerEvent(QTimerEvent* e);
+
 public slots:
-  void onTailsTimer();
   void onTailsModeChanged(int mode, int minutes);
 
-  void trySelect(QVector2D cursorCoords, float scale);
+  void select(const std::pair<float, float>& coords, float scale);
 
   void deleteTarget(QString tag);
   void updateTarget(QString tag, RadarTarget target);

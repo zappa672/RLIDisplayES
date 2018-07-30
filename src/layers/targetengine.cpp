@@ -8,13 +8,10 @@
 
 
 TargetEngine::TargetEngine(QOpenGLContext* context, QObject* parent) : QObject(parent), QOpenGLFunctions(context) {
-  _tailsTime   = 0;
-  _selected = "1";
+  _tailsTime = 1;
+  _selected = "";
 
-  connect(&_tailsTimer, SIGNAL(timeout()), SLOT(onTailsTimer()));
-  if (_tailsTime > 0)
-    _tailsTimer.start((_tailsTime * 60 * 1000) / TRG_TAIL_NUM);
-
+  startTimer(2000);
 
   initializeOpenGLFunctions();
 
@@ -38,23 +35,14 @@ TargetEngine::~TargetEngine() {
   glDeleteBuffers(1, &_ind_vbo_id);
 }
 
-int TargetEngine::getCurrentIndex() {
-  if (_targets.contains(_selected))
-    return _targets.keys().indexOf(_selected);
-  else
-    return -1;
-}
-
-void TargetEngine::trySelect(QVector2D cursorCoords, float scale) {
-  QList<QString> tags = _targets.keys();
-  for (int i = 0; i < tags.size(); i++) {
-    if (tags[i] == _selected)
+void TargetEngine::select(const std::pair<float, float>& coords, float scale) {
+  for (const QString& tag: _targets.keys()) {
+    if (tag == _selected)
       continue;
 
-    QVector2D target_coords(_targets[tags[i]].Latitude, _targets[tags[i]].Longtitude);
-    QPointF dist_to_target = RLIMath::coords_to_pos(cursorCoords, target_coords, QPoint(0, 0), scale);
-    if (QVector2D(dist_to_target).length() < 16) {
-      _selected = tags[i];
+    float dist = RLIMath::geo_distance(coords.first, coords.second, _targets[tag].Latitude, _targets[tag].Longtitude);
+    if ((dist / scale) < 16) {
+      _selected = tag;
       emit selectedTargetUpdated(_selected, _targets[_selected]);
       return;
     }
@@ -62,23 +50,22 @@ void TargetEngine::trySelect(QVector2D cursorCoords, float scale) {
 }
 
 
-void TargetEngine::onTailsTimer() {
+void TargetEngine::timerEvent(QTimerEvent* e) {
+  Q_UNUSED(e);
+
   _trgtsMutex.lock();
-  //qDebug() << QDateTime::currentDateTime() << ": " << "onTailsTimer";
 
   QList<QString> tags = _targets.keys();
   for (int i = 0; i < tags.count(); i++) {
     QString tag = tags[i];
     _tails[tag].push_back(QVector2D(_targets[tag].Latitude,_targets[tag].Longtitude));
 
-    if (_tails[tag].size() > TRG_TAIL_NUM)
+    while (_tails[tag].size() > TRG_TAIL_NUM)
       _tails[tag].removeFirst();
   }
 
   _trgtsMutex.unlock();
-  //qDebug() << _tails[tags[0]].size();
 }
-
 
 void TargetEngine::onTailsModeChanged(int mode, int minutes) {
   Q_UNUSED(mode);
@@ -87,6 +74,7 @@ void TargetEngine::onTailsModeChanged(int mode, int minutes) {
       _tailsTimer.stop();
 
   _tailsTime = minutes;
+
   if(_tailsTime <= 0) {
     _trgtsMutex.lock();
     //qDebug() << QDateTime::currentDateTime() << ": " << "onTailsTimer";
@@ -111,7 +99,7 @@ void TargetEngine::updateTarget(QString tag, RadarTarget target) {
 
   if (!_targets.contains(tag)) {
     _targets.insert(tag, target);
-    _tails.insert(tag, QList<QVector2D>());    
+    _tails.insert(tag, QList<QVector2D>());
     emit targetCountChanged(_targets.size());
   } else {
     _targets[tag] = target;
@@ -190,24 +178,19 @@ void TargetEngine::draw(const QMatrix4x4& mvp_matrix, const RLIState& state) {
 
   glBindTexture(GL_TEXTURE_2D, 0);
 
-
-
   glLineWidth(2);
 
   // Draw target headings
   glUniform1f(_unif_locs[AIS_TRGT_UNIF_TYPE], 1);
   glDrawArrays(GL_LINES, 0,  _targets.size()*4);
 
-  // Draw target courses
-  // glPushAttrib(GL_ENABLE_BIT);
-  // glLineStipple(1, 0xF0F0);
-  // glEnable(GL_LINE_STIPPLE);
-
   glUniform1f(_unif_locs[AIS_TRGT_UNIF_TYPE], 2);
   glDrawArrays(GL_LINES, 0, _targets.size()*4);
-  // glPopAttrib();
 
-  // glPointSize(5);
+
+#if !(defined(GL_ES_VERSION_2_0) || defined(GL_ES_VERSION_3_0))
+  glPointSize(5.0);
+#endif
 
 
   // Draw tails++
@@ -378,25 +361,15 @@ QOpenGLTexture* TargetEngine::initTexture(QString path) {
 
   /*
   glGenTextures(1, tex_id);
-
   glBindTexture(GL_TEXTURE_2D, *tex_id);
-
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-  QImage img(path);
-  img = QOpenGLContext::convertToGLFormat(img);
-
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, img.width(), img.height()
-               , 0, GL_RGBA, GL_UNSIGNED_BYTE, img.bits());
-
+  img = QOpenGLContext::convertToGLFormat(QImage(path));
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, img.width(), img.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, img.bits());
   glGenerateMipmap(GL_TEXTURE_2D);
   glBindTexture(GL_TEXTURE_2D, 0);
   */
 }
 
-int TargetEngine::getTailsTime(void) {
-    return _tailsTime;
-}

@@ -1,25 +1,36 @@
 #include "rlimath.h"
 
-QVector2D RLIMath::pos_to_coords(QVector2D center, QPointF center_pos, QPointF pos, float scale) {
-  QPointF metric_pos = (pos - center_pos) * scale;
+#include "QDebug"
 
-  float lat_rads = radians(center.x());
 
-  float lat = degrees(-metric_pos.y() / EARTH_RADIUS) + center.x();
-  float lon = degrees(metric_pos.x() / (EARTH_RADIUS * cos(lat_rads))) + center.y();
+std::pair<float, float> RLIMath::pos_to_coords( const std::pair<float, float> center_coords
+                                              , const QPoint& center_position
+                                              , const QPoint& position
+                                              , float scale) {
+  QPoint metric_pos = (position - center_position) * scale;
 
-  return QVector2D(lat, lon);
+  float lat_rads = radians(center_coords.first);
+
+  float lat = degrees(-metric_pos.y() / EARTH_RADIUS) + center_coords.first;
+  float lon = degrees(metric_pos.x() / (EARTH_RADIUS * cos(lat_rads))) + center_coords.second;
+
+  return { lat, lon };
 }
 
-QPointF RLIMath::coords_to_pos(QVector2D center, QVector2D coords, QPointF center_pos, float scale) {
-  float lat_rads = radians(center.x());
+QPoint RLIMath::coords_to_pos( const std::pair<float, float> center_coords
+                             , const std::pair<float, float> coords
+                             , QPoint center_position
+                             , float scale) {
+  float lat_rads = radians(center_coords.first);
 
-  float y_m = -EARTH_RADIUS*radians(coords.x() - center.x());
-  float x_m = EARTH_RADIUS*cos(lat_rads)*radians(coords.y() - center.y());
+  float y_m = -EARTH_RADIUS*radians(coords.first - center_coords.first);
+  float x_m = EARTH_RADIUS*cos(lat_rads)*radians(coords.second - center_coords.second);
 
-  QPointF pix_pos(x_m / scale, y_m / scale);
-  return pix_pos + center_pos;
+  QPoint pix_pos = QPoint(floor(x_m / scale), floor(y_m / scale));
+
+  return pix_pos + center_position;
 }
+
 
 double RLIMath::geo_distance(double lat1, double lon1, double lat2, double lon2) {
   double lat2_rads = radians(lat2);

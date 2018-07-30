@@ -353,6 +353,7 @@ void InfoEngine::initBlockCourse() {
   _blocks["course"]->setText("table_1_2", RLI_STR_NM);
 }
 
+
 void InfoEngine::initBlockPosition() {
   _blocks["position"]->setText("table_0_0", RLI_STR_LAT);
   _blocks["position"]->setText("table_0_1", RLI_STR_BLANK);
@@ -360,6 +361,12 @@ void InfoEngine::initBlockPosition() {
   _blocks["position"]->setText("table_1_0", RLI_STR_LON);
   _blocks["position"]->setText("table_1_1", RLI_STR_BLANK);
 }
+
+void InfoEngine::onPositionChanged(const std::pair<float, float>& position) {
+  _blocks["position"]->setText("table_0_1", QString::number(position.first, 'd', 2).toLocal8Bit());
+  _blocks["position"]->setText("table_1_1", QString::number(position.second, 'd', 2).toLocal8Bit());
+}
+
 
 void InfoEngine::initBlockBlank() {
 
@@ -403,24 +410,10 @@ void InfoEngine::initBlockVector() {
   _blocks["vector"]->setText("table_0_2", RLI_STR_MIN);
 }
 
-//<panel name="targets" pos="-4,-68" size="236x168" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
-//  <rect name="header-middle" rect="118x0x1x20" color="64,252,0,255" />
-//  <rect name="header-bottom" rect="0x20x236x1" color="64,252,0,255" />
-//  <!-- /////////////////////////////////////////////////////////// -->
-//  <text name="header"         rect="4x4x228x14" allign="left"   font="F12X14B" color="0,252,252,255"  />  <!-- static text color -->
-//  <text name="current-target" rect="4x4x110x14" allign="right"  font="F12X14B" color="252,252,84,255" />  <!-- dynamic text color -->
-//  <text name="target-count"   rect="4x4x228x14" allign="right"  font="F12X14B" color="252,252,84,255" />  <!-- dynamic text color -->
-//  <!-- /////////////////////////////////////////////////////////// -->
-//  <table name="table" row_count="8" top="24" row_height="18" >
-//    <column left="4"   width="116" allign="left"  font="F12X14B" color="0,252,252,255"  />  <!-- static text color -->
-//    <column left="120" width="60"  allign="right" font="F12X14B" color="252,252,84,255" />  <!-- dynamic text color -->
-//    <column left="186" width="36"  allign="left"  font="F8X14B"  color="0,252,252,255"  />  <!-- static text color -->
-//  </table>
-//</panel>
 void InfoEngine::initBlockTargets() {
   _blocks["targets"]->setText("header", RLI_STR_TRG_ALL);
-  _blocks["targets"]->setText("current-target", QByteArray("1"));
-  _blocks["targets"]->setText("target-count", QByteArray("4"));
+  _blocks["targets"]->setText("current-target", QByteArray("0"));
+  _blocks["targets"]->setText("target-count", QByteArray("0"));
 
   _blocks["targets"]->setText("table_0_0", RLI_STR_BEARING);
   _blocks["targets"]->setText("table_0_1", QByteArray("0.00"));
@@ -454,6 +447,18 @@ void InfoEngine::initBlockTargets() {
   _blocks["targets"]->setText("table_7_1", QByteArray("0.00"));
   _blocks["targets"]->setText("table_7_2", RLI_STR_MIN);
 }
+
+void InfoEngine::onTargetCountChanged(int count) {
+  _blocks["targets"]->setText("target-count", QString::number(count).toLocal8Bit());
+}
+
+void InfoEngine::onSelectedTargetUpdated(const QString& tag, const RadarTarget& trgt) {
+  _blocks["targets"]->setText("current-target", tag.toLocal8Bit());
+
+  _blocks["targets"]->setText("table_2_1", QString::number(trgt.CourseOverGround).left(6).toLatin1());
+  _blocks["targets"]->setText("table_3_1", QString::number(trgt.SpeedOverGround).left(6).toLatin1());
+}
+
 
 void InfoEngine::initBlockCursor() {
   _blocks["cursor"]->setText("header", RLI_STR_CURSOR);

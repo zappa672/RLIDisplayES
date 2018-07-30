@@ -12,7 +12,7 @@ public:
   explicit ShipDataSource(QObject *parent = 0);
   virtual ~ShipDataSource();
 
-  inline std::pair<float, float> getPosition() { return position; }
+  inline const std::pair<float, float>& position() const { return _position; }
 
 signals:
   void positionChanged(std::pair<float, float> position);
@@ -28,7 +28,7 @@ private:
   int _timerId;
   QDateTime _startTime;
 
-  std::pair<float, float> position;
+  std::pair<float, float> _position;
 };
 
 #endif // SHIPDATASOURCE_H

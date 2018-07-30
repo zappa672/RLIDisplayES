@@ -9,10 +9,13 @@
 
 #include "common/properties.h"
 #include "common/rlistrings.h"
+#include "common/rlimath.h"
+
 
 RLIDisplayWidget::RLIDisplayWidget(QWidget *parent) : QOpenGLWidget(parent) {
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "RLIDisplayWidget construction start";
 
+  qRegisterMetaType<RadarTarget>("RadarTarget");
   qRegisterMetaType<RLIString>("RLIString");
 
   _initialized = false;
@@ -23,6 +26,7 @@ RLIDisplayWidget::RLIDisplayWidget(QWidget *parent) : QOpenGLWidget(parent) {
 
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "RLIDisplayWidget construction finish";
 }
+
 
 RLIDisplayWidget::~RLIDisplayWidget() {
   delete _chart_mngr;
@@ -42,6 +46,30 @@ RLIDisplayWidget::~RLIDisplayWidget() {
     delete _program;
   }
 }
+
+
+void RLIDisplayWidget::setupRadarDataSource(RadarDataSource* rds) {
+  connect( rds, SIGNAL(updateData(uint,uint,GLfloat*))
+         , _radarEngine, SLOT(updateData(uint,uint,GLfloat*)));
+
+  connect( rds, SIGNAL(updateData2(uint,uint,GLfloat*))
+         , _tailsEngine, SLOT(updateData(uint,uint,GLfloat*)));
+}
+
+void RLIDisplayWidget::setupTargetDataSource(TargetDataSource* tds) {
+  connect( tds, SIGNAL(updateTarget(QString,RadarTarget))
+         , _trgtEngine, SLOT(updateTarget(QString,RadarTarget)));
+}
+
+void RLIDisplayWidget::setupShipDataSource(ShipDataSource* sds) {
+  _infoEngine->onPositionChanged(sds->position());
+  _state.setShipPosition(sds->position());
+
+  connect(sds, SIGNAL(positionChanged(std::pair<float,float>))
+         , SLOT(onShipPositionChanged(std::pair<float,float>)));
+}
+
+
 
 void RLIDisplayWidget::toggleRadarTailsShift() {
   if (_debug_radar_tails_shift == 0)
@@ -163,9 +191,18 @@ void RLIDisplayWidget::initializeGL() {
   _chart_mngr->loadCharts();
   connect(_chart_mngr, SIGNAL(new_chart_available(QString)), SLOT(onNewChartAvailable(QString)));
 
-  connect(_menuEngine, SIGNAL(radarBrightnessChanged(int)), _radarEngine, SLOT(onBrightnessChanged(int)));
-  connect(_menuEngine, SIGNAL(languageChanged(RLIString)), _menuEngine, SLOT(onLanguageChanged(RLIString)));
-  connect(_menuEngine, SIGNAL(languageChanged(RLIString)), _infoEngine, SLOT(onLanguageChanged(RLIString)));
+  connect( _menuEngine, SIGNAL(radarBrightnessChanged(int))
+         , _radarEngine, SLOT(onBrightnessChanged(int)));
+
+  connect( _menuEngine, SIGNAL(languageChanged(RLIString))
+         , _menuEngine, SLOT(onLanguageChanged(RLIString)));
+  connect( _menuEngine, SIGNAL(languageChanged(RLIString))
+         , _infoEngine, SLOT(onLanguageChanged(RLIString)));
+
+  connect( _trgtEngine, SIGNAL(targetCountChanged(int))
+         , _infoEngine, SLOT(onTargetCountChanged(int)));
+  connect( _trgtEngine, SIGNAL(selectedTargetUpdated(QString,RadarTarget))
+         , _infoEngine, SLOT(onSelectedTargetUpdated(QString,RadarTarget)));
 }
 
 void RLIDisplayWidget::initShaders() {
@@ -209,6 +246,12 @@ void RLIDisplayWidget::resizeGL(int w, int h) {
   _menuEngine->resize(_layout_manager->layout()->menu);
   _magnEngine->resize(_layout_manager->layout()->magnifier);
   _infoEngine->resize(_layout_manager->layout());
+
+  _infoEngine->secondChanged();
+  _infoEngine->setFps(frameRate());
+  _infoEngine->onPositionChanged(_state.shipPosition());
+  _infoEngine->onTargetCountChanged(_trgtEngine->targetCount());
+  _infoEngine->onSelectedTargetUpdated(_trgtEngine->selectedTag(), _trgtEngine->selectedTrgt());
 }
 
 
@@ -352,6 +395,22 @@ void RLIDisplayWidget::drawRect(const QRectF& rect, GLuint textureId) {
   _program->release();
 }
 
+
+void RLIDisplayWidget::onShipPositionChanged(const std::pair<float,float>& pos) {
+  _state.setShipPosition(pos);
+  _infoEngine->onPositionChanged(pos);
+}
+
+
+
+void RLIDisplayWidget::mousePressEvent(QMouseEvent* event) {
+  auto selected_coords = RLIMath::pos_to_coords( _state.shipPosition()
+                                               , _layout_manager->layout()->circle.center
+                                               , event->pos()
+                                               , _state.chartScale() );
+
+  _trgtEngine->select(selected_coords, _state.chartScale());
+}
 
 
 

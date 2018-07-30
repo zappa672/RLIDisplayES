@@ -14,6 +14,10 @@
 #include "common/rlilayout.h"
 #include "common/rlistate.h"
 
+#include "datasources/radardatasource.h"
+#include "datasources/shipdatasource.h"
+#include "datasources/targetdatasource.h"
+
 #include "layers/radar/radarengine.h"
 #include "layers/chart/chartengine.h"
 #include "layers/info/infoengine.h"
@@ -31,27 +35,22 @@ public:
   explicit RLIDisplayWidget(QWidget *parent = 0);
   ~RLIDisplayWidget();
 
-  inline MaskEngine*      maskEngine()      { return _maskEngine; }
-  inline RadarEngine*     radarEngine()     { return _radarEngine; }
-  inline RadarEngine*     tailsEngine()     { return _tailsEngine; }
-  inline ChartEngine*     chartEngine()     { return _chartEngine; }
-  inline InfoEngine*      infoEngine()      { return _infoEngine; }
-  inline MenuEngine*      menuEngine()      { return _menuEngine; }
-  inline MagnifierEngine* magnifierEngine() { return _magnEngine; }
-  inline TargetEngine*    targetEngine()    { return _trgtEngine; }
-  inline ControlsEngine*  controlsEngine()  { return _ctrlEngine; }
-
   void toggleRadarTailsShift();
   float frameRate();
+
+  void setupRadarDataSource(RadarDataSource* rds);
+  void setupTargetDataSource(TargetDataSource* tds);
+  void setupShipDataSource(ShipDataSource* sds);
 
 signals:
   void initialized();
 
 public slots:  
-  void keyReleaseEvent(QKeyEvent *event);
-  void keyPressEvent(QKeyEvent *event);
+  void keyReleaseEvent(QKeyEvent* event);
+  void keyPressEvent(QKeyEvent* event);
+  void mousePressEvent(QMouseEvent* event);
 
-  inline void onShipPositionChanged(std::pair<float,float> pos) { _state.setShipPosition(pos); }
+  void onShipPositionChanged(const std::pair<float,float>& pos);
 
 protected slots:
   void initializeGL();

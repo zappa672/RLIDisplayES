@@ -256,7 +256,7 @@ void MaskEngine::initTextBuffers() {
   _text_point_count = 0;
 
   for (int i = 0; i < 360; i += 10) {
-    QByteArray tm = QString::number(i).toLatin1();
+    QByteArray tm = QString::number(i).toLocal8Bit();
 
     for (int l = 0; l < tm.size(); l++) {
       for (int k = 0; k < 4; k++) {
