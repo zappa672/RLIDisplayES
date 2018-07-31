@@ -34,7 +34,7 @@
   <property name="autoFillBackground">
    <bool>false</bool>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_4" stretch="0,1,0,0">
+  <layout class="QVBoxLayout" name="verticalLayout_4" stretch="0,1,0">
    <property name="spacing">
     <number>4</number>
    </property>
@@ -1142,16 +1142,6 @@
       </widget>
      </item>
     </layout>
-   </item>
-   <item>
-    <widget class="QPushButton" name="btnConfigMenu">
-     <property name="focusPolicy">
-      <enum>Qt::NoFocus</enum>
-     </property>
-     <property name="text">
-      <string>Config Menu</string>
-     </property>
-    </widget>
    </item>
   </layout>
  </widget>

@@ -169,10 +169,10 @@ void ChartEngine::setSndgLayer(S52Chart* chrt, S52References* ref) {
 
 
 void ChartEngine::update(const RLIState& state, const QString& color_scheme) {
-  auto center = state.shipPosition();
-  float scale = state.chartScale();
-  float angle = state.northShift();
-  const QPoint& center_shift = state.centerShift();
+  auto center = state.ship_position;
+  float scale = state.chart_scale;
+  float angle = state.north_shift;
+  const QPoint& center_shift = state.center_shift;
 
   bool need_update = ( _force_update
                     || fabs(_center.first - center.first) > 0.000005

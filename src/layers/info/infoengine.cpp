@@ -31,7 +31,8 @@ InfoEngine::~InfoEngine() {
 void InfoEngine::resize(RLILayout* layout) {
   for (const QString& name : _blocks.keys())
     _blocks[name]->resize(layout->panels[name]);
-  initBlocks();
+
+  initBlocks();  
 }
 
 void InfoEngine::initShaders() {
@@ -246,38 +247,52 @@ void InfoEngine::initBlocks() {
 
 void InfoEngine::initBlockGain() {
   _blocks["gain"]->setText("text", RLI_STR_GAIN);
-  QRect bar = _blocks["gain"]->rectangles()["bar"].geometry;
-  bar.setWidth(1);
-  _blocks["gain"]->setRect("bar", bar);
 }
 
 void InfoEngine::initBlockWater() {
   _blocks["water"]->setText("text", RLI_STR_WATER);
-  QRect bar = _blocks["water"]->rectangles()["bar"].geometry;
-  bar.setWidth(30);
-  _blocks["water"]->setRect("bar", bar);
 }
 
 void InfoEngine::initBlockRain() {
   _blocks["rain"]->setText("text", RLI_STR_RAIN);
-  QRect bar = _blocks["rain"]->rectangles()["bar"].geometry;
-  bar.setWidth(20);
-  _blocks["rain"]->setRect("bar", bar);
 }
 
 void InfoEngine::initBlockApch() {
   _blocks["apch"]->setText("text", RLI_STR_AFC);
-  QRect bar = _blocks["apch"]->rectangles()["bar"].geometry;
-  bar.setWidth(0);
-  _blocks["apch"]->setRect("bar", bar);
 }
 
 void InfoEngine::initBlockEmission() {
-  _blocks["emission"]->setText("text", RLI_STR_EMISSION);
-  QRect bar = _blocks["emission"]->rectangles()["bar"].geometry;
-  bar.setWidth(49);
-  _blocks["emission"]->setRect("bar", bar);
+  _blocks["emission"]->setText("text", RLI_STR_EMISSION);  
 }
+
+void InfoEngine::updateGain(float gain) {
+  updateValueBar("gain", gain);
+}
+
+void InfoEngine::updateWater(float water) {
+  updateValueBar("water", water);
+}
+
+void InfoEngine::updateRain(float rain) {
+  updateValueBar("rain", rain);
+}
+
+void InfoEngine::updateApch(float apch) {
+  updateValueBar("apch", apch);
+}
+
+void InfoEngine::updateEmission(float emission) {
+  updateValueBar("emission", emission);
+}
+
+void InfoEngine::updateValueBar(const QString& name, float value) {
+  int max_bar_width = _blocks[name]->geometry().width() - _blocks[name]->rectangles()["splitter"].geometry.x() - 2;
+  int bar_width = (value / 255.0) * max_bar_width;
+  QRect bar = _blocks[name]->rectangles()["bar"].geometry;
+  bar.setWidth(bar_width);
+  _blocks[name]->setRect("bar", bar);
+}
+
 
 
 void InfoEngine::initBlockLabel5() {

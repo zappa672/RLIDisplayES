@@ -41,7 +41,6 @@ private slots:
   void on_btnTrace5_clicked();
   void on_btnTrace6_clicked();
   void on_btnMenu_clicked();
-  void on_btnConfigMenu_clicked();
   void on_btnMagnifier_clicked();
 
   void on_btnMode1_clicked();
@@ -70,7 +69,6 @@ private slots:
   void on_btnTrace5_released();
   void on_btnTrace6_released();
   void on_btnMenu_released();
-  void on_btnConfigMenu_released();
   void on_btnMagnifier_released();
 
   void on_btnMode1_released();
@@ -90,9 +88,9 @@ signals:
   void vdChanged(float val);
   void vnChanged(float val);
 
-  void gainChanged(int val);
-  void waterChanged(int val);
-  void rainChanged(int val);
+  void gainChanged(float val);
+  void waterChanged(float val);
+  void rainChanged(float val);
 
   void closeApp();
 

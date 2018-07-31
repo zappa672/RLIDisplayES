@@ -156,11 +156,6 @@ void RLIControlWidget::on_btnMenu_clicked() {
   postKeyEvent(QEvent::KeyPress, Qt::Key_W);
 }
 
-//Скрытое меню
-void RLIControlWidget::on_btnConfigMenu_clicked() {
-  postKeyEvent(QEvent::KeyPress, Qt::Key_U);
-}
-
 //Электронная лупа
 void RLIControlWidget::on_btnMagnifier_clicked() {
   postKeyEvent(QEvent::KeyPress, Qt::Key_L);
@@ -316,11 +311,6 @@ void RLIControlWidget::on_btnTrace6_released() {
 //Меню
 void RLIControlWidget::on_btnMenu_released() {
   postKeyEvent(QEvent::KeyRelease, Qt::Key_W);
-}
-
-//Скрытое меню
-void RLIControlWidget::on_btnConfigMenu_released() {
-  postKeyEvent(QEvent::KeyRelease, Qt::Key_U);
 }
 
 //Электронная лупа

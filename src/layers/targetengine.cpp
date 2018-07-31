@@ -157,8 +157,8 @@ void TargetEngine::draw(const QMatrix4x4& mvp_matrix, const RLIState& state) {
 
   _prog->bind();
 
-  auto coords = state.shipPosition();
-  glUniform1f(_unif_locs[AIS_TRGT_UNIF_SCALE], state.chartScale());
+  auto coords = state.ship_position;
+  glUniform1f(_unif_locs[AIS_TRGT_UNIF_SCALE], state.chart_scale);
   glUniform2f(_unif_locs[AIS_TRGT_UNIF_CENTER], coords.first, coords.second);
   _prog->setUniformValue(_unif_locs[AIS_TRGT_UNIF_MVP], mvp_matrix);
 

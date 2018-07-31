@@ -1,9 +1,9 @@
 #include "rlistate.h"
 
-RLIState::RLIState() {
-  _chart_scale = 100.f;
+void RLIState::save() {
+
 }
 
-RLIState::~RLIState() {
+void RLIState::restore() {
 
 }

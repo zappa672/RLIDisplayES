@@ -30,6 +30,15 @@ public:
 
 public slots:
   void onLanguageChanged(RLIString lang_str);
+
+  void updateGain(float gain);
+  void updateWater(float water);
+  void updateRain(float rain);
+  void updateApch(float apch);
+  void updateEmission(float emission);
+
+  void updateValueBar(const QString& name, float value);
+
   void secondChanged();
   void setFps(int fps);
   void onPositionChanged(const std::pair<float, float>& position);

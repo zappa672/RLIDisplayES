@@ -10,6 +10,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
   wgtButtonPanel = new RLIControlWidget(wgtRLI, this);
 
   connect(wgtButtonPanel, SIGNAL(closeApp()), SLOT(close()));
+
+  connect(wgtButtonPanel, SIGNAL(gainChanged(float)), wgtRLI, SLOT(onGainChanged(float)));
+  connect(wgtButtonPanel, SIGNAL(waterChanged(float)), wgtRLI, SLOT(onWaterChanged(float)));
+  connect(wgtButtonPanel, SIGNAL(rainChanged(float)), wgtRLI, SLOT(onRainChanged(float)));
+
   connect(wgtRLI, SIGNAL(initialized()), SLOT(onRLIWidgetInitialized()));
 
   _radar_ds = new RadarDataSource(this);

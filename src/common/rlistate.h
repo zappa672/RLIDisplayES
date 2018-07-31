@@ -3,29 +3,20 @@
 
 #include <QPoint>
 
-class RLIState
-{
-public:
-  RLIState();
-  ~RLIState();
+struct RLIState {
+  float gain      = 0.f;
+  float water     = 0.f;
+  float rain      = 0.f;
+  float apch      = 0.f;
+  float emission  = 0.f;
 
-  inline const QPoint& centerShift() const { return _center_shift; }
-  inline void setCenterShift(const QPoint& shift) { _center_shift = shift; }
+  float north_shift = 0.f;
+  float chart_scale = 100.f;
+  std::pair<float,float> ship_position { 0.0, 0.0 };
+  QPoint center_shift { 0, 0 };
 
-  inline const std::pair<float, float>& shipPosition() const { return _ship_position; }
-  inline void setShipPosition(const std::pair<float, float>& pos) { _ship_position = pos; }
-
-  inline float chartScale() const { return _chart_scale; }
-  inline void setChartScale(float scale) { _chart_scale = scale; }
-
-  inline float northShift() const { return _north_shift; }
-  inline void setNorthShift(float shift) { _north_shift = shift; }
-
-private:
-  float _north_shift;
-  float _chart_scale;
-  std::pair<float,float> _ship_position;
-  QPoint _center_shift;
+  void save();
+  void restore();
 };
 
 #endif // RLISTATE_H

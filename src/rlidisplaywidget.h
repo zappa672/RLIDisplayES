@@ -50,6 +50,12 @@ public slots:
   void keyPressEvent(QKeyEvent* event);
   void mousePressEvent(QMouseEvent* event);
 
+  void onGainChanged(float value);
+  void onWaterChanged(float value);
+  void onRainChanged(float value);
+  void onApchChanged(float value);
+  void onEmissionChanged(float value);
+
   void onShipPositionChanged(const std::pair<float,float>& pos);
 
 protected slots:

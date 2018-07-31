@@ -63,7 +63,7 @@ void RLIDisplayWidget::setupTargetDataSource(TargetDataSource* tds) {
 
 void RLIDisplayWidget::setupShipDataSource(ShipDataSource* sds) {
   _infoEngine->onPositionChanged(sds->position());
-  _state.setShipPosition(sds->position());
+  _state.ship_position = sds->position();
 
   connect(sds, SIGNAL(positionChanged(std::pair<float,float>))
          , SLOT(onShipPositionChanged(std::pair<float,float>)));
@@ -249,9 +249,15 @@ void RLIDisplayWidget::resizeGL(int w, int h) {
 
   _infoEngine->secondChanged();
   _infoEngine->setFps(frameRate());
-  _infoEngine->onPositionChanged(_state.shipPosition());
+  _infoEngine->onPositionChanged(_state.ship_position);
   _infoEngine->onTargetCountChanged(_trgtEngine->targetCount());
   _infoEngine->onSelectedTargetUpdated(_trgtEngine->selectedTag(), _trgtEngine->selectedTrgt());
+
+  _infoEngine->updateGain(_state.gain);
+  _infoEngine->updateWater(_state.water);
+  _infoEngine->updateRain(_state.rain);
+  _infoEngine->updateApch(_state.apch);
+  _infoEngine->updateEmission(_state.emission);
 }
 
 
@@ -397,21 +403,46 @@ void RLIDisplayWidget::drawRect(const QRectF& rect, GLuint textureId) {
 
 
 void RLIDisplayWidget::onShipPositionChanged(const std::pair<float,float>& pos) {
-  _state.setShipPosition(pos);
+  _state.ship_position = pos;
   _infoEngine->onPositionChanged(pos);
 }
 
 
 
 void RLIDisplayWidget::mousePressEvent(QMouseEvent* event) {
-  auto selected_coords = RLIMath::pos_to_coords( _state.shipPosition()
+  auto selected_coords = RLIMath::pos_to_coords( _state.ship_position
                                                , _layout_manager->layout()->circle.center
                                                , event->pos()
-                                               , _state.chartScale() );
+                                               , _state.chart_scale );
 
-  _trgtEngine->select(selected_coords, _state.chartScale());
+  _trgtEngine->select(selected_coords, _state.chart_scale);
 }
 
+
+void RLIDisplayWidget::onGainChanged(float value) {
+  _state.gain = value;
+  _infoEngine->updateGain(_state.gain);
+}
+
+void RLIDisplayWidget::onWaterChanged(float value) {
+  _state.water = value;
+  _infoEngine->updateWater(_state.water);
+}
+
+void RLIDisplayWidget::onRainChanged(float value) {
+  _state.rain = value;
+  _infoEngine->updateRain(_state.rain);
+}
+
+void RLIDisplayWidget::onApchChanged(float value) {
+  _state.apch = value;
+  _infoEngine->updateApch(_state.apch);
+}
+
+void RLIDisplayWidget::onEmissionChanged(float value) {
+  _state.emission = value;
+  _infoEngine->updateEmission(_state.emission);
+}
 
 
 void RLIDisplayWidget::keyReleaseEvent(QKeyEvent *event) {
@@ -419,33 +450,33 @@ void RLIDisplayWidget::keyReleaseEvent(QKeyEvent *event) {
   QOpenGLWidget::keyReleaseEvent(event);
 }
 
+
 void RLIDisplayWidget::keyPressEvent(QKeyEvent *event) {
+  auto mod_keys = event->modifiers();
 
   switch(event->key()) {
   case Qt::Key_PageUp:
-    /*
     if (mod_keys & Qt::ControlModifier)
-      emit gainChanged(qMin(_gain_ctrl->value() + 5, 255));
+      onGainChanged(qMin(_state.gain + 5.0, 255.0));
 
     if (mod_keys & Qt::AltModifier)
-      emit waterChanged(qMin(_water_ctrl->value() + 5, 255));
+      onWaterChanged(qMin(_state.water + 5.0, 255.0));
 
     if (mod_keys & Qt::ShiftModifier)
-      emit rainChanged(qMin(_rain_ctrl->value() + 5, 255));
-    */
+      onRainChanged(qMin(_state.rain + 5.0, 255.0));
+
     break;
 
   case Qt::Key_PageDown:
-    /*
     if (mod_keys & Qt::ControlModifier)
-      emit gainChanged(qMin(_gain_ctrl->value() - 5, 255));
+      onGainChanged(qMax(_state.gain - 5.0, 0.0));
 
     if (mod_keys & Qt::AltModifier)
-      emit waterChanged(qMin(_water_ctrl->value() - 5, 255));
+      onWaterChanged(qMax(_state.water - 5.0, 0.0));
 
     if (mod_keys & Qt::ShiftModifier)
-      emit rainChanged(qMin(_rain_ctrl->value() - 5, 255));
-    */
+      onRainChanged(qMax(_state.rain - 5.0, 0.0));
+
     break;
 
   // Под. имп. Помех
@@ -475,12 +506,12 @@ void RLIDisplayWidget::keyPressEvent(QKeyEvent *event) {
 
   // Шкала +
   case Qt::Key_Plus:
-    _state.setChartScale( 0.95 * _state.chartScale() );
+    _state.chart_scale *= 0.95;
     break;
 
   // Шкала -
   case Qt::Key_Minus:
-    _state.setChartScale( 1.05 * _state.chartScale() );
+    _state.chart_scale *= 1.05;
     break;
 
   // Вынос центра
@@ -514,7 +545,7 @@ void RLIDisplayWidget::keyPressEvent(QKeyEvent *event) {
     break;
 
   // Захват
-  case Qt::Key_Enter:
+  case Qt::Key_Return:
     if (_menuEngine->visible())
       _menuEngine->onEnter();
     break;
