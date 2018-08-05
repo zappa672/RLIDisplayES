@@ -19,12 +19,12 @@ public:
 
   void draw(const QMatrix4x4& mvp_matrix, const RLIState& state);
 
-  QVector2D getLastPoint() { return _currentRoute.last(); }
+  QPointF getLastPoint() { return _currentRoute.last(); }
   inline bool isIndexUsed(int index) { return (index < 0 || index >= _routes.size() || _routes[index].size() > 0); }
 
 public slots:
   void clearCurrentRoute();
-  void addPointToCurrent(const QVector2D& p);
+  void addPointToCurrent(const QPointF& p);
   void removePointFromCurrent();
 
   void loadFrom(int index);
@@ -37,24 +37,21 @@ private:
   int loadBuffers();
 
   QMutex _routesMutex;
-  QList<QVector2D> _currentRoute;
-  QVector<QList<QVector2D> > _routes;
+  QList<QPointF> _currentRoute;
+  QVector<QList<QPointF> > _routes;
 
   QOpenGLShaderProgram* _prog;
 
   // -----------------------------------------------
-  enum { ROUTE_ATTR_PREV_COORDS = 0
-       , ROUTE_ATTR_CURR_COORDS = 1
-       , ROUTE_ATTR_NEXT_COORDS = 2
-       , ROUTE_ATTR_COUNT       = 3 } ;
+  enum { ROUTE_ATTR_COORDS  = 0
+       , ROUTE_ATTR_COUNT   = 1 } ;
 
   enum { ROUTE_UNIF_MVP_MATRIX  = 0
-       , ROUTE_UNIF_CENTER = 1
-       , ROUTE_UNIF_SCALE = 2
-       , ROUTE_UNIF_TYPE = 3
-       , ROUTE_UNIF_COUNT = 4 } ;
+       , ROUTE_UNIF_CENTER      = 1
+       , ROUTE_UNIF_SCALE       = 2
+       , ROUTE_UNIF_COUNT       = 3} ;
 
-  GLuint _vbo_ids[ROUTE_ATTR_COUNT];
+  GLuint _vbo_ids[3][ROUTE_ATTR_COUNT];
   GLuint _attr_locs[ROUTE_ATTR_COUNT];
   GLuint _unif_locs[ROUTE_UNIF_COUNT];
 };

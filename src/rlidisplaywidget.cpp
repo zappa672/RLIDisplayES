@@ -331,9 +331,13 @@ void RLIDisplayWidget::paintLayers() {
   projection.setToIdentity();
   projection.ortho(0.f, width(), height(), 0.f, -1.f, 1.f);
 
+  const QSize& sz = _layout_manager->currentSize();
+
   QMatrix4x4 transform;
   transform.setToIdentity();
-  transform.translate(center.x(), center.y(), 0.f);
+  transform.translate( center.x() + (width() - sz.width()) / 2
+                     , center.y() + (height() - sz.height()) / 2
+                     , 0.f);
 
   _trgtEngine->draw(projection*transform, _state);
   _ctrlEngine->draw(projection*transform);
@@ -385,8 +389,16 @@ void RLIDisplayWidget::drawRect(const QRectF& rect, GLuint textureId) {
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, textureId);
 
+  const QSize& sz = _layout_manager->currentSize();
+
+  QMatrix4x4 transform;
+  transform.setToIdentity();
+  transform.translate( (width() - sz.width()) / 2
+                     , (height() - sz.height()) / 2
+                     , 0.f);
+
   _program->setUniformValue("texture", 0);
-  _program->setUniformValue("mvp_matrix", _projection);
+  _program->setUniformValue("mvp_matrix", _projection*transform);
 
   glBindBuffer(GL_ARRAY_BUFFER, _vbo_ids[ATTR_POSITION]);
   glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);

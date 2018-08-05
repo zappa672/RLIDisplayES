@@ -2,6 +2,31 @@
 
 uniform mat4 mvp_matrix;
 
+attribute vec2  world_coords;
+
+uniform vec2 center;
+uniform float scale;
+
+const float EARTH_RAD_METERS = 6378137.0;
+
+void main() {
+  float lat_rads = radians(center.x);
+
+  float y_m = -(EARTH_RAD_METERS / scale) * radians(world_coords.x - center.x);
+  float x_m =  (EARTH_RAD_METERS / scale) * cos(lat_rads) * radians(world_coords.y - center.y);
+
+  // screen position
+  vec2 pix_pos = vec2(x_m, y_m);
+
+  gl_Position = mvp_matrix  * vec4(pix_pos, 0.0, 1.0);
+  gl_PointSize = 5.0;
+}
+
+
+
+/*
+uniform mat4 mvp_matrix;
+
 attribute vec2  prev_world_coords;
 attribute vec2  curr_world_coords;
 attribute vec2  next_world_coords;
@@ -14,6 +39,7 @@ vec2 pix_pos(vec2 coords, float scale);
 vec2 line_intersection(vec2 p11, vec2 p12, vec2 p21, vec2 p22);
 
 void main() {
+  gl_PointSize = 5.0;
   vec2 curr_pix_pos = pix_pos(curr_world_coords, scale);
 
   if (type == 0.0) {
@@ -77,25 +103,4 @@ void main() {
     }
   }
 }
-
-vec2 line_intersection(vec2 p11, vec2 p12, vec2 p21, vec2 p22) {
-  float d1 = (p11.x*p12.y-p11.y*p12.x);
-  float d2 = (p21.x*p22.y-p21.y*p22.x);
-  float d3 = (p11.x-p12.x)*(p21.y-p22.y) - (p11.y-p12.y)*(p21.x-p22.x);
-
-  float xt = d1*(p21.x-p22.x) - d2*(p11.x-p12.x);
-  float yt = d1*(p21.y-p22.y) - d2*(p11.y-p12.y);
-
-  return vec2(xt/d3, yt/d3);
-}
-
-const float EARTH_RAD_METERS = 6378137.0;
-
-vec2 pix_pos(vec2 coords, float scale) {
-  float lat_rads = radians(center.x);
-
-  float y_m = -(EARTH_RAD_METERS / scale) * radians(coords.x - center.x);
-  float x_m =  (EARTH_RAD_METERS / scale) * cos(lat_rads) * radians(coords.y - center.y);
-
-  return vec2(x_m, y_m);
-}
+*/
