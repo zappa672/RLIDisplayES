@@ -44,5 +44,9 @@
         <file>shaders/core/radar.vert.glsl</file>
         <file>shaders/core/trgt.frag.glsl</file>
         <file>shaders/core/trgt.vert.glsl</file>
+        <file>shaders/core/route.frag.glsl</file>
+        <file>shaders/core/route.vert.glsl</file>
+        <file>shaders/es/route.frag.glsl</file>
+        <file>shaders/es/route.vert.glsl</file>
     </qresource>
 </RCC>

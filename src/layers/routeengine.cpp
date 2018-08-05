@@ -1,75 +1,82 @@
-/*
 #include "routeengine.h"
-#include "../../common/properties.h"
 
-RouteEngine::RouteEngine(QObject* parent) : QObject(parent), QGLFunctions(), _routes(200) {
-  _initialized = false;
+#include "../common/rlistate.h"
+#include "../common/properties.h"
 
-  _currentRoute.push_back(QVector2D(12.7000f, -81.6000f));
-  _currentRoute.push_back(QVector2D(12.6000f, -81.5000f));
-  _currentRoute.push_back(QVector2D(12.4000f, -81.5500f));
+RouteEngine::RouteEngine(QOpenGLContext* context, QObject* parent) : QObject(parent), QOpenGLFunctions(context) {
+  _currentRoute.push_back(QVector2D(15.3730f, 145.6600f));
+  _currentRoute.push_back(QVector2D(15.3640f, 145.7200f));
+  _currentRoute.push_back(QVector2D(15.3340f, 145.8000f));
+  _currentRoute.push_back(QVector2D(15.3040f, 145.8300f));
+  _currentRoute.push_back(QVector2D(15.2440f, 145.8600f));
+
+  initializeOpenGLFunctions();
+
+  _prog = new QOpenGLShaderProgram();
+
+  glGenBuffers(ROUTE_ATTR_COUNT, _vbo_ids);
+  initShader();
 }
 
 RouteEngine::~RouteEngine() {
-  if (_initialized) {
-    delete _prog;
-    glDeleteBuffers(ROUTE_ATTR_COUNT, _vbo_ids);
-  }
+  delete _prog;
+  glDeleteBuffers(ROUTE_ATTR_COUNT, _vbo_ids);
 }
 
 void RouteEngine::clearCurrentRoute() {
   _routesMutex.lock();
+
   _currentRoute.clear();
+
   _routesMutex.unlock();
 }
 
 void RouteEngine::addPointToCurrent(const QVector2D& p) {
   _routesMutex.lock();
+
   _currentRoute.push_back(p);
+
   _routesMutex.unlock();
 }
 
 void RouteEngine::removePointFromCurrent() {
   _routesMutex.lock();
+
   if (_currentRoute.size() > 1)
     _currentRoute.removeLast();
+
   _routesMutex.unlock();
 }
 
 void RouteEngine::loadFrom(int index) {
+  _routesMutex.lock();
+
   if (index >= 0 && index < _routes.size())
     _currentRoute = _routes[index];
+
+  _routesMutex.unlock();
 }
 
 void RouteEngine::saveTo(int index) {
+  _routesMutex.lock();
+
   if (index >= 0 && index < _routes.size())
     _routes[index] = _currentRoute;
+
+  _routesMutex.unlock();
 }
 
-bool RouteEngine::init(const QGLContext* context) {
-  Q_UNUSED(context);
 
-  if (_initialized) return false;
 
-  initializeGLFunctions(context);
 
-  _prog = new QGLShaderProgram();
-
-  glGenBuffers(ROUTE_ATTR_COUNT, _vbo_ids);
-
-  initShader();
-
-  _initialized = true;
-  return _initialized;
-}
-
-void RouteEngine::draw(QVector2D center_coords, float scale) {
+void RouteEngine::draw(const QMatrix4x4& mvp_matrix, const RLIState& state) {
   _routesMutex.lock();
 
   _prog->bind();
 
-  glUniform1f(_unif_locs[ROUTE_UNIF_SCALE], scale);
-  glUniform2f(_unif_locs[ROUTE_UNIF_CENTER], center_coords.x(), center_coords.y());
+  glUniform1f(_unif_locs[ROUTE_UNIF_SCALE], state.chart_scale);
+  glUniform2f(_unif_locs[ROUTE_UNIF_CENTER], state.ship_position.first, state.ship_position.second);
+  _prog->setUniformValue(_unif_locs[ROUTE_UNIF_MVP_MATRIX], mvp_matrix);
 
   int pCount = loadBuffers();
 
@@ -77,15 +84,9 @@ void RouteEngine::draw(QVector2D center_coords, float scale) {
   glPointSize(5);
   glDrawArrays(GL_POINTS, 0, pCount);
 
-  glPushAttrib(GL_ENABLE_BIT);
-
-  glLineStipple(1, 0xF0F0);
-  glEnable(GL_LINE_STIPPLE);
 
   glLineWidth(1);
   glDrawArrays(GL_LINE_STRIP, 0, pCount);
-
-  glPopAttrib();
 
   glUniform1f(_unif_locs[ROUTE_UNIF_TYPE], 1);
   glLineWidth(1);
@@ -104,8 +105,8 @@ void RouteEngine::initShader() {
   // Overriding system locale until shaders are compiled
   setlocale(LC_NUMERIC, "C");
 
-  _prog->addShaderFromSourceFile(QGLShader::Vertex, SHADERS_PATH + "route.vert.glsl");
-  _prog->addShaderFromSourceFile(QGLShader::Fragment, SHADERS_PATH + "route.frag.glsl");
+  _prog->addShaderFromSourceFile(QOpenGLShader::Vertex, SHADERS_PATH + "route.vert.glsl");
+  _prog->addShaderFromSourceFile(QOpenGLShader::Fragment, SHADERS_PATH + "route.frag.glsl");
 
   _prog->link();
   _prog->bind();
@@ -114,9 +115,10 @@ void RouteEngine::initShader() {
   _attr_locs[ROUTE_ATTR_CURR_COORDS] = _prog->attributeLocation("curr_world_coords");
   _attr_locs[ROUTE_ATTR_NEXT_COORDS] = _prog->attributeLocation("next_world_coords");
 
-  _unif_locs[ROUTE_UNIF_CENTER] = _prog->uniformLocation("center");
-  _unif_locs[ROUTE_UNIF_SCALE] = _prog->uniformLocation("scale");
-  _unif_locs[ROUTE_UNIF_TYPE] = _prog->uniformLocation("type");
+  _unif_locs[ROUTE_UNIF_MVP_MATRIX] = _prog->uniformLocation("mvp_matrix");
+  _unif_locs[ROUTE_UNIF_CENTER]     = _prog->uniformLocation("center");
+  _unif_locs[ROUTE_UNIF_SCALE]      = _prog->uniformLocation("scale");
+  _unif_locs[ROUTE_UNIF_TYPE]       = _prog->uniformLocation("type");
 
   _prog->release();
 
@@ -168,4 +170,3 @@ int RouteEngine::loadBuffers() {
 
   return curr_points.size() / 2;
 }
-*/

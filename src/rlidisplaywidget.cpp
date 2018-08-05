@@ -41,6 +41,7 @@ RLIDisplayWidget::~RLIDisplayWidget() {
     delete _menuEngine;
     delete _magnEngine;
     delete _trgtEngine;
+    delete _routeEngine;
     delete _ctrlEngine;
 
     delete _program;
@@ -170,6 +171,10 @@ void RLIDisplayWidget::initializeGL() {
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Target engine init start";
   _trgtEngine = new TargetEngine(context(), this);
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Target engine init finish";
+
+  qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Route engine init start";
+  _routeEngine = new RouteEngine(context(), this);
+  qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Route engine init finish";
 
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Controls engine init start";
   _ctrlEngine = new ControlsEngine(context(), this);
@@ -304,7 +309,6 @@ void RLIDisplayWidget::paintLayers() {
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 
-
   glViewport(0, 0, width(), height());
 
   glClearColor(0.f, 0.f, 0.f, 1.f);
@@ -333,6 +337,7 @@ void RLIDisplayWidget::paintLayers() {
 
   _trgtEngine->draw(projection*transform, _state);
   _ctrlEngine->draw(projection*transform);
+  _routeEngine->draw(projection*transform, _state);
 
 
   drawRect(rect(), _maskEngine->textureId());
@@ -546,6 +551,7 @@ void RLIDisplayWidget::keyPressEvent(QKeyEvent *event) {
 
   // Захват
   case Qt::Key_Return:
+  case Qt::Key_Enter:
     if (_menuEngine->visible())
       _menuEngine->onEnter();
     break;

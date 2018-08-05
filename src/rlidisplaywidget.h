@@ -97,6 +97,7 @@ private:
   InfoEngine*       _infoEngine;
   MenuEngine*       _menuEngine;
   TargetEngine*     _trgtEngine;
+  RouteEngine*      _routeEngine;
   ControlsEngine*   _ctrlEngine;
   MagnifierEngine*  _magnEngine;
 
