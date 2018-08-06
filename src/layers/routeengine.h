@@ -19,12 +19,12 @@ public:
 
   void draw(const QMatrix4x4& mvp_matrix, const RLIState& state);
 
-  QPointF getLastPoint() { return _currentRoute.last(); }
+  QVector2D getLastPoint() { return _currentRoute.last(); }
   inline bool isIndexUsed(int index) { return (index < 0 || index >= _routes.size() || _routes[index].size() > 0); }
 
 public slots:
   void clearCurrentRoute();
-  void addPointToCurrent(const QPointF& p);
+  void addPointToCurrent(const QVector2D& p);
   void removePointFromCurrent();
 
   void loadFrom(int index);
@@ -36,9 +36,12 @@ private:
   void initShader();
   int loadBuffers();
 
+  QVector2D lineIntersection( const QVector2D& p11, const QVector2D& p12
+                            , const QVector2D& p21, const QVector2D& p22) const;
+
   QMutex _routesMutex;
-  QList<QPointF> _currentRoute;
-  QVector<QList<QPointF> > _routes;
+  QList<QVector2D> _currentRoute;
+  QVector<QList<QVector2D>> _routes;
 
   QOpenGLShaderProgram* _prog;
 
