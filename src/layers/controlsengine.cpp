@@ -6,8 +6,12 @@
 ControlsEngine::ControlsEngine(QOpenGLContext* context, QObject* parent) : QObject(parent), QOpenGLFunctions(context) {
   initializeOpenGLFunctions();
 
-  _showCircles = true;
-  _showParallelLines = true;
+  _vn_p = 0.f;
+  _vn_cu = 0.f;
+  _vd = 0.f;
+
+  _showCircles = false;
+  _showParallelLines = false;
 
   _prog = new QOpenGLShaderProgram();
 
@@ -36,7 +40,7 @@ void ControlsEngine::draw(const QMatrix4x4& mvp_mat) {
   drawCursor(QColor(255, 0, 255, 255));
 
   // Визир дальности
-  drawCircleSegment(QColor(255, 255, 255, 255),  64.f);
+  drawCircleSegment(QColor(255, 255, 255, 255),  _vd);
 
   if (_showCircles) {
     drawCircleSegment(QColor(203, 67, 69, 255),  80.f);
@@ -48,24 +52,25 @@ void ControlsEngine::draw(const QMatrix4x4& mvp_mat) {
   }
 
   // Визиры направления
-  drawRaySegment(QColor(255, 192, 26, 255),  45.f);
-  drawRaySegment(QColor(255, 192, 26, 255), 235.f);
+  drawRaySegment(QColor(255, 192, 26, 255), _vn_cu);
+  drawRaySegment(QColor(255, 192, 26, 255), _vn_p);
 
   // Область захвата
-  drawRaySegment(QColor(255, 255, 0, 255), 280.f, 48.f, 112.f);
-  drawRaySegment(QColor(255, 255, 0, 255), 340.f, 48.f, 112.f);    
-  drawCircleSegment(QColor(255, 255, 0, 255),   48.f, 280.f, 340.f);
-  drawCircleSegment(QColor(255, 255, 0, 255),  112.f, 280.f, 340.f);
+  drawRaySegment   (QColor(255, 255, 0, 255),  280.f,   48.f,  112.f);
+  drawRaySegment   (QColor(255, 255, 0, 255),  340.f,   48.f,  112.f);
+  drawCircleSegment(QColor(255, 255, 0, 255),   48.f,  280.f,  340.f);
+  drawCircleSegment(QColor(255, 255, 0, 255),  112.f,  280.f,  340.f);
 
   // Лупа
-  drawRaySegment(QColor(0, 0, 255, 255), (90.f / 4096.f) * 360.f        , 96.f, 96.f + 224.f);
-  drawRaySegment(QColor(0, 0, 255, 255), (90.f + 224.f / 4096.f) * 360.f, 96.f, 96.f + 224.f);
-  drawCircleSegment(QColor(0, 0, 255, 255),  96.f        , (90.f / 4096.f) * 360.f, (90.f + 224.f / 4096.f) * 360.f);
-  drawCircleSegment(QColor(0, 0, 255, 255),  96.f + 224.f, (90.f / 4096.f) * 360.f, (90.f + 224.f / 4096.f) * 360.f);
+  drawRaySegment   (QColor(0, 0, 255, 255), (90.f / 4096.f) * 360.f        ,  96.f                   ,  96.f + 224.f);
+  drawRaySegment   (QColor(0, 0, 255, 255), (90.f + 224.f / 4096.f) * 360.f,  96.f                   ,  96.f + 224.f);
+  drawCircleSegment(QColor(0, 0, 255, 255),  96.f                          ,  (90.f / 4096.f) * 360.f,  (90.f + 224.f / 4096.f) * 360.f);
+  drawCircleSegment(QColor(0, 0, 255, 255),  96.f + 224.f                  ,  (90.f / 4096.f) * 360.f,  (90.f + 224.f / 4096.f) * 360.f);
+
 
   if (_showParallelLines) {
-    drawRaySegment(QColor(255, 255, 255, 255), 45.f, -2048.f, 2048.f,  64.f);
-    drawRaySegment(QColor(255, 255, 255, 255), 45.f, -2048.f, 2048.f, -64.f);
+    drawRaySegment(QColor(255, 255, 255, 255), _vn_p, -2048.f, 2048.f,  _vd);
+    drawRaySegment(QColor(255, 255, 255, 255), _vn_p, -2048.f, 2048.f, -_vd);
   }
 
   _prog->release();

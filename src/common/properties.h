@@ -11,6 +11,11 @@ static QString SHADERS_PATH = ":/shaders/es/";
 static QString SHADERS_PATH = ":/shaders/core/";
 #endif
 
+
+enum class RLIWdgetState {
+
+};
+
 // Application property names
 static char* PROPERTY_SHOW_BUTTON_PANEL = "PROPERTY_SHOW_BUTTON_PANEL";
 

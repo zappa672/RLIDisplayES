@@ -545,20 +545,30 @@ void RLIDisplayWidget::keyPressEvent(QKeyEvent *event) {
 
   // Выбор цели
   case Qt::Key_Up:
-    if (_menuEngine->visible())
+    if (_menuEngine->visible()) {
       _menuEngine->onUp();
+      break;
+    }
+
+    _ctrlEngine->shiftVd(1.f);
     break;
 
   // ЛИД / ЛОД
   case Qt::Key_Down:
-    if (_menuEngine->visible())
+    if (_menuEngine->visible()) {
       _menuEngine->onDown();
+      break;
+    }
+
+    _ctrlEngine->shiftVd(-1.f);
     break;
 
   case Qt::Key_Left:
+    _ctrlEngine->shiftVnP(1.f);
     break;
 
   case Qt::Key_Right:
+    _ctrlEngine->shiftVnP(-1.f);
     break;
 
   // Захват

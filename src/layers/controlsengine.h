@@ -19,6 +19,14 @@ public:
 
   void draw(const QMatrix4x4& mvp_mat);
 
+  inline float getVnP() { return _vn_p; }
+  inline float getVnCu() { return _vn_cu; }
+  inline float getVd() { return _vd; }
+
+  inline void shiftVnP(float d) { _vn_p += d; }
+  inline void shiftVnCu(float d) {_vn_cu += d; if(_vn_cu < 0) _vn_cu = 360 + _vn_cu; if(_vn_cu >= 360) _vn_cu = _vn_cu - 360;}
+  inline void shiftVd(float d) { _vd += d; if (_vd < 0) _vd = 0; }
+
   bool isCirclesVisible() { return _showCircles; }
   bool isParallelLinesVisible() { return _showParallelLines; }
 
@@ -30,6 +38,10 @@ public slots:
   inline void setParallelLinesVisible(bool val) { _showParallelLines = val; }
 
 private:
+  float _vn_p;
+  float _vn_cu;
+  float _vd;
+
   QPoint _cursorPos;
 
   bool _showCircles;
