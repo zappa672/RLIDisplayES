@@ -7,7 +7,6 @@ MagnifierEngine::MagnifierEngine(const RLIMagnifierLayout& layout, QOpenGLContex
   : QObject(parent), QOpenGLFunctions(context) {
   initializeOpenGLFunctions();
 
-  _visible = false;
   _prog = new QOpenGLShaderProgram();
   _fbo = nullptr;
 
@@ -38,10 +37,12 @@ void MagnifierEngine::resize(const RLIMagnifierLayout& layout) {
   initRadarBuffers();
 }
 
-void MagnifierEngine::update(GLuint amp_vbo_id, GLuint pal_tex_id, int pel_len, int pel_cnt, int min_pel, int min_rad) {
-  if (!_visible)
-    return;
-
+void MagnifierEngine::update(  GLuint amp_vbo_id
+                             , GLuint pal_tex_id
+                             , int pel_len
+                             , int pel_cnt
+                             , int min_pel
+                             , int min_rad) {
   glViewport(0, 0, _fbo->width(), _fbo->height());
 
   _fbo->bind();

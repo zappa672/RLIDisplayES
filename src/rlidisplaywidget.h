@@ -35,7 +35,6 @@ public:
   explicit RLIDisplayWidget(QWidget *parent = 0);
   ~RLIDisplayWidget();
 
-  void toggleRadarTailsShift();
   float frameRate();
 
   void setupRadarDataSource(RadarDataSource* rds);
@@ -50,14 +49,6 @@ public slots:
   void keyPressEvent(QKeyEvent* event);
   void mousePressEvent(QMouseEvent* event);
 
-  void onGainChanged(float value);
-  void onWaterChanged(float value);
-  void onRainChanged(float value);
-  void onApchChanged(float value);
-  void onEmissionChanged(float value);
-
-  void onShipPositionChanged(const std::pair<float,float>& pos);
-
 protected slots:
   void initializeGL();
   void resizeGL(int w, int h);
@@ -71,8 +62,6 @@ private:
 
   bool _initialized;
 
-  int _debug_radar_tails_shift;
-
   QMutex frameRateMutex;
   QQueue<QDateTime> frameTimes;
 
@@ -84,7 +73,7 @@ private:
 
   void drawRect(const QRectF& rect, GLuint textureId);
 
-  RLIState _state;
+  RLIState _state { this };
   ChartManager* _chart_mngr;
   RLILayoutManager* _layout_manager;
 

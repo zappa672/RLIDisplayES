@@ -35,13 +35,13 @@ TargetEngine::~TargetEngine() {
   glDeleteBuffers(1, &_ind_vbo_id);
 }
 
-void TargetEngine::select(const std::pair<float, float>& coords, float scale) {
+void TargetEngine::select(const QVector2D& coords, float scale) {
   for (const QString& tag: _targets.keys()) {
     if (tag == _selected)
       continue;
 
-    float dist = RLIMath::geo_distance(coords.first, coords.second, _targets[tag].Latitude, _targets[tag].Longtitude);
-    if ((dist / scale) < 16) {
+    float dist = RLIMath::geo_distance(coords.x(), coords.y(), _targets[tag].Latitude, _targets[tag].Longtitude);
+    if ((dist / scale) < 32) {
       _selected = tag;
       emit selectedTargetUpdated(_selected, _targets[_selected]);
       return;
@@ -157,9 +157,9 @@ void TargetEngine::draw(const QMatrix4x4& mvp_matrix, const RLIState& state) {
 
   _prog->bind();
 
-  auto coords = state.ship_position;
-  glUniform1f(_unif_locs[AIS_TRGT_UNIF_SCALE], state.chart_scale);
-  glUniform2f(_unif_locs[AIS_TRGT_UNIF_CENTER], coords.first, coords.second);
+  auto coords = state.shipPosition();
+  glUniform1f(_unif_locs[AIS_TRGT_UNIF_SCALE], state.chartScale());
+  glUniform2f(_unif_locs[AIS_TRGT_UNIF_CENTER], coords.x(), coords.y());
   _prog->setUniformValue(_unif_locs[AIS_TRGT_UNIF_MVP], mvp_matrix);
 
   initBuffersTrgts("");

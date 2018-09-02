@@ -19,7 +19,6 @@ MenuEngine::MenuEngine(const RLIMenuLayout& layout, QOpenGLContext* context, QOb
 
   _selected_line = 1;
   _selection_active = false;
-  _state = DISABLED;
 
   _prog = new QOpenGLShaderProgram();
   _fbo = nullptr;
@@ -449,18 +448,17 @@ MenuEngine::~MenuEngine() {
   delete _main_menu;
 }
 
-void MenuEngine::setState(MenuState state) {
-  _state = state;
-  switch (_state) {
-  case DISABLED:
-      _selection_active = false;
-      _menu = NULL;
-      break;
-  case MAIN:
+void MenuEngine::onStateChanged(RLIWidgetState state) {
+  switch (state) {
+  case RLIWidgetState::RLISTATE_MAIN_MENU:
       _menu = _main_menu;
       break;
-  case CONFIG:
+  case RLIWidgetState::RLISTATE_CONFIG_MENU:
       _menu = _cnfg_menu;
+      break;
+  default:
+      _selection_active = false;
+      _menu = NULL;
       break;
   }
 
@@ -481,6 +479,32 @@ void MenuEngine::onLanguageChanged(RLIString lang_str) {
     _lang = RLI_LANG_RUSSIAN;
 
   _need_update = true;
+}
+
+void MenuEngine::onKeyPressed(QKeyEvent* event) {
+  switch(event->key()) {
+  // Выбор цели
+  case Qt::Key_Up:
+    onUp();
+    break;
+
+  // ЛИД / ЛОД
+  case Qt::Key_Down:
+    onDown();
+    break;
+
+  // Захват
+  case Qt::Key_Return:
+  case Qt::Key_Enter:
+    onEnter();
+    break;
+
+  //Сброс
+  case Qt::Key_Escape:
+    onBack();
+    break;
+
+  }
 }
 
 void MenuEngine::onUp() {
@@ -575,9 +599,6 @@ void MenuEngine::resize(const RLIMenuLayout& layout) {
 }
 
 void MenuEngine::update() {
-  if (visible() && _last_action_time.secsTo(QDateTime::currentDateTime()) > 90)
-    setState(DISABLED);
-
   if (!_need_update)
     return;
 

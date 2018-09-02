@@ -21,8 +21,6 @@ class MenuEngine : public QObject, protected QOpenGLFunctions {
   Q_OBJECT
 
 public:
-  enum MenuState { DISABLED, MAIN, CONFIG };
-
   explicit MenuEngine(const RLIMenuLayout& layout, QOpenGLContext* context, QObject* parent = 0);
   virtual ~MenuEngine();
 
@@ -32,11 +30,7 @@ public:
   //inline void setRouteEngine(RouteEngine* e) { _routeEngine = e; }
 
   inline void setFonts(InfoFonts* fonts) { _fonts = fonts; }
-
   void resize(const RLIMenuLayout& layout);
-
-  inline MenuState state() { return _state; }
-  inline bool visible() { return _state != DISABLED; }  
 
 signals:
   void languageChanged(RLIString lang_str);
@@ -54,8 +48,9 @@ signals:
   void bandModeChanged(RLIString lang_str);
 
 public slots:
-  void setState(MenuState state);
+  void onStateChanged(RLIWidgetState state);
   void onLanguageChanged(RLIString lang_str);
+  void onKeyPressed(QKeyEvent* event);
 
   void update();
 
@@ -80,8 +75,6 @@ private:
   void drawText(const QByteArray& text, int line, TextAllignement align, const QColor& col);
 
   bool _need_update;
-
-  MenuState _state;
 
   QRect _geometry;
 

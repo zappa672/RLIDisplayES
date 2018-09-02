@@ -586,7 +586,7 @@
       </panel>
 
 
-      <panel name="fps" pos="4,152" size="132x22" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="fps" pos="4,672" size="132x22" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
         <text name="label" rect="5x5x122x14" allign="left"   font="F12X14B"  color="0,252,252,255"   />  <!-- static text color -->
         <text name="value" rect="5x5x122x14" allign="right"  font="F12X14B"  color="252,252,84,255"  />  <!-- dynamic text color -->
       </panel>

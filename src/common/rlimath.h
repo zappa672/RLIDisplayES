@@ -14,13 +14,13 @@ namespace RLIMath {
   inline double radians(double deg) { return (deg / 180.f) * PI; }
   inline double degrees(double rad) { return (rad / PI) * 180.f; }
 
-  std::pair<float, float> pos_to_coords( const std::pair<float, float> center_coords
-                                       , const QPoint& center_position
-                                       , const QPoint& position
-                                       , float scale);
-  QPoint coords_to_pos( const std::pair<float, float> center_coords
-                      , const std::pair<float, float> coords
-                      , QPoint center_position
+  QVector2D pos_to_coords( const QVector2D& center_coords
+                         , const QPoint& center_position
+                         , const QPoint& position
+                         , float scale);
+  QPoint coords_to_pos( const QVector2D& center_coords
+                      , const QVector2D& coords
+                      , const QPoint& center_position
                       , float scale);
 
   double geo_distance(double lat1, double lon1, double lat2, double lon2);

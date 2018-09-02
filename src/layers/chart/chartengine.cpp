@@ -13,11 +13,6 @@ ChartEngine::ChartEngine(uint tex_radius, S52References* ref, QOpenGLContext* co
 
   _context = context;
 
-  _center_shift = QPoint(0, 0);
-  _center = std::pair<float, float>(0, 0);
-  _scale = 10;
-  _angle = 0;
-
   _fbo = nullptr;
   settings = new ChartSettingsModel("chart_disp_conf.xml");
   assets = new S52Assets(context, ref);
@@ -169,14 +164,14 @@ void ChartEngine::setSndgLayer(S52Chart* chrt, S52References* ref) {
 
 
 void ChartEngine::update(const RLIState& state, const QString& color_scheme) {
-  auto center = state.ship_position;
-  float scale = state.chart_scale;
-  float angle = state.north_shift;
-  const QPoint& center_shift = state.center_shift;
+  auto center = state.shipPosition();
+  float scale = state.chartScale();
+  float angle = state.northShift();
+  const QPoint& center_shift = state.centerShift();
 
   bool need_update = ( _force_update
-                    || fabs(_center.first - center.first) > 0.000005
-                    || fabs(_center.second - center.second) > 0.000005
+                    || fabs(_center.x() - center.x()) > 0.000005
+                    || fabs(_center.y() - center.y()) > 0.000005
                     || fabs(_scale - scale) > 0.005
                     || fabs(_angle - angle) > 0.005
                     || fabs(_center_shift.x() - center_shift.x()) > 0.005
@@ -237,7 +232,7 @@ void ChartEngine::drawAreaLayers(const QMatrix4x4& mvp_matrix, const QString& co
   QOpenGLTexture* pattern_tex = assets->getAreaPatternTex(color_scheme);
   QOpenGLTexture* color_scheme_tex = assets->getColorSchemeTex(color_scheme);
 
-  prog->setUniformValue(shaders->getAreaUniformLoc(COMMON_UNIFORMS_CENTER), _center.first, _center.second);
+  prog->setUniformValue(shaders->getAreaUniformLoc(COMMON_UNIFORMS_CENTER), _center.x(), _center.y());
   prog->setUniformValue(shaders->getAreaUniformLoc(COMMON_UNIFORMS_SCALE), _scale);
   prog->setUniformValue(shaders->getAreaUniformLoc(COMMON_UNIFORMS_NORTH), _angle);
   prog->setUniformValue(shaders->getAreaUniformLoc(COMMON_UNIFORMS_PATTERN_TEX_DIM), pattern_tex->width(), pattern_tex->height());
@@ -276,7 +271,7 @@ void ChartEngine::drawLineLayers(const QMatrix4x4& mvp_matrix, const QString& co
   QOpenGLShaderProgram* prog = shaders->getChartLineProgram();
   prog->bind();
 
-  prog->setUniformValue(shaders->getLineUniformLoc(COMMON_UNIFORMS_CENTER), _center.first, _center.second);
+  prog->setUniformValue(shaders->getLineUniformLoc(COMMON_UNIFORMS_CENTER), _center.x(), _center.y());
   prog->setUniformValue(shaders->getLineUniformLoc(COMMON_UNIFORMS_SCALE), _scale);
   prog->setUniformValue(shaders->getLineUniformLoc(COMMON_UNIFORMS_NORTH), _angle);
   prog->setUniformValue(shaders->getLineUniformLoc(COMMON_UNIFORMS_PATTERN_TEX_DIM), pattern_tex->width(), pattern_tex->height());
@@ -346,7 +341,7 @@ void ChartEngine::drawMarkLayers(const QMatrix4x4& mvp_matrix, const QString& co
 
   QOpenGLTexture* pattern_tex = assets->getSymbolTex(color_scheme);
 
-  glUniform2f(shaders->getMarkUniformLoc(COMMON_UNIFORMS_CENTER), _center.first, _center.second);
+  glUniform2f(shaders->getMarkUniformLoc(COMMON_UNIFORMS_CENTER), _center.x(), _center.y());
   glUniform1f(shaders->getMarkUniformLoc(COMMON_UNIFORMS_SCALE), _scale);
   glUniform1f(shaders->getMarkUniformLoc(COMMON_UNIFORMS_NORTH), _angle);
   glUniform2f(shaders->getMarkUniformLoc(COMMON_UNIFORMS_PATTERN_TEX_DIM), pattern_tex->width(), pattern_tex->height());

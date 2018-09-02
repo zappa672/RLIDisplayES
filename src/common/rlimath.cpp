@@ -2,29 +2,28 @@
 
 #include "QDebug"
 
-
-std::pair<float, float> RLIMath::pos_to_coords( const std::pair<float, float> center_coords
-                                              , const QPoint& center_position
-                                              , const QPoint& position
-                                              , float scale) {
+QVector2D RLIMath::pos_to_coords( const QVector2D& center_coords
+                                , const QPoint& center_position
+                                , const QPoint& position
+                                , float scale) {
   QPoint metric_pos = (position - center_position) * scale;
 
-  float lat_rads = radians(center_coords.first);
+  float lat_rads = radians(center_coords.x());
 
-  float lat = degrees(-metric_pos.y() / EARTH_RADIUS) + center_coords.first;
-  float lon = degrees(metric_pos.x() / (EARTH_RADIUS * cos(lat_rads))) + center_coords.second;
+  float lat = degrees(-metric_pos.y() / EARTH_RADIUS) + center_coords.x();
+  float lon = degrees(metric_pos.x() / (EARTH_RADIUS * cos(lat_rads))) + center_coords.y();
 
   return { lat, lon };
 }
 
-QPoint RLIMath::coords_to_pos( const std::pair<float, float> center_coords
-                             , const std::pair<float, float> coords
-                             , QPoint center_position
+QPoint RLIMath::coords_to_pos( const QVector2D& center_coords
+                             , const QVector2D& coords
+                             , const QPoint& center_position
                              , float scale) {
-  float lat_rads = radians(center_coords.first);
+  float lat_rads = radians(center_coords.x());
 
-  float y_m = -EARTH_RADIUS*radians(coords.first - center_coords.first);
-  float x_m = EARTH_RADIUS*cos(lat_rads)*radians(coords.second - center_coords.second);
+  float y_m = -EARTH_RADIUS*radians(coords.x() - center_coords.x());
+  float x_m = EARTH_RADIUS*cos(lat_rads)*radians(coords.y() - center_coords.y());
 
   QPoint pix_pos = QPoint(floor(x_m / scale), floor(y_m / scale));
 

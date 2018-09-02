@@ -39,7 +39,7 @@ protected slots:
 public slots:
   void onTailsModeChanged(int mode, int minutes);
 
-  void select(const std::pair<float, float>& coords, float scale);
+  void select(const QVector2D& coords, float scale);
 
   void deleteTarget(QString tag);
   void updateTarget(QString tag, RadarTarget target);

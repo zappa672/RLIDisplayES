@@ -41,7 +41,7 @@ public slots:
 
   void secondChanged();
   void setFps(int fps);
-  void onPositionChanged(const std::pair<float, float>& position);
+  void onPositionChanged(const QVector2D& position);
   void onTargetCountChanged(int count);
   void onSelectedTargetUpdated(const QString& tag, const RadarTarget& trgt);
 

@@ -22,8 +22,6 @@ public:
   virtual ~MagnifierEngine ();
 
   inline QRect geometry()   { return _geometry; }
-  inline bool visible()     { return _visible; }
-  inline void setVisible(bool val) { _visible = val; }
 
   inline GLuint texture()   { return _fbo->texture(); }
 
@@ -42,7 +40,6 @@ private:
   void drawBorder();
   void drawPelengs(GLuint amp_vbo_id, GLuint pal_tex_id, int pel_len, int pel_cnt, int min_pel, int min_rad);
 
-  bool _visible;
 
   QRect _geometry;
   QOpenGLFramebufferObject* _fbo;

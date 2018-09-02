@@ -22,7 +22,7 @@ public:
   inline QSize size() const      { return _fbo->size(); }
   inline GLuint textureId() const { return _fbo->texture(); }
 
-  inline GLuint amplitutedesVboId() const { return _vbo_ids[ATTR_AMP]; }
+  inline GLuint ampsVboId() const { return _vbo_ids[ATTR_AMP]; }
   inline GLuint paletteTexId() const { return _palette->texture(); }
 
   inline int pelengCount() const { return _peleng_count; }

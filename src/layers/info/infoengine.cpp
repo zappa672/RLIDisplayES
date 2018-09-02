@@ -377,9 +377,9 @@ void InfoEngine::initBlockPosition() {
   _blocks["position"]->setText("table_1_1", RLI_STR_BLANK);
 }
 
-void InfoEngine::onPositionChanged(const std::pair<float, float>& position) {
-  _blocks["position"]->setText("table_0_1", QString::number(position.first, 'd', 2).toLocal8Bit());
-  _blocks["position"]->setText("table_1_1", QString::number(position.second, 'd', 2).toLocal8Bit());
+void InfoEngine::onPositionChanged(const QVector2D& position) {
+  _blocks["position"]->setText("table_0_1", QString::number(position.x(), 'd', 2).toLocal8Bit());
+  _blocks["position"]->setText("table_1_1", QString::number(position.y(), 'd', 2).toLocal8Bit());
 }
 
 

@@ -1,6 +1,8 @@
 #include "rlidisplaywidget.h"
 #include "mainwindow.h"
 
+#include <math.h>
+
 #include <QOpenGLTexture>
 
 #include <QDebug>
@@ -19,10 +21,9 @@ RLIDisplayWidget::RLIDisplayWidget(QWidget *parent) : QOpenGLWidget(parent) {
   qRegisterMetaType<RLIString>("RLIString");
 
   _initialized = false;
-  _debug_radar_tails_shift = 0;
 
   _chart_mngr = new ChartManager(this);
-  _layout_manager = new RLILayoutManager("layouts.xml");  
+  _layout_manager = new RLILayoutManager("layouts.xml");
 
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "RLIDisplayWidget construction finish";
 }
@@ -64,19 +65,12 @@ void RLIDisplayWidget::setupTargetDataSource(TargetDataSource* tds) {
 
 void RLIDisplayWidget::setupShipDataSource(ShipDataSource* sds) {
   _infoEngine->onPositionChanged(sds->position());
-  _state.ship_position = sds->position();
+  _state.onShipPositionChanged(sds->position());
 
-  connect(sds, SIGNAL(positionChanged(std::pair<float,float>))
-         , SLOT(onShipPositionChanged(std::pair<float,float>)));
-}
-
-
-
-void RLIDisplayWidget::toggleRadarTailsShift() {
-  if (_debug_radar_tails_shift == 0)
-    _debug_radar_tails_shift = 320;
-  else
-    _debug_radar_tails_shift = 0;
+  connect( sds, SIGNAL(positionChanged(QVector2D))
+         , _infoEngine , SLOT(onShipPositionChanged(QVector2D)));
+  connect( sds, SIGNAL(positionChanged(QVector2D))
+         ,  &_state, SLOT(onShipPositionChanged(QVector2D)));
 }
 
 void RLIDisplayWidget::onNewChartAvailable(const QString& name) {
@@ -254,15 +248,15 @@ void RLIDisplayWidget::resizeGL(int w, int h) {
 
   _infoEngine->secondChanged();
   _infoEngine->setFps(frameRate());
-  _infoEngine->onPositionChanged(_state.ship_position);
+  _infoEngine->onPositionChanged(_state.shipPosition());
   _infoEngine->onTargetCountChanged(_trgtEngine->targetCount());
   _infoEngine->onSelectedTargetUpdated(_trgtEngine->selectedTag(), _trgtEngine->selectedTrgt());
 
-  _infoEngine->updateGain(_state.gain);
-  _infoEngine->updateWater(_state.water);
-  _infoEngine->updateRain(_state.rain);
-  _infoEngine->updateApch(_state.apch);
-  _infoEngine->updateEmission(_state.emission);
+  _infoEngine->updateGain(_state.gain());
+  _infoEngine->updateWater(_state.water());
+  _infoEngine->updateRain(_state.rain());
+  _infoEngine->updateApch(_state.apch());
+  _infoEngine->updateEmission(_state.emission());
 }
 
 
@@ -315,14 +309,13 @@ void RLIDisplayWidget::paintLayers() {
   glClear(GL_COLOR_BUFFER_BIT);
 
 
-  QPoint shift(_debug_radar_tails_shift, _debug_radar_tails_shift);
   QPoint topLeft = _layout_manager->layout()->circle.bounding_rect.topLeft();
 
 
   drawRect(QRect(topLeft, _chartEngine->size()), _chartEngine->textureId());
 
-  drawRect(QRect(topLeft + shift, _radarEngine->size()), _radarEngine->textureId());
-  drawRect(QRect(topLeft - shift, _tailsEngine->size()), _tailsEngine->textureId());
+  drawRect(QRect(topLeft, _radarEngine->size()), _radarEngine->textureId());
+  drawRect(QRect(topLeft, _tailsEngine->size()), _tailsEngine->textureId());
 
 
   QPointF center = _layout_manager->layout()->circle.center;
@@ -340,7 +333,7 @@ void RLIDisplayWidget::paintLayers() {
                      , 0.f);
 
   _trgtEngine->draw(projection*transform, _state);
-  _ctrlEngine->draw(projection*transform);
+  _ctrlEngine->draw(projection*transform, _state);
   _routeEngine->draw(projection*transform, _state);
 
 
@@ -351,7 +344,7 @@ void RLIDisplayWidget::paintLayers() {
 
   drawRect(_menuEngine->geometry(), _menuEngine->texture());
 
-  if (_magnEngine->visible())
+  if (_state.state() == RLIWidgetState::RLISTATE_MAGNIFIER)
     drawRect(_magnEngine->geometry(), _magnEngine->texture());
 }
 
@@ -364,7 +357,7 @@ void RLIDisplayWidget::updateLayers() {
   _chartEngine->update(_state, colorScheme);
   _infoEngine->update(_infoFonts);
   _menuEngine->update();
-  _magnEngine->update( _radarEngine->amplitutedesVboId()
+  _magnEngine->update( _radarEngine->ampsVboId()
                      , _radarEngine->paletteTexId()
                      , _radarEngine->pelengLength()
                      , _radarEngine->pelengCount()
@@ -419,23 +412,19 @@ void RLIDisplayWidget::drawRect(const QRectF& rect, GLuint textureId) {
 }
 
 
-void RLIDisplayWidget::onShipPositionChanged(const std::pair<float,float>& pos) {
-  _state.ship_position = pos;
-  _infoEngine->onPositionChanged(pos);
-}
-
 
 
 void RLIDisplayWidget::mousePressEvent(QMouseEvent* event) {
-  auto selected_coords = RLIMath::pos_to_coords( _state.ship_position
+  auto selected_coords = RLIMath::pos_to_coords( _state.shipPosition()
                                                , _layout_manager->layout()->circle.center
                                                , event->pos()
-                                               , _state.chart_scale );
+                                               , _state.chartScale() );
 
-  _trgtEngine->select(selected_coords, _state.chart_scale);
+  _trgtEngine->select(selected_coords, _state.chartScale());
 }
 
 
+/*
 void RLIDisplayWidget::onGainChanged(float value) {
   _state.gain = value;
   _infoEngine->updateGain(_state.gain);
@@ -460,7 +449,7 @@ void RLIDisplayWidget::onEmissionChanged(float value) {
   _state.emission = value;
   _infoEngine->updateEmission(_state.emission);
 }
-
+*/
 
 void RLIDisplayWidget::keyReleaseEvent(QKeyEvent *event) {
   pressedKeys.remove(event->key());
@@ -468,193 +457,14 @@ void RLIDisplayWidget::keyReleaseEvent(QKeyEvent *event) {
 }
 
 
-void RLIDisplayWidget::keyPressEvent(QKeyEvent *event) {
-  auto mod_keys = event->modifiers();
-
-  switch(event->key()) {
-  case Qt::Key_PageUp:
-    if (mod_keys & Qt::ControlModifier)
-      onGainChanged(qMin(_state.gain + 5.0, 255.0));
-
-    if (mod_keys & Qt::AltModifier)
-      onWaterChanged(qMin(_state.water + 5.0, 255.0));
-
-    if (mod_keys & Qt::ShiftModifier)
-      onRainChanged(qMin(_state.rain + 5.0, 255.0));
-
-    break;
-
-  case Qt::Key_PageDown:
-    if (mod_keys & Qt::ControlModifier)
-      onGainChanged(qMax(_state.gain - 5.0, 0.0));
-
-    if (mod_keys & Qt::AltModifier)
-      onWaterChanged(qMax(_state.water - 5.0, 0.0));
-
-    if (mod_keys & Qt::ShiftModifier)
-      onRainChanged(qMax(_state.rain - 5.0, 0.0));
-
-    break;
-
-  // Под. имп. Помех
-  case Qt::Key_S:
-    break;
-
-  // Меню
-  case Qt::Key_W:
-    if(pressedKeys.contains(Qt::Key_B)) {
-      if (_magnEngine->visible())
-        return;
-
-      if (_menuEngine->state() == MenuEngine::CONFIG)
-        _menuEngine->setState(MenuEngine::DISABLED);
-      else
-        _menuEngine->setState(MenuEngine::CONFIG);
-     } else {
-      if (_magnEngine->visible())
-        return;
-
-      if (_menuEngine->state() == MenuEngine::MAIN)
-        _menuEngine->setState(MenuEngine::DISABLED);
-      else
-        _menuEngine->setState(MenuEngine::MAIN);
-     }
-     break;
-
-  // Шкала +
-  case Qt::Key_Plus:
-    _state.chart_scale *= 0.95;
-    break;
-
-  // Шкала -
-  case Qt::Key_Minus:
-    _state.chart_scale *= 1.05;
-    break;
-
-  // Вынос центра
-  case Qt::Key_C:
-    break;
-
-  // Скрытое меню
-  case Qt::Key_U:
-    break;
-
-  // Следы точки
-  case Qt::Key_T:
-    break;
-
-  // Выбор цели
-  case Qt::Key_Up:
-    if (_menuEngine->visible()) {
-      _menuEngine->onUp();
-      break;
-    }
-
-    _ctrlEngine->shiftVd(1.f);
-    break;
-
-  // ЛИД / ЛОД
-  case Qt::Key_Down:
-    if (_menuEngine->visible()) {
-      _menuEngine->onDown();
-      break;
-    }
-
-    _ctrlEngine->shiftVd(-1.f);
-    break;
-
-  case Qt::Key_Left:
-    _ctrlEngine->shiftVnP(1.f);
-    break;
-
-  case Qt::Key_Right:
-    _ctrlEngine->shiftVnP(-1.f);
-    break;
-
-  // Захват
-  case Qt::Key_Return:
-  case Qt::Key_Enter:
-    if (_menuEngine->visible())
-      _menuEngine->onEnter();
-    break;
-
-  //Сброс
-  case Qt::Key_Escape:
-    if (_menuEngine->visible())
-      _menuEngine->onBack();
-    break;
-
-  // Парал. Линии
-  case Qt::Key_Backslash:
-    _ctrlEngine->setParallelLinesVisible(!_ctrlEngine->isParallelLinesVisible());
-    break;
-
-  //Электронная лупа
-  case Qt::Key_L:
-    if (!_menuEngine->visible())
-      _magnEngine->setVisible(!_magnEngine->visible());
-    break;
-
-  //Обзор
-  case Qt::Key_X:
-    toggleRadarTailsShift();
-    break;
-
-  //Узкий / Шир.
-  case Qt::Key_Greater:
-    break;
-
-  //Накоп. Видео
-  case Qt::Key_V:
-    break;
-
-  //Сброс АС
-  case Qt::Key_Q:
-    break;
-
-  //Манёвр
-  case Qt::Key_M:
-    break;
-
-  //Курс / Север / Курс стаб
-  case Qt::Key_H:
-    break;
-
-  //ИД / ОД
-  case Qt::Key_R:
-    break;
-
-  //НКД
-  case Qt::Key_D:
-    break;
-
-  //Карта (Маршрут)
-  case Qt::Key_A:
-    break;
-
-  //Выбор
-  case Qt::Key_G:
-    break;
-
-  //Стоп-кадр
-  case Qt::Key_F:
-    break;
-
-  //Откл. Звука
-  case Qt::Key_B:
-    break;
-
-  //Откл. ОК
-  case Qt::Key_K:
-    break;
-
-  //Вынос ВН/ВД
-  case Qt::Key_Slash:
-    _ctrlEngine->setCirclesVisible(!_ctrlEngine->isCirclesVisible());
-    break;
-
-  }
-
+void RLIDisplayWidget::keyPressEvent(QKeyEvent* event) {
   pressedKeys.insert(event->key());
+
+  if (    _state.state() == RLIWidgetState::RLISTATE_MAIN_MENU
+       || _state.state() == RLIWidgetState::RLISTATE_CONFIG_MENU )
+    _menuEngine->onKeyPressed(event);
+  else
+    _state.onKeyPressed(event, pressedKeys);
+
   QOpenGLWidget::keyPressEvent(event);
 }

@@ -6,13 +6,6 @@
 ControlsEngine::ControlsEngine(QOpenGLContext* context, QObject* parent) : QObject(parent), QOpenGLFunctions(context) {
   initializeOpenGLFunctions();
 
-  _vn_p = 0.f;
-  _vn_cu = 0.f;
-  _vd = 0.f;
-
-  _showCircles = false;
-  _showParallelLines = false;
-
   _prog = new QOpenGLShaderProgram();
 
   glGenBuffers(CTRL_ATTR_COUNT, _vbo_ids_cursor);
@@ -33,16 +26,16 @@ ControlsEngine::~ControlsEngine() {
   delete _prog;
 }
 
-void ControlsEngine::draw(const QMatrix4x4& mvp_mat) {
+void ControlsEngine::draw(const QMatrix4x4& mvp_mat, const RLIState& state) {
   _prog->bind();
   _prog->setUniformValue(_unif_locs[CTRL_UNIF_MVP], mvp_mat);
 
   drawCursor(QColor(255, 0, 255, 255));
 
   // Визир дальности
-  drawCircleSegment(QColor(255, 255, 255, 255),  _vd);
+  drawCircleSegment(QColor(255, 255, 255, 255),  state.vd());
 
-  if (_showCircles) {
+  if (state.showCircles()) {
     drawCircleSegment(QColor(203, 67, 69, 255),  80.f);
     drawCircleSegment(QColor(203, 67, 69, 255), 160.f);
     drawCircleSegment(QColor(203, 67, 69, 255), 240.f);
@@ -52,8 +45,8 @@ void ControlsEngine::draw(const QMatrix4x4& mvp_mat) {
   }
 
   // Визиры направления
-  drawRaySegment(QColor(255, 192, 26, 255), _vn_cu);
-  drawRaySegment(QColor(255, 192, 26, 255), _vn_p);
+  drawRaySegment(QColor(255, 192, 26, 255), state.vnCu());
+  drawRaySegment(QColor(255, 192, 26, 255), state.vnP());
 
   // Область захвата
   drawRaySegment   (QColor(255, 255, 0, 255),  280.f,   48.f,  112.f);
@@ -68,9 +61,9 @@ void ControlsEngine::draw(const QMatrix4x4& mvp_mat) {
   drawCircleSegment(QColor(0, 0, 255, 255),  96.f + 224.f                  ,  (90.f / 4096.f) * 360.f,  (90.f + 224.f / 4096.f) * 360.f);
 
 
-  if (_showParallelLines) {
-    drawRaySegment(QColor(255, 255, 255, 255), _vn_p, -2048.f, 2048.f,  _vd);
-    drawRaySegment(QColor(255, 255, 255, 255), _vn_p, -2048.f, 2048.f, -_vd);
+  if (state.showParallel()) {
+    drawRaySegment(QColor(255, 255, 255, 255), state.vnP(), -2048.f, 2048.f,  state.vd());
+    drawRaySegment(QColor(255, 255, 255, 255), state.vnP(), -2048.f, 2048.f, -state.vd());
   }
 
   _prog->release();

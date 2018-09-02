@@ -48,10 +48,10 @@ private:
 
   uint    _radius;
 
-  QPoint _center_shift;
-  std::pair<float, float> _center;
-  float _scale;
-  float _angle;
+  QPoint _center_shift { 0, 0 };
+  QVector2D _center { 0, 0 };
+  float _scale { 10 };
+  float _angle { 0 };
 
   S52Assets* assets;  
   QOpenGLFramebufferObject* _fbo = nullptr;
