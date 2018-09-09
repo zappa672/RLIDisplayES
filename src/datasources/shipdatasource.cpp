@@ -6,11 +6,9 @@ ShipDataSource::ShipDataSource(QObject *parent) : QObject(parent) {
   _timerId = -1;
 
   //longtitude
-  //position.first  = +12.5f;
-  _position.setX( 15.123f + 0.25f );
+  _ship_state.position.setX( 15.123f + 0.25f );
   //latitude
-  //position.second = -81.6f;
-  _position.setY( 145.66f );
+  _ship_state.position.setY( 145.66f );
 }
 
 ShipDataSource::~ShipDataSource() {
@@ -23,11 +21,11 @@ void ShipDataSource::timerEvent(QTimerEvent* e) {
   QDateTime now = QDateTime::currentDateTime();
 
   //longtitude
-  _position.setX( 15.123f + 0.25f * cos(_startTime.msecsTo(now)/60000.f) );
+  _ship_state.position.setX( 15.123f + 0.25f * cos(_startTime.msecsTo(now)/60000.f) );
   //latitude
-  _position.setY( 145.66f + 0.25f * sin(_startTime.msecsTo(now)/60000.f) );
+  _ship_state.position.setY( 145.66f + 0.25f * sin(_startTime.msecsTo(now)/60000.f) );
 
-  emit positionChanged(_position);
+  emit shipStateChanged(_ship_state);
 }
 
 void ShipDataSource::start() {

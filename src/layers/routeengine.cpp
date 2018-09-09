@@ -69,9 +69,9 @@ void RouteEngine::draw(const QMatrix4x4& mvp_matrix, const RLIState& state) {
 
   _prog->bind();
 
-  QVector2D pos = state.shipPosition();
+  QVector2D pos = state.ship_position;
 
-  glUniform1f(_unif_locs[ROUTE_UNIF_SCALE], state.chartScale());
+  glUniform1f(_unif_locs[ROUTE_UNIF_SCALE], state.chart_scale);
   glUniform2f(_unif_locs[ROUTE_UNIF_CENTER], pos.x(), pos.y());
   _prog->setUniformValue(_unif_locs[ROUTE_UNIF_MVP_MATRIX], mvp_matrix);
 

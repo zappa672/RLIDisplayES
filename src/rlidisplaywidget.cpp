@@ -17,22 +17,15 @@
 RLIDisplayWidget::RLIDisplayWidget(QWidget *parent) : QOpenGLWidget(parent) {
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "RLIDisplayWidget construction start";
 
-  qRegisterMetaType<RadarTarget>("RadarTarget");
+  qRegisterMetaType<RLITarget>("RadarTarget");
+  qRegisterMetaType<RLIShipState>("RLIShipState");
   qRegisterMetaType<RLIString>("RLIString");
-
-  _initialized = false;
-
-  _chart_mngr = new ChartManager(this);
-  _layout_manager = new RLILayoutManager("layouts.xml");
 
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "RLIDisplayWidget construction finish";
 }
 
 
 RLIDisplayWidget::~RLIDisplayWidget() {
-  delete _chart_mngr;
-  delete _layout_manager;
-
   if (_initialized) {
     delete _infoFonts;
     delete _radarEngine;
@@ -64,20 +57,20 @@ void RLIDisplayWidget::setupTargetDataSource(TargetDataSource* tds) {
 }
 
 void RLIDisplayWidget::setupShipDataSource(ShipDataSource* sds) {
-  _infoEngine->onPositionChanged(sds->position());
-  _state.onShipPositionChanged(sds->position());
+  onShipStateChanged(sds->shipState());
 
-  connect( sds, SIGNAL(positionChanged(QVector2D))
-         , _infoEngine , SLOT(onShipPositionChanged(QVector2D)));
-  connect( sds, SIGNAL(positionChanged(QVector2D))
-         ,  &_state, SLOT(onShipPositionChanged(QVector2D)));
+  connect( sds, SIGNAL(shipStateChanged(RLIShipState))
+         , this, SLOT(onShipStateChanged(RLIShipState)));
 }
+
+
+
 
 void RLIDisplayWidget::onNewChartAvailable(const QString& name) {
   if (name == "US2SP01M.000") {
   //if (name == "CO200008.000") {
     qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Setting up chart " << name;
-    _chartEngine->setChart(_chart_mngr->getChart(name), _chart_mngr->refs());
+    _chartEngine->setChart(_chart_mngr.getChart(name), _chart_mngr.refs());
     qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Setting up chart finished";
   }
 }
@@ -124,7 +117,7 @@ void RLIDisplayWidget::initializeGL() {
   uint peleng_size         = qApp->property(PROPERTY_PELENG_SIZE).toInt();
   uint bearings_per_cycle  = qApp->property(PROPERTY_BEARINGS_PER_CYCLE).toInt();
 
-  uint circle_radius = _layout_manager->layout()->circle.radius;
+  uint circle_radius = _layout_manager.layout()->circle.radius;
 
   // Layers initialization
   //-------------------------------------------------------------
@@ -142,24 +135,26 @@ void RLIDisplayWidget::initializeGL() {
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Tails engine init finish";
 
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Mask engine init start";
-  _maskEngine = new MaskEngine(size(), _layout_manager->layout()->circle, _infoFonts, context(), this);
+  _maskEngine = new MaskEngine(size(), _layout_manager.layout()->circle, _infoFonts, context(), this);
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Mask engine init finish";
 
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Chart engine init start";
-  _chartEngine = new ChartEngine(circle_radius, _chart_mngr->refs(), context(), this);
+  _chartEngine = new ChartEngine(circle_radius, _chart_mngr.refs(), context(), this);
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Chart engine init finish";
 
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Info engine init start";
-  _infoEngine = new InfoEngine(_layout_manager->layout(), context(), this);
+  _infoEngine = new InfoEngine(_layout_manager.layout(), context(), this);
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Info engine init finish";
 
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Menu engine init start";
-  _menuEngine = new MenuEngine(_layout_manager->layout()->menu, context(), this);
+  _menuEngine = new MenuEngine(_layout_manager.layout()->menu, context(), this);
   _menuEngine->setFonts(_infoFonts);
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Menu engine init finish";
 
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Magnifier engine init start";
-  _magnEngine = new MagnifierEngine(_layout_manager->layout()->magnifier, context(), this);
+  _magnEngine = new MagnifierEngine(_layout_manager.layout()->magnifier, context(), this);
+  _magnEngine->setAmplitudesVBOId(_radarEngine->ampsVboId());
+  _magnEngine->setPalletteTextureId(_radarEngine->paletteTexId());
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Magnifier engine init finish";
 
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Target engine init start";
@@ -187,8 +182,8 @@ void RLIDisplayWidget::initializeGL() {
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "GL init finish";
 
 
-  _chart_mngr->loadCharts();
-  connect(_chart_mngr, SIGNAL(new_chart_available(QString)), SLOT(onNewChartAvailable(QString)));
+  _chart_mngr.loadCharts();
+  connect( &_chart_mngr, SIGNAL(new_chart_available(QString)), SLOT(onNewChartAvailable(QString)));
 
   connect( _menuEngine, SIGNAL(radarBrightnessChanged(int))
          , _radarEngine, SLOT(onBrightnessChanged(int)));
@@ -228,35 +223,35 @@ void RLIDisplayWidget::resizeGL(int w, int h) {
   if (!_initialized)
     return;
 
-  QSize curr_size = _layout_manager->currentSize();
-  _layout_manager->resize(QSize(w, h));
-  QSize new_size = _layout_manager->currentSize();
+  QSize curr_size = _layout_manager.currentSize();
+  _layout_manager.resize(QSize(w, h));
+  QSize new_size = _layout_manager.currentSize();
 
   if (curr_size == new_size)
     return;
 
-  int circle_radius = _layout_manager->layout()->circle.radius;
+  int circle_radius = _layout_manager.layout()->circle.radius;
 
   _radarEngine->resizeTexture(circle_radius);
   _tailsEngine->resizeTexture(circle_radius);
   _chartEngine->resize(circle_radius);
 
-  _maskEngine->resize(QSize(w, h), _layout_manager->layout()->circle);
-  _menuEngine->resize(_layout_manager->layout()->menu);
-  _magnEngine->resize(_layout_manager->layout()->magnifier);
-  _infoEngine->resize(_layout_manager->layout());
+  _maskEngine->resize(QSize(w, h), _layout_manager.layout()->circle);
+  _menuEngine->resize(_layout_manager.layout()->menu);
+  _magnEngine->resize(_layout_manager.layout()->magnifier);
+  _infoEngine->resize(_layout_manager.layout());
 
   _infoEngine->secondChanged();
   _infoEngine->setFps(frameRate());
-  _infoEngine->onPositionChanged(_state.shipPosition());
+  _infoEngine->onPositionChanged(_state.ship_position);
   _infoEngine->onTargetCountChanged(_trgtEngine->targetCount());
   _infoEngine->onSelectedTargetUpdated(_trgtEngine->selectedTag(), _trgtEngine->selectedTrgt());
 
-  _infoEngine->updateGain(_state.gain());
-  _infoEngine->updateWater(_state.water());
-  _infoEngine->updateRain(_state.rain());
-  _infoEngine->updateApch(_state.apch());
-  _infoEngine->updateEmission(_state.emission());
+  _infoEngine->updateGain(_state.gain);
+  _infoEngine->updateWater(_state.water);
+  _infoEngine->updateRain(_state.rain);
+  _infoEngine->updateApch(_state.apch);
+  _infoEngine->updateEmission(_state.emission);
 }
 
 
@@ -309,7 +304,7 @@ void RLIDisplayWidget::paintLayers() {
   glClear(GL_COLOR_BUFFER_BIT);
 
 
-  QPoint topLeft = _layout_manager->layout()->circle.bounding_rect.topLeft();
+  QPoint topLeft = _layout_manager.layout()->circle.bounding_rect.topLeft();
 
 
   drawRect(QRect(topLeft, _chartEngine->size()), _chartEngine->textureId());
@@ -318,13 +313,13 @@ void RLIDisplayWidget::paintLayers() {
   drawRect(QRect(topLeft, _tailsEngine->size()), _tailsEngine->textureId());
 
 
-  QPointF center = _layout_manager->layout()->circle.center;
+  QPointF center = _layout_manager.layout()->circle.center;
 
   QMatrix4x4 projection;
   projection.setToIdentity();
   projection.ortho(0.f, width(), height(), 0.f, -1.f, 1.f);
 
-  const QSize& sz = _layout_manager->currentSize();
+  const QSize& sz = _layout_manager.currentSize();
 
   QMatrix4x4 transform;
   transform.setToIdentity();
@@ -344,7 +339,7 @@ void RLIDisplayWidget::paintLayers() {
 
   drawRect(_menuEngine->geometry(), _menuEngine->texture());
 
-  if (_state.state() == RLIWidgetState::RLISTATE_MAGNIFIER)
+  if (_state.state == RLIWidgetState::RLISTATE_MAGNIFIER)
     drawRect(_magnEngine->geometry(), _magnEngine->texture());
 }
 
@@ -353,16 +348,13 @@ void RLIDisplayWidget::updateLayers() {
   _radarEngine->updateTexture();
   _tailsEngine->updateTexture();
 
-  QString colorScheme = _chart_mngr->refs()->getColorScheme();
+  QString colorScheme = _chart_mngr.refs()->getColorScheme();
   _chartEngine->update(_state, colorScheme);
   _infoEngine->update(_infoFonts);
   _menuEngine->update();
-  _magnEngine->update( _radarEngine->ampsVboId()
-                     , _radarEngine->paletteTexId()
-                     , _radarEngine->pelengLength()
-                     , _radarEngine->pelengCount()
-                     , 90       // min_pel
-                     , 96 );    // min_rad
+
+  if (_state.state == RLIWidgetState::RLISTATE_MAGNIFIER)
+    _magnEngine->update( _radarEngine->pelengLength(), _radarEngine->pelengCount(), 90, 96 ); // min_pel, min_rad
 }
 
 
@@ -382,7 +374,7 @@ void RLIDisplayWidget::drawRect(const QRectF& rect, GLuint textureId) {
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, textureId);
 
-  const QSize& sz = _layout_manager->currentSize();
+  const QSize& sz = _layout_manager.currentSize();
 
   QMatrix4x4 transform;
   transform.setToIdentity();
@@ -413,43 +405,48 @@ void RLIDisplayWidget::drawRect(const QRectF& rect, GLuint textureId) {
 
 
 
+void RLIDisplayWidget::onShipStateChanged(const RLIShipState& sst) {
+  _state.ship_position  = sst.position;
+  _state.ship_course    = sst.course;
+  _state.ship_speed     = sst.speed;
 
-void RLIDisplayWidget::mousePressEvent(QMouseEvent* event) {
-  auto selected_coords = RLIMath::pos_to_coords( _state.shipPosition()
-                                               , _layout_manager->layout()->circle.center
-                                               , event->pos()
-                                               , _state.chartScale() );
-
-  _trgtEngine->select(selected_coords, _state.chartScale());
+  _infoEngine->onPositionChanged(sst.position);
 }
 
 
-/*
+
+void RLIDisplayWidget::mousePressEvent(QMouseEvent* event) {
+  auto selected_coords = RLIMath::pos_to_coords( _state.ship_position
+                                               , _layout_manager.layout()->circle.center
+                                               , event->pos()
+                                               , _state.chart_scale );
+
+  _trgtEngine->select(selected_coords, _state.chart_scale);
+}
+
+
+
 void RLIDisplayWidget::onGainChanged(float value) {
-  _state.gain = value;
-  _infoEngine->updateGain(_state.gain);
+  _infoEngine->updateGain(_state.gain = value);
 }
 
 void RLIDisplayWidget::onWaterChanged(float value) {
-  _state.water = value;
-  _infoEngine->updateWater(_state.water);
+  _infoEngine->updateWater(_state.water = value);
 }
 
 void RLIDisplayWidget::onRainChanged(float value) {
-  _state.rain = value;
-  _infoEngine->updateRain(_state.rain);
+  _infoEngine->updateRain(_state.rain = value);
 }
 
 void RLIDisplayWidget::onApchChanged(float value) {
-  _state.apch = value;
-  _infoEngine->updateApch(_state.apch);
+  _infoEngine->updateApch(_state.apch = value);
 }
 
 void RLIDisplayWidget::onEmissionChanged(float value) {
-  _state.emission = value;
-  _infoEngine->updateEmission(_state.emission);
+  _infoEngine->updateEmission(_state.emission = value);
 }
-*/
+
+
 
 void RLIDisplayWidget::keyReleaseEvent(QKeyEvent *event) {
   pressedKeys.remove(event->key());
@@ -459,12 +456,178 @@ void RLIDisplayWidget::keyReleaseEvent(QKeyEvent *event) {
 
 void RLIDisplayWidget::keyPressEvent(QKeyEvent* event) {
   pressedKeys.insert(event->key());
+  auto mod_keys = event->modifiers();
 
-  if (    _state.state() == RLIWidgetState::RLISTATE_MAIN_MENU
-       || _state.state() == RLIWidgetState::RLISTATE_CONFIG_MENU )
+  if (    _state.state == RLIWidgetState::RLISTATE_MAIN_MENU
+      || _state.state == RLIWidgetState::RLISTATE_CONFIG_MENU )
     _menuEngine->onKeyPressed(event);
-  else
-    _state.onKeyPressed(event, pressedKeys);
+
+  switch(event->key()) {
+  case Qt::Key_PageUp:
+    if (mod_keys & Qt::ControlModifier)
+      emit _infoEngine->updateGain( _state.gain = qMin(_state.gain + 5.0, 255.0) );
+
+    if (mod_keys & Qt::AltModifier)
+      emit _infoEngine->updateWater( _state.water = qMin(_state.water + 5.0, 255.0) );
+
+    if (mod_keys & Qt::ShiftModifier)
+      emit _infoEngine->updateRain(  _state.rain = qMin(_state.rain + 5.0, 255.0) );
+
+    break;
+
+  case Qt::Key_PageDown:
+    if (mod_keys & Qt::ControlModifier)
+      emit _infoEngine->updateGain( _state.gain = qMax(_state.gain - 5.0, 0.0) );
+
+    if (mod_keys & Qt::AltModifier)
+      emit _infoEngine->updateWater( _state.water = qMax(_state.water - 5.0, 0.0) );
+
+    if (mod_keys & Qt::ShiftModifier)
+      emit _infoEngine->updateRain( _state.rain = qMax(_state.rain - 5.0, 0.0) );
+
+    break;
+
+  // Под. имп. Помех
+  case Qt::Key_S:
+    break;
+
+  // Меню
+  case Qt::Key_W:
+    if(pressedKeys.contains(Qt::Key_B)) {
+      if (_state.state == RLIWidgetState::RLISTATE_CONFIG_MENU)
+        _state.state = RLIWidgetState::RLISTATE_DEFAULT;
+      else if (_state.state == RLIWidgetState::RLISTATE_DEFAULT)
+        _state.state = RLIWidgetState::RLISTATE_CONFIG_MENU;
+
+    } else {
+      if (_state.state == RLIWidgetState::RLISTATE_MAIN_MENU)
+        _state.state = RLIWidgetState::RLISTATE_DEFAULT;
+      else if (_state.state == RLIWidgetState::RLISTATE_DEFAULT)
+        _state.state = RLIWidgetState::RLISTATE_MAIN_MENU;
+    }
+
+    _menuEngine->onStateChanged(_state.state);
+    break;
+
+  // Шкала +
+  case Qt::Key_Plus:
+    _state.chart_scale *= 0.95;
+    break;
+
+  // Шкала -
+  case Qt::Key_Minus:
+    _state.chart_scale *= 1.05;
+    break;
+
+  // Вынос центра
+  case Qt::Key_C:
+    break;
+
+  // Скрытое меню
+  case Qt::Key_U:
+    break;
+
+  // Следы точки
+  case Qt::Key_T:
+    break;
+
+  // Выбор цели
+  case Qt::Key_Up:
+    _state.vd += 1.f;
+    break;
+
+  // ЛИД / ЛОД
+  case Qt::Key_Down:
+    _state.vd = qMax(0.f, _state.vd - 1.f);
+    break;
+
+  case Qt::Key_Left:
+    _state.vn_p = fmod(_state.vn_p - 1.f, 360);
+    break;
+
+  case Qt::Key_Right:
+    _state.vn_p = fmod(_state.vn_p + 1.f, 360);
+    break;
+
+  // Захват
+  case Qt::Key_Return:
+  case Qt::Key_Enter:
+    break;
+
+  //Сброс
+  case Qt::Key_Escape:
+    break;
+
+  // Парал. Линии
+  case Qt::Key_Backslash:
+    _state.show_parallel = !_state.show_parallel;
+    break;
+
+  //Электронная лупа
+  case Qt::Key_L:
+    if ( _state.state == RLIWidgetState::RLISTATE_DEFAULT )
+      _state.state = RLIWidgetState::RLISTATE_MAGNIFIER;
+    else if ( _state.state == RLIWidgetState::RLISTATE_MAGNIFIER )
+      _state.state = RLIWidgetState::RLISTATE_DEFAULT;
+    break;
+
+  //Обзор
+  case Qt::Key_X:
+    break;
+
+  //Узкий / Шир.
+  case Qt::Key_Greater:
+    break;
+
+  //Накоп. Видео
+  case Qt::Key_V:
+    break;
+
+  //Сброс АС
+  case Qt::Key_Q:
+    break;
+
+  //Манёвр
+  case Qt::Key_M:
+    break;
+
+  //Курс / Север / Курс стаб
+  case Qt::Key_H:
+    break;
+
+  //ИД / ОД
+  case Qt::Key_R:
+    break;
+
+  //НКД
+  case Qt::Key_D:
+    break;
+
+  //Карта (Маршрут)
+  case Qt::Key_A:
+    break;
+
+  //Выбор
+  case Qt::Key_G:
+    break;
+
+  //Стоп-кадр
+  case Qt::Key_F:
+    break;
+
+  //Откл. Звука
+  case Qt::Key_B:
+    break;
+
+  //Откл. ОК
+  case Qt::Key_K:
+    break;
+
+  //Вынос ВН/ВД
+  case Qt::Key_Slash:
+    _state.show_circles = !_state.show_circles;
+    break;
+  }
 
   QOpenGLWidget::keyPressEvent(event);
 }

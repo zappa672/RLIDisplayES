@@ -11,6 +11,9 @@
 #include "datasources/shipdatasource.h"
 #include "datasources/targetdatasource.h"
 
+Q_DECLARE_METATYPE(RLITarget)
+Q_DECLARE_METATYPE(RLIShipState)
+
 namespace Ui {
 class MainWindow;
 }

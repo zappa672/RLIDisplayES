@@ -49,6 +49,12 @@ public slots:
   void keyPressEvent(QKeyEvent* event);
   void mousePressEvent(QMouseEvent* event);
 
+  void onGainChanged(float value);
+  void onWaterChanged(float value);
+  void onRainChanged(float value);
+  void onApchChanged(float value);
+  void onEmissionChanged(float value);
+
 protected slots:
   void initializeGL();
   void resizeGL(int w, int h);
@@ -56,11 +62,12 @@ protected slots:
 
 private slots:
   void onNewChartAvailable(const QString& name);
+  void onShipStateChanged(const RLIShipState& sst);
 
 private:
   QSet<int> pressedKeys;
 
-  bool _initialized;
+  bool _initialized = false;
 
   QMutex frameRateMutex;
   QQueue<QDateTime> frameTimes;
@@ -73,9 +80,10 @@ private:
 
   void drawRect(const QRectF& rect, GLuint textureId);
 
-  RLIState _state { this };
-  ChartManager* _chart_mngr;
-  RLILayoutManager* _layout_manager;
+  RLIState _state;
+
+  ChartManager     _chart_mngr      { this };
+  RLILayoutManager _layout_manager  { "layouts.xml" };
 
   InfoFonts*    _infoFonts;
 

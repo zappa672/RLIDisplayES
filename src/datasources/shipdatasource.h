@@ -6,6 +6,13 @@
 #include <QDateTime>
 #include <QTimerEvent>
 
+struct RLIShipState {
+  QVector2D position { 0.f, 0.f };
+  float course { 0.f };
+  float speed { 0.f };
+};
+
+
 class ShipDataSource : public QObject
 {
   Q_OBJECT
@@ -13,10 +20,10 @@ public:
   explicit ShipDataSource(QObject *parent = 0);
   virtual ~ShipDataSource();
 
-  inline const QVector2D& position() const { return _position; }
+  inline const RLIShipState& shipState() const { return _ship_state; }
 
 signals:
-  void positionChanged(QVector2D position);
+  void shipStateChanged(RLIShipState state);
 
 protected slots:
   void timerEvent(QTimerEvent* e);
@@ -27,9 +34,9 @@ public slots:
 
 private:
   int _timerId;
-  QDateTime _startTime;
+  QDateTime _startTime;  
 
-  QVector2D _position;
+  RLIShipState _ship_state;
 };
 
 #endif // SHIPDATASOURCE_H

@@ -33,9 +33,9 @@ void ControlsEngine::draw(const QMatrix4x4& mvp_mat, const RLIState& state) {
   drawCursor(QColor(255, 0, 255, 255));
 
   // Визир дальности
-  drawCircleSegment(QColor(255, 255, 255, 255),  state.vd());
+  drawCircleSegment(QColor(255, 255, 255, 255),  state.vd);
 
-  if (state.showCircles()) {
+  if (state.show_circles) {
     drawCircleSegment(QColor(203, 67, 69, 255),  80.f);
     drawCircleSegment(QColor(203, 67, 69, 255), 160.f);
     drawCircleSegment(QColor(203, 67, 69, 255), 240.f);
@@ -45,8 +45,8 @@ void ControlsEngine::draw(const QMatrix4x4& mvp_mat, const RLIState& state) {
   }
 
   // Визиры направления
-  drawRaySegment(QColor(255, 192, 26, 255), state.vnCu());
-  drawRaySegment(QColor(255, 192, 26, 255), state.vnP());
+  drawRaySegment(QColor(255, 192, 26, 255), state.vn_cu);
+  drawRaySegment(QColor(255, 192, 26, 255), state.vn_p);
 
   // Область захвата
   drawRaySegment   (QColor(255, 255, 0, 255),  280.f,   48.f,  112.f);
@@ -61,9 +61,9 @@ void ControlsEngine::draw(const QMatrix4x4& mvp_mat, const RLIState& state) {
   drawCircleSegment(QColor(0, 0, 255, 255),  96.f + 224.f                  ,  (90.f / 4096.f) * 360.f,  (90.f + 224.f / 4096.f) * 360.f);
 
 
-  if (state.showParallel()) {
-    drawRaySegment(QColor(255, 255, 255, 255), state.vnP(), -2048.f, 2048.f,  state.vd());
-    drawRaySegment(QColor(255, 255, 255, 255), state.vnP(), -2048.f, 2048.f, -state.vd());
+  if (state.show_parallel) {
+    drawRaySegment(QColor(255, 255, 255, 255), state.vn_p, -2048.f, 2048.f,  state.vd);
+    drawRaySegment(QColor(255, 255, 255, 255), state.vn_p, -2048.f, 2048.f, -state.vd);
   }
 
   _prog->release();

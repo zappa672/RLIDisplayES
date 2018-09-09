@@ -22,15 +22,17 @@ public:
   virtual ~MagnifierEngine ();
 
   inline QRect geometry()   { return _geometry; }
-
   inline GLuint texture()   { return _fbo->texture(); }
+
+  inline void setAmplitudesVBOId(GLuint amp_vbo_id) { _amp_vbo_id = amp_vbo_id; }
+  inline void setPalletteTextureId(GLuint pal_tex_id) { _pal_tex_id = pal_tex_id; }
 
   void resize(const RLIMagnifierLayout& params);
 
 private slots:
 
 public slots:
-  void update(GLuint amp_vbo_id, GLuint pal_tex_id, int pel_len, int pel_cnt, int min_pel, int min_rad);
+  void update(int pel_len, int pel_cnt, int min_pel, int min_rad);
 
 private:
   void initShaders();
@@ -38,8 +40,10 @@ private:
   void initRadarBuffers();
 
   void drawBorder();
-  void drawPelengs(GLuint amp_vbo_id, GLuint pal_tex_id, int pel_len, int pel_cnt, int min_pel, int min_rad);
+  void drawPelengs(int pel_len, int pel_cnt, int min_pel, int min_rad);
 
+  GLuint _amp_vbo_id = -1;
+  GLuint _pal_tex_id = -1;
 
   QRect _geometry;
   QOpenGLFramebufferObject* _fbo;

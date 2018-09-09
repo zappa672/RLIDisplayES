@@ -27,11 +27,11 @@ public:
 
   inline int targetCount() const { return _targets.size(); }
   inline const QString& selectedTag() const { return _selected; }
-  inline RadarTarget selectedTrgt() const { return _targets.value(_selected); }
+  inline RLITarget selectedTrgt() const { return _targets.value(_selected); }
 
 signals:
   void targetCountChanged(int count);
-  void selectedTargetUpdated(const QString& tag, const RadarTarget& trgt);
+  void selectedTargetUpdated(const QString& tag, const RLITarget& trgt);
 
 protected slots:
   void timerEvent(QTimerEvent* e);
@@ -42,7 +42,7 @@ public slots:
   void select(const QVector2D& coords, float scale);
 
   void deleteTarget(QString tag);
-  void updateTarget(QString tag, RadarTarget target);
+  void updateTarget(QString tag, RLITarget target);
 
 private:
   void bindBuffers();
@@ -54,7 +54,7 @@ private:
 
   QMutex _trgtsMutex;
   QString _selected;
-  QMap<QString, RadarTarget> _targets;
+  QMap<QString, RLITarget> _targets;
 
   QTimer _tailsTimer;
   QMap<QString, QList<QVector2D> > _tails;

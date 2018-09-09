@@ -3,41 +3,33 @@
 
 #include <QObject>
 #include <QVector>
+#include <QVector2D>
 #include <QDateTime>
 #include <QTimerEvent>
 
-struct RadarTarget {
-public:
-  RadarTarget() {
-    Lost = false;
-    Latitude = 0;
-    Longtitude = 0;
-    Heading = 0;
-    Rotation = 0;
-    CourseOverGround = 0;
-    SpeedOverGround = 0;
-  }
+struct RLITarget {
+  RLITarget() { }
 
-  RadarTarget(const RadarTarget& o) {
-    Lost = o.Lost;
-    Latitude = o.Latitude;
-    Longtitude = o.Longtitude;
-    Heading = o.Heading;
-    Rotation = o.Rotation;
-    CourseOverGround = o.CourseOverGround;
-    SpeedOverGround = o.SpeedOverGround;
-  }
+  RLITarget(const RLITarget& o) :
+        lost        { o.lost },
+        latitude    { o.latitude },
+        longtitude  { o.longtitude },
+        heading     { o.heading },
+        rotation    { o.rotation },
+        course_grnd { o.course_grnd },
+        speed_grnd  { o.speed_grnd }
+  { }
 
-  ~RadarTarget() { }
+  ~RLITarget() { }
 
-  bool Lost;
-  float Latitude, Longtitude;
-  float Heading, Rotation;
-  float CourseOverGround, SpeedOverGround;
+  bool lost         { false };
+  float latitude    { 0.f };
+  float longtitude  { 0.f };
+  float heading     { 0.f };
+  float rotation    { 0.f };
+  float course_grnd { 0.f };
+  float speed_grnd  { 0.f };
 };
-
-Q_DECLARE_METATYPE(RadarTarget)
-
 
 class TargetDataSource : public QObject
 {
@@ -46,19 +38,8 @@ public:
   explicit TargetDataSource(QObject *parent = 0);
   virtual ~TargetDataSource();
 
-  enum {
-    TAILMODE_FIRST  = 0,
-    TAILMODE_OFF    = 0,
-    TAILMODE_RADAR  = 1,
-    TAILMODE_DOTS   = 2,
-    TAILMODE_LAST   = 2
-  };
-
-  void incrementMode();
-
 signals:
-  void updateTarget(QString tag, RadarTarget target);
-  void tailsModeChanged(int mode, int minutes);
+  void updateTarget(const QString& tag, const RLITarget& target);
 
 protected slots:
   void timerEvent(QTimerEvent* e);
@@ -67,16 +48,25 @@ public slots:
   void start();
   void finish();
 
-  void onTailsModeChanged(const QByteArray mode);
-
 private:
   int _timerId;
   QDateTime _startTime;
-
-  int tail_mode;
-  int tail_minutes;
-
-  QVector<RadarTarget> _targets;
+  QVector<RLITarget> _targets;
 };
 
 #endif // TARGETDATASOURCE_H
+
+
+/*
+enum {
+  TAILMODE_FIRST  = 0,
+  TAILMODE_OFF    = 0,
+  TAILMODE_RADAR  = 1,
+  TAILMODE_DOTS   = 2,
+  TAILMODE_LAST   = 2
+};
+
+void incrementMode();
+void onTailsModeChanged(const QByteArray mode);
+void tailsModeChanged(int mode, int minutes);
+*/

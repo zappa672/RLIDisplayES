@@ -40,7 +40,7 @@ void TargetEngine::select(const QVector2D& coords, float scale) {
     if (tag == _selected)
       continue;
 
-    float dist = RLIMath::geo_distance(coords.x(), coords.y(), _targets[tag].Latitude, _targets[tag].Longtitude);
+    float dist = RLIMath::geo_distance(coords.x(), coords.y(), _targets[tag].latitude, _targets[tag].longtitude);
     if ((dist / scale) < 32) {
       _selected = tag;
       emit selectedTargetUpdated(_selected, _targets[_selected]);
@@ -58,7 +58,7 @@ void TargetEngine::timerEvent(QTimerEvent* e) {
   QList<QString> tags = _targets.keys();
   for (int i = 0; i < tags.count(); i++) {
     QString tag = tags[i];
-    _tails[tag].push_back(QVector2D(_targets[tag].Latitude,_targets[tag].Longtitude));
+    _tails[tag].push_back(QVector2D(_targets[tag].latitude,_targets[tag].longtitude));
 
     while (_tails[tag].size() > TRG_TAIL_NUM)
       _tails[tag].removeFirst();
@@ -82,7 +82,7 @@ void TargetEngine::onTailsModeChanged(int mode, int minutes) {
     QList<QString> tags = _targets.keys();
     for (int i = 0; i < tags.count(); i++) {
       QString tag = tags[i];
-      _tails[tag].push_back(QVector2D(_targets[tag].Latitude,_targets[tag].Longtitude));
+      _tails[tag].push_back(QVector2D(_targets[tag].latitude,_targets[tag].longtitude));
 
       if (_tails[tag].size() > TRG_TAIL_NUM)
         _tails[tag].removeFirst();
@@ -94,7 +94,7 @@ void TargetEngine::onTailsModeChanged(int mode, int minutes) {
     _tailsTimer.start((_tailsTime * 60 * 1000) / TRG_TAIL_NUM);
 }
 
-void TargetEngine::updateTarget(QString tag, RadarTarget target) {
+void TargetEngine::updateTarget(QString tag, RLITarget target) {
   _trgtsMutex.lock();
 
   if (!_targets.contains(tag)) {
@@ -120,7 +120,7 @@ void TargetEngine::deleteTarget(QString tag) {
     emit targetCountChanged(_targets.size());
 
     if (tag == _selected) {
-      emit selectedTargetUpdated(tag, RadarTarget());
+      emit selectedTargetUpdated(tag, RLITarget());
       _selected = "";
     }
   }
@@ -157,8 +157,8 @@ void TargetEngine::draw(const QMatrix4x4& mvp_matrix, const RLIState& state) {
 
   _prog->bind();
 
-  auto coords = state.shipPosition();
-  glUniform1f(_unif_locs[AIS_TRGT_UNIF_SCALE], state.chartScale());
+  auto coords = state.ship_position;
+  glUniform1f(_unif_locs[AIS_TRGT_UNIF_SCALE], state.chart_scale);
   glUniform2f(_unif_locs[AIS_TRGT_UNIF_CENTER], coords.x(), coords.y());
   _prog->setUniformValue(_unif_locs[AIS_TRGT_UNIF_MVP], mvp_matrix);
 
@@ -293,19 +293,19 @@ void TargetEngine::initBuffersTrgts(QString tag) {
     for (int trgt = 0; trgt < keys.size(); trgt++) {
       for (int i = 0; i < 4; i++) {
         order.push_back(i);
-        point.push_back(_targets[keys[trgt]].Latitude);
-        point.push_back(_targets[keys[trgt]].Longtitude);
-        heading.push_back(_targets[keys[trgt]].Heading);
-        rotation.push_back(_targets[keys[trgt]].Rotation);
-        course.push_back(_targets[keys[trgt]].CourseOverGround);
-        speed.push_back(_targets[keys[trgt]].SpeedOverGround);
+        point.push_back(_targets[keys[trgt]].latitude);
+        point.push_back(_targets[keys[trgt]].longtitude);
+        heading.push_back(_targets[keys[trgt]].heading);
+        rotation.push_back(_targets[keys[trgt]].rotation);
+        course.push_back(_targets[keys[trgt]].course_grnd);
+        speed.push_back(_targets[keys[trgt]].speed_grnd);
       }
     }
   } else {
     for (int i = 0; i < 4; i++) {
       order.push_back(i);
-      point.push_back(_targets[tag].Latitude);
-      point.push_back(_targets[tag].Longtitude);
+      point.push_back(_targets[tag].latitude);
+      point.push_back(_targets[tag].longtitude);
       heading.push_back(0);
       rotation.push_back(0);
       course.push_back(0);

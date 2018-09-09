@@ -43,7 +43,7 @@ public slots:
   void setFps(int fps);
   void onPositionChanged(const QVector2D& position);
   void onTargetCountChanged(int count);
-  void onSelectedTargetUpdated(const QString& tag, const RadarTarget& trgt);
+  void onSelectedTargetUpdated(const QString& tag, const RLITarget& trgt);
 
 private:
   void updateBlock(InfoBlock* b, InfoFonts* fonts);

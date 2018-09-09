@@ -383,6 +383,8 @@ void InfoEngine::onPositionChanged(const QVector2D& position) {
 }
 
 
+
+
 void InfoEngine::initBlockBlank() {
 
 }
@@ -467,11 +469,11 @@ void InfoEngine::onTargetCountChanged(int count) {
   _blocks["targets"]->setText("target-count", QString::number(count).toLocal8Bit());
 }
 
-void InfoEngine::onSelectedTargetUpdated(const QString& tag, const RadarTarget& trgt) {
+void InfoEngine::onSelectedTargetUpdated(const QString& tag, const RLITarget& trgt) {
   _blocks["targets"]->setText("current-target", tag.toLocal8Bit());
 
-  _blocks["targets"]->setText("table_2_1", QString::number(trgt.CourseOverGround).left(6).toLatin1());
-  _blocks["targets"]->setText("table_3_1", QString::number(trgt.SpeedOverGround).left(6).toLatin1());
+  _blocks["targets"]->setText("table_2_1", QString::number(trgt.course_grnd).left(6).toLatin1());
+  _blocks["targets"]->setText("table_3_1", QString::number(trgt.speed_grnd).left(6).toLatin1());
 }
 
 

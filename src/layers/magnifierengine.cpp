@@ -37,12 +37,7 @@ void MagnifierEngine::resize(const RLIMagnifierLayout& layout) {
   initRadarBuffers();
 }
 
-void MagnifierEngine::update(  GLuint amp_vbo_id
-                             , GLuint pal_tex_id
-                             , int pel_len
-                             , int pel_cnt
-                             , int min_pel
-                             , int min_rad) {
+void MagnifierEngine::update(int pel_len, int pel_cnt, int min_pel, int min_rad) {
   glViewport(0, 0, _fbo->width(), _fbo->height());
 
   _fbo->bind();
@@ -59,18 +54,18 @@ void MagnifierEngine::update(  GLuint amp_vbo_id
   _prog->setUniformValue(_unif_locs[MAGN_UNIF_MVP], projection);
 
   drawBorder();
-  drawPelengs(amp_vbo_id, pal_tex_id, pel_len, pel_cnt, min_pel, min_rad);
+  drawPelengs(pel_len, pel_cnt, min_pel, min_rad);
 
 
   _prog->release();
   _fbo->release();
 }
 
-void MagnifierEngine::drawPelengs(GLuint amp_vbo_id, GLuint pal_tex_id, int pel_len, int pel_cnt, int min_pel, int min_rad) {
+void MagnifierEngine::drawPelengs(int pel_len, int pel_cnt, int min_pel, int min_rad) {
   glUniform1i(_unif_locs[MAGN_UNIF_TEXTURE], 0);
 
   glActiveTexture(GL_TEXTURE0);
-  glBindTexture(GL_TEXTURE_2D, pal_tex_id);
+  glBindTexture(GL_TEXTURE_2D, _pal_tex_id);
 
   for (int i = 0; i < _fbo->width() - 2; i++) {
     glUniform4f(_unif_locs[MAGN_UNIF_COLOR], 1.0f*(i%2), 1.0f, 0.0f, 1.0f);
@@ -81,7 +76,7 @@ void MagnifierEngine::drawPelengs(GLuint amp_vbo_id, GLuint pal_tex_id, int pel_
 
     int amp_shift = ((min_pel + i) % pel_cnt) * pel_len + min_rad;
 
-    glBindBuffer(GL_ARRAY_BUFFER, amp_vbo_id);
+    glBindBuffer(GL_ARRAY_BUFFER, _amp_vbo_id);
     glVertexAttribPointer(_attr_locs[MAGN_ATTR_AMPLITUDE], 1, GL_FLOAT, GL_FALSE, 0, (void*) (amp_shift * sizeof(GLfloat)));
     glEnableVertexAttribArray(_attr_locs[MAGN_ATTR_AMPLITUDE]);
 
