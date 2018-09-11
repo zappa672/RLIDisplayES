@@ -10,6 +10,8 @@ RouteEngine::RouteEngine(QOpenGLContext* context, QObject* parent) : QObject(par
   _currentRoute.push_back(QVector2D(15.3040f, 145.8300f));
   _currentRoute.push_back(QVector2D(15.5440f, 145.9600f));
 
+  saveTo(1);
+
   initializeOpenGLFunctions();
 
   _prog = new QOpenGLShaderProgram();
@@ -17,7 +19,9 @@ RouteEngine::RouteEngine(QOpenGLContext* context, QObject* parent) : QObject(par
   glGenBuffers(ROUTE_ATTR_COUNT, _vbo_ids[0]);
   glGenBuffers(ROUTE_ATTR_COUNT, _vbo_ids[1]);
   glGenBuffers(ROUTE_ATTR_COUNT, _vbo_ids[2]);
+
   initShader();
+
   loadBuffers();
 }
 
@@ -31,12 +35,14 @@ RouteEngine::~RouteEngine() {
 void RouteEngine::clearCurrentRoute() {
   _routesMutex.lock();
   _currentRoute.clear();
+  _need_reload_buffer = true;
   _routesMutex.unlock();
 }
 
 void RouteEngine::addPointToCurrent(const QVector2D& p) {
   _routesMutex.lock();
   _currentRoute.push_back(p);
+  _need_reload_buffer = true;
   _routesMutex.unlock();
 }
 
@@ -44,20 +50,23 @@ void RouteEngine::removePointFromCurrent() {
   _routesMutex.lock();
   if (_currentRoute.size() > 1)
     _currentRoute.removeLast();
+  _need_reload_buffer = true;
   _routesMutex.unlock();
 }
 
 void RouteEngine::loadFrom(int index) {
   _routesMutex.lock();
-  if (index >= 0 && index < _routes.size())
+  if (index >= 0 && index < ROUTES_COUNT)
     _currentRoute = _routes[index];
+  _need_reload_buffer = true;
   _routesMutex.unlock();
 }
 
 void RouteEngine::saveTo(int index) {
   _routesMutex.lock();
-  if (index >= 0 && index < _routes.size())
+  if (index >= 0 && index < ROUTES_COUNT)
     _routes[index] = _currentRoute;
+  //_need_reload_buffer = true;
   _routesMutex.unlock();
 }
 
@@ -66,6 +75,9 @@ void RouteEngine::saveTo(int index) {
 
 void RouteEngine::draw(const QMatrix4x4& mvp_matrix, const RLIState& state) {
   _routesMutex.lock();
+
+  if (_need_reload_buffer)
+    loadBuffers();
 
   _prog->bind();
 

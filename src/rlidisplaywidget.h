@@ -62,7 +62,11 @@ protected slots:
 
 private slots:
   void onNewChartAvailable(const QString& name);
+
   void onShipStateChanged(const RLIShipState& sst);
+
+  void onRouteEditionStarted();
+  void onRouteEditionFinished();
 
 private:
   QSet<int> pressedKeys;

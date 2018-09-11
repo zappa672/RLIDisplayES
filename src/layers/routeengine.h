@@ -1,6 +1,9 @@
 #ifndef ROUTEENGINE_H
 #define ROUTEENGINE_H
 
+#define ROUTES_COUNT 4
+
+
 #include <QList>
 #include <QMutex>
 #include <QVector2D>
@@ -20,7 +23,7 @@ public:
   void draw(const QMatrix4x4& mvp_matrix, const RLIState& state);
 
   QVector2D getLastPoint() { return _currentRoute.last(); }
-  inline bool isIndexUsed(int index) { return (index < 0 || index >= _routes.size() || _routes[index].size() > 0); }
+  inline bool isIndexUsed(int index) { return (index < 0 || index >= 4 || _routes[index].size() > 0); }
 
 public slots:
   void clearCurrentRoute();
@@ -41,7 +44,8 @@ private:
 
   QMutex _routesMutex;
   QList<QVector2D> _currentRoute;
-  QVector<QList<QVector2D>> _routes;
+  bool _need_reload_buffer = false;
+  QList<QVector2D> _routes[ROUTES_COUNT];
 
   QOpenGLShaderProgram* _prog;
 

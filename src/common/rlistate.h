@@ -13,7 +13,7 @@ enum class RLIWidgetState {
 , RLISTATE_MAIN_MENU      = 1
 , RLISTATE_CONFIG_MENU    = 2
 , RLISTATE_MAGNIFIER      = 3
-, RLSITATE_ROUTE_EDITION  = 4
+, RLISTATE_ROUTE_EDITION  = 4
 };
 
 struct RLIState {
@@ -31,11 +31,12 @@ struct RLIState {
   QPoint  center_shift  { 0, 0 };
 
   // Ship parameters
-  QVector2D ship_position { 0.0, 0.0 };
-  float     ship_speed    { 0.0 };
-  float     ship_course   { 0.0 };
+  QVector2D ship_position { 0.f, 0.f };
+  float     ship_speed    { 0.f };
+  float     ship_course   { 0.f };
 
   // Controls parameters
+  QVector2D visir_center_pos { 0.f, 0.f };
   float   vn_p          { 0.f };
   float   vn_cu         { 0.f };
   float   vd            { 0.f };

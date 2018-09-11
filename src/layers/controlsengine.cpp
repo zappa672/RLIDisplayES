@@ -2,6 +2,7 @@
 #include "../common/properties.h"
 
 #include <vector>
+#include "../common/rlimath.h"
 
 ControlsEngine::ControlsEngine(QOpenGLContext* context, QObject* parent) : QObject(parent), QOpenGLFunctions(context) {
   initializeOpenGLFunctions();
@@ -28,9 +29,17 @@ ControlsEngine::~ControlsEngine() {
 
 void ControlsEngine::draw(const QMatrix4x4& mvp_mat, const RLIState& state) {
   _prog->bind();
-  _prog->setUniformValue(_unif_locs[CTRL_UNIF_MVP], mvp_mat);
 
-  drawCursor(QColor(255, 0, 255, 255));
+  QMatrix4x4 transform;
+  transform.setToIdentity();
+
+  if (state.state == RLIWidgetState::RLISTATE_ROUTE_EDITION) {
+    QPointF tr = RLIMath::coords_to_pos( state.ship_position, state.visir_center_pos, QPoint(0,0), state.chart_scale);
+    transform.translate( tr.x(), tr.y(), 0.f);
+  }
+
+  _prog->setUniformValue(_unif_locs[CTRL_UNIF_MVP], mvp_mat*transform);
+
 
   // Визир дальности
   drawCircleSegment(QColor(255, 255, 255, 255),  state.vd);
@@ -48,6 +57,16 @@ void ControlsEngine::draw(const QMatrix4x4& mvp_mat, const RLIState& state) {
   drawRaySegment(QColor(255, 192, 26, 255), state.vn_cu);
   drawRaySegment(QColor(255, 192, 26, 255), state.vn_p);
 
+  if (state.show_parallel) {
+    drawRaySegment(QColor(255, 255, 255, 255), state.vn_p, -2048.f, 2048.f,  state.vd);
+    drawRaySegment(QColor(255, 255, 255, 255), state.vn_p, -2048.f, 2048.f, -state.vd);
+  }
+
+
+  _prog->setUniformValue(_unif_locs[CTRL_UNIF_MVP], mvp_mat);
+
+  drawCursor(QColor(255, 0, 255, 255));
+
   // Область захвата
   drawRaySegment   (QColor(255, 255, 0, 255),  280.f,   48.f,  112.f);
   drawRaySegment   (QColor(255, 255, 0, 255),  340.f,   48.f,  112.f);
@@ -60,11 +79,6 @@ void ControlsEngine::draw(const QMatrix4x4& mvp_mat, const RLIState& state) {
   drawCircleSegment(QColor(0, 0, 255, 255),  96.f                          ,  (90.f / 4096.f) * 360.f,  (90.f + 224.f / 4096.f) * 360.f);
   drawCircleSegment(QColor(0, 0, 255, 255),  96.f + 224.f                  ,  (90.f / 4096.f) * 360.f,  (90.f + 224.f / 4096.f) * 360.f);
 
-
-  if (state.show_parallel) {
-    drawRaySegment(QColor(255, 255, 255, 255), state.vn_p, -2048.f, 2048.f,  state.vd);
-    drawRaySegment(QColor(255, 255, 255, 255), state.vn_p, -2048.f, 2048.f, -state.vd);
-  }
 
   _prog->release();
 }

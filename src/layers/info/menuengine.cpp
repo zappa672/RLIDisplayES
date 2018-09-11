@@ -456,9 +456,13 @@ void MenuEngine::onStateChanged(RLIWidgetState state) {
   case RLIWidgetState::RLISTATE_CONFIG_MENU:
       _menu = _cnfg_menu;
       break;
-  default:
+  case RLIWidgetState::RLISTATE_DEFAULT:
+  case RLIWidgetState::RLISTATE_MAGNIFIER:
       _selection_active = false;
       _menu = NULL;
+      break;
+  case RLIWidgetState::RLISTATE_ROUTE_EDITION:
+  default:
       break;
   }
 
@@ -470,6 +474,7 @@ void MenuEngine::onStateChanged(RLIWidgetState state) {
 void MenuEngine::onAnalogZeroChanged(int val) {
   analogZeroItem->setValue(val);
 }
+
 
 void MenuEngine::onLanguageChanged(RLIString lang_str) {
   if (lang_str == RLI_STR_ARRAY_LANG_ENGL)
@@ -558,10 +563,10 @@ void MenuEngine::onEnter() {
 
     if (!_selection_active) {
       if (_menu->item(_selected_line - 1) == routeLoaderItem)
-        emit loadRoute(routeLoaderItem->intValue());
+        emit loadRoute(routeLoaderItem->intValue()-1);
 
       if (_menu->item(_selected_line - 1) == routeSaverItem)
-        emit saveRoute(routeSaverItem->intValue());
+        emit saveRoute(routeSaverItem->intValue()-1);
 
     }
   }

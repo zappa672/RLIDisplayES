@@ -3,10 +3,10 @@
 #include "QDebug"
 
 QVector2D RLIMath::pos_to_coords( const QVector2D& center_coords
-                                , const QPoint& center_position
-                                , const QPoint& position
+                                , const QPointF& center_position
+                                , const QPointF& position
                                 , float scale) {
-  QPoint metric_pos = (position - center_position) * scale;
+  QPointF metric_pos = (position - center_position) * scale;
 
   float lat_rads = radians(center_coords.x());
 
@@ -16,16 +16,16 @@ QVector2D RLIMath::pos_to_coords( const QVector2D& center_coords
   return { lat, lon };
 }
 
-QPoint RLIMath::coords_to_pos( const QVector2D& center_coords
-                             , const QVector2D& coords
-                             , const QPoint& center_position
-                             , float scale) {
+QPointF RLIMath::coords_to_pos( const QVector2D& center_coords
+                              , const QVector2D& coords
+                              , const QPointF& center_position
+                              , float scale) {
   float lat_rads = radians(center_coords.x());
 
   float y_m = -EARTH_RADIUS*radians(coords.x() - center_coords.x());
   float x_m = EARTH_RADIUS*cos(lat_rads)*radians(coords.y() - center_coords.y());
 
-  QPoint pix_pos = QPoint(floor(x_m / scale), floor(y_m / scale));
+  QPointF pix_pos(floor(x_m / scale), floor(y_m / scale));
 
   return pix_pos + center_position;
 }

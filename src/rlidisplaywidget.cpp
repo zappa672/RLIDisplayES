@@ -197,6 +197,16 @@ void RLIDisplayWidget::initializeGL() {
          , _infoEngine, SLOT(onTargetCountChanged(int)));
   connect( _trgtEngine, SIGNAL(selectedTargetUpdated(QString,RadarTarget))
          , _infoEngine, SLOT(onSelectedTargetUpdated(QString,RadarTarget)));
+
+  connect ( _menuEngine, SIGNAL(saveRoute(int))
+          , _routeEngine, SLOT(saveTo(int)));
+  connect ( _menuEngine, SIGNAL(loadRoute(int))
+          , _routeEngine, SLOT(loadFrom(int)));
+
+  connect( _menuEngine, SIGNAL(startRouteEdit())
+         , this, SLOT(onRouteEditionStarted()));
+  connect( _menuEngine, SIGNAL(finishRouteEdit())
+         , this, SLOT(onRouteEditionFinished()));
 }
 
 void RLIDisplayWidget::initShaders() {
@@ -447,6 +457,17 @@ void RLIDisplayWidget::onEmissionChanged(float value) {
 }
 
 
+void RLIDisplayWidget::onRouteEditionStarted() {
+  _routeEngine->clearCurrentRoute();
+  _routeEngine->addPointToCurrent(_state.ship_position);
+  _state.visir_center_pos = _state.ship_position;
+  _state.state = RLIWidgetState::RLISTATE_ROUTE_EDITION;
+}
+
+void RLIDisplayWidget::onRouteEditionFinished() {
+  _state.state = RLIWidgetState::RLISTATE_MAIN_MENU;
+}
+
 
 void RLIDisplayWidget::keyReleaseEvent(QKeyEvent *event) {
   pressedKeys.remove(event->key());
@@ -458,8 +479,9 @@ void RLIDisplayWidget::keyPressEvent(QKeyEvent* event) {
   pressedKeys.insert(event->key());
   auto mod_keys = event->modifiers();
 
-  if (    _state.state == RLIWidgetState::RLISTATE_MAIN_MENU
-      || _state.state == RLIWidgetState::RLISTATE_CONFIG_MENU )
+  if (   _state.state == RLIWidgetState::RLISTATE_MAIN_MENU
+      || _state.state == RLIWidgetState::RLISTATE_CONFIG_MENU
+      || _state.state == RLIWidgetState::RLISTATE_ROUTE_EDITION )
     _menuEngine->onKeyPressed(event);
 
   switch(event->key()) {
@@ -511,11 +533,29 @@ void RLIDisplayWidget::keyPressEvent(QKeyEvent* event) {
 
   // Шкала +
   case Qt::Key_Plus:
+    if (_state.state == RLIWidgetState::RLISTATE_ROUTE_EDITION) {
+      QPointF pos = QPointF( sin(RLIMath::radians(_state.vn_p)) * _state.vd
+                           ,-cos(RLIMath::radians(_state.vn_p)) * _state.vd );
+      //float scale = (_rli_scale.len*1852.f) / _maskEngine->getRadius();
+      QVector2D last_route_point = _routeEngine->getLastPoint();
+      QVector2D cursor_coords = RLIMath::pos_to_coords( last_route_point, QPoint(0, 0), pos, _state.chart_scale);
+      _state.visir_center_pos = cursor_coords;
+      _routeEngine->addPointToCurrent(cursor_coords);
+
+      break;
+    }
+
     _state.chart_scale *= 0.95;
     break;
 
   // Шкала -
   case Qt::Key_Minus:
+    if (_state.state == RLIWidgetState::RLISTATE_ROUTE_EDITION) {
+      _routeEngine->removePointFromCurrent();
+      _state.visir_center_pos = _routeEngine->getLastPoint();
+      break;
+    }
+
     _state.chart_scale *= 1.05;
     break;
 

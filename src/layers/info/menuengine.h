@@ -27,8 +27,6 @@ public:
   inline QRect geometry() { return _geometry; }
   inline GLuint texture() { return _fbo->texture(); }
 
-  //inline void setRouteEngine(RouteEngine* e) { _routeEngine = e; }
-
   inline void setFonts(InfoFonts* fonts) { _fonts = fonts; }
   void resize(const RLIMenuLayout& layout);
 
