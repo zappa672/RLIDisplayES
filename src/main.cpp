@@ -11,6 +11,7 @@
 
 #define RLI_THREADS_NUM 6 // Required number of threads in global QThreadPool
 
+void parseArgs(QApplication* a);
 
 
 int main(int argc, char *argv[]) {
@@ -19,8 +20,22 @@ int main(int argc, char *argv[]) {
   qDebug() << "Max number of threads: " << QThreadPool::globalInstance()->maxThreadCount();
 
   QApplication a(argc, argv);
+  parseArgs(&a);
 
-  QStringList args = a.arguments();
+  QGLFormat format = QGLFormat::defaultFormat();
+  format.setDoubleBuffer(true);
+  format.setSampleBuffers(false);
+  format.setSamples(1);
+  QGLFormat::setDefaultFormat(format);
+
+  MainWindow w;
+  w.showFullScreen();
+
+  return a.exec();
+}
+
+void parseArgs(QApplication* a) {
+  QStringList args = a->arguments();
 
   if (args.contains("--help")) {
     qDebug() << "-bp to show debug buttons panel";
@@ -30,53 +45,40 @@ int main(int argc, char *argv[]) {
     qDebug() << "-d to setup delay between sending data blocks by radardatasource in milliseconds (default: 15)";
     qDebug() << "-s to setup size of data blocks to send in pelengs (default: 64)";
     qDebug() << "-w to setup rliwidget size (example: 1024x768, no default, depends on screen size)";
-    return 0;
-  }  
+    exit(0);
+  }
 
   if (args.contains("-bp"))
-    a.setProperty(PROPERTY_SHOW_BUTTON_PANEL, true);
+    a->setProperty(PROPERTY_SHOW_BUTTON_PANEL, true);
   else
-    a.setProperty(PROPERTY_SHOW_BUTTON_PANEL, false);
+    a->setProperty(PROPERTY_SHOW_BUTTON_PANEL, false);
 
 
   if (args.contains("-p"))
-    a.setProperty(PROPERTY_PELENG_SIZE, args[args.indexOf("-p") + 1].toInt());
+    a->setProperty(PROPERTY_PELENG_SIZE, args[args.indexOf("-p") + 1].toInt());
   else
-    a.setProperty(PROPERTY_PELENG_SIZE, 800);
+    a->setProperty(PROPERTY_PELENG_SIZE, 800);
 
   if (args.contains("-b"))
-    a.setProperty(PROPERTY_BEARINGS_PER_CYCLE, args[args.indexOf("-b") + 1].toInt());
+    a->setProperty(PROPERTY_BEARINGS_PER_CYCLE, args[args.indexOf("-b") + 1].toInt());
   else
-    a.setProperty(PROPERTY_BEARINGS_PER_CYCLE, 4096);
+    a->setProperty(PROPERTY_BEARINGS_PER_CYCLE, 4096);
 
   if (args.contains("-f"))
-    a.setProperty(PROPERTY_FRAME_DELAY, args[args.indexOf("-f") + 1].toInt());
+    a->setProperty(PROPERTY_FRAME_DELAY, args[args.indexOf("-f") + 1].toInt());
   else
-    a.setProperty(PROPERTY_FRAME_DELAY, 25);
+    a->setProperty(PROPERTY_FRAME_DELAY, 25);
 
   if (args.contains("-d"))
-    a.setProperty(PROPERTY_DATA_DELAY, args[args.indexOf("-d") + 1].toInt());
+    a->setProperty(PROPERTY_DATA_DELAY, args[args.indexOf("-d") + 1].toInt());
   else
-    a.setProperty(PROPERTY_DATA_DELAY, 30);
+    a->setProperty(PROPERTY_DATA_DELAY, 30);
 
   if (args.contains("-s"))
-    a.setProperty(PROPERTY_BLOCK_SIZE, args[args.indexOf("-s") + 1].toInt());
+    a->setProperty(PROPERTY_BLOCK_SIZE, args[args.indexOf("-s") + 1].toInt());
   else
-    a.setProperty(PROPERTY_BLOCK_SIZE, 128);
+    a->setProperty(PROPERTY_BLOCK_SIZE, 128);
 
   if (args.contains("-w"))
-    a.setProperty(PROPERTY_RLI_WIDGET_SIZE, args[args.indexOf("-w") + 1]);
-
-
-  QGLFormat format = QGLFormat::defaultFormat();
-  format.setDoubleBuffer(true);
-  format.setSampleBuffers(false);
-  format.setSamples(1);
-  QGLFormat::setDefaultFormat(format);
-
-
-  MainWindow w;
-  w.showFullScreen();
-
-  return a.exec();
+    a->setProperty(PROPERTY_RLI_WIDGET_SIZE, args[args.indexOf("-w") + 1]);
 }

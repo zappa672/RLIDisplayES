@@ -27,7 +27,6 @@ public:
 
   inline GLuint textureId()   { return _fbo->texture(); }
 
-  inline void setAngleShift (float s)           { _angle_shift = s; }
   inline void setCursorPos  (const QPoint& p)   { _cursor_pos = p; }
 
   inline GLuint  getTextureId   ()   { return _fbo->texture(); }
@@ -49,13 +48,11 @@ private:
 
   InfoFonts* _fonts;
 
-  float     _angle_shift;
   float     _hole_radius;
 
   QPointF   _hole_center;
   QPointF   _cursor_pos;
 
-  QSizeF    _size;
   QString   _font;
 
   QOpenGLFramebufferObject* _fbo;

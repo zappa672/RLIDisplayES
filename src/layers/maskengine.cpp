@@ -19,7 +19,6 @@ MaskEngine::MaskEngine(const QSize& sz, const RLICircleLayout& layout, InfoFonts
   _fbo = nullptr;
   _program = new QOpenGLShaderProgram();
 
-  _angle_shift = 0;
   _text_point_count = 0;
   _hole_point_count = 362;
 
@@ -37,10 +36,6 @@ MaskEngine::~MaskEngine() {
 }
 
 void MaskEngine::resize(const QSize& sz, const RLICircleLayout& layout) {
-  if (_fbo != nullptr && sz == _fbo->size())
-     return;
-
-  _size = sz;
   _font = layout.font;
   _hole_radius = layout.radius;
   _hole_center = layout.center;
@@ -57,7 +52,7 @@ void MaskEngine::resize(const QSize& sz, const RLICircleLayout& layout) {
 void MaskEngine::update() {
   _fbo->bind();
 
-  glViewport(0, 0, _size.width(), _size.height());
+  glViewport(0, 0, _fbo->width(), _fbo->height());
 
   glClearColor(0.12, 0.13, 0.10, 1.0);
   glClear(GL_COLOR_BUFFER_BIT);
@@ -69,7 +64,7 @@ void MaskEngine::update() {
 
   QMatrix4x4 projection;
   projection.setToIdentity();
-  projection.ortho(0.f, _size.width(), 0.f, _size.height(), -1.f, 1.f);
+  projection.ortho(0.f, _fbo->width(), 0.f, _fbo->height(), -1.f, 1.f);
 
   // Start mark shader drawing
   _program->bind();
@@ -77,7 +72,7 @@ void MaskEngine::update() {
   // Set uniforms
   // ---------------------------------------------------------------------
   _program->setUniformValue(_unif_locs[MASK_UNIF_MVP], projection);
-  glUniform1f(_unif_locs[MASK_UNIF_ANGLE_SHIFT], _angle_shift);
+  glUniform1f(_unif_locs[MASK_UNIF_ANGLE_SHIFT], 0.f);
   glUniform1f(_unif_locs[MASK_UNIF_CIRCLE_RADIUS], _hole_radius);
   glUniform2f(_unif_locs[MASK_UNIF_CIRCLE_POS], _hole_center.x(), _hole_center.y());
   glUniform2f(_unif_locs[MASK_UNIF_CURSOR_POS], _cursor_pos.x(), _cursor_pos.y());

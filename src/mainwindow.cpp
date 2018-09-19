@@ -44,13 +44,14 @@ void MainWindow::resizeEvent(QResizeEvent* e) {
   wgtButtonPanel->move(width() - wgtButtonPanel->width(), 0);
 
   QSize s = e->size();
-  QSize availableSize;
+  QSize availableSize;  
+  int availableWidth;
 
   if (qApp->property(PROPERTY_RLI_WIDGET_SIZE).isValid()) {
     QStringList l = qApp->property(PROPERTY_RLI_WIDGET_SIZE).toString().split("x");
     availableSize = QSize(l[0].toInt(), l[1].toInt());
   } else {
-    int availableWidth = showButtonPanel ? s.width() - wgtButtonPanel->width() : s.width();
+    availableWidth = showButtonPanel ? s.width() - wgtButtonPanel->width() : s.width();
     availableSize = QSize(availableWidth, s.height() );
   }
 
