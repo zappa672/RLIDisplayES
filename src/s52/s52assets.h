@@ -15,7 +15,7 @@ public:
   explicit S52Assets(QOpenGLContext* context, S52References* ref);
   virtual ~S52Assets();
 
-  //inline QOpenGLTexture* getFontTexId       ()                                    { return font_texture; }
+  inline QOpenGLTexture* getFontTexId       ()                                    { return font_texture; }
 
   inline QOpenGLTexture* getColorSchemeTex  (const QString& s)                    { return color_scheme_textures[s]; }
 
@@ -33,7 +33,7 @@ public:
   inline QOpenGLTexture* getSymbolTex       (const QString& s)                    { return symbol_textures[graphic_files[s]]; }
 
 private:
-  //void initFontTexture();
+  void initFontTexture();
 
   void initColorSchemeTextures(S52References* ref);
   void initPatternTextures(S52References* ref);
@@ -42,7 +42,7 @@ private:
 
   QOpenGLTexture* dirToPatternTex(const QString& path, const QString& ex_path, QMap<QString, QPoint>& locations,  QMap<QString, QSize>& sizes);
 
-  //QOpenGLTexture*                         font_texture;
+  QOpenGLTexture*                         font_texture;
 
   QMap<QString, QOpenGLTexture*>          color_scheme_textures;
 

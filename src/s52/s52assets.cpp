@@ -16,7 +16,7 @@
 S52Assets::S52Assets(QOpenGLContext* context, S52References* ref) : QOpenGLFunctions(context) {
   initializeOpenGLFunctions();    
 
-  //initFontTexture();
+  initFontTexture();
 
   initColorSchemeTextures(ref);
 
@@ -26,7 +26,7 @@ S52Assets::S52Assets(QOpenGLContext* context, S52References* ref) : QOpenGLFunct
 }
 
 S52Assets::~S52Assets() {
-  //font_texture->destroy();
+  font_texture->destroy();
 
   for (QOpenGLTexture* tex : pattern_textures)
     tex->destroy();
@@ -41,7 +41,7 @@ S52Assets::~S52Assets() {
     tex->destroy();
 }
 
-/*
+
 void S52Assets::initFontTexture() {
   QImage img(16*16, 16*16, QImage::Format_ARGB32);
 
@@ -76,7 +76,7 @@ void S52Assets::initFontTexture() {
 
   font_texture->setData(img, QOpenGLTexture::DontGenerateMipMaps);
 }
-*/
+
 
 void S52Assets::initColorSchemeTextures(S52References* ref) {
   QStringList color_scheme_names = ref->getColorSchemeNames();

@@ -55,7 +55,7 @@ void TargetDataSource::start() {
     return;
 
   _startTime = QDateTime::currentDateTime();
-  _timerId = startTimer(20);
+  _timerId = startTimer(200);
 }
 
 void TargetDataSource::finish() {

@@ -5,6 +5,8 @@
 #include <QMatrix4x4>
 #include <QDateTime>
 
+#include <qmath.h>
+
 static double const PI = acos(-1);
 
 RadarEngine::RadarEngine(uint pel_count, uint pel_len, uint tex_radius, QOpenGLContext* context, QObject* parent)

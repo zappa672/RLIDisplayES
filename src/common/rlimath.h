@@ -7,7 +7,7 @@
 
 
 namespace RLIMath {
-  constexpr double PI = 2 * asin(1);
+  const double PI = 2 * asin(1);
   constexpr double EARTH_RADIUS = 6378137.0;
   constexpr double METERS_PER_MILE = 1852.f;
 

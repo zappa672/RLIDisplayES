@@ -3,6 +3,8 @@
 #include "../common/properties.h"
 #include "../common/rlilayout.h"
 
+#include <qmath.h>
+
 static double const PI = acos(-1);
 
 MaskEngine::MaskEngine(const QSize& sz, const RLICircleLayout& layout, InfoFonts* fonts, QOpenGLContext* context, QObject* parent)
