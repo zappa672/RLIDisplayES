@@ -196,6 +196,7 @@ RLIInfoPanelLayout RLILayoutManager::readInfoPanelLayout(const QSize& scrn_sz, Q
   layout.border_width = attrs["border_width"].toInt();
   layout.border_color = parseColor(attrs["border_color"]);
   layout.back_color = parseColor(attrs["back_color"]);
+  layout.text_count = attrs["text_count"].toInt();
 
   while (!xml->atEnd()) {
     switch (xml->readNext()) {

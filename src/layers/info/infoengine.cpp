@@ -4,20 +4,306 @@
 
 #include "../../common/properties.h"
 
+static constexpr int RLI_PANEL_GAIN_TEXT_ID     = 0;
+static constexpr int RLI_PANEL_WATER_TEXT_ID    = 0;
+static constexpr int RLI_PANEL_RAIN_TEXT_ID     = 0;
+static constexpr int RLI_PANEL_APCH_TEXT_ID     = 0;
+static constexpr int RLI_PANEL_EMISSION_TEXT_ID = 0;
+
+
+static constexpr int RLI_PANEL_LABEL5_TEXT_ID   = 0;
+static constexpr int RLI_PANEL_BAND_TEXT_ID     = 0;
+static constexpr int RLI_PANEL_LABEL1_TEXT_ID   = 0;
+static constexpr int RLI_PANEL_LABEL2_TEXT_ID   = 0;
+static constexpr int RLI_PANEL_LABEL3_TEXT_ID   = 0;
+static constexpr int RLI_PANEL_LABEL4_TEXT_ID   = 0;
+
+static constexpr int RLI_PANEL_FPS_LABEL_TEXT_ID  = 0;
+static constexpr int RLI_PANEL_FPS_VALUE_TEXT_ID  = 1;
+
+
+static constexpr int RLI_PANEL_SCALE_SCALE1_TEXT_ID = 0;
+static constexpr int RLI_PANEL_SCALE_SLASH_TEXT_ID  = 1;
+static constexpr int RLI_PANEL_SCALE_SCALE2_TEXT_ID = 2;
+static constexpr int RLI_PANEL_SCALE_UNITS_TEXT_ID  = 3;
+
+static constexpr int RLI_PANEL_VN_HEADER_TEXT_ID    = 0;
+static constexpr int RLI_PANEL_VN_TBL_0_0_TEXT_ID   = 1;
+static constexpr int RLI_PANEL_VN_TBL_0_1_TEXT_ID   = 2;
+static constexpr int RLI_PANEL_VN_TBL_0_2_TEXT_ID   = 3;
+static constexpr int RLI_PANEL_VN_TBL_1_0_TEXT_ID   = 4;
+static constexpr int RLI_PANEL_VN_TBL_1_1_TEXT_ID   = 5;
+static constexpr int RLI_PANEL_VN_TBL_1_2_TEXT_ID   = 6;
+
+static constexpr int RLI_PANEL_VD_HEADER_TEXT_ID    = 0;
+static constexpr int RLI_PANEL_VD_TBL_0_0_TEXT_ID   = 1;
+static constexpr int RLI_PANEL_VD_TBL_0_1_TEXT_ID   = 2;
+
+static constexpr int RLI_PANEL_COURSE_TBL_0_0_TEXT_ID = 0;
+static constexpr int RLI_PANEL_COURSE_TBL_0_1_TEXT_ID = 1;
+static constexpr int RLI_PANEL_COURSE_TBL_0_2_TEXT_ID = 2;
+static constexpr int RLI_PANEL_COURSE_TBL_1_0_TEXT_ID = 3;
+static constexpr int RLI_PANEL_COURSE_TBL_1_1_TEXT_ID = 4;
+static constexpr int RLI_PANEL_COURSE_TBL_1_2_TEXT_ID = 5;
+
+
+static constexpr int RLI_PANEL_POSITION_TBL_0_0_TEXT_ID = 0;
+static constexpr int RLI_PANEL_POSITION_TBL_0_1_TEXT_ID = 1;
+static constexpr int RLI_PANEL_POSITION_TBL_1_0_TEXT_ID = 2;
+static constexpr int RLI_PANEL_POSITION_TBL_1_1_TEXT_ID = 3;
+
+//static constexpr int RLI_PANEL_BLANK...
+
+static constexpr int RLI_PANEL_CLOCK_LABEL_TEXT_ID  = 0;
+static constexpr int RLI_PANEL_CLOCK_TIME_TEXT_ID   = 1;
+
+
+static constexpr int RLI_PANEL_DANGER_LABEL_TEXT_ID = 0;
+
+static constexpr int RLI_PANEL_TAILS_TBL_0_0_TEXT_ID  = 0;
+static constexpr int RLI_PANEL_TAILS_TBL_0_1_TEXT_ID  = 1;
+static constexpr int RLI_PANEL_TAILS_TBL_0_2_TEXT_ID  = 2;
+
+static constexpr int RLI_PANEL_DANGER_DETAILS_TBL_0_0_TEXT_ID = 0;
+static constexpr int RLI_PANEL_DANGER_DETAILS_TBL_0_1_TEXT_ID = 1;
+static constexpr int RLI_PANEL_DANGER_DETAILS_TBL_0_2_TEXT_ID = 2;
+static constexpr int RLI_PANEL_DANGER_DETAILS_TBL_1_0_TEXT_ID = 3;
+static constexpr int RLI_PANEL_DANGER_DETAILS_TBL_1_1_TEXT_ID = 4;
+static constexpr int RLI_PANEL_DANGER_DETAILS_TBL_1_2_TEXT_ID = 5;
+
+static constexpr int RLI_PANEL_VECTOR_TBL_0_0_TEXT_ID = 0;
+static constexpr int RLI_PANEL_VECTOR_TBL_0_1_TEXT_ID = 1;
+static constexpr int RLI_PANEL_VECTOR_TBL_0_2_TEXT_ID = 2;
+
+static constexpr int RLI_PANEL_TARGETS_HEADER_TEXT_ID   = 0;
+static constexpr int RLI_PANEL_TARGETS_CURRENT_TEXT_ID  = 1;
+static constexpr int RLI_PANEL_TARGETS_COUNT_TEXT_ID    = 2;
+static constexpr int RLI_PANEL_TARGETS_TBL_0_0_TEXT_ID  = 3;
+static constexpr int RLI_PANEL_TARGETS_TBL_0_1_TEXT_ID  = 4;
+static constexpr int RLI_PANEL_TARGETS_TBL_0_2_TEXT_ID  = 5;
+static constexpr int RLI_PANEL_TARGETS_TBL_1_0_TEXT_ID  = 6;
+static constexpr int RLI_PANEL_TARGETS_TBL_1_1_TEXT_ID  = 7;
+static constexpr int RLI_PANEL_TARGETS_TBL_1_2_TEXT_ID  = 8;
+static constexpr int RLI_PANEL_TARGETS_TBL_2_0_TEXT_ID  = 9;
+static constexpr int RLI_PANEL_TARGETS_TBL_2_1_TEXT_ID  = 10;
+static constexpr int RLI_PANEL_TARGETS_TBL_2_2_TEXT_ID  = 11;
+static constexpr int RLI_PANEL_TARGETS_TBL_3_0_TEXT_ID  = 12;
+static constexpr int RLI_PANEL_TARGETS_TBL_3_1_TEXT_ID  = 13;
+static constexpr int RLI_PANEL_TARGETS_TBL_3_2_TEXT_ID  = 14;
+static constexpr int RLI_PANEL_TARGETS_TBL_4_0_TEXT_ID  = 15;
+static constexpr int RLI_PANEL_TARGETS_TBL_4_1_TEXT_ID  = 16;
+static constexpr int RLI_PANEL_TARGETS_TBL_4_2_TEXT_ID  = 17;
+static constexpr int RLI_PANEL_TARGETS_TBL_5_0_TEXT_ID  = 18;
+static constexpr int RLI_PANEL_TARGETS_TBL_5_1_TEXT_ID  = 19;
+static constexpr int RLI_PANEL_TARGETS_TBL_5_2_TEXT_ID  = 20;
+static constexpr int RLI_PANEL_TARGETS_TBL_6_0_TEXT_ID  = 21;
+static constexpr int RLI_PANEL_TARGETS_TBL_6_1_TEXT_ID  = 22;
+static constexpr int RLI_PANEL_TARGETS_TBL_6_2_TEXT_ID  = 23;
+static constexpr int RLI_PANEL_TARGETS_TBL_7_0_TEXT_ID  = 24;
+static constexpr int RLI_PANEL_TARGETS_TBL_7_1_TEXT_ID  = 25;
+static constexpr int RLI_PANEL_TARGETS_TBL_7_2_TEXT_ID  = 26;
+
+static constexpr int RLI_PANEL_CURSOR_HEADER_TEXT_ID  = 0;
+static constexpr int RLI_PANEL_CURSOR_TBL_0_0_TEXT_ID = 1;
+static constexpr int RLI_PANEL_CURSOR_TBL_0_1_TEXT_ID = 2;
+static constexpr int RLI_PANEL_CURSOR_TBL_0_2_TEXT_ID = 3;
+static constexpr int RLI_PANEL_CURSOR_TBL_1_0_TEXT_ID = 4;
+static constexpr int RLI_PANEL_CURSOR_TBL_1_1_TEXT_ID = 5;
+static constexpr int RLI_PANEL_CURSOR_TBL_1_2_TEXT_ID = 6;
+
+
+const static std::map<int, std::map<QString, int>> panel_texts_map {
+  {  InfoEngine::RLI_PANEL_GAIN,
+    std::map<QString, int> { { "text", RLI_PANEL_GAIN_TEXT_ID } }
+  }
+, {  InfoEngine::RLI_PANEL_WATER,
+    std::map<QString, int> { { "text", RLI_PANEL_WATER_TEXT_ID } }
+  }
+, {  InfoEngine::RLI_PANEL_RAIN,
+    std::map<QString, int> { { "text", RLI_PANEL_RAIN_TEXT_ID } }
+  }
+, {  InfoEngine::RLI_PANEL_APCH,
+    std::map<QString, int> { { "text", RLI_PANEL_APCH_TEXT_ID } }
+  }
+, {  InfoEngine::RLI_PANEL_EMISSION,
+    std::map<QString, int> { { "text", RLI_PANEL_EMISSION_TEXT_ID } }
+  }
+
+, {  InfoEngine::RLI_PANEL_LABEL5,
+    std::map<QString, int> { { "text", RLI_PANEL_LABEL5_TEXT_ID } }
+  }
+, {  InfoEngine::RLI_PANEL_BAND,
+    std::map<QString, int> { { "text", RLI_PANEL_BAND_TEXT_ID } }
+  }
+, {  InfoEngine::RLI_PANEL_LABEL1,
+    std::map<QString, int> { { "text", RLI_PANEL_LABEL1_TEXT_ID } }
+  }
+, {  InfoEngine::RLI_PANEL_LABEL2,
+    std::map<QString, int> { { "text", RLI_PANEL_LABEL2_TEXT_ID } }
+  }
+, {  InfoEngine::RLI_PANEL_LABEL3,
+    std::map<QString, int> { { "text", RLI_PANEL_LABEL3_TEXT_ID } }
+  }
+, {  InfoEngine::RLI_PANEL_LABEL4,
+    std::map<QString, int> { { "text", RLI_PANEL_LABEL4_TEXT_ID } }
+  }
+, {  InfoEngine::RLI_PANEL_FPS,
+    std::map<QString, int> { { "label", RLI_PANEL_FPS_LABEL_TEXT_ID }
+                           , { "value", RLI_PANEL_FPS_VALUE_TEXT_ID } }
+  }
+
+, {  InfoEngine::RLI_PANEL_SCALE,
+    std::map<QString, int> { { "scale1", RLI_PANEL_SCALE_SCALE1_TEXT_ID }
+                           , { "slash" , RLI_PANEL_SCALE_SLASH_TEXT_ID  }
+                           , { "scale2", RLI_PANEL_SCALE_SCALE2_TEXT_ID }
+                           , { "units" , RLI_PANEL_SCALE_UNITS_TEXT_ID  } }
+  }
+, {  InfoEngine::RLI_PANEL_VN,
+    std::map<QString, int> { { "header", RLI_PANEL_VN_HEADER_TEXT_ID }
+                           , { "table_0_0", RLI_PANEL_VN_TBL_0_0_TEXT_ID }
+                           , { "table_0_1", RLI_PANEL_VN_TBL_0_1_TEXT_ID }
+                           , { "table_0_2", RLI_PANEL_VN_TBL_0_2_TEXT_ID }
+                           , { "table_1_0", RLI_PANEL_VN_TBL_1_0_TEXT_ID }
+                           , { "table_1_1", RLI_PANEL_VN_TBL_1_1_TEXT_ID }
+                           , { "table_1_2", RLI_PANEL_VN_TBL_1_2_TEXT_ID } }
+  }
+, {  InfoEngine::RLI_PANEL_VD ,
+    std::map<QString, int> { { "header", RLI_PANEL_VD_HEADER_TEXT_ID }
+                           , { "table_0_0", RLI_PANEL_VD_TBL_0_0_TEXT_ID }
+                           , { "table_0_1", RLI_PANEL_VD_TBL_0_1_TEXT_ID } }
+  }
+, {  InfoEngine::RLI_PANEL_COURSE,
+    std::map<QString, int> { { "table_0_0", RLI_PANEL_COURSE_TBL_0_0_TEXT_ID }
+                           , { "table_0_1", RLI_PANEL_COURSE_TBL_0_1_TEXT_ID }
+                           , { "table_0_2", RLI_PANEL_COURSE_TBL_0_2_TEXT_ID }
+                           , { "table_1_0", RLI_PANEL_COURSE_TBL_1_0_TEXT_ID }
+                           , { "table_1_1", RLI_PANEL_COURSE_TBL_1_1_TEXT_ID }
+                           , { "table_1_2", RLI_PANEL_COURSE_TBL_1_2_TEXT_ID } }
+  }
+
+, {  InfoEngine::RLI_PANEL_POSITION,
+    std::map<QString, int> { { "table_0_0", RLI_PANEL_POSITION_TBL_0_0_TEXT_ID }
+                           , { "table_0_1", RLI_PANEL_POSITION_TBL_0_1_TEXT_ID }
+                           , { "table_1_0", RLI_PANEL_POSITION_TBL_1_0_TEXT_ID }
+                           , { "table_1_1", RLI_PANEL_POSITION_TBL_1_1_TEXT_ID }}
+  }
+, {  InfoEngine::RLI_PANEL_BLANK,
+    std::map<QString, int> { }
+  }
+, {  InfoEngine::RLI_PANEL_CLOCK,
+    std::map<QString, int> { { "label", RLI_PANEL_CLOCK_LABEL_TEXT_ID }
+                           , { "time" , RLI_PANEL_CLOCK_TIME_TEXT_ID  } }
+  }
+
+, {  InfoEngine::RLI_PANEL_DANGER,
+    std::map<QString, int> { { "label", RLI_PANEL_DANGER_LABEL_TEXT_ID } }
+  }
+, {  InfoEngine::RLI_PANEL_TAILS,
+    std::map<QString, int> { { "table_0_0", RLI_PANEL_TAILS_TBL_0_0_TEXT_ID }
+                           , { "table_0_1", RLI_PANEL_TAILS_TBL_0_1_TEXT_ID }
+                           , { "table_0_2", RLI_PANEL_TAILS_TBL_0_2_TEXT_ID } }
+  }
+, {  InfoEngine::RLI_PANEL_DANGER_DETAILS,
+    std::map<QString, int> { { "table_0_0", RLI_PANEL_DANGER_DETAILS_TBL_0_0_TEXT_ID }
+                           , { "table_0_1", RLI_PANEL_DANGER_DETAILS_TBL_0_1_TEXT_ID }
+                           , { "table_0_2", RLI_PANEL_DANGER_DETAILS_TBL_0_2_TEXT_ID }
+                           , { "table_1_0", RLI_PANEL_DANGER_DETAILS_TBL_1_0_TEXT_ID }
+                           , { "table_1_1", RLI_PANEL_DANGER_DETAILS_TBL_1_1_TEXT_ID }
+                           , { "table_1_2", RLI_PANEL_DANGER_DETAILS_TBL_1_2_TEXT_ID } }
+  }
+, {  InfoEngine::RLI_PANEL_VECTOR,
+    std::map<QString, int> { { "table_0_0", RLI_PANEL_VECTOR_TBL_0_0_TEXT_ID }
+                           , { "table_0_1", RLI_PANEL_VECTOR_TBL_0_1_TEXT_ID }
+                           , { "table_0_2", RLI_PANEL_VECTOR_TBL_0_2_TEXT_ID } }
+  }
+, {  InfoEngine::RLI_PANEL_TARGETS,
+    std::map<QString, int> { { "header"   , RLI_PANEL_TARGETS_HEADER_TEXT_ID  }
+                           , { "current"  , RLI_PANEL_TARGETS_CURRENT_TEXT_ID }
+                           , { "count"    , RLI_PANEL_TARGETS_COUNT_TEXT_ID   }
+                           , { "table_0_0", RLI_PANEL_TARGETS_TBL_0_0_TEXT_ID }
+                           , { "table_0_1", RLI_PANEL_TARGETS_TBL_0_1_TEXT_ID }
+                           , { "table_0_2", RLI_PANEL_TARGETS_TBL_0_2_TEXT_ID }
+                           , { "table_1_0", RLI_PANEL_TARGETS_TBL_1_0_TEXT_ID }
+                           , { "table_1_1", RLI_PANEL_TARGETS_TBL_1_1_TEXT_ID }
+                           , { "table_1_2", RLI_PANEL_TARGETS_TBL_1_2_TEXT_ID }
+                           , { "table_2_0", RLI_PANEL_TARGETS_TBL_2_0_TEXT_ID }
+                           , { "table_2_1", RLI_PANEL_TARGETS_TBL_2_1_TEXT_ID }
+                           , { "table_2_2", RLI_PANEL_TARGETS_TBL_2_2_TEXT_ID }
+                           , { "table_3_0", RLI_PANEL_TARGETS_TBL_3_0_TEXT_ID }
+                           , { "table_3_1", RLI_PANEL_TARGETS_TBL_3_1_TEXT_ID }
+                           , { "table_3_2", RLI_PANEL_TARGETS_TBL_3_2_TEXT_ID }
+                           , { "table_4_0", RLI_PANEL_TARGETS_TBL_4_0_TEXT_ID }
+                           , { "table_4_1", RLI_PANEL_TARGETS_TBL_4_1_TEXT_ID }
+                           , { "table_4_2", RLI_PANEL_TARGETS_TBL_4_2_TEXT_ID }
+                           , { "table_5_0", RLI_PANEL_TARGETS_TBL_5_0_TEXT_ID }
+                           , { "table_5_1", RLI_PANEL_TARGETS_TBL_5_1_TEXT_ID }
+                           , { "table_5_2", RLI_PANEL_TARGETS_TBL_5_2_TEXT_ID }
+                           , { "table_6_0", RLI_PANEL_TARGETS_TBL_6_0_TEXT_ID }
+                           , { "table_6_1", RLI_PANEL_TARGETS_TBL_6_1_TEXT_ID }
+                           , { "table_6_2", RLI_PANEL_TARGETS_TBL_6_2_TEXT_ID }
+                           , { "table_7_0", RLI_PANEL_TARGETS_TBL_7_0_TEXT_ID }
+                           , { "table_7_1", RLI_PANEL_TARGETS_TBL_7_1_TEXT_ID }
+                           , { "table_7_2", RLI_PANEL_TARGETS_TBL_7_2_TEXT_ID } }
+  }
+, {  InfoEngine::RLI_PANEL_CURSOR,
+    std::map<QString, int> { { "header"   , RLI_PANEL_CURSOR_HEADER_TEXT_ID }
+                           , { "table_0_0", RLI_PANEL_CURSOR_TBL_0_0_TEXT_ID }
+                           , { "table_0_1", RLI_PANEL_CURSOR_TBL_0_1_TEXT_ID }
+                           , { "table_0_2", RLI_PANEL_CURSOR_TBL_0_2_TEXT_ID }
+                           , { "table_1_0", RLI_PANEL_CURSOR_TBL_1_0_TEXT_ID }
+                           , { "table_1_1", RLI_PANEL_CURSOR_TBL_1_1_TEXT_ID }
+                           , { "table_1_2", RLI_PANEL_CURSOR_TBL_1_2_TEXT_ID } }
+  }
+};
+
+
+
+
+const static std::map<QString, int> panels_map {
+    { "gain",     InfoEngine::RLI_PANEL_GAIN }
+,   { "water",    InfoEngine::RLI_PANEL_WATER }
+,   { "rain",     InfoEngine::RLI_PANEL_RAIN }
+,   { "apch",     InfoEngine::RLI_PANEL_APCH }
+,   { "emission", InfoEngine::RLI_PANEL_EMISSION }
+
+,   { "label5",   InfoEngine::RLI_PANEL_LABEL5 }
+,   { "band",     InfoEngine::RLI_PANEL_BAND }
+,   { "label1",   InfoEngine::RLI_PANEL_LABEL1 }
+,   { "label2",   InfoEngine::RLI_PANEL_LABEL2 }
+,   { "label3",   InfoEngine::RLI_PANEL_LABEL3 }
+,   { "label4",   InfoEngine::RLI_PANEL_LABEL4 }
+,   { "fps",      InfoEngine::RLI_PANEL_FPS }
+
+,   { "scale",    InfoEngine::RLI_PANEL_SCALE }
+,   { "vn",       InfoEngine::RLI_PANEL_VN }
+,   { "vd",       InfoEngine::RLI_PANEL_VD }
+,   { "course",   InfoEngine::RLI_PANEL_COURSE }
+
+,   { "position", InfoEngine::RLI_PANEL_POSITION }
+,   { "blank",    InfoEngine::RLI_PANEL_BLANK }
+,   { "clock",    InfoEngine::RLI_PANEL_CLOCK }
+
+,   { "danger",   InfoEngine::RLI_PANEL_DANGER }
+,   { "tails",    InfoEngine::RLI_PANEL_TAILS }
+,   { "danger-details", InfoEngine::RLI_PANEL_DANGER_DETAILS }
+,   { "vector",   InfoEngine::RLI_PANEL_VECTOR }
+,   { "targets",  InfoEngine::RLI_PANEL_TARGETS }
+,   { "cursor",   InfoEngine::RLI_PANEL_CURSOR }
+};
+
 
 InfoEngine::InfoEngine(RLILayout* layout, QOpenGLContext* context, QObject* parent) : QObject(parent), QOpenGLFunctions(context)  {
   initializeOpenGLFunctions();
 
-  _prog = new QOpenGLShaderProgram();
-  _lang = RLI_LANG_RUSSIAN;
+  for (const QString& name : layout->panels.keys()) {
+    int panel_id = panels_map.at(name);
+    _blocks[panel_id] = new InfoBlock(layout->panels[name], panel_texts_map.at(panel_id), context);
+  }
 
-  for (const QString& name : layout->panels.keys())
-    _blocks.insert(name, new InfoBlock(layout->panels[name], context));
-
-  _full_update = true;
-
+  _prog = new QOpenGLShaderProgram(this);
   glGenBuffers(INFO_ATTR_COUNT, _vbo_ids);
   initShaders();
+
   initBlocks();
 }
 
@@ -29,8 +315,10 @@ InfoEngine::~InfoEngine() {
 }
 
 void InfoEngine::resize(RLILayout* layout) {
-  for (const QString& name : _blocks.keys())
-    _blocks[name]->resize(layout->panels[name]);
+  for (const QString& name : layout->panels.keys()) {
+    int panel_id = panels_map.at(name);
+    _blocks[panel_id]->resize(layout->panels[name], panel_texts_map.at(panel_id));
+  }
 
   initBlocks();  
 }
@@ -56,7 +344,7 @@ void InfoEngine::initShaders() {
 void InfoEngine::update(InfoFonts* fonts) {
   glEnable(GL_BLEND);
 
-  for (InfoBlock* block : _blocks)
+  for (InfoBlock* block: _blocks) {
     if (_full_update || block->needUpdate()) {
       block->fbo()->bind();
       _prog->bind();
@@ -76,6 +364,7 @@ void InfoEngine::update(InfoFonts* fonts) {
       _prog->release();
       block->fbo()->release();
     }
+  }
 
   _full_update = false;
 }
@@ -246,140 +535,142 @@ void InfoEngine::initBlocks() {
 
 
 void InfoEngine::initBlockGain() {
-  _blocks["gain"]->setText("text", RLI_STR_GAIN);
+  _blocks[RLI_PANEL_GAIN]->setText(RLI_PANEL_GAIN_TEXT_ID, RLI_STR_GAIN);
 }
 
 void InfoEngine::initBlockWater() {
-  _blocks["water"]->setText("text", RLI_STR_WATER);
+  _blocks[RLI_PANEL_WATER]->setText(RLI_PANEL_WATER_TEXT_ID, RLI_STR_WATER);
 }
 
 void InfoEngine::initBlockRain() {
-  _blocks["rain"]->setText("text", RLI_STR_RAIN);
+  _blocks[RLI_PANEL_RAIN]->setText(RLI_PANEL_RAIN_TEXT_ID, RLI_STR_RAIN);
 }
 
 void InfoEngine::initBlockApch() {
-  _blocks["apch"]->setText("text", RLI_STR_AFC);
+  _blocks[RLI_PANEL_APCH]->setText(RLI_PANEL_APCH_TEXT_ID, RLI_STR_AFC);
 }
 
 void InfoEngine::initBlockEmission() {
-  _blocks["emission"]->setText("text", RLI_STR_EMISSION);  
+  _blocks[RLI_PANEL_EMISSION]->setText(RLI_PANEL_EMISSION_TEXT_ID, RLI_STR_EMISSION);
 }
 
 void InfoEngine::updateGain(float gain) {
-  updateValueBar("gain", gain);
+  updateValueBar(RLI_PANEL_GAIN, gain);
 }
 
 void InfoEngine::updateWater(float water) {
-  updateValueBar("water", water);
+  updateValueBar(RLI_PANEL_WATER, water);
 }
 
 void InfoEngine::updateRain(float rain) {
-  updateValueBar("rain", rain);
+  updateValueBar(RLI_PANEL_RAIN, rain);
 }
 
 void InfoEngine::updateApch(float apch) {
-  updateValueBar("apch", apch);
+  updateValueBar(RLI_PANEL_APCH, apch);
 }
 
 void InfoEngine::updateEmission(float emission) {
-  updateValueBar("emission", emission);
+  updateValueBar(RLI_PANEL_EMISSION, emission);
 }
 
-void InfoEngine::updateValueBar(const QString& name, float value) {
-  int max_bar_width = _blocks[name]->geometry().width() - _blocks[name]->rectangles()["splitter"].geometry.x() - 2;
+void InfoEngine::updateValueBar(RLIPanel id, float value) {
+  int max_bar_width = _blocks[id]->geometry().width() - _blocks[id]->rectangles()["splitter"].geometry.x() - 2;
   int bar_width = (value / 255.0) * max_bar_width;
-  QRect bar = _blocks[name]->rectangles()["bar"].geometry;
+
+  QRect bar = _blocks[id]->rectangles()["bar"].geometry;
+
   bar.setWidth(bar_width);
-  _blocks[name]->setRect("bar", bar);
+  _blocks[id]->setRect("bar", bar);
 }
 
 
 
 void InfoEngine::initBlockLabel5() {
-  _blocks["label5"]->setText("text", RLI_STR_PP12p);
+  _blocks[RLI_PANEL_LABEL5]->setText(RLI_PANEL_LABEL5_TEXT_ID, RLI_STR_PP12p);
 }
 
 void InfoEngine::initBlockBand() {
-  _blocks["band"]->setText("text", RLI_STR_S_BAND);
+  _blocks[RLI_PANEL_BAND]->setText(RLI_PANEL_BAND_TEXT_ID, RLI_STR_S_BAND);
 }
 
 void InfoEngine::initBlockLabel1() {
-  _blocks["label1"]->setText("text", RLI_STR_NORTH);
+  _blocks[RLI_PANEL_LABEL1]->setText(RLI_PANEL_LABEL1_TEXT_ID, RLI_STR_NORTH);
 }
 
 void InfoEngine::initBlockLabel2() {
-  _blocks["label2"]->setText("text", RLI_STR_RM);
+  _blocks[RLI_PANEL_LABEL2]->setText(RLI_PANEL_LABEL2_TEXT_ID, RLI_STR_RM);
 }
 
 void InfoEngine::initBlockLabel3() {
-  _blocks["label3"]->setText("text", RLI_STR_WATER);
+  _blocks[RLI_PANEL_LABEL3]->setText(RLI_PANEL_LABEL3_TEXT_ID, RLI_STR_WATER);
 }
 
 void InfoEngine::initBlockLabel4() {
-  _blocks["label4"]->setText("text", RLI_STR_LOD);
+  _blocks[RLI_PANEL_LABEL4]->setText(RLI_PANEL_LABEL4_TEXT_ID, RLI_STR_LOD);
 }
 
 
 
 void InfoEngine::initBlockFps() {
-  _blocks["fps"]->setText("label", RLI_STR_FPS);
-  _blocks["fps"]->setText("value", QByteArray("0"));
+  _blocks[RLI_PANEL_FPS]->setText(RLI_PANEL_FPS_LABEL_TEXT_ID, RLI_STR_FPS);
+  _blocks[RLI_PANEL_FPS]->setText(RLI_PANEL_FPS_VALUE_TEXT_ID, QByteArray("0"));
 }
 
 void InfoEngine::setFps(int fps) {
-  _blocks["fps"]->setText("value", QString::number(fps).toLocal8Bit());
+  _blocks[RLI_PANEL_FPS]->setText(RLI_PANEL_FPS_VALUE_TEXT_ID, QString::number(fps).toLocal8Bit());
 }
 
 
 
 void InfoEngine::initBlockScale() {
-  _blocks["scale"]->setText("scale1", QByteArray("0.125"));
-  _blocks["scale"]->setText("slash", QByteArray("/"));
-  _blocks["scale"]->setText("scale2", QByteArray("0.025"));
-  _blocks["scale"]->setText("units", RLI_STR_NM);
+  _blocks[RLI_PANEL_SCALE]->setText(RLI_PANEL_SCALE_SCALE1_TEXT_ID, QByteArray("0.125"));
+  _blocks[RLI_PANEL_SCALE]->setText(RLI_PANEL_SCALE_SLASH_TEXT_ID, QByteArray("/"));
+  _blocks[RLI_PANEL_SCALE]->setText(RLI_PANEL_SCALE_SCALE2_TEXT_ID, QByteArray("0.025"));
+  _blocks[RLI_PANEL_SCALE]->setText(RLI_PANEL_SCALE_UNITS_TEXT_ID, RLI_STR_NM);
 }
 
 void InfoEngine::initBlockVn() {
-  _blocks["vn"]->setText("header", RLI_STR_EBL);
+  _blocks[RLI_PANEL_VN]->setText(RLI_PANEL_VN_HEADER_TEXT_ID, RLI_STR_EBL);
 
-  _blocks["vn"]->setText("table_0_0", RLI_STR_B);
-  _blocks["vn"]->setText("table_0_1", QByteArray("0.00"));
-  _blocks["vn"]->setText("table_0_2", RLI_STR_DEGREE_SIGN);
+  _blocks[RLI_PANEL_VN]->setText(RLI_PANEL_VN_TBL_0_0_TEXT_ID, RLI_STR_B);
+  _blocks[RLI_PANEL_VN]->setText(RLI_PANEL_VN_TBL_0_1_TEXT_ID, QByteArray("0.00"));
+  _blocks[RLI_PANEL_VN]->setText(RLI_PANEL_VN_TBL_0_2_TEXT_ID, RLI_STR_DEGREE_SIGN);
 
-  _blocks["vn"]->setText("table_1_0", RLI_STR_CU);
-  _blocks["vn"]->setText("table_1_1", QByteArray("0.00"));
-  _blocks["vn"]->setText("table_1_2", RLI_STR_GRAD_RB);
+  _blocks[RLI_PANEL_VN]->setText(RLI_PANEL_VN_TBL_1_0_TEXT_ID, RLI_STR_CU);
+  _blocks[RLI_PANEL_VN]->setText(RLI_PANEL_VN_TBL_1_1_TEXT_ID, QByteArray("0.00"));
+  _blocks[RLI_PANEL_VN]->setText(RLI_PANEL_VN_TBL_1_2_TEXT_ID, RLI_STR_GRAD_RB);
 }
 
 void InfoEngine::initBlockVd() {
-  _blocks["vd"]->setText("header", RLI_STR_VRM);
+  _blocks[RLI_PANEL_VD]->setText(RLI_PANEL_VD_HEADER_TEXT_ID, RLI_STR_VRM);
 
-  _blocks["vd"]->setText("table_0_0", QByteArray("0.00"));
-  _blocks["vd"]->setText("table_0_1", RLI_STR_NM);
+  _blocks[RLI_PANEL_VD]->setText(RLI_PANEL_VD_TBL_0_0_TEXT_ID, QByteArray("0.00"));
+  _blocks[RLI_PANEL_VD]->setText(RLI_PANEL_VD_TBL_0_1_TEXT_ID, RLI_STR_NM);
 }
 
 void InfoEngine::initBlockCourse() {
-  _blocks["course"]->setText("table_0_0", RLI_STR_GYRO_HDG);
-  _blocks["course"]->setText("table_0_1", QByteArray("0"));
-  _blocks["course"]->setText("table_0_2", RLI_STR_DEGREE_SIGN);
+  _blocks[RLI_PANEL_COURSE]->setText(RLI_PANEL_COURSE_TBL_0_0_TEXT_ID, RLI_STR_GYRO_HDG);
+  _blocks[RLI_PANEL_COURSE]->setText(RLI_PANEL_COURSE_TBL_0_1_TEXT_ID, QByteArray("0"));
+  _blocks[RLI_PANEL_COURSE]->setText(RLI_PANEL_COURSE_TBL_0_2_TEXT_ID, RLI_STR_DEGREE_SIGN);
 
-  _blocks["course"]->setText("table_1_0", RLI_STR_MAN_SPD);
-  _blocks["course"]->setText("table_1_1", QByteArray("0"));
-  _blocks["course"]->setText("table_1_2", RLI_STR_NM);
+  _blocks[RLI_PANEL_COURSE]->setText(RLI_PANEL_COURSE_TBL_1_0_TEXT_ID, RLI_STR_MAN_SPD);
+  _blocks[RLI_PANEL_COURSE]->setText(RLI_PANEL_COURSE_TBL_1_1_TEXT_ID, QByteArray("0"));
+  _blocks[RLI_PANEL_COURSE]->setText(RLI_PANEL_COURSE_TBL_1_2_TEXT_ID, RLI_STR_NM);
 }
 
 
 void InfoEngine::initBlockPosition() {
-  _blocks["position"]->setText("table_0_0", RLI_STR_LAT);
-  _blocks["position"]->setText("table_0_1", RLI_STR_BLANK);
+  _blocks[RLI_PANEL_POSITION]->setText(RLI_PANEL_POSITION_TBL_0_0_TEXT_ID, RLI_STR_LAT);
+  _blocks[RLI_PANEL_POSITION]->setText(RLI_PANEL_POSITION_TBL_0_1_TEXT_ID, RLI_STR_BLANK);
 
-  _blocks["position"]->setText("table_1_0", RLI_STR_LON);
-  _blocks["position"]->setText("table_1_1", RLI_STR_BLANK);
+  _blocks[RLI_PANEL_POSITION]->setText(RLI_PANEL_POSITION_TBL_1_0_TEXT_ID, RLI_STR_LON);
+  _blocks[RLI_PANEL_POSITION]->setText(RLI_PANEL_POSITION_TBL_1_1_TEXT_ID, RLI_STR_BLANK);
 }
 
 void InfoEngine::onPositionChanged(const QVector2D& position) {
-  _blocks["position"]->setText("table_0_1", QString::number(position.x(), 'd', 2).toLocal8Bit());
-  _blocks["position"]->setText("table_1_1", QString::number(position.y(), 'd', 2).toLocal8Bit());
+  _blocks[RLI_PANEL_POSITION]->setText(RLI_PANEL_POSITION_TBL_0_1_TEXT_ID, QString::number(position.x(), 'd', 2).toLocal8Bit());
+  _blocks[RLI_PANEL_POSITION]->setText(RLI_PANEL_POSITION_TBL_1_1_TEXT_ID, QString::number(position.y(), 'd', 2).toLocal8Bit());
 }
 
 
@@ -391,100 +682,100 @@ void InfoEngine::initBlockBlank() {
 
 
 void InfoEngine::initBlockClock() {
-  _blocks["clock"]->setText("label", RLI_STR_TIME);
-  _blocks["clock"]->setText("time", QTime::currentTime().toString().toLocal8Bit());
+  _blocks[RLI_PANEL_CLOCK]->setText(RLI_PANEL_CLOCK_LABEL_TEXT_ID, RLI_STR_TIME);
+  _blocks[RLI_PANEL_CLOCK]->setText(RLI_PANEL_CLOCK_TIME_TEXT_ID, QTime::currentTime().toString().toLocal8Bit());
 }
 
 void InfoEngine::secondChanged() {
-  _blocks["clock"]->setText("time", QTime::currentTime().toString().toLocal8Bit());
+  _blocks[RLI_PANEL_CLOCK]->setText(RLI_PANEL_CLOCK_TIME_TEXT_ID, QTime::currentTime().toString().toLocal8Bit());
 }
 
 
 
 void InfoEngine::initBlockDanger() {
-  _blocks["danger"]->setText("label", RLI_STR_DANGER_TRG);
+  _blocks[RLI_PANEL_DANGER]->setText(RLI_PANEL_DANGER_LABEL_TEXT_ID, RLI_STR_DANGER_TRG);
 }
 
 void InfoEngine::initBlockTails() {
-  _blocks["tails"]->setText("table_0_0", RLI_STR_TAILS);
-  _blocks["tails"]->setText("table_0_1", RLI_STR_OFF);
-  _blocks["tails"]->setText("table_0_2", RLI_STR_MIN);
+  _blocks[RLI_PANEL_TAILS]->setText(RLI_PANEL_TAILS_TBL_0_0_TEXT_ID, RLI_STR_TAILS);
+  _blocks[RLI_PANEL_TAILS]->setText(RLI_PANEL_TAILS_TBL_0_1_TEXT_ID, RLI_STR_OFF);
+  _blocks[RLI_PANEL_TAILS]->setText(RLI_PANEL_TAILS_TBL_0_2_TEXT_ID, RLI_STR_MIN);
 }
 
 void InfoEngine::initBlockDetails() {
-  _blocks["danger-details"]->setText("table_0_0", RLI_STR_CPA);
-  _blocks["danger-details"]->setText("table_0_1", QByteArray("0"));
-  _blocks["danger-details"]->setText("table_0_2", RLI_STR_NM);
+  _blocks[RLI_PANEL_DANGER_DETAILS]->setText(RLI_PANEL_DANGER_DETAILS_TBL_0_0_TEXT_ID, RLI_STR_CPA);
+  _blocks[RLI_PANEL_DANGER_DETAILS]->setText(RLI_PANEL_DANGER_DETAILS_TBL_0_1_TEXT_ID, QByteArray("0"));
+  _blocks[RLI_PANEL_DANGER_DETAILS]->setText(RLI_PANEL_DANGER_DETAILS_TBL_0_2_TEXT_ID, RLI_STR_NM);
 
-  _blocks["danger-details"]->setText("table_1_0", RLI_STR_TCPA_LIMIT);
-  _blocks["danger-details"]->setText("table_1_1", QByteArray("0"));
-  _blocks["danger-details"]->setText("table_1_2", RLI_STR_MIN);
+  _blocks[RLI_PANEL_DANGER_DETAILS]->setText(RLI_PANEL_DANGER_DETAILS_TBL_1_0_TEXT_ID, RLI_STR_TCPA_LIMIT);
+  _blocks[RLI_PANEL_DANGER_DETAILS]->setText(RLI_PANEL_DANGER_DETAILS_TBL_1_1_TEXT_ID, QByteArray("0"));
+  _blocks[RLI_PANEL_DANGER_DETAILS]->setText(RLI_PANEL_DANGER_DETAILS_TBL_1_2_TEXT_ID, RLI_STR_MIN);
 }
 
 void InfoEngine::initBlockVector() {
-  _blocks["vector"]->setText("table_0_0", RLI_STR_VECTOR);
-  _blocks["vector"]->setText("table_0_1", QByteArray("20"));
-  _blocks["vector"]->setText("table_0_2", RLI_STR_MIN);
+  _blocks[RLI_PANEL_VECTOR]->setText(RLI_PANEL_VECTOR_TBL_0_0_TEXT_ID, RLI_STR_VECTOR);
+  _blocks[RLI_PANEL_VECTOR]->setText(RLI_PANEL_VECTOR_TBL_0_1_TEXT_ID, QByteArray("20"));
+  _blocks[RLI_PANEL_VECTOR]->setText(RLI_PANEL_VECTOR_TBL_0_2_TEXT_ID, RLI_STR_MIN);
 }
 
 void InfoEngine::initBlockTargets() {
-  _blocks["targets"]->setText("header", RLI_STR_TRG_ALL);
-  _blocks["targets"]->setText("current-target", QByteArray("0"));
-  _blocks["targets"]->setText("target-count", QByteArray("0"));
+  _blocks[RLI_PANEL_TARGETS]->setText(RLI_PANEL_TARGETS_HEADER_TEXT_ID, RLI_STR_TRG_ALL);
+  _blocks[RLI_PANEL_TARGETS]->setText(RLI_PANEL_TARGETS_CURRENT_TEXT_ID, QByteArray("0"));
+  _blocks[RLI_PANEL_TARGETS]->setText(RLI_PANEL_TARGETS_COUNT_TEXT_ID, QByteArray("0"));
 
-  _blocks["targets"]->setText("table_0_0", RLI_STR_BEARING);
-  _blocks["targets"]->setText("table_0_1", QByteArray("0.00"));
-  _blocks["targets"]->setText("table_0_2", RLI_STR_DEGREE_SIGN);
+  _blocks[RLI_PANEL_TARGETS]->setText(RLI_PANEL_TARGETS_TBL_0_0_TEXT_ID, RLI_STR_BEARING);
+  _blocks[RLI_PANEL_TARGETS]->setText(RLI_PANEL_TARGETS_TBL_0_1_TEXT_ID, QByteArray("0.00"));
+  _blocks[RLI_PANEL_TARGETS]->setText(RLI_PANEL_TARGETS_TBL_0_2_TEXT_ID, RLI_STR_DEGREE_SIGN);
 
-  _blocks["targets"]->setText("table_1_0", RLI_STR_RANGE);
-  _blocks["targets"]->setText("table_1_1", QByteArray("0.00"));
-  _blocks["targets"]->setText("table_1_2", RLI_STR_NM);
+  _blocks[RLI_PANEL_TARGETS]->setText(RLI_PANEL_TARGETS_TBL_1_0_TEXT_ID, RLI_STR_RANGE);
+  _blocks[RLI_PANEL_TARGETS]->setText(RLI_PANEL_TARGETS_TBL_1_1_TEXT_ID, QByteArray("0.00"));
+  _blocks[RLI_PANEL_TARGETS]->setText(RLI_PANEL_TARGETS_TBL_1_2_TEXT_ID, RLI_STR_NM);
 
-  _blocks["targets"]->setText("table_2_0", RLI_STR_COURSE_W);
-  _blocks["targets"]->setText("table_2_1", QByteArray("0.00"));
-  _blocks["targets"]->setText("table_2_2", RLI_STR_DEGREE_SIGN);
+  _blocks[RLI_PANEL_TARGETS]->setText(RLI_PANEL_TARGETS_TBL_2_0_TEXT_ID, RLI_STR_COURSE_W);
+  _blocks[RLI_PANEL_TARGETS]->setText(RLI_PANEL_TARGETS_TBL_2_1_TEXT_ID, QByteArray("0.00"));
+  _blocks[RLI_PANEL_TARGETS]->setText(RLI_PANEL_TARGETS_TBL_2_2_TEXT_ID, RLI_STR_DEGREE_SIGN);
 
-  _blocks["targets"]->setText("table_3_0", RLI_STR_SPEED_W);
-  _blocks["targets"]->setText("table_3_1", QByteArray("0.00"));
-  _blocks["targets"]->setText("table_3_2", RLI_STR_KTS);
+  _blocks[RLI_PANEL_TARGETS]->setText(RLI_PANEL_TARGETS_TBL_3_0_TEXT_ID, RLI_STR_SPEED_W);
+  _blocks[RLI_PANEL_TARGETS]->setText(RLI_PANEL_TARGETS_TBL_3_1_TEXT_ID, QByteArray("0.00"));
+  _blocks[RLI_PANEL_TARGETS]->setText(RLI_PANEL_TARGETS_TBL_3_2_TEXT_ID, RLI_STR_KTS);
 
-  _blocks["targets"]->setText("table_4_0", RLI_STR_CPA);
-  _blocks["targets"]->setText("table_4_1", QByteArray("0.00"));
-  _blocks["targets"]->setText("table_4_2", RLI_STR_NM);
+  _blocks[RLI_PANEL_TARGETS]->setText(RLI_PANEL_TARGETS_TBL_4_0_TEXT_ID, RLI_STR_CPA);
+  _blocks[RLI_PANEL_TARGETS]->setText(RLI_PANEL_TARGETS_TBL_4_1_TEXT_ID, QByteArray("0.00"));
+  _blocks[RLI_PANEL_TARGETS]->setText(RLI_PANEL_TARGETS_TBL_4_2_TEXT_ID, RLI_STR_NM);
 
-  _blocks["targets"]->setText("table_5_0", RLI_STR_TCPA);
-  _blocks["targets"]->setText("table_5_1", QByteArray("0.00"));
-  _blocks["targets"]->setText("table_5_2", RLI_STR_MIN);
+  _blocks[RLI_PANEL_TARGETS]->setText(RLI_PANEL_TARGETS_TBL_5_0_TEXT_ID, RLI_STR_TCPA);
+  _blocks[RLI_PANEL_TARGETS]->setText(RLI_PANEL_TARGETS_TBL_5_1_TEXT_ID, QByteArray("0.00"));
+  _blocks[RLI_PANEL_TARGETS]->setText(RLI_PANEL_TARGETS_TBL_5_2_TEXT_ID, RLI_STR_MIN);
 
-  _blocks["targets"]->setText("table_6_0", RLI_STR_DCC);
-  _blocks["targets"]->setText("table_6_1", QByteArray("0.00"));
-  _blocks["targets"]->setText("table_6_2", RLI_STR_NM);
+  _blocks[RLI_PANEL_TARGETS]->setText(RLI_PANEL_TARGETS_TBL_6_0_TEXT_ID, RLI_STR_DCC);
+  _blocks[RLI_PANEL_TARGETS]->setText(RLI_PANEL_TARGETS_TBL_6_1_TEXT_ID, QByteArray("0.00"));
+  _blocks[RLI_PANEL_TARGETS]->setText(RLI_PANEL_TARGETS_TBL_6_2_TEXT_ID, RLI_STR_NM);
 
-  _blocks["targets"]->setText("table_7_0", RLI_STR_TCC);
-  _blocks["targets"]->setText("table_7_1", QByteArray("0.00"));
-  _blocks["targets"]->setText("table_7_2", RLI_STR_MIN);
+  _blocks[RLI_PANEL_TARGETS]->setText(RLI_PANEL_TARGETS_TBL_7_0_TEXT_ID, RLI_STR_TCC);
+  _blocks[RLI_PANEL_TARGETS]->setText(RLI_PANEL_TARGETS_TBL_7_1_TEXT_ID, QByteArray("0.00"));
+  _blocks[RLI_PANEL_TARGETS]->setText(RLI_PANEL_TARGETS_TBL_7_2_TEXT_ID, RLI_STR_MIN);
 }
 
 void InfoEngine::onTargetCountChanged(int count) {
-  _blocks["targets"]->setText("target-count", QString::number(count).toLocal8Bit());
+  _blocks[RLI_PANEL_TARGETS]->setText(RLI_PANEL_TARGETS_COUNT_TEXT_ID, QString::number(count).toLocal8Bit());
 }
 
 void InfoEngine::onSelectedTargetUpdated(const QString& tag, const RLITarget& trgt) {
-  _blocks["targets"]->setText("current-target", tag.toLocal8Bit());
+  _blocks[RLI_PANEL_TARGETS]->setText(RLI_PANEL_TARGETS_CURRENT_TEXT_ID, tag.toLocal8Bit());
 
-  _blocks["targets"]->setText("table_2_1", QString::number(trgt.course_grnd).left(6).toLatin1());
-  _blocks["targets"]->setText("table_3_1", QString::number(trgt.speed_grnd).left(6).toLatin1());
+  _blocks[RLI_PANEL_TARGETS]->setText(RLI_PANEL_TARGETS_TBL_2_1_TEXT_ID, QString::number(trgt.course_grnd).left(6).toLatin1());
+  _blocks[RLI_PANEL_TARGETS]->setText(RLI_PANEL_TARGETS_TBL_3_1_TEXT_ID, QString::number(trgt.speed_grnd).left(6).toLatin1());
 }
 
 
 void InfoEngine::initBlockCursor() {
-  _blocks["cursor"]->setText("header", RLI_STR_CURSOR);
+  _blocks[RLI_PANEL_CURSOR]->setText(RLI_PANEL_CURSOR_HEADER_TEXT_ID, RLI_STR_CURSOR);
 
-  _blocks["cursor"]->setText("table_0_0", RLI_STR_BEARING);
-  _blocks["cursor"]->setText("table_0_1", QByteArray("0.00"));
-  _blocks["cursor"]->setText("table_0_2", RLI_STR_DEGREE_SIGN);
+  _blocks[RLI_PANEL_CURSOR]->setText(RLI_PANEL_CURSOR_TBL_0_0_TEXT_ID, RLI_STR_BEARING);
+  _blocks[RLI_PANEL_CURSOR]->setText(RLI_PANEL_CURSOR_TBL_0_1_TEXT_ID, QByteArray("0.00"));
+  _blocks[RLI_PANEL_CURSOR]->setText(RLI_PANEL_CURSOR_TBL_0_2_TEXT_ID, RLI_STR_DEGREE_SIGN);
 
-  _blocks["cursor"]->setText("table_1_0", RLI_STR_RANGE);
-  _blocks["cursor"]->setText("table_1_1", QByteArray("0.00"));
-  _blocks["cursor"]->setText("table_1_2", RLI_STR_NM);
+  _blocks[RLI_PANEL_CURSOR]->setText(RLI_PANEL_CURSOR_TBL_1_0_TEXT_ID, RLI_STR_RANGE);
+  _blocks[RLI_PANEL_CURSOR]->setText(RLI_PANEL_CURSOR_TBL_1_1_TEXT_ID, QByteArray("0.00"));
+  _blocks[RLI_PANEL_CURSOR]->setText(RLI_PANEL_CURSOR_TBL_1_2_TEXT_ID, RLI_STR_NM);
 }

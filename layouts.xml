@@ -7,69 +7,69 @@
     <magnifier  pos="-10,155"     size="224x224" />
 
     <panels>
-      <panel name="gain" pos="4,4" size="151x21" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="gain" pos="4,4" size="151x21" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="1">
         <text name="text" rect="0x0x99x21" allign="center" font="F12X14B" color="0,252,252,255" />
         <rect name="splitter" rect="99x0x1x21" color="64,252,0,255" />
         <rect name="bar" rect="100x3x20x15" color="64,252,0,255" />
       </panel>
 
-      <panel name="water" pos="4,29" size="151x21" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="water" pos="4,29" size="151x21" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="1">
         <text name="text" rect="0x0x99x21" allign="center" font="F12X14B" color="0,252,252,255" />
         <rect name="splitter" rect="99x0x1x21" color="64,252,0,255" />
         <rect name="bar" rect="100x3x20x15" color="64,252,0,255" />
       </panel>
 
-      <panel name="rain" pos="4,54" size="151x21" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="rain" pos="4,54" size="151x21" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="1">
         <text name="text" rect="0x0x99x21" allign="center" font="F12X14B" color="0,252,252,255" />
         <rect name="splitter" rect="99x0x1x21" color="64,252,0,255" />
         <rect name="bar" rect="100x3x20x15" color="64,252,0,255" />
       </panel>
 
-      <panel name="apch" pos="4,79" size="151x21" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="apch" pos="4,79" size="151x21" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="1">
         <text name="text" rect="0x0x99x21" allign="center" font="F12X14B" color="0,252,252,255" />
         <rect name="splitter" rect="99x0x1x21" color="64,252,0,255" />
         <rect name="bar" rect="100x3x20x15" color="64,252,0,255" />
       </panel>
 
-      <panel name="emission" pos="159,4" size="163x21" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="emission" pos="159,4" size="163x21" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="1">
         <text name="text" rect="0x0x111x21" allign="center" font="F12X14B" color="0,252,252,255" />
         <rect name="splitter" rect="111x0x1x21" color="64,252,0,255" />
         <rect name="bar" rect="112x3x20x15" color="64,252,0,255" />
       </panel>
 
 
-      <panel name="label5" pos="4,104" size="102x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="label5" pos="4,104" size="102x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="1">
         <text name="text" rect="0x0x102x20" allign="center" font="F12X14B" color="0,252,252,255" />
       </panel>
 
-      <panel name="band" pos="4,128" size="102x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="band" pos="4,128" size="102x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="1">
         <text name="text" rect="0x0x102x20" allign="center" font="F12X14B" color="0,252,252,255" />
       </panel>
 
-      <panel name="label1" pos="-244,44" size="112x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="label1" pos="-244,44" size="112x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="1">
         <text name="text" rect="0x0x112x20" allign="center" font="F12X14B" color="0,252,252,255" />
       </panel>
 
-      <panel name="label2" pos="-244,68" size="112x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="label2" pos="-244,68" size="112x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="1">
         <text name="text" rect="0x0x112x20" allign="center" font="F12X14B" color="0,252,252,255" />
       </panel>
 
-      <panel name="label3" pos="-244,92" size="112x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="label3" pos="-244,92" size="112x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="1">
         <text name="text" rect="0x0x112x20" allign="center" font="F12X14B" color="0,252,252,255" />
       </panel>
 
-      <panel name="label4" pos="-244,-68" size="96x32" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="label4" pos="-244,-68" size="96x32" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="1">
         <text name="text" rect="0x0x96x32" allign="center" font="F16X28B" color="0,252,252,255" />
       </panel>
 
 
-      <panel name="fps" pos="4,152" size="132x22" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="fps" pos="4,152" size="132x22" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="2">
         <text name="label" rect="5x5x122x14" allign="left"   font="F12X14B"  color="0,252,252,255"   />  <!-- static text color -->
         <text name="value" rect="5x5x122x14" allign="right"  font="F12X14B"  color="252,252,84,255"  />  <!-- dynamic text color -->
       </panel>
 
       <!-- rect="left_x_top_x_width_x_height" -->
-      <panel name="scale" pos="-244,4" size="236x36" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="scale" pos="-244,4" size="236x36" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="4">
         <rect name="splitter" rect="174x0x1x36" color="64,252,0,255" />
         <!-- /////////////////////////////////////////////////////////// -->
         <text name="scale1" rect="5x5x80x28"    allign="center" font="F16X28B" color="252,252,84,255" />  <!-- dynamic text color -->
@@ -78,7 +78,7 @@
         <text name="units"  rect="176x12x56x14" allign="center" font="F14X14B" color="0,252,252,255"  />  <!-- static text color -->
       </panel>
 
-      <panel name="vn" pos="4,-4" size="140x66" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="vn" pos="4,-4" size="140x66" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="7">
         <text name="header" rect="0x6x132x14" allign="center" font="F12X14B" color="0,252,252,255" /> <!-- static text color -->
         <!-- /////////////////////////////////////////////////////////// -->
         <table name="table" row_count="2" top="28" row_height="18" >
@@ -88,7 +88,7 @@
         </table>
       </panel>
 
-      <panel name="vd" pos="-244,-4" size="140x52" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="vd" pos="-244,-4" size="140x52" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="3">
         <text name="header" rect="0x6x132x14" allign="center" font="F12X14B" color="0,252,252,255" /> <!-- static text color -->
         <!-- /////////////////////////////////////////////////////////// -->
         <table name="table" row_count="1" top="28" row_height="18" >
@@ -97,7 +97,7 @@
         </table>
       </panel>
 
-      <panel name="course" pos="-4,4" size="236x38" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="course" pos="-4,4" size="236x38" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="6">
         <table name="table" row_count="2" top="4" row_height="18" >
           <column left="4"    width="116" allign="left"   font="F12X14B" color="0,252,252,255"  />  <!-- static text color -->
           <column left="120"  width="60"  allign="right"  font="F12X14B" color="252,252,84,255" />  <!-- dynamic text color -->
@@ -105,26 +105,26 @@
         </table>
       </panel>
 
-      <panel name="position" pos="-4,46" size="236x38" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="position" pos="-4,46" size="236x38" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="4">
         <table name="table" row_count="2" top="4" row_height="18" >
           <column left="4"    width="116" allign="left"   font="F12X14B" color="0,252,252,255"  />  <!-- static text color -->
           <column left="120"  width="112" allign="right"  font="F12X14B" color="252,252,84,255" />  <!-- dynamic text color -->
         </table>
       </panel>
 
-      <panel name="blank" pos="-4,88" size="236x38" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="blank" pos="-4,88" size="236x38" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="0">
       </panel>
 
-      <panel name="clock" pos="-4,130" size="236x18" border_width="0" border_color="0,0,0,255" back_color="0,0,0,0" >
+      <panel name="clock" pos="-4,130" size="236x18" border_width="0" border_color="0,0,0,255" back_color="0,0,0,0" text_count="2">
         <text name="label"  rect="4x4x80x14"    allign="center" font="F12X14B" color="0,252,252,255"  />  <!-- static text color -->
         <text name="time"   rect="120x4x96x14"  allign="center" font="F12X14B" color="252,252,84,255" />  <!-- dynamic text color -->
       </panel>
 
-      <panel name="danger" pos="-4,-330" size="236x20" border_width="0" border_color="0,0,0,255" back_color="252,252,84,255" >
+      <panel name="danger" pos="-4,-330" size="236x20" border_width="0" border_color="0,0,0,255" back_color="252,252,84,255" text_count="1">
         <text name="label" rect="0x0x236x20" allign="center" font="F12X14B" color="0,0,0,255"  />
       </panel>
 
-      <panel name="tails" pos="-4,-306" size="236x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="tails" pos="-4,-306" size="236x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="3">
         <table name="table" row_count="1" top="3" row_height="18" >
           <column left="4"   width="116" allign="left"  font="F12X14B" color="0,252,252,255"  />  <!-- static text color -->
           <column left="120" width="60"  allign="right" font="F12X14B" color="252,252,84,255" />  <!-- dynamic text color -->
@@ -132,7 +132,7 @@
         </table>
       </panel>
 
-      <panel name="danger-details" pos="-4,-264" size="236x38" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="danger-details" pos="-4,-264" size="236x38" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="6">
         <table name="table" row_count="2" top="3" row_height="18" >
           <column left="4"   width="116" allign="left"  font="F12X14B" color="0,252,252,255"  />  <!-- static text color -->
           <column left="120" width="60"  allign="right" font="F12X14B" color="252,252,84,255" />  <!-- dynamic text color -->
@@ -140,7 +140,7 @@
         </table>
       </panel>
 
-      <panel name="vector" pos="-4,-240" size="236x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="vector" pos="-4,-240" size="236x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="3">
         <table name="table" row_count="1" top="3" row_height="18" >
           <column left="4"   width="116" allign="left"  font="F12X14B"  color="0,252,252,255"  />  <!-- static text color -->
           <column left="120" width="60"  allign="right" font="F12X14B"  color="252,252,84,255" />  <!-- dynamic text color -->
@@ -148,13 +148,13 @@
         </table>
       </panel>
 
-      <panel name="targets" pos="-4,-68" size="236x168" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="targets" pos="-4,-68" size="236x168" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="27">
         <rect name="header-middle" rect="118x0x1x20" color="64,252,0,255" />
         <rect name="header-bottom" rect="0x20x236x1" color="64,252,0,255" />
         <!-- /////////////////////////////////////////////////////////// -->
-        <text name="header"         rect="4x4x228x14" allign="left"   font="F12X14B" color="0,252,252,255"  />  <!-- static text color -->
-        <text name="current-target" rect="4x4x110x14" allign="right"  font="F12X14B" color="252,252,84,255" />  <!-- dynamic text color -->
-        <text name="target-count"   rect="4x4x228x14" allign="right"  font="F12X14B" color="252,252,84,255" />  <!-- dynamic text color -->
+        <text name="header"  rect="4x4x228x14" allign="left"   font="F12X14B" color="0,252,252,255"  />  <!-- static text color -->
+        <text name="current" rect="4x4x110x14" allign="right"  font="F12X14B" color="252,252,84,255" />  <!-- dynamic text color -->
+        <text name="count"   rect="4x4x228x14" allign="right"  font="F12X14B" color="252,252,84,255" />  <!-- dynamic text color -->
         <!-- /////////////////////////////////////////////////////////// -->
         <table name="table" row_count="8" top="24" row_height="18" >
           <column left="4"   width="116" allign="left"  font="F12X14B" color="0,252,252,255"  />  <!-- static text color -->
@@ -163,7 +163,7 @@
         </table>
       </panel>
 
-      <panel name="cursor" pos="-4,-4" size="236x60" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="cursor" pos="-4,-4" size="236x60" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="7">
         <text name="header" rect="0x4x236x14" allign="center" font="F12X14B" color="0,252,252,255"  />  <!-- static text color -->
         <!-- /////////////////////////////////////////////////////////// -->
         <table name="table" row_count="2" top="24" row_height="18" >
@@ -182,69 +182,69 @@
     <magnifier pos="-10,155" size="224x224" />
 
     <panels>
-      <panel name="gain" pos="4,4" size="151x21" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="gain" pos="4,4" size="151x21" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="1">
         <text name="text" rect="0x0x99x21" allign="center" font="F12X14B" color="0,252,252,255" />
         <rect name="splitter" rect="99x0x1x21" color="64,252,0,255" />
         <rect name="bar" rect="100x3x20x15" color="64,252,0,255" />
       </panel>
 
-      <panel name="water" pos="4,29" size="151x21" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="water" pos="4,29" size="151x21" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="1">
         <text name="text" rect="0x0x99x21" allign="center" font="F12X14B" color="0,252,252,255" />
         <rect name="splitter" rect="99x0x1x21" color="64,252,0,255" />
         <rect name="bar" rect="100x3x20x15" color="64,252,0,255" />
       </panel>
 
-      <panel name="rain" pos="4,54" size="151x21" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="rain" pos="4,54" size="151x21" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="1">
         <text name="text" rect="0x0x99x21" allign="center" font="F12X14B" color="0,252,252,255" />
         <rect name="splitter" rect="99x0x1x21" color="64,252,0,255" />
         <rect name="bar" rect="100x3x20x15" color="64,252,0,255" />
       </panel>
 
-      <panel name="apch" pos="4,79" size="151x21" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="apch" pos="4,79" size="151x21" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="1">
         <text name="text" rect="0x0x99x21" allign="center" font="F12X14B" color="0,252,252,255" />
         <rect name="splitter" rect="99x0x1x21" color="64,252,0,255" />
         <rect name="bar" rect="100x3x20x15" color="64,252,0,255" />
       </panel>
 
-      <panel name="emission" pos="159,4" size="163x21" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="emission" pos="159,4" size="163x21" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="1">
         <text name="text" rect="0x0x111x21" allign="center" font="F12X14B" color="0,252,252,255" />
         <rect name="splitter" rect="111x0x1x21" color="64,252,0,255" />
         <rect name="bar" rect="112x3x20x15" color="64,252,0,255" />
       </panel>
 
 
-      <panel name="label5" pos="4,104" size="102x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="label5" pos="4,104" size="102x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="1">
         <text name="text" rect="0x0x102x20" allign="center" font="F12X14B" color="0,252,252,255" />
       </panel>
 
-      <panel name="band" pos="4,128" size="102x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="band" pos="4,128" size="102x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="1">
         <text name="text" rect="0x0x102x20" allign="center" font="F12X14B" color="0,252,252,255" />
       </panel>
 
-      <panel name="label1" pos="-244,44" size="112x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="label1" pos="-244,44" size="112x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="1">
         <text name="text" rect="0x0x112x20" allign="center" font="F12X14B" color="0,252,252,255" />
       </panel>
 
-      <panel name="label2" pos="-244,68" size="112x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="label2" pos="-244,68" size="112x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="1">
         <text name="text" rect="0x0x112x20" allign="center" font="F12X14B" color="0,252,252,255" />
       </panel>
 
-      <panel name="label3" pos="-244,92" size="112x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="label3" pos="-244,92" size="112x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="1">
         <text name="text" rect="0x0x112x20" allign="center" font="F12X14B" color="0,252,252,255" />
       </panel>
 
-      <panel name="label4" pos="-244,-68" size="96x32" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="label4" pos="-244,-68" size="96x32" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="1">
         <text name="text" rect="0x0x96x32" allign="center" font="F16X28B" color="0,252,252,255" />
       </panel>
 
 
-      <panel name="fps" pos="4,152" size="132x22" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="fps" pos="4,152" size="132x22" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="2">
         <text name="label" rect="5x5x122x14" allign="left"   font="F12X14B"  color="0,252,252,255"   />  <!-- static text color -->
         <text name="value" rect="5x5x122x14" allign="right"  font="F12X14B"  color="252,252,84,255"  />  <!-- dynamic text color -->
       </panel>
 
       <!-- rect="left_x_top_x_width_x_height" -->
-      <panel name="scale" pos="-244,4" size="236x36" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="scale" pos="-244,4" size="236x36" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="4">
         <rect name="splitter" rect="174x0x1x36" color="64,252,0,255" />
         <!-- /////////////////////////////////////////////////////////// -->
         <text name="scale1" rect="5x5x80x28"    allign="center" font="F16X28B" color="252,252,84,255" />  <!-- dynamic text color -->
@@ -253,7 +253,7 @@
         <text name="units"  rect="176x12x56x14" allign="center" font="F14X14B" color="0,252,252,255"  />  <!-- static text color -->
       </panel>
 
-      <panel name="vn" pos="4,-4" size="140x66" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="vn" pos="4,-4" size="140x66" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="7">
         <text name="header" rect="0x6x132x14" allign="center" font="F12X14B" color="0,252,252,255" /> <!-- static text color -->
         <!-- /////////////////////////////////////////////////////////// -->
         <table name="table" row_count="2" top="28" row_height="18" >
@@ -263,7 +263,7 @@
         </table>
       </panel>
 
-      <panel name="vd" pos="-244,-4" size="140x52" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="vd" pos="-244,-4" size="140x52" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="3">
         <text name="header" rect="0x6x132x14" allign="center" font="F12X14B" color="0,252,252,255" /> <!-- static text color -->
         <!-- /////////////////////////////////////////////////////////// -->
         <table name="table" row_count="1" top="28" row_height="18" >
@@ -272,7 +272,7 @@
         </table>
       </panel>
 
-      <panel name="course" pos="-4,4" size="236x38" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="course" pos="-4,4" size="236x38" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="6">
         <table name="table" row_count="2" top="4" row_height="18" >
           <column left="4"    width="116" allign="left"   font="F12X14B" color="0,252,252,255"  />  <!-- static text color -->
           <column left="120"  width="60"  allign="right"  font="F12X14B" color="252,252,84,255" />  <!-- dynamic text color -->
@@ -280,26 +280,26 @@
         </table>
       </panel>
 
-      <panel name="position" pos="-4,46" size="236x38" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="position" pos="-4,46" size="236x38" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="4">
         <table name="table" row_count="2" top="4" row_height="18" >
           <column left="4"    width="116" allign="left"   font="F12X14B" color="0,252,252,255"  />  <!-- static text color -->
           <column left="120"  width="112" allign="right"  font="F12X14B" color="252,252,84,255" />  <!-- dynamic text color -->
         </table>
       </panel>
 
-      <panel name="blank" pos="-4,88" size="236x38" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="blank" pos="-4,88" size="236x38" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="0">
       </panel>
 
-      <panel name="clock" pos="-4,130" size="236x18" border_width="0" border_color="0,0,0,255" back_color="0,0,0,0" >
+      <panel name="clock" pos="-4,130" size="236x18" border_width="0" border_color="0,0,0,255" back_color="0,0,0,0" text_count="2">
         <text name="label"  rect="4x4x80x14"    allign="center" font="F12X14B" color="0,252,252,255"  />  <!-- static text color -->
         <text name="time"   rect="120x4x96x14"  allign="center" font="F12X14B" color="252,252,84,255" />  <!-- dynamic text color -->
       </panel>
 
-      <panel name="danger" pos="-4,-330" size="236x20" border_width="0" border_color="0,0,0,255" back_color="252,252,84,255" >
+      <panel name="danger" pos="-4,-330" size="236x20" border_width="0" border_color="0,0,0,255" back_color="252,252,84,255" text_count="1">
         <text name="label" rect="0x0x236x20" allign="center" font="F12X14B" color="0,0,0,255"  />
       </panel>
 
-      <panel name="tails" pos="-4,-306" size="236x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="tails" pos="-4,-306" size="236x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="3">
         <table name="table" row_count="1" top="3" row_height="18" >
           <column left="4"   width="116" allign="left"  font="F12X14B" color="0,252,252,255"  />  <!-- static text color -->
           <column left="120" width="60"  allign="right" font="F12X14B" color="252,252,84,255" />  <!-- dynamic text color -->
@@ -307,7 +307,7 @@
         </table>
       </panel>
 
-      <panel name="danger-details" pos="-4,-264" size="236x38" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="danger-details" pos="-4,-264" size="236x38" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="6">
         <table name="table" row_count="2" top="3" row_height="18" >
           <column left="4"   width="116" allign="left"  font="F12X14B" color="0,252,252,255"  />  <!-- static text color -->
           <column left="120" width="60"  allign="right" font="F12X14B" color="252,252,84,255" />  <!-- dynamic text color -->
@@ -315,7 +315,7 @@
         </table>
       </panel>
 
-      <panel name="vector" pos="-4,-240" size="236x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="vector" pos="-4,-240" size="236x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="3">
         <table name="table" row_count="1" top="3" row_height="18" >
           <column left="4"   width="116" allign="left"  font="F12X14B"  color="0,252,252,255"  />  <!-- static text color -->
           <column left="120" width="60"  allign="right" font="F12X14B"  color="252,252,84,255" />  <!-- dynamic text color -->
@@ -323,13 +323,13 @@
         </table>
       </panel>
 
-      <panel name="targets" pos="-4,-68" size="236x168" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="targets" pos="-4,-68" size="236x168" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="27">
         <rect name="header-middle" rect="118x0x1x20" color="64,252,0,255" />
         <rect name="header-bottom" rect="0x20x236x1" color="64,252,0,255" />
         <!-- /////////////////////////////////////////////////////////// -->
-        <text name="header"         rect="4x4x228x14" allign="left"   font="F12X14B" color="0,252,252,255"  />  <!-- static text color -->
-        <text name="current-target" rect="4x4x110x14" allign="right"  font="F12X14B" color="252,252,84,255" />  <!-- dynamic text color -->
-        <text name="target-count"   rect="4x4x228x14" allign="right"  font="F12X14B" color="252,252,84,255" />  <!-- dynamic text color -->
+        <text name="header"  rect="4x4x228x14" allign="left"   font="F12X14B" color="0,252,252,255"  />  <!-- static text color -->
+        <text name="current" rect="4x4x110x14" allign="right"  font="F12X14B" color="252,252,84,255" />  <!-- dynamic text color -->
+        <text name="count"   rect="4x4x228x14" allign="right"  font="F12X14B" color="252,252,84,255" />  <!-- dynamic text color -->
         <!-- /////////////////////////////////////////////////////////// -->
         <table name="table" row_count="8" top="24" row_height="18" >
           <column left="4"   width="116" allign="left"  font="F12X14B" color="0,252,252,255"  />  <!-- static text color -->
@@ -338,7 +338,7 @@
         </table>
       </panel>
 
-      <panel name="cursor" pos="-4,-4" size="236x60" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="cursor" pos="-4,-4" size="236x60" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="7">
         <text name="header" rect="0x4x236x14" allign="center" font="F12X14B" color="0,252,252,255"  />  <!-- static text color -->
         <!-- /////////////////////////////////////////////////////////// -->
         <table name="table" row_count="2" top="24" row_height="18" >
@@ -356,69 +356,69 @@
     <magnifier pos="-10,155" size="224x224" />
 
     <panels>
-      <panel name="gain" pos="4,4" size="151x21" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="gain" pos="4,4" size="151x21" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="1">
         <text name="text" rect="0x0x99x21" allign="center" font="F12X14B" color="0,252,252,255" />
         <rect name="splitter" rect="99x0x1x21" color="64,252,0,255" />
         <rect name="bar" rect="100x3x20x15" color="64,252,0,255" />
       </panel>
 
-      <panel name="water" pos="4,29" size="151x21" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="water" pos="4,29" size="151x21" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="1">
         <text name="text" rect="0x0x99x21" allign="center" font="F12X14B" color="0,252,252,255" />
         <rect name="splitter" rect="99x0x1x21" color="64,252,0,255" />
         <rect name="bar" rect="100x3x20x15" color="64,252,0,255" />
       </panel>
 
-      <panel name="rain" pos="4,54" size="151x21" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="rain" pos="4,54" size="151x21" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="1">
         <text name="text" rect="0x0x99x21" allign="center" font="F12X14B" color="0,252,252,255" />
         <rect name="splitter" rect="99x0x1x21" color="64,252,0,255" />
         <rect name="bar" rect="100x3x20x15" color="64,252,0,255" />
       </panel>
 
-      <panel name="apch" pos="4,79" size="151x21" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="apch" pos="4,79" size="151x21" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="1">
         <text name="text" rect="0x0x99x21" allign="center" font="F12X14B" color="0,252,252,255" />
         <rect name="splitter" rect="99x0x1x21" color="64,252,0,255" />
         <rect name="bar" rect="100x3x20x15" color="64,252,0,255" />
       </panel>
 
-      <panel name="emission" pos="159,4" size="163x21" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="emission" pos="159,4" size="163x21" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="1">
         <text name="text" rect="0x0x111x21" allign="center" font="F12X14B" color="0,252,252,255" />
         <rect name="splitter" rect="111x0x1x21" color="64,252,0,255" />
         <rect name="bar" rect="112x3x20x15" color="64,252,0,255" />
       </panel>
 
 
-      <panel name="label5" pos="4,104" size="102x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="label5" pos="4,104" size="102x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="1">
         <text name="text" rect="0x0x102x20" allign="center" font="F12X14B" color="0,252,252,255" />
       </panel>
 
-      <panel name="band" pos="4,128" size="102x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="band" pos="4,128" size="102x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="1">
         <text name="text" rect="0x0x102x20" allign="center" font="F12X14B" color="0,252,252,255" />
       </panel>
 
-      <panel name="label1" pos="-244,44" size="112x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="label1" pos="-244,44" size="112x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="1">
         <text name="text" rect="0x0x112x20" allign="center" font="F12X14B" color="0,252,252,255" />
       </panel>
 
-      <panel name="label2" pos="-244,68" size="112x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="label2" pos="-244,68" size="112x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="1">
         <text name="text" rect="0x0x112x20" allign="center" font="F12X14B" color="0,252,252,255" />
       </panel>
 
-      <panel name="label3" pos="-244,92" size="112x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="label3" pos="-244,92" size="112x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="1">
         <text name="text" rect="0x0x112x20" allign="center" font="F12X14B" color="0,252,252,255" />
       </panel>
 
-      <panel name="label4" pos="-244,-68" size="96x32" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="label4" pos="-244,-68" size="96x32" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="1">
         <text name="text" rect="0x0x96x32" allign="center" font="F16X28B" color="0,252,252,255" />
       </panel>
 
 
-      <panel name="fps" pos="4,152" size="132x22" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="fps" pos="4,152" size="132x22" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="2">
         <text name="label" rect="5x5x122x14" allign="left"   font="F12X14B"  color="0,252,252,255"   />  <!-- static text color -->
         <text name="value" rect="5x5x122x14" allign="right"  font="F12X14B"  color="252,252,84,255"  />  <!-- dynamic text color -->
       </panel>
 
       <!-- rect="left_x_top_x_width_x_height" -->
-      <panel name="scale" pos="-244,4" size="236x36" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="scale" pos="-244,4" size="236x36" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="4">
         <rect name="splitter" rect="174x0x1x36" color="64,252,0,255" />
         <!-- /////////////////////////////////////////////////////////// -->
         <text name="scale1" rect="5x5x80x28"    allign="center" font="F16X28B" color="252,252,84,255" />  <!-- dynamic text color -->
@@ -427,7 +427,7 @@
         <text name="units"  rect="176x12x56x14" allign="center" font="F14X14B" color="0,252,252,255"  />  <!-- static text color -->
       </panel>
 
-      <panel name="vn" pos="4,-4" size="140x66" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="vn" pos="4,-4" size="140x66" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="7">
         <text name="header" rect="0x6x132x14" allign="center" font="F12X14B" color="0,252,252,255" /> <!-- static text color -->
         <!-- /////////////////////////////////////////////////////////// -->
         <table name="table" row_count="2" top="28" row_height="18" >
@@ -437,7 +437,7 @@
         </table>
       </panel>
 
-      <panel name="vd" pos="-244,-4" size="140x52" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="vd" pos="-244,-4" size="140x52" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="3">
         <text name="header" rect="0x6x132x14" allign="center" font="F12X14B" color="0,252,252,255" /> <!-- static text color -->
         <!-- /////////////////////////////////////////////////////////// -->
         <table name="table" row_count="1" top="28" row_height="18" >
@@ -446,7 +446,7 @@
         </table>
       </panel>
 
-      <panel name="course" pos="-4,4" size="236x38" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="course" pos="-4,4" size="236x38" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="6">
         <table name="table" row_count="2" top="4" row_height="18" >
           <column left="4"    width="116" allign="left"   font="F12X14B" color="0,252,252,255"  />  <!-- static text color -->
           <column left="120"  width="60"  allign="right"  font="F12X14B" color="252,252,84,255" />  <!-- dynamic text color -->
@@ -454,26 +454,26 @@
         </table>
       </panel>
 
-      <panel name="position" pos="-4,46" size="236x38" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="position" pos="-4,46" size="236x38" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="4">
         <table name="table" row_count="2" top="4" row_height="18" >
           <column left="4"    width="116" allign="left"   font="F12X14B" color="0,252,252,255"  />  <!-- static text color -->
           <column left="120"  width="112" allign="right"  font="F12X14B" color="252,252,84,255" />  <!-- dynamic text color -->
         </table>
       </panel>
 
-      <panel name="blank" pos="-4,88" size="236x38" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="blank" pos="-4,88" size="236x38" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="0">
       </panel>
 
-      <panel name="clock" pos="-4,130" size="236x18" border_width="0" border_color="0,0,0,255" back_color="0,0,0,0" >
+      <panel name="clock" pos="-4,130" size="236x18" border_width="0" border_color="0,0,0,255" back_color="0,0,0,0" text_count="2">
         <text name="label"  rect="4x4x80x14"    allign="center" font="F12X14B" color="0,252,252,255"  />  <!-- static text color -->
         <text name="time"   rect="120x4x96x14"  allign="center" font="F12X14B" color="252,252,84,255" />  <!-- dynamic text color -->
       </panel>
 
-      <panel name="danger" pos="-4,-330" size="236x20" border_width="0" border_color="0,0,0,255" back_color="252,252,84,255" >
+      <panel name="danger" pos="-4,-330" size="236x20" border_width="0" border_color="0,0,0,255" back_color="252,252,84,255" text_count="1">
         <text name="label" rect="0x0x236x20" allign="center" font="F12X14B" color="0,0,0,255"  />
       </panel>
 
-      <panel name="tails" pos="-4,-306" size="236x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="tails" pos="-4,-306" size="236x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="3">
         <table name="table" row_count="1" top="3" row_height="18" >
           <column left="4"   width="116" allign="left"  font="F12X14B" color="0,252,252,255"  />  <!-- static text color -->
           <column left="120" width="60"  allign="right" font="F12X14B" color="252,252,84,255" />  <!-- dynamic text color -->
@@ -481,7 +481,7 @@
         </table>
       </panel>
 
-      <panel name="danger-details" pos="-4,-264" size="236x38" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="danger-details" pos="-4,-264" size="236x38" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="6">
         <table name="table" row_count="2" top="3" row_height="18" >
           <column left="4"   width="116" allign="left"  font="F12X14B" color="0,252,252,255"  />  <!-- static text color -->
           <column left="120" width="60"  allign="right" font="F12X14B" color="252,252,84,255" />  <!-- dynamic text color -->
@@ -489,7 +489,7 @@
         </table>
       </panel>
 
-      <panel name="vector" pos="-4,-240" size="236x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="vector" pos="-4,-240" size="236x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="3">
         <table name="table" row_count="1" top="3" row_height="18" >
           <column left="4"   width="116" allign="left"  font="F12X14B"  color="0,252,252,255"  />  <!-- static text color -->
           <column left="120" width="60"  allign="right" font="F12X14B"  color="252,252,84,255" />  <!-- dynamic text color -->
@@ -497,13 +497,13 @@
         </table>
       </panel>
 
-      <panel name="targets" pos="-4,-68" size="236x168" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="targets" pos="-4,-68" size="236x168" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="27">
         <rect name="header-middle" rect="118x0x1x20" color="64,252,0,255" />
         <rect name="header-bottom" rect="0x20x236x1" color="64,252,0,255" />
         <!-- /////////////////////////////////////////////////////////// -->
-        <text name="header"         rect="4x4x228x14" allign="left"   font="F12X14B" color="0,252,252,255"  />  <!-- static text color -->
-        <text name="current-target" rect="4x4x110x14" allign="right"  font="F12X14B" color="252,252,84,255" />  <!-- dynamic text color -->
-        <text name="target-count"   rect="4x4x228x14" allign="right"  font="F12X14B" color="252,252,84,255" />  <!-- dynamic text color -->
+        <text name="header"  rect="4x4x228x14" allign="left"   font="F12X14B" color="0,252,252,255"  />  <!-- static text color -->
+        <text name="current" rect="4x4x110x14" allign="right"  font="F12X14B" color="252,252,84,255" />  <!-- dynamic text color -->
+        <text name="count"   rect="4x4x228x14" allign="right"  font="F12X14B" color="252,252,84,255" />  <!-- dynamic text color -->
         <!-- /////////////////////////////////////////////////////////// -->
         <table name="table" row_count="8" top="24" row_height="18" >
           <column left="4"   width="116" allign="left"  font="F12X14B" color="0,252,252,255"  />  <!-- static text color -->
@@ -512,7 +512,7 @@
         </table>
       </panel>
 
-      <panel name="cursor" pos="-4,-4" size="236x60" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="cursor" pos="-4,-4" size="236x60" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="7">
         <text name="header" rect="0x4x236x14" allign="center" font="F12X14B" color="0,252,252,255"  />  <!-- static text color -->
         <!-- /////////////////////////////////////////////////////////// -->
         <table name="table" row_count="2" top="24" row_height="18" >
@@ -530,69 +530,69 @@
     <magnifier pos="-10,155" size="224x224" />
 
     <panels>
-      <panel name="gain" pos="4,4" size="151x21" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="gain" pos="4,4" size="151x21" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="1">
         <text name="text" rect="0x0x99x21" allign="center" font="F12X14B" color="0,252,252,255" />
         <rect name="splitter" rect="99x0x1x21" color="64,252,0,255" />
         <rect name="bar" rect="100x3x20x15" color="64,252,0,255" />
       </panel>
 
-      <panel name="water" pos="4,29" size="151x21" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="water" pos="4,29" size="151x21" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="1">
         <text name="text" rect="0x0x99x21" allign="center" font="F12X14B" color="0,252,252,255" />
         <rect name="splitter" rect="99x0x1x21" color="64,252,0,255" />
         <rect name="bar" rect="100x3x20x15" color="64,252,0,255" />
       </panel>
 
-      <panel name="rain" pos="4,54" size="151x21" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="rain" pos="4,54" size="151x21" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="1">
         <text name="text" rect="0x0x99x21" allign="center" font="F12X14B" color="0,252,252,255" />
         <rect name="splitter" rect="99x0x1x21" color="64,252,0,255" />
         <rect name="bar" rect="100x3x20x15" color="64,252,0,255" />
       </panel>
 
-      <panel name="apch" pos="4,79" size="151x21" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="apch" pos="4,79" size="151x21" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="1">
         <text name="text" rect="0x0x99x21" allign="center" font="F12X14B" color="0,252,252,255" />
         <rect name="splitter" rect="99x0x1x21" color="64,252,0,255" />
         <rect name="bar" rect="100x3x20x15" color="64,252,0,255" />
       </panel>
 
-      <panel name="emission" pos="159,4" size="163x21" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="emission" pos="159,4" size="163x21" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="1">
         <text name="text" rect="0x0x111x21" allign="center" font="F12X14B" color="0,252,252,255" />
         <rect name="splitter" rect="111x0x1x21" color="64,252,0,255" />
         <rect name="bar" rect="112x3x20x15" color="64,252,0,255" />
       </panel>
 
 
-      <panel name="label5" pos="4,104" size="102x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="label5" pos="4,104" size="102x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="1">
         <text name="text" rect="0x0x102x20" allign="center" font="F12X14B" color="0,252,252,255" />
       </panel>
 
-      <panel name="band" pos="4,128" size="102x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="band" pos="4,128" size="102x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="1">
         <text name="text" rect="0x0x102x20" allign="center" font="F12X14B" color="0,252,252,255" />
       </panel>
 
-      <panel name="label1" pos="-244,44" size="112x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="label1" pos="-244,44" size="112x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="1">
         <text name="text" rect="0x0x112x20" allign="center" font="F12X14B" color="0,252,252,255" />
       </panel>
 
-      <panel name="label2" pos="-244,68" size="112x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="label2" pos="-244,68" size="112x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="1">
         <text name="text" rect="0x0x112x20" allign="center" font="F12X14B" color="0,252,252,255" />
       </panel>
 
-      <panel name="label3" pos="-244,92" size="112x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="label3" pos="-244,92" size="112x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="1">
         <text name="text" rect="0x0x112x20" allign="center" font="F12X14B" color="0,252,252,255" />
       </panel>
 
-      <panel name="label4" pos="-244,-68" size="96x32" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="label4" pos="-244,-68" size="96x32" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="1">
         <text name="text" rect="0x0x96x32" allign="center" font="F16X28B" color="0,252,252,255" />
       </panel>
 
 
-      <panel name="fps" pos="4,672" size="132x22" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="fps" pos="4,152" size="132x22" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="2">
         <text name="label" rect="5x5x122x14" allign="left"   font="F12X14B"  color="0,252,252,255"   />  <!-- static text color -->
         <text name="value" rect="5x5x122x14" allign="right"  font="F12X14B"  color="252,252,84,255"  />  <!-- dynamic text color -->
       </panel>
 
       <!-- rect="left_x_top_x_width_x_height" -->
-      <panel name="scale" pos="-244,4" size="236x36" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="scale" pos="-244,4" size="236x36" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="4">
         <rect name="splitter" rect="174x0x1x36" color="64,252,0,255" />
         <!-- /////////////////////////////////////////////////////////// -->
         <text name="scale1" rect="5x5x80x28"    allign="center" font="F16X28B" color="252,252,84,255" />  <!-- dynamic text color -->
@@ -601,7 +601,7 @@
         <text name="units"  rect="176x12x56x14" allign="center" font="F14X14B" color="0,252,252,255"  />  <!-- static text color -->
       </panel>
 
-      <panel name="vn" pos="4,-4" size="140x66" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="vn" pos="4,-4" size="140x66" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="7">
         <text name="header" rect="0x6x132x14" allign="center" font="F12X14B" color="0,252,252,255" /> <!-- static text color -->
         <!-- /////////////////////////////////////////////////////////// -->
         <table name="table" row_count="2" top="28" row_height="18" >
@@ -611,7 +611,7 @@
         </table>
       </panel>
 
-      <panel name="vd" pos="-244,-4" size="140x52" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="vd" pos="-244,-4" size="140x52" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="3">
         <text name="header" rect="0x6x132x14" allign="center" font="F12X14B" color="0,252,252,255" /> <!-- static text color -->
         <!-- /////////////////////////////////////////////////////////// -->
         <table name="table" row_count="1" top="28" row_height="18" >
@@ -620,7 +620,7 @@
         </table>
       </panel>
 
-      <panel name="course" pos="-4,4" size="236x38" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="course" pos="-4,4" size="236x38" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="6">
         <table name="table" row_count="2" top="4" row_height="18" >
           <column left="4"    width="116" allign="left"   font="F12X14B" color="0,252,252,255"  />  <!-- static text color -->
           <column left="120"  width="60"  allign="right"  font="F12X14B" color="252,252,84,255" />  <!-- dynamic text color -->
@@ -628,26 +628,26 @@
         </table>
       </panel>
 
-      <panel name="position" pos="-4,46" size="236x38" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="position" pos="-4,46" size="236x38" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="4">
         <table name="table" row_count="2" top="4" row_height="18" >
           <column left="4"    width="116" allign="left"   font="F12X14B" color="0,252,252,255"  />  <!-- static text color -->
           <column left="120"  width="112" allign="right"  font="F12X14B" color="252,252,84,255" />  <!-- dynamic text color -->
         </table>
       </panel>
 
-      <panel name="blank" pos="-4,88" size="236x38" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="blank" pos="-4,88" size="236x38" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="0">
       </panel>
 
-      <panel name="clock" pos="-4,130" size="236x18" border_width="0" border_color="0,0,0,255" back_color="0,0,0,0" >
+      <panel name="clock" pos="-4,130" size="236x18" border_width="0" border_color="0,0,0,255" back_color="0,0,0,0" text_count="2">
         <text name="label"  rect="4x4x80x14"    allign="center" font="F12X14B" color="0,252,252,255"  />  <!-- static text color -->
         <text name="time"   rect="120x4x96x14"  allign="center" font="F12X14B" color="252,252,84,255" />  <!-- dynamic text color -->
       </panel>
 
-      <panel name="danger" pos="-4,-330" size="236x20" border_width="0" border_color="0,0,0,255" back_color="252,252,84,255" >
+      <panel name="danger" pos="-4,-330" size="236x20" border_width="0" border_color="0,0,0,255" back_color="252,252,84,255" text_count="1">
         <text name="label" rect="0x0x236x20" allign="center" font="F12X14B" color="0,0,0,255"  />
       </panel>
 
-      <panel name="tails" pos="-4,-306" size="236x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="tails" pos="-4,-306" size="236x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="3">
         <table name="table" row_count="1" top="3" row_height="18" >
           <column left="4"   width="116" allign="left"  font="F12X14B" color="0,252,252,255"  />  <!-- static text color -->
           <column left="120" width="60"  allign="right" font="F12X14B" color="252,252,84,255" />  <!-- dynamic text color -->
@@ -655,7 +655,7 @@
         </table>
       </panel>
 
-      <panel name="danger-details" pos="-4,-264" size="236x38" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="danger-details" pos="-4,-264" size="236x38" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="6">
         <table name="table" row_count="2" top="3" row_height="18" >
           <column left="4"   width="116" allign="left"  font="F12X14B" color="0,252,252,255"  />  <!-- static text color -->
           <column left="120" width="60"  allign="right" font="F12X14B" color="252,252,84,255" />  <!-- dynamic text color -->
@@ -663,7 +663,7 @@
         </table>
       </panel>
 
-      <panel name="vector" pos="-4,-240" size="236x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="vector" pos="-4,-240" size="236x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="3">
         <table name="table" row_count="1" top="3" row_height="18" >
           <column left="4"   width="116" allign="left"  font="F12X14B"  color="0,252,252,255"  />  <!-- static text color -->
           <column left="120" width="60"  allign="right" font="F12X14B"  color="252,252,84,255" />  <!-- dynamic text color -->
@@ -671,13 +671,13 @@
         </table>
       </panel>
 
-      <panel name="targets" pos="-4,-68" size="236x168" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="targets" pos="-4,-68" size="236x168" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="27">
         <rect name="header-middle" rect="118x0x1x20" color="64,252,0,255" />
         <rect name="header-bottom" rect="0x20x236x1" color="64,252,0,255" />
         <!-- /////////////////////////////////////////////////////////// -->
-        <text name="header"         rect="4x4x228x14" allign="left"   font="F12X14B" color="0,252,252,255"  />  <!-- static text color -->
-        <text name="current-target" rect="4x4x110x14" allign="right"  font="F12X14B" color="252,252,84,255" />  <!-- dynamic text color -->
-        <text name="target-count"   rect="4x4x228x14" allign="right"  font="F12X14B" color="252,252,84,255" />  <!-- dynamic text color -->
+        <text name="header"  rect="4x4x228x14" allign="left"   font="F12X14B" color="0,252,252,255"  />  <!-- static text color -->
+        <text name="current" rect="4x4x110x14" allign="right"  font="F12X14B" color="252,252,84,255" />  <!-- dynamic text color -->
+        <text name="count"   rect="4x4x228x14" allign="right"  font="F12X14B" color="252,252,84,255" />  <!-- dynamic text color -->
         <!-- /////////////////////////////////////////////////////////// -->
         <table name="table" row_count="8" top="24" row_height="18" >
           <column left="4"   width="116" allign="left"  font="F12X14B" color="0,252,252,255"  />  <!-- static text color -->
@@ -686,7 +686,7 @@
         </table>
       </panel>
 
-      <panel name="cursor" pos="-4,-4" size="236x60" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="cursor" pos="-4,-4" size="236x60" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="7">
         <text name="header" rect="0x4x236x14" allign="center" font="F12X14B" color="0,252,252,255"  />  <!-- static text color -->
         <!-- /////////////////////////////////////////////////////////// -->
         <table name="table" row_count="2" top="24" row_height="18" >
@@ -704,69 +704,69 @@
     <magnifier pos="-10,155" size="224x224" />
 
     <panels>
-      <panel name="gain" pos="4,4" size="151x21" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="gain" pos="4,4" size="151x21" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="1">
         <text name="text" rect="0x0x99x21" allign="center" font="F12X14B" color="0,252,252,255" />
         <rect name="splitter" rect="99x0x1x21" color="64,252,0,255" />
         <rect name="bar" rect="100x3x20x15" color="64,252,0,255" />
       </panel>
 
-      <panel name="water" pos="4,29" size="151x21" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="water" pos="4,29" size="151x21" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="1">
         <text name="text" rect="0x0x99x21" allign="center" font="F12X14B" color="0,252,252,255" />
         <rect name="splitter" rect="99x0x1x21" color="64,252,0,255" />
         <rect name="bar" rect="100x3x20x15" color="64,252,0,255" />
       </panel>
 
-      <panel name="rain" pos="4,54" size="151x21" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="rain" pos="4,54" size="151x21" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="1">
         <text name="text" rect="0x0x99x21" allign="center" font="F12X14B" color="0,252,252,255" />
         <rect name="splitter" rect="99x0x1x21" color="64,252,0,255" />
         <rect name="bar" rect="100x3x20x15" color="64,252,0,255" />
       </panel>
 
-      <panel name="apch" pos="4,79" size="151x21" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="apch" pos="4,79" size="151x21" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="1">
         <text name="text" rect="0x0x99x21" allign="center" font="F12X14B" color="0,252,252,255" />
         <rect name="splitter" rect="99x0x1x21" color="64,252,0,255" />
         <rect name="bar" rect="100x3x20x15" color="64,252,0,255" />
       </panel>
 
-      <panel name="emission" pos="159,4" size="163x21" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="emission" pos="159,4" size="163x21" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="1">
         <text name="text" rect="0x0x111x21" allign="center" font="F12X14B" color="0,252,252,255" />
         <rect name="splitter" rect="111x0x1x21" color="64,252,0,255" />
         <rect name="bar" rect="112x3x20x15" color="64,252,0,255" />
       </panel>
 
 
-      <panel name="label5" pos="4,104" size="102x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="label5" pos="4,104" size="102x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="1">
         <text name="text" rect="0x0x102x20" allign="center" font="F12X14B" color="0,252,252,255" />
       </panel>
 
-      <panel name="band" pos="4,128" size="102x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="band" pos="4,128" size="102x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="1">
         <text name="text" rect="0x0x102x20" allign="center" font="F12X14B" color="0,252,252,255" />
       </panel>
 
-      <panel name="label1" pos="-244,44" size="112x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="label1" pos="-244,44" size="112x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="1">
         <text name="text" rect="0x0x112x20" allign="center" font="F12X14B" color="0,252,252,255" />
       </panel>
 
-      <panel name="label2" pos="-244,68" size="112x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="label2" pos="-244,68" size="112x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="1">
         <text name="text" rect="0x0x112x20" allign="center" font="F12X14B" color="0,252,252,255" />
       </panel>
 
-      <panel name="label3" pos="-244,92" size="112x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="label3" pos="-244,92" size="112x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="1">
         <text name="text" rect="0x0x112x20" allign="center" font="F12X14B" color="0,252,252,255" />
       </panel>
 
-      <panel name="label4" pos="-244,-68" size="96x32" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="label4" pos="-244,-68" size="96x32" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="1">
         <text name="text" rect="0x0x96x32" allign="center" font="F16X28B" color="0,252,252,255" />
       </panel>
 
 
-      <panel name="fps" pos="4,152" size="132x22" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="fps" pos="4,152" size="132x22" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="2">
         <text name="label" rect="5x5x122x14" allign="left"   font="F12X14B"  color="0,252,252,255"   />  <!-- static text color -->
         <text name="value" rect="5x5x122x14" allign="right"  font="F12X14B"  color="252,252,84,255"  />  <!-- dynamic text color -->
       </panel>
 
       <!-- rect="left_x_top_x_width_x_height" -->
-      <panel name="scale" pos="-244,4" size="236x36" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="scale" pos="-244,4" size="236x36" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="4">
         <rect name="splitter" rect="174x0x1x36" color="64,252,0,255" />
         <!-- /////////////////////////////////////////////////////////// -->
         <text name="scale1" rect="5x5x80x28"    allign="center" font="F16X28B" color="252,252,84,255" />  <!-- dynamic text color -->
@@ -775,7 +775,7 @@
         <text name="units"  rect="176x12x56x14" allign="center" font="F14X14B" color="0,252,252,255"  />  <!-- static text color -->
       </panel>
 
-      <panel name="vn" pos="4,-4" size="140x66" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="vn" pos="4,-4" size="140x66" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="7">
         <text name="header" rect="0x6x132x14" allign="center" font="F12X14B" color="0,252,252,255" /> <!-- static text color -->
         <!-- /////////////////////////////////////////////////////////// -->
         <table name="table" row_count="2" top="28" row_height="18" >
@@ -785,7 +785,7 @@
         </table>
       </panel>
 
-      <panel name="vd" pos="-244,-4" size="140x52" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="vd" pos="-244,-4" size="140x52" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="3">
         <text name="header" rect="0x6x132x14" allign="center" font="F12X14B" color="0,252,252,255" /> <!-- static text color -->
         <!-- /////////////////////////////////////////////////////////// -->
         <table name="table" row_count="1" top="28" row_height="18" >
@@ -794,7 +794,7 @@
         </table>
       </panel>
 
-      <panel name="course" pos="-4,4" size="236x38" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="course" pos="-4,4" size="236x38" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="6">
         <table name="table" row_count="2" top="4" row_height="18" >
           <column left="4"    width="116" allign="left"   font="F12X14B" color="0,252,252,255"  />  <!-- static text color -->
           <column left="120"  width="60"  allign="right"  font="F12X14B" color="252,252,84,255" />  <!-- dynamic text color -->
@@ -802,26 +802,26 @@
         </table>
       </panel>
 
-      <panel name="position" pos="-4,46" size="236x38" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="position" pos="-4,46" size="236x38" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="4">
         <table name="table" row_count="2" top="4" row_height="18" >
           <column left="4"    width="116" allign="left"   font="F12X14B" color="0,252,252,255"  />  <!-- static text color -->
           <column left="120"  width="112" allign="right"  font="F12X14B" color="252,252,84,255" />  <!-- dynamic text color -->
         </table>
       </panel>
 
-      <panel name="blank" pos="-4,88" size="236x38" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="blank" pos="-4,88" size="236x38" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="0">
       </panel>
 
-      <panel name="clock" pos="-4,130" size="236x18" border_width="0" border_color="0,0,0,255" back_color="0,0,0,0" >
+      <panel name="clock" pos="-4,130" size="236x18" border_width="0" border_color="0,0,0,255" back_color="0,0,0,0" text_count="2">
         <text name="label"  rect="4x4x80x14"    allign="center" font="F12X14B" color="0,252,252,255"  />  <!-- static text color -->
         <text name="time"   rect="120x4x96x14"  allign="center" font="F12X14B" color="252,252,84,255" />  <!-- dynamic text color -->
       </panel>
 
-      <panel name="danger" pos="-4,-330" size="236x20" border_width="0" border_color="0,0,0,255" back_color="252,252,84,255" >
+      <panel name="danger" pos="-4,-330" size="236x20" border_width="0" border_color="0,0,0,255" back_color="252,252,84,255" text_count="1">
         <text name="label" rect="0x0x236x20" allign="center" font="F12X14B" color="0,0,0,255"  />
       </panel>
 
-      <panel name="tails" pos="-4,-306" size="236x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="tails" pos="-4,-306" size="236x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="3">
         <table name="table" row_count="1" top="3" row_height="18" >
           <column left="4"   width="116" allign="left"  font="F12X14B" color="0,252,252,255"  />  <!-- static text color -->
           <column left="120" width="60"  allign="right" font="F12X14B" color="252,252,84,255" />  <!-- dynamic text color -->
@@ -829,7 +829,7 @@
         </table>
       </panel>
 
-      <panel name="danger-details" pos="-4,-264" size="236x38" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="danger-details" pos="-4,-264" size="236x38" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="6">
         <table name="table" row_count="2" top="3" row_height="18" >
           <column left="4"   width="116" allign="left"  font="F12X14B" color="0,252,252,255"  />  <!-- static text color -->
           <column left="120" width="60"  allign="right" font="F12X14B" color="252,252,84,255" />  <!-- dynamic text color -->
@@ -837,7 +837,7 @@
         </table>
       </panel>
 
-      <panel name="vector" pos="-4,-240" size="236x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="vector" pos="-4,-240" size="236x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="3">
         <table name="table" row_count="1" top="3" row_height="18" >
           <column left="4"   width="116" allign="left"  font="F12X14B"  color="0,252,252,255"  />  <!-- static text color -->
           <column left="120" width="60"  allign="right" font="F12X14B"  color="252,252,84,255" />  <!-- dynamic text color -->
@@ -845,13 +845,13 @@
         </table>
       </panel>
 
-      <panel name="targets" pos="-4,-68" size="236x168" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="targets" pos="-4,-68" size="236x168" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="27">
         <rect name="header-middle" rect="118x0x1x20" color="64,252,0,255" />
         <rect name="header-bottom" rect="0x20x236x1" color="64,252,0,255" />
         <!-- /////////////////////////////////////////////////////////// -->
-        <text name="header"         rect="4x4x228x14" allign="left"   font="F12X14B" color="0,252,252,255"  />  <!-- static text color -->
-        <text name="current-target" rect="4x4x110x14" allign="right"  font="F12X14B" color="252,252,84,255" />  <!-- dynamic text color -->
-        <text name="target-count"   rect="4x4x228x14" allign="right"  font="F12X14B" color="252,252,84,255" />  <!-- dynamic text color -->
+        <text name="header"  rect="4x4x228x14" allign="left"   font="F12X14B" color="0,252,252,255"  />  <!-- static text color -->
+        <text name="current" rect="4x4x110x14" allign="right"  font="F12X14B" color="252,252,84,255" />  <!-- dynamic text color -->
+        <text name="count"   rect="4x4x228x14" allign="right"  font="F12X14B" color="252,252,84,255" />  <!-- dynamic text color -->
         <!-- /////////////////////////////////////////////////////////// -->
         <table name="table" row_count="8" top="24" row_height="18" >
           <column left="4"   width="116" allign="left"  font="F12X14B" color="0,252,252,255"  />  <!-- static text color -->
@@ -860,7 +860,7 @@
         </table>
       </panel>
 
-      <panel name="cursor" pos="-4,-4" size="236x60" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" >
+      <panel name="cursor" pos="-4,-4" size="236x60" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="7">
         <text name="header" rect="0x4x236x14" allign="center" font="F12X14B" color="0,252,252,255"  />  <!-- static text color -->
         <!-- /////////////////////////////////////////////////////////// -->
         <table name="table" row_count="2" top="24" row_height="18" >

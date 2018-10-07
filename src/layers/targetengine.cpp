@@ -100,6 +100,7 @@ void TargetEngine::updateTarget(QString tag, RLITarget target) {
   if (!_targets.contains(tag)) {
     _targets.insert(tag, target);
     _tails.insert(tag, QList<QVector2D>());
+    _selected = tag;
     emit targetCountChanged(_targets.size());
   } else {
     _targets[tag] = target;

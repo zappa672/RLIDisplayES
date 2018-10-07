@@ -344,7 +344,7 @@ void RLIDisplayWidget::paintLayers() {
 
   drawRect(rect(), _maskEngine->textureId());
 
-  for (InfoBlock* block : _infoEngine->blocks())
+  for (InfoBlock* block: _infoEngine->blocks())
     drawRect(block->geometry(), block->fbo()->texture());
 
   drawRect(_menuEngine->geometry(), _menuEngine->texture());

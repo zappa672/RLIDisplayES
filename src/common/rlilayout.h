@@ -27,7 +27,7 @@ struct RLIInfoRectLayout {
 
 struct RLIInfoTextLayout {
   QString name;
-  QRect   bounding_rect;
+  QRect bounding_rect;
   RLITextAllign allign;
   QString font_tag;
   QColor color;
@@ -54,6 +54,7 @@ struct RLIInfoPanelLayout {
   int border_width;
   QColor back_color;
   QColor border_color;
+  int text_count;
 
   QMap<QString, RLIInfoTextLayout> texts;
   QMap<QString, RLIInfoRectLayout> rects;

@@ -4,11 +4,15 @@
 #include <QDateTime>
 
 
-InfoBlock::InfoBlock(const RLIInfoPanelLayout& layout, QOpenGLContext* context) : QOpenGLFunctions(context) {
+InfoBlock::InfoBlock(const RLIInfoPanelLayout& layout, const std::map<QString, int>& text_id_map, QOpenGLContext* context) : QOpenGLFunctions(context) {
   initializeOpenGLFunctions();
   clear();
+
   _fbo = nullptr;
-  resize(layout);
+  _texts = QVector<InfoText>(layout.text_count);
+
+  resize(layout, text_id_map);
+
   _need_update = false;
 }
 
@@ -22,13 +26,13 @@ void InfoBlock::setRect(QString rectId, const QRect& rect) {
   _need_update = true;
 }
 
-void InfoBlock::setText(QString textId, RLIString str) {
+void InfoBlock::setText(int textId, RLIString str) {
   _texts[textId].string = str;
   _texts[textId].value.clear();
   _need_update = true;
 }
 
-void InfoBlock::setText(QString textId, const QByteArray& val) {
+void InfoBlock::setText(int textId, const QByteArray& val) {
   _texts[textId].string = RLI_STR_NONE;
   _texts[textId].value = val;
   _need_update = true;
@@ -48,7 +52,7 @@ void InfoBlock::clear() {
 }
 
 
-void InfoBlock::resize(const RLIInfoPanelLayout& layout) {
+void InfoBlock::resize(const RLIInfoPanelLayout& layout, const std::map<QString, int>& text_id_map) {
   if (_fbo == nullptr || layout.geometry.size() != _fbo->size()) {
     delete _fbo;
     _fbo = new QOpenGLFramebufferObject(layout.geometry.size());
@@ -67,22 +71,24 @@ void InfoBlock::resize(const RLIInfoPanelLayout& layout) {
   }
 
   for (const RLIInfoTextLayout& tl : layout.texts) {
+    int text_id = text_id_map.at(tl.name);
+
     InfoText text;
     text.geometry = tl.bounding_rect;
     text.color = tl.color;
     text.allign = tl.allign;
     text.font_tag = tl.font_tag;
-    if (_texts.contains(tl.name)) {
-      text.string = _texts[tl.name].string;
-      text.value = _texts[tl.name].value;
-    }
-    _texts[tl.name] = text;
+    text.string = _texts[text_id].string;
+    text.value = _texts[text_id].value;
+
+    _texts[text_id] = text;
   }
 
   for (const RLIInfoTableLayout& tl : layout.tables) {
     for (int i = 0; i < tl.row_count; i++) {
       for (int j = 0; j < tl.columns.size(); j++) {
         QString text_name = tl.name + "_" + QString::number(i) + "_" + QString::number(j);
+        int text_id = text_id_map.at(text_name);
 
         QPoint topLeft(tl.columns[j].left, tl.top + i * tl.row_height);
         QSize size(tl.columns[j].width, tl.row_height);
@@ -92,13 +98,10 @@ void InfoBlock::resize(const RLIInfoPanelLayout& layout) {
         text.color = tl.columns[j].color;
         text.allign = tl.columns[j].allign;
         text.font_tag = tl.columns[j].font_tag;
+        text.string = _texts[text_id].string;
+        text.value = _texts[text_id].value;
 
-        if (_texts.contains(text_name)) {
-          text.string = _texts[text_name].string;
-          text.value = _texts[text_name].value;
-        }
-
-        _texts[text_name] = text;
+        _texts[text_id] = text;
       }
     }
   }

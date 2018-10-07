@@ -38,15 +38,15 @@ struct InfoText {
 class InfoBlock : protected QOpenGLFunctions {
 
 public:
-  explicit InfoBlock(const RLIInfoPanelLayout& layout, QOpenGLContext* context);
+  explicit InfoBlock(const RLIInfoPanelLayout& layout, const std::map<QString, int>& text_id_map, QOpenGLContext* context);
   virtual ~InfoBlock();
 
   void clear();
-  void resize(const RLIInfoPanelLayout& layout);
+  void resize(const RLIInfoPanelLayout& layout, const std::map<QString, int>& text_id_map);
 
 
   inline const QMap<QString, InfoRect>& rectangles() { return _rects; }
-  inline const QMap<QString, InfoText>& texts()      { return _texts; }
+  inline const QVector<InfoText>& texts()      { return _texts; }
 
 
   inline const QRect& geometry()              { return _geometry; }
@@ -68,12 +68,12 @@ public:
 
 
   void setRect(QString rectId, const QRect& r);
-  void setText(QString textId, RLIString str);
-  void setText(QString textId, const QByteArray& val);
+  void setText(int textId, RLIString str);
+  void setText(int textId, const QByteArray& val);
 
 private:
   QMap<QString, InfoRect> _rects;
-  QMap<QString, InfoText> _texts;
+  QVector<InfoText> _texts;
 
   QRect   _geometry;
   QColor  _back_color;
