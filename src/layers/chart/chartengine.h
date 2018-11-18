@@ -23,10 +23,10 @@ class ChartEngine : public QObject, protected QOpenGLFunctions {
   Q_OBJECT
 
 public:
-  explicit ChartEngine(uint tex_radius, S52References* ref, QOpenGLContext* context, QObject* parent = nullptr);
+  ChartEngine(int tex_radius, S52References* ref, QOpenGLContext* context, QObject* parent = nullptr);
   virtual ~ChartEngine();
 
-  void resize(uint radius);
+  void resize(int radius);
   inline QSize size() { return _fbo->size(); }
 
   void setChart(S52Chart* chrt, S52References* ref);
@@ -46,10 +46,10 @@ private:
   ChartShaders* shaders;
   ChartSettingsModel* settings;
 
-  uint    _radius;
+  int    _radius;
 
   QPoint _center_shift { 0, 0 };
-  QVector2D _center { 0, 0 };
+  GeoPos _center { 0, 0 };
   float _scale { 10 };
   float _angle { 0 };
 

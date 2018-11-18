@@ -9,10 +9,8 @@
 
 static double const PI = acos(-1);
 
-RadarEngine::RadarEngine(uint pel_count, uint pel_len, uint tex_radius, QOpenGLContext* context, QObject* parent)
+RadarEngine::RadarEngine(int pel_count, int pel_len, int tex_radius, QOpenGLContext* context, QObject* parent)
   : QObject(parent), QOpenGLFunctions(context) {
-
-
   initializeOpenGLFunctions();
 
   _peleng_count = 0;
@@ -68,7 +66,7 @@ void RadarEngine::initShader() {
 }
 
 
-void RadarEngine::resizeData(uint pel_count, uint pel_len) {
+void RadarEngine::resizeData(int pel_count, int pel_len) {
   if (_peleng_count == pel_count && _peleng_len == pel_len)
     return;
 
@@ -84,12 +82,12 @@ void RadarEngine::fillCoordTable() {
   _positions.clear();
   _draw_indices.clear();
 
-  uint total = _peleng_count*_peleng_len;
+  int total = _peleng_count*_peleng_len;
 
-  for (uint index = 0; index < _peleng_count; index++) {
-    for (uint radius = 0; radius < _peleng_len; radius++) {
-      uint curr_index = index*_peleng_len + radius;
-      uint prev_index = ((index-1)*_peleng_len + radius + total) % total;
+  for (int index = 0; index < _peleng_count; index++) {
+    for (int radius = 0; radius < _peleng_len; radius++) {
+      GLuint curr_index = index*_peleng_len + radius;
+      GLuint prev_index = ((index-1)*_peleng_len + radius + total) % total;
 
       _positions.push_back(curr_index);
       _draw_indices.push_back(curr_index);
@@ -102,7 +100,7 @@ void RadarEngine::fillCoordTable() {
   }
 }
 
-void RadarEngine::resizeTexture(uint radius) {
+void RadarEngine::resizeTexture(int radius) {
   if (_fbo != nullptr && _fbo->width() == static_cast<int>(2*radius+1))
     return;
 
@@ -124,7 +122,7 @@ void RadarEngine::clearData() {
   glBufferData(GL_ARRAY_BUFFER, _peleng_count*_peleng_len*sizeof(GLfloat), _positions.data(), GL_STATIC_DRAW);
 
   glBindBuffer(GL_ARRAY_BUFFER, _vbo_ids[ATTR_AMP]);
-  glBufferData(GL_ARRAY_BUFFER, _peleng_count*_peleng_len*sizeof(GLfloat), NULL, GL_DYNAMIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, _peleng_count*_peleng_len*sizeof(GLfloat), nullptr, GL_DYNAMIC_DRAW);
 
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ind_vbo_id);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, 2*_peleng_count*(_peleng_len+1)*sizeof(GLuint), _draw_indices.data(), GL_STATIC_DRAW);
@@ -139,12 +137,12 @@ void RadarEngine::clearData() {
 }
 
 
-void RadarEngine::updateData(uint offset, uint count, GLfloat* amps) {
+void RadarEngine::updateData(int offset, int count, GLfloat* amps) {
   glBindBuffer(GL_ARRAY_BUFFER, _vbo_ids[ATTR_AMP]);
   glBufferSubData(GL_ARRAY_BUFFER, offset*_peleng_len*sizeof(GLfloat), count*_peleng_len*sizeof(GLfloat), amps);
 
   // New last added peleng
-  uint nlap = (offset + count - 1) % _peleng_count;
+  int nlap = (offset + count - 1) % _peleng_count;
 
   // If we recieved full circle after last draw
   _draw_circle = (_last_added_peleng < _last_drawn_peleng && nlap >= _last_drawn_peleng) || count == _peleng_len;
@@ -184,8 +182,8 @@ void RadarEngine::updateTexture() {
   if (_last_added_peleng == _last_drawn_peleng && !_draw_circle)
     return;
 
-  uint first_peleng_to_draw = (_last_drawn_peleng + 1) % _peleng_count;
-  uint last_peleng_to_draw = _last_added_peleng % _peleng_count;
+  int first_peleng_to_draw = (_last_drawn_peleng + 1) % _peleng_count;
+  int last_peleng_to_draw = _last_added_peleng % _peleng_count;
 
   if (_draw_circle)
     first_peleng_to_draw = (_last_added_peleng + 1) % _peleng_count;
@@ -240,7 +238,7 @@ void RadarEngine::updateTexture() {
   _draw_circle = false;
 }
 
-void RadarEngine::drawPelengs(uint first, uint last) {
+void RadarEngine::drawPelengs(int first, int last) {
   // Clear depth when the new cycle begins to avoid the previous circle data
   if (first == 0) {
     glClearDepthf(0.f);

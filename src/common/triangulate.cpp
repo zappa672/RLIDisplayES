@@ -372,8 +372,8 @@ polyout *trapezate_polygon(int ncontours, int cntr[], double (*vertices)[2])
 
 //  Create output data structure
 
-  pplast = NULL;
-  top = NULL;
+  pplast = nullptr;
+  top = nullptr;
 
   for (i = 0; i < nmonpoly; i++)
   {
@@ -406,10 +406,10 @@ polyout *trapezate_polygon(int ncontours, int cntr[], double (*vertices)[2])
           p = mchain[p].next;
         }
 
-      if(NULL != pplast)
+      if(nullptr != pplast)
           pplast->poly_next = pp;
 
-      if(NULL == top)
+      if(nullptr == top)
           top = pp;
 
 //  prepare next link
@@ -471,7 +471,7 @@ polyout  *triangulate_polygon(int ncontours, int cntr[], double (*vertices)[2])
     }
     __except (eps = GetExceptionInformation(), filter(eps))
     {
-        ret_val = NULL;
+        ret_val = nullptr;
     }
     #else
     //    In a Posix environment, use sigaction, etc.. to catch bad code in the tesselator
@@ -484,14 +484,14 @@ polyout  *triangulate_polygon(int ncontours, int cntr[], double (*vertices)[2])
 
           ret_val = 0;
 
-          sigaction(SIGSEGV, &sa_all_old, NULL);        // reset signal handler
+          sigaction(SIGSEGV, &sa_all_old, nullptr);        // reset signal handler
 
           return ret_val;
       }
 
       ret_val = do_triangulate_polygon(ncontours, cntr, vertices);
 
-      sigaction(SIGSEGV, &sa_all_old, NULL);        // reset signal handler
+      sigaction(SIGSEGV, &sa_all_old, nullptr);        // reset signal handler
 
       #endif
 
@@ -619,13 +619,13 @@ polyout  *do_triangulate_polygon(int ncontours, int cntr[], double (*vertices)[2
               vt1 = mchain[q].vnum;
 
               if(vt1 == vt0)
-                  return NULL;
+                  return nullptr;
 
               q = mchain[q].next;
           }
 
 //          if(vert[vt0].pt.y < 5.0)
-//              return NULL;
+//              return nullptr;
 
           p = mchain[p].next;
       }
@@ -641,8 +641,8 @@ polyout  *do_triangulate_polygon(int ncontours, int cntr[], double (*vertices)[2
 
 //  Create output data structure
 
-  pplast = NULL;
-  top = NULL;
+  pplast = nullptr;
+  top = nullptr;
 
   for (i = 0; i < ntri; i++)
   {
@@ -703,10 +703,10 @@ polyout  *do_triangulate_polygon(int ncontours, int cntr[], double (*vertices)[2
       pp->index_hash = pp->index_hash * 16777619;
 
 
-     if(NULL != pplast)
+     if(nullptr != pplast)
           pplast->poly_next = pp;
 
-      if(NULL == top)
+      if(nullptr == top)
           top = pp;
 
 //  prepare next link
@@ -811,19 +811,20 @@ int generate_random_ordering(int n)
     }
   return 0;
 */
-  register int i;
+  int i;
   int m;
   int *p;
   int *st;
 
-  st = (int *)calloc((n + 2) * sizeof(int), 1);
+  st = static_cast<int *>(calloc((n + 2) * sizeof(int), 1));
 
   choose_idx = 1;
-  srand( (unsigned)time( NULL ) );
+  srand( static_cast<unsigned>(time(nullptr)) );
 
 
-  for (i = 0; i <= n; i++)
+  for (i = 0; i <= n; i++) {
     st[i] = i;
+  }
 
 
     p = st;
@@ -870,7 +871,7 @@ int read_segments(char *filename, int *genus)
   register int i;
   int ncontours, npoints, first, last;
 
-  if ((infile = fopen(filename, "r")) == NULL)
+  if ((infile = fopen(filename, "r")) == nullptr)
     {
       perror(filename);
       return -1;
@@ -1167,10 +1168,11 @@ int monotonate_trapezoids(int n)
   /* First locate a trapezoid which lies inside the polygon */
   /* and which is triangular */
 
-  for (i = 0; i < (n * 4); i++)
+  for (i = 0; i < (n * 4); i++) {
     if (inside_polygon(&tr[i]))
-            break;
-    tr_start = i;
+      break;
+  }
+  tr_start = i;
 
   /* Initialise the mon data-structure and start spanning all the */
   /* trapezoids within the polygon */
@@ -4518,8 +4520,8 @@ int int_trapezate_polygon(int ncontours, int cntr[], double (*vertices)[2], itra
       {
             ret_val = 1;
             *n_traps = 0;
-            *trap_return = NULL;
-            *iseg_return = NULL;
+            *trap_return = nullptr;
+            *iseg_return = nullptr;
       }
 #else
       //    In a Posix environment, use sigaction, etc.. to catch bad code in the tesselator
@@ -4532,17 +4534,17 @@ int int_trapezate_polygon(int ncontours, int cntr[], double (*vertices)[2], itra
 
             ret_val = 1;
             *n_traps = 0;
-            *trap_return = NULL;
-            *iseg_return = NULL;
+            *trap_return = nullptr;
+            *iseg_return = nullptr;
 
-            sigaction(SIGSEGV, &sa_all_old, NULL);        // reset signal handler
+            sigaction(SIGSEGV, &sa_all_old, nullptr);        // reset signal handler
 
             return ret_val;
       }
 
       ret_val = do_int_trapezate_polygon(ncontours, cntr, vertices, trap_return,iseg_return, n_traps);
 
-      sigaction(SIGSEGV, &sa_all_old, NULL);        // reset signal handler
+      sigaction(SIGSEGV, &sa_all_old, nullptr);        // reset signal handler
 
 #endif
 

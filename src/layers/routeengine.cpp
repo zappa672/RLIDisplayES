@@ -39,7 +39,7 @@ void RouteEngine::clearCurrentRoute() {
   _routesMutex.unlock();
 }
 
-void RouteEngine::addPointToCurrent(const QVector2D& p) {
+void RouteEngine::addPointToCurrent(const GeoPos& p) {
   _routesMutex.lock();
   _currentRoute.push_back(p);
   _need_reload_buffer = true;
@@ -81,14 +81,14 @@ void RouteEngine::draw(const QMatrix4x4& mvp_matrix, const RLIState& state) {
 
   _prog->bind();
 
-  QVector2D pos = state.ship_position;
+  const GeoPos& pos = state.ship_position;
 
   glUniform1f(_unif_locs[ROUTE_UNIF_SCALE], state.chart_scale);
-  glUniform2f(_unif_locs[ROUTE_UNIF_CENTER], pos.x(), pos.y());
+  glUniform2f(_unif_locs[ROUTE_UNIF_CENTER], pos.lat, pos.lon);
   _prog->setUniformValue(_unif_locs[ROUTE_UNIF_MVP_MATRIX], mvp_matrix);
 
   glBindBuffer(GL_ARRAY_BUFFER, _vbo_ids[0][ROUTE_ATTR_COORDS]);
-  glVertexAttribPointer(_attr_locs[ROUTE_ATTR_COORDS], 2, GL_FLOAT, GL_FALSE, 0, (void*) (0));
+  glVertexAttribPointer(_attr_locs[ROUTE_ATTR_COORDS], 2, GL_FLOAT, GL_FALSE, 0, reinterpret_cast<const GLvoid*>(0));
   glEnableVertexAttribArray(_attr_locs[ROUTE_ATTR_COORDS]);
 
   int pCount = _currentRoute.size();
@@ -105,12 +105,12 @@ void RouteEngine::draw(const QMatrix4x4& mvp_matrix, const RLIState& state) {
   glLineWidth(1.0);
 
   glBindBuffer(GL_ARRAY_BUFFER, _vbo_ids[1][ROUTE_ATTR_COORDS]);
-  glVertexAttribPointer(_attr_locs[ROUTE_ATTR_COORDS], 2, GL_FLOAT, GL_FALSE, 0, (void*) (0));
+  glVertexAttribPointer(_attr_locs[ROUTE_ATTR_COORDS], 2, GL_FLOAT, GL_FALSE, 0, reinterpret_cast<const GLvoid*>(0));
   glEnableVertexAttribArray(_attr_locs[ROUTE_ATTR_COORDS]);
   glDrawArrays(GL_LINE_STRIP, 0, pCount);
 
   glBindBuffer(GL_ARRAY_BUFFER, _vbo_ids[2][ROUTE_ATTR_COORDS]);
-  glVertexAttribPointer(_attr_locs[ROUTE_ATTR_COORDS], 2, GL_FLOAT, GL_FALSE, 0, (void*) (0));
+  glVertexAttribPointer(_attr_locs[ROUTE_ATTR_COORDS], 2, GL_FLOAT, GL_FALSE, 0, reinterpret_cast<const GLvoid*>(0));
   glEnableVertexAttribArray(_attr_locs[ROUTE_ATTR_COORDS]);
   glDrawArrays(GL_LINE_STRIP, 0, pCount);
 
@@ -147,7 +147,7 @@ int RouteEngine::loadBuffers() {
   std::vector<GLfloat> ps1, ps2, ps3;
 
   for (int i = 0; i < _currentRoute.size(); i++) {
-    QVector2D p = _currentRoute[i];
+    QVector2D p = _currentRoute[i].toVec2D();
 
     ps1.push_back( p.x() );
     ps1.push_back( p.y() );
@@ -157,13 +157,13 @@ int RouteEngine::loadBuffers() {
     QVector2D norm  { 0.f, 0.f };
 
     if (i > 0) {
-      QVector2D tan = p - _currentRoute[i-1];
+      QVector2D tan = p - _currentRoute[i-1].toVec2D();
       tan.normalize();
       norm1 = 0.02*QVector2D(-tan.y(), tan.x());
     }
 
     if (i < _currentRoute.size()-1) {
-      QVector2D tan = _currentRoute[i+1]-p;
+      QVector2D tan = _currentRoute[i+1].toVec2D() - p;
       tan.normalize();
       norm2 = 0.02*QVector2D(-tan.y(), tan.x());
     }
@@ -174,10 +174,10 @@ int RouteEngine::loadBuffers() {
       } else if (i == _currentRoute.size()-1) {
         norm = norm1;
       } else {
-        QVector2D p11 = _currentRoute[i-1] + norm1;
+        QVector2D p11 = _currentRoute[i-1].toVec2D() + norm1;
         QVector2D p12 = p + norm1;
         QVector2D p21 = p + norm2;
-        QVector2D p22 = _currentRoute[i+1] + norm2;
+        QVector2D p22 = _currentRoute[i+1].toVec2D() + norm2;
         QVector2D inters = lineIntersection(p11, p12, p21, p22);
         norm = inters - p;
       }
@@ -191,13 +191,13 @@ int RouteEngine::loadBuffers() {
   }
 
   glBindBuffer(GL_ARRAY_BUFFER, _vbo_ids[0][ROUTE_ATTR_COORDS]);
-  glBufferData(GL_ARRAY_BUFFER, ps1.size()*sizeof(GLfloat), ps1.data(), GL_DYNAMIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, ps1.size() * sizeof(GLfloat), ps1.data(), GL_DYNAMIC_DRAW);
 
   glBindBuffer(GL_ARRAY_BUFFER, _vbo_ids[1][ROUTE_ATTR_COORDS]);
-  glBufferData(GL_ARRAY_BUFFER, ps2.size()*sizeof(GLfloat), ps2.data(), GL_DYNAMIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, ps2.size() * sizeof(GLfloat), ps2.data(), GL_DYNAMIC_DRAW);
 
   glBindBuffer(GL_ARRAY_BUFFER, _vbo_ids[2][ROUTE_ATTR_COORDS]);
-  glBufferData(GL_ARRAY_BUFFER, ps3.size()*sizeof(GLfloat), ps3.data(), GL_DYNAMIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, ps3.size() * sizeof(GLfloat), ps3.data(), GL_DYNAMIC_DRAW);
 
   return ps1.size() / 2;
 }

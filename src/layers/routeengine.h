@@ -17,17 +17,17 @@ class RouteEngine : public QObject, protected QOpenGLFunctions {
   Q_OBJECT
 
 public:
-  explicit RouteEngine(QOpenGLContext* context, QObject* parent = 0);
+  explicit RouteEngine(QOpenGLContext* context, QObject* parent = nullptr);
   virtual ~RouteEngine();
 
   void draw(const QMatrix4x4& mvp_matrix, const RLIState& state);
 
-  QVector2D getLastPoint() { return _currentRoute.last(); }
+  GeoPos getLastPoint() { return _currentRoute.last(); }
   inline bool isIndexUsed(int index) { return (index < 0 || index >= 4 || _routes[index].size() > 0); }
 
 public slots:
   void clearCurrentRoute();
-  void addPointToCurrent(const QVector2D& p);
+  void addPointToCurrent(const GeoPos& p);
   void removePointFromCurrent();
 
   void loadFrom(int index);
@@ -43,9 +43,9 @@ private:
                             , const QVector2D& p21, const QVector2D& p22) const;
 
   QMutex _routesMutex;
-  QList<QVector2D> _currentRoute;
+  QList<GeoPos> _currentRoute;
   bool _need_reload_buffer = false;
-  QList<QVector2D> _routes[ROUTES_COUNT];
+  QList<GeoPos> _routes[ROUTES_COUNT];
 
   QOpenGLShaderProgram* _prog;
 

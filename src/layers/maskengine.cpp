@@ -175,19 +175,19 @@ void MaskEngine::setBuffers(GLuint* vbo_ids, int count, GLfloat* angles, GLfloat
 
 void MaskEngine::bindBuffers(GLuint* vbo_ids) {
   glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[MASK_ATTR_ANGLE]);
-  glVertexAttribPointer(_attr_locs[MASK_ATTR_ANGLE], 1, GL_FLOAT, GL_FALSE, 0, (void*) (0));
+  glVertexAttribPointer(_attr_locs[MASK_ATTR_ANGLE], 1, GL_FLOAT, GL_FALSE, 0, reinterpret_cast<const GLvoid*>(0));
   glEnableVertexAttribArray(_attr_locs[MASK_ATTR_ANGLE]);
 
   glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[MASK_ATTR_CHAR_VAL]);
-  glVertexAttribPointer(_attr_locs[MASK_ATTR_CHAR_VAL], 1, GL_FLOAT, GL_FALSE, 0, (void*) (0));
+  glVertexAttribPointer(_attr_locs[MASK_ATTR_CHAR_VAL], 1, GL_FLOAT, GL_FALSE, 0, reinterpret_cast<const GLvoid*>(0));
   glEnableVertexAttribArray(_attr_locs[MASK_ATTR_CHAR_VAL]);
 
   glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[MASK_ATTR_ORDER]);
-  glVertexAttribPointer(_attr_locs[MASK_ATTR_ORDER], 1, GL_FLOAT, GL_FALSE, 0, (void*) (0));
+  glVertexAttribPointer(_attr_locs[MASK_ATTR_ORDER], 1, GL_FLOAT, GL_FALSE, 0, reinterpret_cast<const GLvoid*>(0));
   glEnableVertexAttribArray(_attr_locs[MASK_ATTR_ORDER]);
 
   glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[MASK_ATTR_SHIFT]);
-  glVertexAttribPointer(_attr_locs[MASK_ATTR_SHIFT], 1, GL_FLOAT, GL_FALSE, 0, (void*) (0));
+  glVertexAttribPointer(_attr_locs[MASK_ATTR_SHIFT], 1, GL_FLOAT, GL_FALSE, 0, reinterpret_cast<const GLvoid*>(0));
   glEnableVertexAttribArray(_attr_locs[MASK_ATTR_SHIFT]);
 }
 

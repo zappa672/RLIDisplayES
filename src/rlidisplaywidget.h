@@ -32,8 +32,8 @@ class RLIDisplayWidget : public QOpenGLWidget, protected QOpenGLFunctions
 {
   Q_OBJECT
 public:
-  explicit RLIDisplayWidget(QWidget *parent = 0);
-  ~RLIDisplayWidget();
+  explicit RLIDisplayWidget(QWidget *parent = nullptr);
+  ~RLIDisplayWidget() override;
 
   float frameRate();
 
@@ -45,9 +45,9 @@ signals:
   void initialized();
 
 public slots:  
-  void keyReleaseEvent(QKeyEvent* event);
-  void keyPressEvent(QKeyEvent* event);
-  void mousePressEvent(QMouseEvent* event);
+  void keyReleaseEvent(QKeyEvent* event) override;
+  void keyPressEvent(QKeyEvent* event) override;
+  void mousePressEvent(QMouseEvent* event) override;
 
   void onGainChanged(float value);
   void onWaterChanged(float value);
@@ -56,9 +56,9 @@ public slots:
   void onEmissionChanged(float value);
 
 protected slots:
-  void initializeGL();
-  void resizeGL(int w, int h);
-  void paintGL();
+  void initializeGL() override;
+  void resizeGL(int w, int h) override;
+  void paintGL() override;
 
 private slots:
   void onNewChartAvailable(const QString& name);

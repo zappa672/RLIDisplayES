@@ -31,11 +31,12 @@ SOURCES     += \
     src/rlicontrolwidget.cpp \
     src/rlidisplaywidget.cpp \
     \
-    src/common/radarscale.cpp \
     src/common/triangulate.cpp \
     src/common/rlimath.cpp \
     src/common/rlisttrings.cpp \
     src/common/rlilayout.cpp \
+    src/common/rlistate.cpp \
+    src/common/radarscale.cpp \
     \    
     src/datasources/radardatasource.cpp \
     src/datasources/shipdatasource.cpp \
@@ -61,21 +62,22 @@ SOURCES     += \
     src/layers/controlsengine.cpp \
     src/layers/magnifierengine.cpp \
     src/layers/info/infoblock.cpp \    
-    src/layers/info/menuitem.cpp \
-    src/common/rlistate.cpp
+    src/layers/info/menuitem.cpp
+
 
 HEADERS     += \
     src/mainwindow.h \
     src/rlicontrolwidget.h \
     src/rlidisplaywidget.h \
     \
-    src/common/radarscale.h \
     src/common/properties.h \
     src/common/triangulate.h \
     src/common/rlimath.h \
     src/common/rlilayout.h \
     src/common/rlistrings.h \
     src/common/rlistringnames.h \
+    src/common/rlistate.h \
+    src/common/radarscale.h \
     \    
     src/datasources/radardatasource.h \
     src/datasources/targetdatasource.h \
@@ -101,8 +103,7 @@ HEADERS     += \
     src/layers/controlsengine.h \
     src/layers/magnifierengine.h \
     src/layers/info/infoblock.h \
-    src/layers/info/menuitem.h \
-    src/common/rlistate.h
+    src/layers/info/menuitem.h
 
 FORMS       += \
     forms/mainwindow.ui \

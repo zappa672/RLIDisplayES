@@ -24,31 +24,31 @@ RLIDisplayWidget::RLIDisplayWidget(QWidget *parent) : QOpenGLWidget(parent) {
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "RLIDisplayWidget construction finish";
 }
 
-
 RLIDisplayWidget::~RLIDisplayWidget() {
-  if (_initialized) {
-    delete _infoFonts;
-    delete _radarEngine;
-    delete _tailsEngine;
-    delete _maskEngine;
-    delete _chartEngine;
-    delete _menuEngine;
-    delete _magnEngine;
-    delete _trgtEngine;
-    delete _routeEngine;
-    delete _ctrlEngine;
+  if (!_initialized)
+    return;
 
-    delete _program;
-  }
+  delete _infoFonts;
+  delete _radarEngine;
+  delete _tailsEngine;
+  delete _maskEngine;
+  delete _chartEngine;
+  delete _menuEngine;
+  delete _magnEngine;
+  delete _trgtEngine;
+  delete _routeEngine;
+  delete _ctrlEngine;
+
+  delete _program;
 }
 
 
 void RLIDisplayWidget::setupRadarDataSource(RadarDataSource* rds) {
-  connect( rds, SIGNAL(updateData(uint,uint,GLfloat*))
-         , _radarEngine, SLOT(updateData(uint,uint,GLfloat*)));
+  connect( rds, SIGNAL(updateData(int, int, GLfloat*))
+         , _radarEngine, SLOT(updateData(int, int, GLfloat*)));
 
-  connect( rds, SIGNAL(updateData2(uint,uint,GLfloat*))
-         , _tailsEngine, SLOT(updateData(uint,uint,GLfloat*)));
+  connect( rds, SIGNAL(updateData2(int, int, GLfloat*))
+         , _tailsEngine, SLOT(updateData(int, int, GLfloat*)));
 }
 
 void RLIDisplayWidget::setupTargetDataSource(TargetDataSource* tds) {
@@ -77,10 +77,10 @@ void RLIDisplayWidget::onNewChartAvailable(const QString& name) {
 
 void RLIDisplayWidget::debugInfo() {
   qDebug() << "";
-  qDebug() << "Vendor: " << (const char*) glGetString(GL_VENDOR);
-  qDebug() << "Renderer: " << (const char*) glGetString(GL_RENDERER);
-  qDebug() << "OpenGL: " << (const char*) glGetString(GL_VERSION);
-  qDebug() << "Shaders: " << (const char*) glGetString(GL_SHADING_LANGUAGE_VERSION);
+  qDebug() << "Vendor: " << reinterpret_cast<const char*>( glGetString(GL_VENDOR) );
+  qDebug() << "Renderer: " << reinterpret_cast<const char*>( glGetString(GL_RENDERER) );
+  qDebug() << "OpenGL: " << reinterpret_cast<const char*>( glGetString(GL_VERSION) );
+  qDebug() << "Shaders: " << reinterpret_cast<const char*>( glGetString(GL_SHADING_LANGUAGE_VERSION) );
 
 //  qDebug() << "";
 //  qDebug() << "Extensions: ";
@@ -114,10 +114,10 @@ void RLIDisplayWidget::initializeGL() {
 
   _program = new QOpenGLShaderProgram(this);
 
-  uint peleng_size         = qApp->property(PROPERTY_PELENG_SIZE).toInt();
-  uint bearings_per_cycle  = qApp->property(PROPERTY_BEARINGS_PER_CYCLE).toInt();
+  int peleng_size         = qApp->property(PROPERTY_PELENG_SIZE).toInt();
+  int bearings_per_cycle  = qApp->property(PROPERTY_BEARINGS_PER_CYCLE).toInt();
 
-  uint circle_radius = _layout_manager.layout()->circle.radius;
+  int circle_radius = _layout_manager.layout()->circle.radius;
 
   // Layers initialization
   //-------------------------------------------------------------
@@ -216,11 +216,11 @@ void RLIDisplayWidget::initShaders() {
   _program->link();
   _program->bind();
 
-  _unif_locs[UNIF_TEXTURE] = _program->uniformLocation("texture");
-  _unif_locs[UNIF_MVPMATRIX] = _program->uniformLocation("mvp_matrix");
+  _unif_locs[UNIF_TEXTURE]    = _program->uniformLocation("texture");
+  _unif_locs[UNIF_MVPMATRIX]  = _program->uniformLocation("mvp_matrix");
 
-  _attr_locs[ATTR_POSITION] = _program->attributeLocation("a_position");
-  _attr_locs[ATTR_TEXCOORD] = _program->attributeLocation("a_texcoord");
+  _attr_locs[ATTR_POSITION]   = _program->attributeLocation("a_position");
+  _attr_locs[ATTR_TEXCOORD]   = _program->attributeLocation("a_texcoord");
 
   _program->release();
 }
@@ -252,10 +252,13 @@ void RLIDisplayWidget::resizeGL(int w, int h) {
   _infoEngine->resize(_layout_manager.layout());
 
   _infoEngine->secondChanged();
-  _infoEngine->setFps(frameRate());
+  _infoEngine->setFps(static_cast<int>(frameRate()));
   _infoEngine->onPositionChanged(_state.ship_position);
   _infoEngine->onTargetCountChanged(_trgtEngine->targetCount());
   _infoEngine->onSelectedTargetUpdated(_trgtEngine->selectedTag(), _trgtEngine->selectedTrgt());
+
+  _infoEngine->onScaleChanged(_state.radar_scale.getCurScale());
+  _state.chart_scale = (_state.radar_scale.getCurScale()->len * 1852.f) / _layout_manager.layout()->circle.radius;
 
   _infoEngine->updateGain(_state.gain);
   _infoEngine->updateWater(_state.water);
@@ -287,7 +290,7 @@ void RLIDisplayWidget::paintGL() {
   while (frameTimes.size() > 20)
     frameTimes.removeFirst();
 
-  _infoEngine->setFps(frameRate());
+  _infoEngine->setFps(static_cast<int>(frameRate()));
 
 
   if (!_initialized)
@@ -487,25 +490,25 @@ void RLIDisplayWidget::keyPressEvent(QKeyEvent* event) {
   switch(event->key()) {
   case Qt::Key_PageUp:
     if (mod_keys & Qt::ControlModifier)
-      emit _infoEngine->updateGain( _state.gain = qMin(_state.gain + 5.0, 255.0) );
+      emit _infoEngine->updateGain( _state.gain = qMin(_state.gain + 5.0f, 255.0f) );
 
     if (mod_keys & Qt::AltModifier)
-      emit _infoEngine->updateWater( _state.water = qMin(_state.water + 5.0, 255.0) );
+      emit _infoEngine->updateWater( _state.water = qMin(_state.water + 5.0f, 255.0f) );
 
     if (mod_keys & Qt::ShiftModifier)
-      emit _infoEngine->updateRain(  _state.rain = qMin(_state.rain + 5.0, 255.0) );
+      emit _infoEngine->updateRain(  _state.rain = qMin(_state.rain + 5.0f, 255.0f) );
 
     break;
 
   case Qt::Key_PageDown:
     if (mod_keys & Qt::ControlModifier)
-      emit _infoEngine->updateGain( _state.gain = qMax(_state.gain - 5.0, 0.0) );
+      emit _infoEngine->updateGain( _state.gain = qMax(_state.gain - 5.0f, 0.0f) );
 
     if (mod_keys & Qt::AltModifier)
-      emit _infoEngine->updateWater( _state.water = qMax(_state.water - 5.0, 0.0) );
+      emit _infoEngine->updateWater( _state.water = qMax(_state.water - 5.0f, 0.0f) );
 
     if (mod_keys & Qt::ShiftModifier)
-      emit _infoEngine->updateRain( _state.rain = qMax(_state.rain - 5.0, 0.0) );
+      emit _infoEngine->updateRain( _state.rain = qMax(_state.rain - 5.0f, 0.0f) );
 
     break;
 
@@ -534,18 +537,20 @@ void RLIDisplayWidget::keyPressEvent(QKeyEvent* event) {
   // Шкала +
   case Qt::Key_Plus:
     if (_state.state == RLIWidgetState::RLISTATE_ROUTE_EDITION) {
-      QPointF pos = QPointF( sin(RLIMath::radians(_state.vn_p)) * _state.vd
-                           ,-cos(RLIMath::radians(_state.vn_p)) * _state.vd );
+      QPointF pos = QPointF( sin(RLIMath::rads(_state.vn_p)) * _state.vd
+                           ,-cos(RLIMath::rads(_state.vn_p)) * _state.vd );
       //float scale = (_rli_scale.len*1852.f) / _maskEngine->getRadius();
-      QVector2D last_route_point = _routeEngine->getLastPoint();
-      QVector2D cursor_coords = RLIMath::pos_to_coords( last_route_point, QPoint(0, 0), pos, _state.chart_scale);
+      GeoPos last_route_point = _routeEngine->getLastPoint();
+      GeoPos cursor_coords = RLIMath::pos_to_coords( last_route_point, QPoint(0, 0), pos, _state.chart_scale);
       _state.visir_center_pos = cursor_coords;
       _routeEngine->addPointToCurrent(cursor_coords);
 
       break;
     }
 
-    _state.chart_scale *= 0.95;
+    _state.radar_scale.prevScale();
+    _infoEngine->onScaleChanged(_state.radar_scale.getCurScale());
+    _state.chart_scale = (_state.radar_scale.getCurScale()->len * 1852.f) / _layout_manager.layout()->circle.radius;
     break;
 
   // Шкала -
@@ -556,7 +561,9 @@ void RLIDisplayWidget::keyPressEvent(QKeyEvent* event) {
       break;
     }
 
-    _state.chart_scale *= 1.05;
+    _state.radar_scale.nextScale();
+    _infoEngine->onScaleChanged(_state.radar_scale.getCurScale());
+    _state.chart_scale = (_state.radar_scale.getCurScale()->len * 1852.f) / _layout_manager.layout()->circle.radius;
     break;
 
   // Вынос центра
@@ -582,11 +589,11 @@ void RLIDisplayWidget::keyPressEvent(QKeyEvent* event) {
     break;
 
   case Qt::Key_Left:
-    _state.vn_p = fmod(_state.vn_p - 1.f, 360);
+    _state.vn_p = fmod(_state.vn_p - 1.f, 360.f);
     break;
 
   case Qt::Key_Right:
-    _state.vn_p = fmod(_state.vn_p + 1.f, 360);
+    _state.vn_p = fmod(_state.vn_p + 1.f, 360.f);
     break;
 
   // Захват

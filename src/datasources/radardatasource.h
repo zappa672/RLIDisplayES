@@ -11,7 +11,7 @@
 class RadarDataSource : public QObject {
   Q_OBJECT
 public:
-  explicit RadarDataSource(QObject* parent = 0);
+  explicit RadarDataSource(QObject* parent = nullptr);
   virtual ~RadarDataSource();
 
 public slots:
@@ -19,8 +19,8 @@ public slots:
   void finish();
 
 signals:
-  void updateData(uint offset, uint count, GLfloat* amps);
-  void updateData2(uint offset, uint count, GLfloat* amps);
+  void updateData(int offset, int count, GLfloat* amps);
+  void updateData2(int offset, int count, GLfloat* amps);
 
 private:
   bool loadData();
@@ -32,10 +32,10 @@ private:
   bool finish_flag;
   GLfloat* file_amps1[2];
   GLfloat* file_amps2[2];
-  uint  file_curr;
+  int  file_curr;
 
-  uint _peleng_size;
-  uint _bearings_per_cycle;
+  int _peleng_size;
+  int _bearings_per_cycle;
 
   void worker();
   QFuture<void> workerThread;

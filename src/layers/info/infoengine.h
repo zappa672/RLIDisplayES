@@ -16,6 +16,7 @@
 #include "infoblock.h"
 #include "../../common/rlilayout.h"
 #include "../../common/rlistrings.h"
+#include "../../common/radarscale.h"
 #include "../targetengine.h"
 
 
@@ -23,7 +24,7 @@ class InfoEngine : public QObject, protected QOpenGLFunctions {
   Q_OBJECT
 
 public:
-  explicit InfoEngine (RLILayout* layout, QOpenGLContext* context, QObject* parent = nullptr);
+  InfoEngine (RLILayout* layout, QOpenGLContext* context, QObject* parent = nullptr);
   virtual ~InfoEngine ();
 
   void resize(RLILayout* layout);
@@ -79,9 +80,10 @@ public slots:
 
   void secondChanged();
   void setFps(int fps);
-  void onPositionChanged(const QVector2D& position);
+  void onPositionChanged(const GeoPos& position);
   void onTargetCountChanged(int count);
   void onSelectedTargetUpdated(const QString& tag, const RLITarget& trgt);
+  void onScaleChanged(const rli_scale_t* scale);
 
 private:
   void updateBlock(InfoBlock* b, InfoFonts* fonts);

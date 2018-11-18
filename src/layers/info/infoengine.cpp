@@ -440,17 +440,17 @@ void InfoEngine::drawText(const InfoText& text, InfoFonts* fonts) {
 
   glBindBuffer(GL_ARRAY_BUFFER, _vbo_ids[INFO_ATTR_POSITION]);
   glBufferData(GL_ARRAY_BUFFER, pos.size()*sizeof(GLfloat), pos.data(), GL_STATIC_DRAW);
-  glVertexAttribPointer(_attr_locs[INFO_ATTR_POSITION], 2, GL_FLOAT, GL_FALSE, 0, (void*) (0));
+  glVertexAttribPointer(_attr_locs[INFO_ATTR_POSITION], 2, GL_FLOAT, GL_FALSE, 0, reinterpret_cast<const GLvoid*>(0));
   glEnableVertexAttribArray(_attr_locs[INFO_ATTR_POSITION]);
 
   glBindBuffer(GL_ARRAY_BUFFER, _vbo_ids[INFO_ATTR_ORDER]);
   glBufferData(GL_ARRAY_BUFFER, ord.size()*sizeof(GLfloat), ord.data(), GL_STATIC_DRAW);
-  glVertexAttribPointer(_attr_locs[INFO_ATTR_ORDER], 1, GL_FLOAT, GL_FALSE, 0, (void*) (0));
+  glVertexAttribPointer(_attr_locs[INFO_ATTR_ORDER], 1, GL_FLOAT, GL_FALSE, 0, reinterpret_cast<const GLvoid*>(0));
   glEnableVertexAttribArray(_attr_locs[INFO_ATTR_ORDER]);
 
   glBindBuffer(GL_ARRAY_BUFFER, _vbo_ids[INFO_ATTR_CHAR_VAL]);
   glBufferData(GL_ARRAY_BUFFER, chars.size()*sizeof(GLfloat), chars.data(), GL_STATIC_DRAW);
-  glVertexAttribPointer(_attr_locs[INFO_ATTR_CHAR_VAL], 1, GL_FLOAT, GL_FALSE, 0, (void*) (0));
+  glVertexAttribPointer(_attr_locs[INFO_ATTR_CHAR_VAL], 1, GL_FLOAT, GL_FALSE, 0, reinterpret_cast<const GLvoid*>(0));
   glEnableVertexAttribArray(_attr_locs[INFO_ATTR_CHAR_VAL]);
 
 
@@ -478,7 +478,7 @@ void InfoEngine::drawRect(const QRect& rect, const QColor& col) {
 
   glBindBuffer(GL_ARRAY_BUFFER, _vbo_ids[INFO_ATTR_POSITION]);
   glBufferData(GL_ARRAY_BUFFER, pos.size()*sizeof(GLfloat), pos.data(), GL_DYNAMIC_DRAW);
-  glVertexAttribPointer(_attr_locs[INFO_ATTR_POSITION], 2, GL_FLOAT, GL_FALSE, 0, (void*) (0));
+  glVertexAttribPointer(_attr_locs[INFO_ATTR_POSITION], 2, GL_FLOAT, GL_FALSE, 0, reinterpret_cast<const GLvoid*>(0));
   glEnableVertexAttribArray(_attr_locs[INFO_ATTR_POSITION]);
 
   glVertexAttrib1f(_attr_locs[INFO_ATTR_ORDER], 0.f);
@@ -624,11 +624,18 @@ void InfoEngine::setFps(int fps) {
 
 
 void InfoEngine::initBlockScale() {
-  _blocks[RLI_PANEL_SCALE]->setText(RLI_PANEL_SCALE_SCALE1_TEXT_ID, QByteArray("0.125"));
+  _blocks[RLI_PANEL_SCALE]->setText(RLI_PANEL_SCALE_SCALE1_TEXT_ID, QByteArray("0"));
   _blocks[RLI_PANEL_SCALE]->setText(RLI_PANEL_SCALE_SLASH_TEXT_ID, QByteArray("/"));
-  _blocks[RLI_PANEL_SCALE]->setText(RLI_PANEL_SCALE_SCALE2_TEXT_ID, QByteArray("0.025"));
+  _blocks[RLI_PANEL_SCALE]->setText(RLI_PANEL_SCALE_SCALE2_TEXT_ID, QByteArray("0"));
   _blocks[RLI_PANEL_SCALE]->setText(RLI_PANEL_SCALE_UNITS_TEXT_ID, RLI_STR_NM);
 }
+
+void InfoEngine::onScaleChanged(const rli_scale_t* scale) {
+  _blocks[RLI_PANEL_SCALE]->setText(RLI_PANEL_SCALE_SCALE1_TEXT_ID, QByteArray(scale->display));
+  _blocks[RLI_PANEL_SCALE]->setText(RLI_PANEL_SCALE_SCALE2_TEXT_ID, QByteArray(scale->dist_rng_display));
+}
+
+
 
 void InfoEngine::initBlockVn() {
   _blocks[RLI_PANEL_VN]->setText(RLI_PANEL_VN_HEADER_TEXT_ID, RLI_STR_EBL);
@@ -668,9 +675,9 @@ void InfoEngine::initBlockPosition() {
   _blocks[RLI_PANEL_POSITION]->setText(RLI_PANEL_POSITION_TBL_1_1_TEXT_ID, RLI_STR_BLANK);
 }
 
-void InfoEngine::onPositionChanged(const QVector2D& position) {
-  _blocks[RLI_PANEL_POSITION]->setText(RLI_PANEL_POSITION_TBL_0_1_TEXT_ID, QString::number(position.x(), 'd', 2).toLocal8Bit());
-  _blocks[RLI_PANEL_POSITION]->setText(RLI_PANEL_POSITION_TBL_1_1_TEXT_ID, QString::number(position.y(), 'd', 2).toLocal8Bit());
+void InfoEngine::onPositionChanged(const GeoPos& position) {
+  _blocks[RLI_PANEL_POSITION]->setText(RLI_PANEL_POSITION_TBL_0_1_TEXT_ID, QString::number(position.lat, 'd', 2).toLocal8Bit());
+  _blocks[RLI_PANEL_POSITION]->setText(RLI_PANEL_POSITION_TBL_1_1_TEXT_ID, QString::number(position.lon, 'd', 2).toLocal8Bit());
 }
 
 

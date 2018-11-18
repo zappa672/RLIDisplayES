@@ -1,11 +1,10 @@
 #ifndef RADARSCALE_H
 #define RADARSCALE_H
 
-#include <stdint.h>
+//#include <stdint.h>
 
 #include <utility>
 #include <sys/types.h>
-#include <qbytearray.h>
 
 #ifdef Q_OS_WIN
 typedef unsigned __int32 u_int32_t;
@@ -17,47 +16,47 @@ typedef unsigned __int32 u_int32_t;
 #define APCTRL_SNDPULSE_LONG     1  // Index in scales table for long sounding pulse
 
 // Data types for managing scales
-enum soundingpulses
-{
-    SNDPLS_NONE  = -1,
-    SNDPLS_FIRST =  0,
-    SNDPLS_SHORT =  0,
-    SNDPLS_LONG  =  1,
-    SNDPLS_LAST  =  1
+enum SoundingPulses {
+  SNDPLS_NONE  = -1,
+  SNDPLS_FIRST =  0,
+  SNDPLS_SHORT =  0,
+  SNDPLS_LONG  =  1,
+  SNDPLS_LAST  =  1
 };
 
-typedef soundingpulses sndpls_t;
+typedef SoundingPulses sndpls_t;
 
-struct rli_scale
-{
-    float        len;      // Length of this scale in miles; 0 means invalid scale
-    sndpls_t     sndpls;   // Type of sounding pulse
-    u_int32_t    pkidpkod; // Settings for PKID and PKOD
-    u_int32_t    gen_addr; // Value to set the address of ADC Frequency Register
-    u_int32_t    gen_dat;  // Value to set the contents of ADC Frequency Register
-    float        dist_rng; // Space in miles between distance rings
-    const char * display;  // Name of the scale for displaying
-    const char * dist_rng_display; // How to display space size between distance rings
-    const char * val_fmt;  // printf format to display float value
+struct RLIScale {
+  float       len;              // Length of this scale in miles; 0 means invalid scale
+  sndpls_t    sndpls;           // Type of sounding pulse
+  u_int32_t   pkidpkod;         // Settings for PKID and PKOD
+  u_int32_t   gen_addr;         // Value to set the address of ADC Frequency Register
+  u_int32_t   gen_dat;          // Value to set the contents of ADC Frequency Register
+  float       dist_rng;         // Space in miles between distance rings
+  const char* display;          // Name of the scale for displaying
+  const char* dist_rng_display; // How to display space size between distance rings
+  const char* val_fmt;          // printf format to display float value
 };
 
-typedef struct rli_scale rli_scale_t;
+typedef struct RLIScale rli_scale_t;
 
-class RadarScale
-{
+class RadarScale {
 public:
-    RadarScale();
+  RadarScale();
 
-    sndpls_t sndpls;
-    const rli_scale_t * current;
+  const rli_scale_t* getCurScale(void);
 
-    static sndpls_t getNextSndPlsType(sndpls_t sndpls);
-    static sndpls_t getPrevSndPlsType(sndpls_t sndpls);
-    static const rli_scale_t * getScale(float len, sndpls_t sndpls);
-    std::pair<QByteArray, QByteArray> getCurScaleText(void);
-    const rli_scale_t * getCurScale(void);
-    int nextScale(void);
-    int prevScale(void);
+  int nextScale(void);
+  int prevScale(void);
+
+private:
+  static const rli_scale_t* getScale(float len, sndpls_t sndpls);
+
+  static sndpls_t getNextSndPlsType(sndpls_t sndpls);
+  static sndpls_t getPrevSndPlsType(sndpls_t sndpls);
+
+  sndpls_t sndpls;
+  const rli_scale_t *current;
 };
 
 #endif // RADARSCALE_H

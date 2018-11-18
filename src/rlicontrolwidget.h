@@ -13,7 +13,7 @@ class RLIControlWidget : public QWidget
   Q_OBJECT
 
 public:
-  explicit RLIControlWidget(QObject* reciever, QWidget *parent = 0);
+  explicit RLIControlWidget(QObject* reciever, QWidget *parent = nullptr);
   ~RLIControlWidget();
 
 private slots:

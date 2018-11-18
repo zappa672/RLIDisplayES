@@ -28,19 +28,19 @@ TargetEngine::TargetEngine(QOpenGLContext* context, QObject* parent) : QObject(p
 
 TargetEngine::~TargetEngine() {
   delete _prog;
-  delete _asset_tex;
-  delete _selection_tex;
+  //delete _asset_tex;
+  //delete _selection_tex;
 
   glDeleteBuffers(AIS_TRGT_ATTR_COUNT, _vbo_ids);
   glDeleteBuffers(1, &_ind_vbo_id);
 }
 
-void TargetEngine::select(const QVector2D& coords, float scale) {
+void TargetEngine::select(const GeoPos& coords, float scale) {
   for (const QString& tag: _targets.keys()) {
     if (tag == _selected)
       continue;
 
-    float dist = RLIMath::geo_distance(coords.x(), coords.y(), _targets[tag].latitude, _targets[tag].longtitude);
+    float dist = RLIMath::GCDistance(coords.lat, coords.lon, _targets[tag].latitude, _targets[tag].longtitude);
     if ((dist / scale) < 32) {
       _selected = tag;
       emit selectedTargetUpdated(_selected, _targets[_selected]);
@@ -160,7 +160,7 @@ void TargetEngine::draw(const QMatrix4x4& mvp_matrix, const RLIState& state) {
 
   auto coords = state.ship_position;
   glUniform1f(_unif_locs[AIS_TRGT_UNIF_SCALE], state.chart_scale);
-  glUniform2f(_unif_locs[AIS_TRGT_UNIF_CENTER], coords.x(), coords.y());
+  glUniform2f(_unif_locs[AIS_TRGT_UNIF_CENTER], coords.lat, coords.lon);
   _prog->setUniformValue(_unif_locs[AIS_TRGT_UNIF_MVP], mvp_matrix);
 
   initBuffersTrgts("");
@@ -174,7 +174,7 @@ void TargetEngine::draw(const QMatrix4x4& mvp_matrix, const RLIState& state) {
   glBindTexture(GL_TEXTURE_2D, _asset_tex->textureId());
 
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ind_vbo_id);
-  glDrawElements(GL_TRIANGLES, 6*_targets.size(), GL_UNSIGNED_INT, (const GLvoid*)(0 * sizeof(GLuint)));
+  glDrawElements(GL_TRIANGLES, 6*_targets.size(), GL_UNSIGNED_INT, reinterpret_cast<const GLvoid*>(0));
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
   glBindTexture(GL_TEXTURE_2D, 0);
@@ -223,27 +223,27 @@ void TargetEngine::draw(const QMatrix4x4& mvp_matrix, const RLIState& state) {
 
 void TargetEngine::bindBuffers() {
   glBindBuffer(GL_ARRAY_BUFFER, _vbo_ids[AIS_TRGT_ATTR_COORDS]);
-  glVertexAttribPointer(_attr_locs[AIS_TRGT_ATTR_COORDS], 2, GL_FLOAT, GL_FALSE, 0, (void*) (0));
+  glVertexAttribPointer(_attr_locs[AIS_TRGT_ATTR_COORDS], 2, GL_FLOAT, GL_FALSE, 0, reinterpret_cast<const GLvoid*>(0));
   glEnableVertexAttribArray(_attr_locs[AIS_TRGT_ATTR_COORDS]);
 
   glBindBuffer(GL_ARRAY_BUFFER, _vbo_ids[AIS_TRGT_ATTR_ORDER]);
-  glVertexAttribPointer(_attr_locs[AIS_TRGT_ATTR_ORDER], 1, GL_FLOAT, GL_FALSE, 0, (void*) (0));
+  glVertexAttribPointer(_attr_locs[AIS_TRGT_ATTR_ORDER], 1, GL_FLOAT, GL_FALSE, 0, reinterpret_cast<const GLvoid*>(0));
   glEnableVertexAttribArray(_attr_locs[AIS_TRGT_ATTR_ORDER]);
 
   glBindBuffer(GL_ARRAY_BUFFER, _vbo_ids[AIS_TRGT_ATTR_HEADING]);
-  glVertexAttribPointer(_attr_locs[AIS_TRGT_ATTR_HEADING], 1, GL_FLOAT, GL_FALSE, 0, (void*) (0));
+  glVertexAttribPointer(_attr_locs[AIS_TRGT_ATTR_HEADING], 1, GL_FLOAT, GL_FALSE, 0, reinterpret_cast<const GLvoid*>(0));
   glEnableVertexAttribArray(_attr_locs[AIS_TRGT_ATTR_HEADING]);
 
   glBindBuffer(GL_ARRAY_BUFFER, _vbo_ids[AIS_TRGT_ATTR_ROTATION]);
-  glVertexAttribPointer(_attr_locs[AIS_TRGT_ATTR_ROTATION], 1, GL_FLOAT, GL_FALSE, 0, (void*) (0));
+  glVertexAttribPointer(_attr_locs[AIS_TRGT_ATTR_ROTATION], 1, GL_FLOAT, GL_FALSE, 0, reinterpret_cast<const GLvoid*>(0));
   glEnableVertexAttribArray(_attr_locs[AIS_TRGT_ATTR_ROTATION]);
 
   glBindBuffer(GL_ARRAY_BUFFER, _vbo_ids[AIS_TRGT_ATTR_COURSE]);
-  glVertexAttribPointer(_attr_locs[AIS_TRGT_ATTR_COURSE], 1, GL_FLOAT, GL_FALSE, 0, (void*) (0));
+  glVertexAttribPointer(_attr_locs[AIS_TRGT_ATTR_COURSE], 1, GL_FLOAT, GL_FALSE, 0, reinterpret_cast<const GLvoid*>(0));
   glEnableVertexAttribArray(_attr_locs[AIS_TRGT_ATTR_COURSE]);
 
   glBindBuffer(GL_ARRAY_BUFFER, _vbo_ids[AIS_TRGT_ATTR_SPEED]);
-  glVertexAttribPointer(_attr_locs[AIS_TRGT_ATTR_SPEED], 1, GL_FLOAT, GL_FALSE, 0, (void*) (0));
+  glVertexAttribPointer(_attr_locs[AIS_TRGT_ATTR_SPEED], 1, GL_FLOAT, GL_FALSE, 0, reinterpret_cast<const GLvoid*>(0));
   glEnableVertexAttribArray(_attr_locs[AIS_TRGT_ATTR_SPEED]);
 }
 
@@ -266,19 +266,19 @@ int TargetEngine::initBuffersTails() {
   glBufferData(GL_ARRAY_BUFFER, point_count*2*sizeof(GLfloat), point.data(), GL_DYNAMIC_DRAW);
 
   glBindBuffer(GL_ARRAY_BUFFER, _vbo_ids[AIS_TRGT_ATTR_ORDER]);
-  glBufferData(GL_ARRAY_BUFFER, point_count*sizeof(GLfloat), NULL, GL_DYNAMIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, point_count*sizeof(GLfloat), nullptr, GL_DYNAMIC_DRAW);
 
   glBindBuffer(GL_ARRAY_BUFFER, _vbo_ids[AIS_TRGT_ATTR_HEADING]);
-  glBufferData(GL_ARRAY_BUFFER, point_count*sizeof(GLfloat), NULL, GL_DYNAMIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, point_count*sizeof(GLfloat), nullptr, GL_DYNAMIC_DRAW);
 
   glBindBuffer(GL_ARRAY_BUFFER, _vbo_ids[AIS_TRGT_ATTR_ROTATION]);
-  glBufferData(GL_ARRAY_BUFFER, point_count*sizeof(GLfloat), NULL, GL_DYNAMIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, point_count*sizeof(GLfloat), nullptr, GL_DYNAMIC_DRAW);
 
   glBindBuffer(GL_ARRAY_BUFFER, _vbo_ids[AIS_TRGT_ATTR_COURSE]);
-  glBufferData(GL_ARRAY_BUFFER, point_count*sizeof(GLfloat), NULL, GL_DYNAMIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, point_count*sizeof(GLfloat), nullptr, GL_DYNAMIC_DRAW);
 
   glBindBuffer(GL_ARRAY_BUFFER, _vbo_ids[AIS_TRGT_ATTR_SPEED]);
-  glBufferData(GL_ARRAY_BUFFER, point_count*sizeof(GLfloat), NULL, GL_DYNAMIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, point_count*sizeof(GLfloat), nullptr, GL_DYNAMIC_DRAW);
 
   return point_count;
 }
@@ -359,18 +359,5 @@ QOpenGLTexture* TargetEngine::initTexture(QString path) {
   tex->setData(img, QOpenGLTexture::DontGenerateMipMaps);
 
   return tex;
-
-  /*
-  glGenTextures(1, tex_id);
-  glBindTexture(GL_TEXTURE_2D, *tex_id);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  img = QOpenGLContext::convertToGLFormat(QImage(path));
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, img.width(), img.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, img.bits());
-  glGenerateMipmap(GL_TEXTURE_2D);
-  glBindTexture(GL_TEXTURE_2D, 0);
-  */
 }
 

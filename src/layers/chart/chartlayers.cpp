@@ -21,7 +21,7 @@ void ChartAreaEngine::clearData() {
 
   for (int i = 0; i < AREA_ATTRIBUTES_COUNT; i++) {
     glBindBuffer(GL_ARRAY_BUFFER, _vbo_ids[i]);
-    glBufferData(GL_ARRAY_BUFFER, 0, NULL, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, 0, nullptr, GL_STATIC_DRAW);
   }
   glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -41,7 +41,7 @@ void ChartAreaEngine::setData(S52AreaLayer* layer, S52Assets* assets, S52Referen
   _color_ind = layer->color_ind;
 
   if ((!_is_color_uniform) || (!_is_pattern_uniform)) {
-    for (uint i = 0; i < layer->start_inds.size(); i++) {
+    for (int i = 0; i < layer->start_inds.size(); i++) {
       int fst_idx = layer->start_inds[i];
       int lst_idx = 0;
 
@@ -165,12 +165,12 @@ void ChartLineEngine::clearData() {
 
   for (int i = 0; i < LINE_ATTRIBUTES_COUNT; i++) {
     glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[i]);
-    glBufferData(GL_ARRAY_BUFFER, 0, NULL, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, 0, nullptr, GL_STATIC_DRAW);
   }
   glBindBuffer(GL_ARRAY_BUFFER, 0);
 
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ind_vbo_id);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, 0, NULL, GL_STATIC_DRAW);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, 0, nullptr, GL_STATIC_DRAW);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
@@ -363,12 +363,12 @@ void ChartMarkEngine::clearData() {
 
   for (int i = 0; i < MARK_ATTRIBUTES_COUNT; i++) {
     glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[i]);
-    glBufferData(GL_ARRAY_BUFFER, 0, NULL, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, 0, nullptr, GL_STATIC_DRAW);
   }
   glBindBuffer(GL_ARRAY_BUFFER, 0);
 
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ind_vbo_id);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, 0, NULL, GL_STATIC_DRAW);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, 0, nullptr, GL_STATIC_DRAW);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
@@ -594,12 +594,12 @@ void ChartTextEngine::clearData() {
 
   for (int i = 0; i < TEXT_ATTRIBUTES_COUNT; i++) {
     glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[i]);
-    glBufferData(GL_ARRAY_BUFFER, 0, NULL, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, 0, nullptr, GL_STATIC_DRAW);
   }
   glBindBuffer(GL_ARRAY_BUFFER, 0);
 
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ind_vbo_id);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, 0, NULL, GL_STATIC_DRAW);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, 0, nullptr, GL_STATIC_DRAW);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 

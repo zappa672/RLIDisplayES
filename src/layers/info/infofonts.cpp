@@ -12,7 +12,6 @@ InfoFonts::InfoFonts(QOpenGLContext* context, const QString& dirPath) : QOpenGLF
 
   for (QString fileName : dir.entryList()) {
     QString tag = fileName.replace(".png", "");
-    //qDebug() << tag << "font available";
 
     QOpenGLTexture* tex = new QOpenGLTexture(QOpenGLTexture::Target2D);
     QImage img(dir.absoluteFilePath(fileName));
@@ -31,6 +30,6 @@ InfoFonts::InfoFonts(QOpenGLContext* context, const QString& dirPath) : QOpenGLF
 }
 
 InfoFonts::~InfoFonts() {
-  for (QOpenGLTexture* tex : _textures)
-    tex->destroy();
+  //for (QOpenGLTexture* tex : _textures)
+  //  tex->destroy();
 }

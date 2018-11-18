@@ -12,7 +12,7 @@
 class S52Assets : protected QOpenGLFunctions
 {
 public:
-  explicit S52Assets(QOpenGLContext* context, S52References* ref);
+  S52Assets(QOpenGLContext* context, S52References* ref);
   virtual ~S52Assets();
 
   inline QOpenGLTexture* getFontTexId       ()                                    { return font_texture; }

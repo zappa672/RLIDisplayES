@@ -22,20 +22,20 @@ struct RLITarget {
 
   ~RLITarget() { }
 
-  bool lost         { false };
-  float latitude    { 0.f };
-  float longtitude  { 0.f };
-  float heading     { 0.f };
-  float rotation    { 0.f };
-  float course_grnd { 0.f };
-  float speed_grnd  { 0.f };
+  bool lost          { false };
+  double latitude    { 0 };
+  double longtitude  { 0 };
+  double heading     { 0 };
+  double rotation    { 0 };
+  double course_grnd { 0 };
+  double speed_grnd  { 0 };
 };
 
 class TargetDataSource : public QObject
 {
   Q_OBJECT
 public:
-  explicit TargetDataSource(QObject *parent = 0);
+  explicit TargetDataSource(QObject *parent = nullptr);
   virtual ~TargetDataSource();
 
 signals:

@@ -17,7 +17,7 @@ class ShipDataSource : public QObject
 {
   Q_OBJECT
 public:
-  explicit ShipDataSource(QObject *parent = 0);
+  explicit ShipDataSource(QObject *parent = nullptr);
   virtual ~ShipDataSource();
 
   inline const RLIShipState& shipState() const { return _ship_state; }

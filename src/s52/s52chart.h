@@ -29,9 +29,9 @@ struct S52AreaLayer {
   //std::vector<QString> color_refs;
   std::vector<float> color_inds;
   // layer i-th area triangles start index
-  std::vector<int>    start_inds;
+  std::vector<size_t>    start_inds;
   // sequence of coords representing triangulated polygon
-  std::vector<GLfloat>  triangles;
+  std::vector<float>  triangles;
 };
 
 struct S52LineLayer {
@@ -51,7 +51,7 @@ struct S52LineLayer {
   // sequence of coords representing polylines
   std::vector<float>  points;
   // length of the line up to current point
-  std::vector<float>  distances;
+  std::vector<double>  distances;
 };
 
 struct S52MarkLayer {
@@ -122,9 +122,9 @@ private:
   bool readTextLayer(OGRLayer* poLayer);
 
   // Reading and tesselating OGRPolygon, append result to triangles
-  bool readOGRPolygon(OGRPolygon* poGeom, std::vector<float> &points, std::vector<float> &distances, bool contour);
+  bool readOGRPolygon(OGRPolygon* poGeom, std::vector<float>& triangles);
   // Reading OGRLine, append result to points
-  bool readOGRLine(OGRLineString* poGeom, std::vector<float> &points, std::vector<float> &distances);
+  bool readOGRLine(OGRLineString* poGeom, std::vector<float>& points, std::vector<double>& distances);
 
   void fillLineParams(QString& layer_name, S52LineLayer* layer, OGRFeature* poFeature);
   void fillAreaParams(QString& layer_name, S52AreaLayer* layer, OGRFeature* poFeature);

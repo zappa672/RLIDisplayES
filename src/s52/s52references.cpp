@@ -279,7 +279,7 @@ const QColor S52References::getColor(const QString& color_ref) {
 
 
 void S52References::readColorTables(QXmlStreamReader* xml) {
-  ColorTable* ct = NULL;
+  ColorTable* ct = nullptr;
 
   while (!xml->atEnd()) {
     switch (xml->readNext()) {
@@ -290,10 +290,10 @@ void S52References::readColorTables(QXmlStreamReader* xml) {
         break;
       }
 
-      if (ct != NULL && xml->name() == "graphics-file")
+      if (ct != nullptr && xml->name() == "graphics-file")
         ct->graphics_file = xml->attributes().value("name").toString();
 
-      if (ct != NULL && xml->name() == "color")
+      if (ct != nullptr && xml->name() == "color")
         ct->colors.insert(xml->attributes().value("name").toString(),
                           QColor(xml->attributes().value("r").toInt()
                                , xml->attributes().value("g").toInt()
@@ -301,7 +301,7 @@ void S52References::readColorTables(QXmlStreamReader* xml) {
 
       break;
     case QXmlStreamReader::EndElement:
-      if (ct != NULL && xml->name() == "color-table")
+      if (ct != nullptr && xml->name() == "color-table")
         color_tables.insert(ct->name, ct);
 
       if (xml->name() == "color-tables")
@@ -316,7 +316,7 @@ void S52References::readColorTables(QXmlStreamReader* xml) {
 
 
 void S52References::readLookUps(QXmlStreamReader* xml) {
-  LookUp* lp = NULL;
+  LookUp* lp = nullptr;
 
   while (!xml->atEnd()) {
     switch (xml->readNext()) {
@@ -329,33 +329,33 @@ void S52References::readLookUps(QXmlStreamReader* xml) {
         break;
       }
 
-      if (lp != NULL && xml->name() == "type")
+      if (lp != nullptr && xml->name() == "type")
         lp->type = xml->readElementText();
 
-      if (lp != NULL && xml->name() == "disp-prio")
+      if (lp != nullptr && xml->name() == "disp-prio")
         lp->disp_prio = xml->readElementText();
 
-      if (lp != NULL && xml->name() == "radar-prio")
+      if (lp != nullptr && xml->name() == "radar-prio")
         lp->radar_prio = xml->readElementText();
 
-      if (lp != NULL && xml->name() == "table-name")
+      if (lp != nullptr && xml->name() == "table-name")
         lp->table_name = xml->readElementText();
 
-      if (lp != NULL && xml->name() == "attrib-code")
+      if (lp != nullptr && xml->name() == "attrib-code")
         lp->attr_refs.append(xml->readElementText());
 
-      if (lp != NULL && xml->name() == "instruction")
+      if (lp != nullptr && xml->name() == "instruction")
         lp->instruction = xml->readElementText();
 
-      if (lp != NULL && xml->name() == "display-cat")
+      if (lp != nullptr && xml->name() == "display-cat")
         lp->display_cat = xml->readElementText();
 
-      if (lp != NULL && xml->name() == "comment")
+      if (lp != nullptr && xml->name() == "comment")
         lp->comment = xml->readElementText();
 
       break;
     case QXmlStreamReader::EndElement:
-      if (lp != NULL && xml->name() == "lookup")
+      if (lp != nullptr && xml->name() == "lookup")
         lookups.insert(lp->rcid, lp);
 
       if (xml->name() == "lookups")
@@ -370,7 +370,7 @@ void S52References::readLookUps(QXmlStreamReader* xml) {
 
 
 void S52References::readLineStyles(QXmlStreamReader* xml) {
-  LineStyle* ls = NULL;
+  LineStyle* ls = nullptr;
 
   while (!xml->atEnd()) {
     switch (xml->readNext()) {
@@ -381,13 +381,13 @@ void S52References::readLineStyles(QXmlStreamReader* xml) {
         break;
       }
 
-      if (ls != NULL && xml->name() == "name")
+      if (ls != nullptr && xml->name() == "name")
         ls->name = xml->readElementText();
 
-      if (ls != NULL && xml->name() == "description")
+      if (ls != nullptr && xml->name() == "description")
         ls->description = xml->readElementText();
 
-      if (ls != NULL && xml->name() == "color-ref")
+      if (ls != nullptr && xml->name() == "color-ref")
         ls->color_ref = xml->readElementText();
 
       if (xml->name() == "vector")
@@ -411,7 +411,7 @@ void S52References::readLineStyles(QXmlStreamReader* xml) {
 
       break;
     case QXmlStreamReader::EndElement:
-      if (ls != NULL && xml->name() == "line-style")
+      if (ls != nullptr && xml->name() == "line-style")
         line_styles.insert(ls->rcid, ls);
 
       if (xml->name() == "line-styles")
@@ -425,7 +425,7 @@ void S52References::readLineStyles(QXmlStreamReader* xml) {
 }
 
 void S52References::readPatterns(QXmlStreamReader* xml) {
-  Pattern* pn = NULL;
+  Pattern* pn = nullptr;
 
   while (!xml->atEnd()) {
     switch (xml->readNext()) {
@@ -436,22 +436,22 @@ void S52References::readPatterns(QXmlStreamReader* xml) {
         break;
       }
 
-      if (pn != NULL && xml->name() == "name")
+      if (pn != nullptr && xml->name() == "name")
         pn->name = xml->readElementText();
 
-      if (pn != NULL && xml->name() == "definition")
+      if (pn != nullptr && xml->name() == "definition")
         pn->definition = xml->readElementText();
 
-      if (pn != NULL && xml->name() == "filltype")
+      if (pn != nullptr && xml->name() == "filltype")
         pn->filltype = xml->readElementText();
 
-      if (pn != NULL && xml->name() == "spacing")
+      if (pn != nullptr && xml->name() == "spacing")
         pn->spacing = xml->readElementText();
 
-      if (pn != NULL && xml->name() == "description")
+      if (pn != nullptr && xml->name() == "description")
         pn->description = xml->readElementText();
 
-      if (pn != NULL && xml->name() == "color-ref")
+      if (pn != nullptr && xml->name() == "color-ref")
         pn->color_ref = xml->readElementText();
 
       if (xml->name() == "vector")
@@ -475,7 +475,7 @@ void S52References::readPatterns(QXmlStreamReader* xml) {
 
       break;
     case QXmlStreamReader::EndElement:
-      if (pn != NULL && xml->name() == "pattern")
+      if (pn != nullptr && xml->name() == "pattern")
         patterns.insert(pn->rcid, pn);
 
       if (xml->name() == "patterns")
@@ -489,7 +489,7 @@ void S52References::readPatterns(QXmlStreamReader* xml) {
 }
 
 void S52References::readSymbols(QXmlStreamReader* xml) {
-  Symbol* sb = NULL;
+  Symbol* sb = nullptr;
   bool vector_part_flag = false;
 
   while (!xml->atEnd()) {
@@ -500,16 +500,16 @@ void S52References::readSymbols(QXmlStreamReader* xml) {
         sb->rcid = xml->attributes().value("RCID").toInt();break;
       }
 
-      if (sb != NULL && xml->name() == "name")
+      if (sb != nullptr && xml->name() == "name")
         sb->name = xml->readElementText();
 
-      if (sb != NULL && xml->name() == "definition")
+      if (sb != nullptr && xml->name() == "definition")
         sb->definition = xml->readElementText();
 
-      if (sb != NULL && xml->name() == "description")
+      if (sb != nullptr && xml->name() == "description")
         sb->description = xml->readElementText();
 
-      if (sb != NULL && xml->name() == "color-ref")
+      if (sb != nullptr && xml->name() == "color-ref")
         sb->color_ref = xml->readElementText();
 
       if (xml->name() == "vector") {
@@ -562,7 +562,7 @@ void S52References::readSymbols(QXmlStreamReader* xml) {
 
       break;
     case QXmlStreamReader::EndElement:
-      if (sb != NULL && xml->name() == "symbol") {
+      if (sb != nullptr && xml->name() == "symbol") {
         symbols.insert(sb->name, sb);
         break;
       }

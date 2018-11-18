@@ -2,6 +2,8 @@
 #define TARGETENGINE_H
 
 #include "../common/rlistate.h"
+#include "../common/rlimath.h"
+
 #include "../datasources/targetdatasource.h"
 
 #include <QPoint>
@@ -20,7 +22,7 @@ class TargetEngine : public QObject, protected QOpenGLFunctions {
   Q_OBJECT
 
 public:
-  explicit TargetEngine(QOpenGLContext* context, QObject* parent = 0);
+  explicit TargetEngine(QOpenGLContext* context, QObject* parent = nullptr);
   virtual ~TargetEngine();
 
   void draw(const QMatrix4x4& mvp_matrix, const RLIState& state);
@@ -39,7 +41,7 @@ protected slots:
 public slots:
   void onTailsModeChanged(int mode, int minutes);
 
-  void select(const QVector2D& coords, float scale);
+  void select(const GeoPos& coords, float scale);
 
   void deleteTarget(QString tag);
   void updateTarget(QString tag, RLITarget target);

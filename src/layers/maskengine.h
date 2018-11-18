@@ -20,16 +20,16 @@
 class MaskEngine : public QObject, protected QOpenGLFunctions {
   Q_OBJECT
 public:
-  explicit MaskEngine (const QSize& sz, const RLICircleLayout& layout, InfoFonts* fonts, QOpenGLContext* context, QObject* parent = nullptr);
-  virtual ~MaskEngine ();
+  MaskEngine(const QSize& sz, const RLICircleLayout& layout, InfoFonts* fonts, QOpenGLContext* context, QObject* parent = nullptr);
+  virtual ~MaskEngine();
 
   void resize(const QSize& sz, const RLICircleLayout& layout);
 
   inline GLuint textureId()   { return _fbo->texture(); }
 
-  inline void setCursorPos  (const QPoint& p)   { _cursor_pos = p; }
+  inline void setCursorPos(const QPoint& p)   { _cursor_pos = p; }
 
-  inline GLuint  getTextureId   ()   { return _fbo->texture(); }
+  inline GLuint  getTextureId()   { return _fbo->texture(); }
 
 public slots:
   void update();

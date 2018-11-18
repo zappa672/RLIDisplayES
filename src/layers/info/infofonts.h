@@ -11,7 +11,7 @@
 class InfoFonts : protected QOpenGLFunctions
 {
 public:
-  explicit InfoFonts(QOpenGLContext* context, const QString& dirPath);
+  InfoFonts(QOpenGLContext* context, const QString& dirPath);
   virtual ~InfoFonts();
 
   inline QOpenGLTexture* getTexture(const QString& tag)   { return _textures.value(tag, nullptr); }

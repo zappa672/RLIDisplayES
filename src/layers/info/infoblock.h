@@ -38,7 +38,7 @@ struct InfoText {
 class InfoBlock : protected QOpenGLFunctions {
 
 public:
-  explicit InfoBlock(const RLIInfoPanelLayout& layout, const std::map<QString, int>& text_id_map, QOpenGLContext* context);
+  InfoBlock(const RLIInfoPanelLayout& layout, const std::map<QString, int>& text_id_map, QOpenGLContext* context);
   virtual ~InfoBlock();
 
   void clear();

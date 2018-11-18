@@ -33,14 +33,14 @@ MenuEngine::MenuEngine(const RLIMenuLayout& layout, QOpenGLContext* context, QOb
   initMainMenuTree();
   initCnfgMenuTree();
 
-  _menu = NULL;
-  //_routeEngine = NULL;
+  _menu = nullptr;
+  //_routeEngine = nullptr;
   _last_action_time = QDateTime::currentDateTime();
   _need_update = true;
 }
 
 void MenuEngine::initCnfgMenuTree() {
-  RLIMenuItemMenu* m1 = new RLIMenuItemMenu(RLI_STR_MENU_1, NULL);
+  RLIMenuItemMenu* m1 = new RLIMenuItemMenu(RLI_STR_MENU_1, nullptr);
 
   // --------------------------
   RLIMenuItemMenu* m10 = new RLIMenuItemMenu(RLI_STR_MENU_10, m1);
@@ -197,7 +197,7 @@ void MenuEngine::initCnfgMenuTree() {
 
 
 void MenuEngine::initMainMenuTree() {
-  RLIMenuItemMenu* m0 = new RLIMenuItemMenu(RLI_STR_MENU_0, NULL);
+  RLIMenuItemMenu* m0 = new RLIMenuItemMenu(RLI_STR_MENU_0, nullptr);
 
   // --------------------------
   RLIMenuItemMenu* m00 = new RLIMenuItemMenu(RLI_STR_MENU_00, m0);
@@ -459,7 +459,7 @@ void MenuEngine::onStateChanged(RLIWidgetState state) {
   case RLIWidgetState::RLISTATE_DEFAULT:
   case RLIWidgetState::RLISTATE_MAGNIFIER:
       _selection_active = false;
-      _menu = NULL;
+      _menu = nullptr;
       break;
   case RLIWidgetState::RLISTATE_ROUTE_EDITION:
   default:
@@ -513,7 +513,7 @@ void MenuEngine::onKeyPressed(QKeyEvent* event) {
 }
 
 void MenuEngine::onUp() {
-  if (_menu == NULL)
+  if (_menu == nullptr)
     return;
 
   if (!_selection_active) {
@@ -528,7 +528,7 @@ void MenuEngine::onUp() {
 }
 
 void MenuEngine::onDown() {
-  if (_menu == NULL)
+  if (_menu == nullptr)
     return;
 
   if (!_selection_active) {
@@ -576,7 +576,7 @@ void MenuEngine::onEnter() {
 }
 
 void MenuEngine::onBack() {
-  if (!_selection_active && _menu->parent() != NULL) {
+  if (!_selection_active && _menu->parent() != nullptr) {
      int _new_selection = 1;
      for (int i = 0; i < _menu->parent()->item_count(); i++)
        if (_menu->parent()->item(i) == _menu)
@@ -631,7 +631,7 @@ void MenuEngine::update() {
   drawRect(QRect(QPoint(0, _geometry.height()-1), QSize(_geometry.width(), 1)), MENU_BORDER_COLOR);
   drawRect(QRect(QPoint(_geometry.width()-1, 0), QSize(1, _geometry.height())), MENU_BORDER_COLOR);
 
-  if (_menu != NULL) {
+  if (_menu != nullptr) {
     QSize font_size = _fonts->getFontSize(_font_tag);
 
     // Header separator
@@ -644,7 +644,7 @@ void MenuEngine::update() {
 
     // Menu
     for (int i = 0; i < _menu->item_count(); i++) {
-//      if ((_menu->item(i) == routeLoaderItem || _menu->item(i) == routeSaverItem) && _routeEngine != NULL) {
+//      if ((_menu->item(i) == routeLoaderItem || _menu->item(i) == routeSaverItem) && _routeEngine != nullptr) {
 //        if (_routeEngine->isIndexUsed(static_cast<RLIMenuItemInt*>(_menu->item(i))->intValue())) {
 //          drawText(_menu->item(i)->name(_lang), i+1, ALIGN_LEFT, MENU_TEXT_STATIC_COLOR);
 //          drawText(_menu->item(i)->value(_lang), i+1, ALIGN_RIGHT, MENU_TEXT_DYNAMIC_COLOR);
@@ -697,7 +697,7 @@ void MenuEngine::drawSelection() {
 }
 
 void MenuEngine::drawBar() {
-  if (_menu == NULL)
+  if (_menu == nullptr)
     return;
 
   QSize size = _fbo->size();
@@ -706,7 +706,7 @@ void MenuEngine::drawBar() {
   RLIMenuItem* currItem = _menu->item(_selected_line - 1);
 
   RLIMenuItemInt* intItem = dynamic_cast<RLIMenuItemInt*>(currItem);
-  if (intItem != NULL) {
+  if (intItem != nullptr) {
     int val = intItem->intValue();
     int min_val = intItem->minValue();
     int max_val = intItem->maxValue();
@@ -714,7 +714,7 @@ void MenuEngine::drawBar() {
   }
 
   RLIMenuItemFloat* fltItem = dynamic_cast<RLIMenuItemFloat*>(currItem);
-  if (fltItem != NULL) {
+  if (fltItem != nullptr) {
     float val = fltItem->fltValue();
     float min_val = fltItem->minValue();
     float max_val = fltItem->maxValue();
@@ -741,7 +741,7 @@ void MenuEngine::drawRect(const QRect& rect, const QColor& col) {
 
   glBindBuffer(GL_ARRAY_BUFFER, _vbo_ids[INFO_ATTR_POSITION]);
   glBufferData(GL_ARRAY_BUFFER, pos.size()*sizeof(GLfloat), pos.data(), GL_STATIC_DRAW);
-  glVertexAttribPointer(_attr_locs[INFO_ATTR_POSITION], 2, GL_FLOAT, GL_FALSE, 0, (void*) (0));
+  glVertexAttribPointer(_attr_locs[INFO_ATTR_POSITION], 2, GL_FLOAT, GL_FALSE, 0, reinterpret_cast<const GLvoid*>(0));
   glEnableVertexAttribArray(_attr_locs[INFO_ATTR_POSITION]);
 
   glVertexAttrib1f(_attr_locs[INFO_ATTR_ORDER], 0.f);
@@ -795,17 +795,17 @@ void MenuEngine::drawText(const QByteArray& text, int line, TextAllignement alig
 
   glBindBuffer(GL_ARRAY_BUFFER, _vbo_ids[INFO_ATTR_POSITION]);
   glBufferData(GL_ARRAY_BUFFER, pos.size()*sizeof(GLfloat), pos.data(), GL_STATIC_DRAW);
-  glVertexAttribPointer(_attr_locs[INFO_ATTR_POSITION], 2, GL_FLOAT, GL_FALSE, 0, (void*) (0));
+  glVertexAttribPointer(_attr_locs[INFO_ATTR_POSITION], 2, GL_FLOAT, GL_FALSE, 0, reinterpret_cast<const GLvoid*>(0));
   glEnableVertexAttribArray(_attr_locs[INFO_ATTR_POSITION]);
 
   glBindBuffer(GL_ARRAY_BUFFER, _vbo_ids[INFO_ATTR_ORDER]);
   glBufferData(GL_ARRAY_BUFFER, ord.size()*sizeof(GLfloat), ord.data(), GL_STATIC_DRAW);
-  glVertexAttribPointer(_attr_locs[INFO_ATTR_ORDER], 1, GL_FLOAT, GL_FALSE, 0, (void*) (0));
+  glVertexAttribPointer(_attr_locs[INFO_ATTR_ORDER], 1, GL_FLOAT, GL_FALSE, 0, reinterpret_cast<const GLvoid*>(0));
   glEnableVertexAttribArray(_attr_locs[INFO_ATTR_ORDER]);
 
   glBindBuffer(GL_ARRAY_BUFFER, _vbo_ids[INFO_ATTR_CHAR_VAL]);
   glBufferData(GL_ARRAY_BUFFER, chars.size()*sizeof(GLfloat), chars.data(), GL_STATIC_DRAW);
-  glVertexAttribPointer(_attr_locs[INFO_ATTR_CHAR_VAL], 1, GL_FLOAT, GL_FALSE, 0, (void*) (0));
+  glVertexAttribPointer(_attr_locs[INFO_ATTR_CHAR_VAL], 1, GL_FLOAT, GL_FALSE, 0, reinterpret_cast<const GLvoid*>(0));
   glEnableVertexAttribArray(_attr_locs[INFO_ATTR_CHAR_VAL]);
 
 

@@ -11,7 +11,7 @@ class ChartManager : public QObject
 {
   Q_OBJECT
 public:
-  explicit ChartManager(QObject *parent = 0);
+  explicit ChartManager(QObject *parent = nullptr);
   ~ChartManager();
 
   void loadCharts();
@@ -19,7 +19,7 @@ public:
   inline S52References* refs() {return _s52_refs; }
   inline int chartCount() { return _charts.size(); }
   inline QList<QString> chartNames() { return _charts.keys(); }
-  inline S52Chart* getChart(const QString& name) { if (!_charts.contains(name)) return NULL; return _charts[name]; }
+  inline S52Chart* getChart(const QString& name) { if (!_charts.contains(name)) return nullptr; return _charts[name]; }
 
 signals:
   void new_chart_available(const QString& name);

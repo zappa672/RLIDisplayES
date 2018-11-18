@@ -14,7 +14,7 @@
 void qSleep(int ms) {
   if (ms <= 0) return;
   struct timespec ts = { ms / 1000, (ms % 1000) * 1000 * 1000 };
-  nanosleep(&ts, NULL);
+  nanosleep(&ts, nullptr);
 }
 
 RadarDataSource::RadarDataSource(QObject* parent) : QObject(parent) {
@@ -57,7 +57,7 @@ void RadarDataSource::finish() {
 
 void RadarDataSource::worker() {
   int delay = qApp->property(PROPERTY_DATA_DELAY).toInt();
-  uint BLOCK_TO_SEND = qApp->property(PROPERTY_BLOCK_SIZE).toInt();
+  int BLOCK_TO_SEND = qApp->property(PROPERTY_BLOCK_SIZE).toInt();
   int file = 0;
   int offset = 0;
 
@@ -91,8 +91,8 @@ bool RadarDataSource::loadData() {
 
 
 bool RadarDataSource::initWithDummy1(GLfloat* amps) {
-  for (uint i = 0; i < _bearings_per_cycle; i++)
-    for (uint j = 0; j < _peleng_size; j++)
+  for (int i = 0; i < _bearings_per_cycle; i++)
+    for (int j = 0; j < _peleng_size; j++)
       if (i % 256 < 9 || i % 256 > 247)
         amps[i*_peleng_size+j] = (255.f * j) / _peleng_size;
       else
@@ -102,8 +102,8 @@ bool RadarDataSource::initWithDummy1(GLfloat* amps) {
 }
 
 bool RadarDataSource::initWithDummy2(GLfloat* amps) {
-  for (uint i = 0; i < _bearings_per_cycle; i++)
-    for (uint j = 0; j < _peleng_size; j++)
+  for (int i = 0; i < _bearings_per_cycle; i++)
+    for (int j = 0; j < _peleng_size; j++)
       if (j > 259 && j < 268)
         amps[i*_peleng_size+j] = 255.f - (255.f * i) / _bearings_per_cycle;
       else
@@ -113,8 +113,8 @@ bool RadarDataSource::initWithDummy2(GLfloat* amps) {
 }
 
 bool RadarDataSource::initWithDummy3(GLfloat* amps) {
-  for (uint i = 0; i < _bearings_per_cycle; i++)
-    for (uint j = 0; j < _peleng_size; j++)
+  for (int i = 0; i < _bearings_per_cycle; i++)
+    for (int j = 0; j < _peleng_size; j++)
       if (i % 256 < 137 && i % 256 > 121)
         amps[i*_peleng_size+j] = (255.f * j) / _peleng_size;
       else
@@ -124,8 +124,8 @@ bool RadarDataSource::initWithDummy3(GLfloat* amps) {
 }
 
 bool RadarDataSource::initWithDummy4(GLfloat* amps) {
-  for (uint i = 0; i < _bearings_per_cycle; i++)
-    for (uint j = 0; j < _peleng_size; j++)
+  for (int i = 0; i < _bearings_per_cycle; i++)
+    for (int j = 0; j < _peleng_size; j++)
       if (j > 131 && j < 140)
         amps[i*_peleng_size+j] = 255.f - (255.f * i) / _bearings_per_cycle;
       else

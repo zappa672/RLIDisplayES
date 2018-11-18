@@ -17,7 +17,7 @@ class ControlsEngine : public QObject, protected QOpenGLFunctions {
   Q_OBJECT
 
 public:
-  explicit ControlsEngine(QOpenGLContext* context, QObject* parent = 0);
+  explicit ControlsEngine(QOpenGLContext* context, QObject* parent = nullptr);
   virtual ~ControlsEngine();
 
   void draw(const QMatrix4x4& mvp_mat, const RLIState& state);

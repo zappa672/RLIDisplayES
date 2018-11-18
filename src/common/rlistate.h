@@ -4,7 +4,9 @@
 #include <QObject>
 #include <QVector2D>
 #include <QPoint>
-#include <QKeyEvent>
+
+#include "../common/radarscale.h"
+#include "../common/rlimath.h"
 
 #include "../datasources/shipdatasource.h"
 
@@ -26,20 +28,21 @@ struct RLIState {
   float emission  { 0.f };
 
   // Chart parameters
-  float   north_shift   { 0.f };
-  float   chart_scale   { 100.f };
-  QPoint  center_shift  { 0, 0 };
+  float       north_shift   { 0.f };
+  RadarScale  radar_scale   {};
+  float       chart_scale   { 100.0 };
+  QPoint      center_shift  { 0, 0 };
 
   // Ship parameters
-  QVector2D ship_position { 0.f, 0.f };
-  float     ship_speed    { 0.f };
-  float     ship_course   { 0.f };
+  GeoPos  ship_position { 0, 0 };
+  float   ship_speed    { 0 };
+  float   ship_course   { 0 };
 
   // Controls parameters
-  QVector2D visir_center_pos { 0.f, 0.f };
-  float   vn_p          { 0.f };
-  float   vn_cu         { 0.f };
-  float   vd            { 0.f };
+  GeoPos  visir_center_pos { 0, 0 };
+  float   vn_p          { 0 };
+  float   vn_cu         { 0 };
+  float   vd            { 0 };
   QPoint  cursor_pos    { 0, 0 };
   bool    show_circles  { false };
   bool    show_parallel { false };

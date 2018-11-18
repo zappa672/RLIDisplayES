@@ -128,7 +128,7 @@ void ControlsEngine::drawCursor(const QColor& col) {
   glUniform4f(_unif_locs[CTRL_UNIF_COLOR], col.redF(), col.greenF(), col.blueF(), col.alphaF());
 
   glBindBuffer(GL_ARRAY_BUFFER, _vbo_ids_cursor[CTRL_ATTR_ANGLE]);
-  glVertexAttribPointer(_attr_locs[CTRL_ATTR_ANGLE], 1, GL_FLOAT, GL_FALSE, 0, (void*) (0));
+  glVertexAttribPointer(_attr_locs[CTRL_ATTR_ANGLE], 1, GL_FLOAT, GL_FALSE, 0, reinterpret_cast<const GLvoid*>(0));
   glEnableVertexAttribArray(_attr_locs[CTRL_ATTR_ANGLE]);
 
   glVertexAttrib1f(_attr_locs[CTRL_ATTR_RADIUS], 5.f);
@@ -175,12 +175,12 @@ void ControlsEngine::drawRaySegment(const QColor& col, GLfloat angle, GLfloat mi
 
   glBindBuffer(GL_ARRAY_BUFFER, _vbo_ids_ray[CTRL_ATTR_ANGLE]);
   glBufferData(GL_ARRAY_BUFFER, 2*sizeof(GLfloat), angs, GL_DYNAMIC_DRAW);
-  glVertexAttribPointer(_attr_locs[CTRL_ATTR_ANGLE], 1, GL_FLOAT, GL_FALSE, 0, (void*) (0));
+  glVertexAttribPointer(_attr_locs[CTRL_ATTR_ANGLE], 1, GL_FLOAT, GL_FALSE, 0, reinterpret_cast<const GLvoid*>(0));
   glEnableVertexAttribArray(_attr_locs[CTRL_ATTR_ANGLE]);
 
   glBindBuffer(GL_ARRAY_BUFFER, _vbo_ids_ray[CTRL_ATTR_RADIUS]);
   glBufferData(GL_ARRAY_BUFFER, 2*sizeof(GLfloat), rads, GL_DYNAMIC_DRAW);
-  glVertexAttribPointer(_attr_locs[CTRL_ATTR_RADIUS], 1, GL_FLOAT, GL_FALSE, 0, (void*) (0));
+  glVertexAttribPointer(_attr_locs[CTRL_ATTR_RADIUS], 1, GL_FLOAT, GL_FALSE, 0, reinterpret_cast<const GLvoid*>(0));
   glEnableVertexAttribArray(_attr_locs[CTRL_ATTR_RADIUS]);
 
   glLineWidth(2.f);

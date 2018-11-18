@@ -18,7 +18,7 @@ class MagnifierEngine : public QObject, protected QOpenGLFunctions {
   Q_OBJECT
 
 public:
-  explicit MagnifierEngine (const RLIMagnifierLayout& layout, QOpenGLContext* context, QObject* parent = 0);
+  MagnifierEngine (const RLIMagnifierLayout& layout, QOpenGLContext* context, QObject* parent = nullptr);
   virtual ~MagnifierEngine ();
 
   inline QRect geometry()   { return _geometry; }
@@ -42,8 +42,8 @@ private:
   void drawBorder();
   void drawPelengs(int pel_len, int pel_cnt, int min_pel, int min_rad);
 
-  GLuint _amp_vbo_id = -1;
-  GLuint _pal_tex_id = -1;
+  GLuint _amp_vbo_id;
+  GLuint _pal_tex_id;
 
   QRect _geometry;
   QOpenGLFramebufferObject* _fbo;
@@ -62,7 +62,7 @@ private:
   GLuint _vbo_ids_border[MAGN_ATTR_COUNT];
   GLuint _vbo_ids_radar[MAGN_ATTR_COUNT];
   GLuint _attr_locs[MAGN_ATTR_COUNT];
-  GLuint _unif_locs[MAGN_UNIF_COUNT];
+  int _unif_locs[MAGN_UNIF_COUNT];
 };
 
 

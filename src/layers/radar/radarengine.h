@@ -16,48 +16,48 @@
 class RadarEngine : public QObject, protected QOpenGLFunctions {
   Q_OBJECT
 public:
-  explicit RadarEngine  (uint pel_count, uint pel_len, uint tex_radius, QOpenGLContext* context, QObject* parent = nullptr);
+  RadarEngine  (int pel_count, int pel_len, int tex_radius, QOpenGLContext* context, QObject* parent = nullptr);
   virtual ~RadarEngine  ();
 
-  inline QSize size() const      { return _fbo->size(); }
-  inline GLuint textureId() const { return _fbo->texture(); }
+  inline QSize size()           const { return _fbo->size(); }
+  inline GLuint textureId()     const { return _fbo->texture(); }
 
-  inline GLuint ampsVboId() const { return _vbo_ids[ATTR_AMP]; }
-  inline GLuint paletteTexId() const { return _palette->texture(); }
+  inline GLuint ampsVboId()     const { return _vbo_ids[ATTR_AMP]; }
+  inline GLuint paletteTexId()  const { return _palette->texture(); }
 
-  inline int pelengCount() const { return _peleng_count; }
-  inline int pelengLength() const { return _peleng_len; }
+  inline int pelengCount()      const { return _peleng_count; }
+  inline int pelengLength()     const { return _peleng_len; }
 
 public slots:
   void onBrightnessChanged(int br);
 
-  void resizeData     (uint pel_count, uint pel_len);
-  void resizeTexture  (uint radius);
+  void resizeData     (int pel_count, int pel_len);
+  void resizeTexture  (int radius);
 
   void clearTexture();
   void clearData();
 
   void updateTexture();
-  void updateData(uint offset, uint count, GLfloat* amps);
+  void updateData(int offset, int count, GLfloat* amps);
 
 private:
   void initShader();
 
   void fillCoordTable();
 
-  void drawPelengs(uint first, uint last);
+  void drawPelengs(int first, int last);
 
   bool _has_data;
 
   // Radar parameters  
-  uint    _radius;
-  uint    _peleng_count, _peleng_len;
+  int _radius;
+  int _peleng_count, _peleng_len;
 
   std::vector<GLuint> _draw_indices;
   std::vector<GLfloat> _positions;
 
   bool  _draw_circle;
-  uint  _last_drawn_peleng, _last_added_peleng;
+  int  _last_drawn_peleng, _last_added_peleng;
 
   // OpenGL vars
   QOpenGLFramebufferObject* _fbo;
@@ -70,9 +70,9 @@ private:
 
   GLuint _vbo_ids[ATTR_CNT];
   // OpenGL program uniforms locations
-  GLuint _unif_locs[UNIF_CNT];
+  int _unif_locs[UNIF_CNT];
   // OpenGL program attributres locations
-  GLuint _attr_locs[ATTR_CNT];
+  int _attr_locs[ATTR_CNT];
   GLuint _ind_vbo_id;
 
   // Palette

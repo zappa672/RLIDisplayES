@@ -21,7 +21,7 @@ class MenuEngine : public QObject, protected QOpenGLFunctions {
   Q_OBJECT
 
 public:
-  explicit MenuEngine(const RLIMenuLayout& layout, QOpenGLContext* context, QObject* parent = 0);
+  MenuEngine(const RLIMenuLayout& layout, QOpenGLContext* context, QObject* parent = nullptr);
   virtual ~MenuEngine();
 
   inline QRect geometry() { return _geometry; }
