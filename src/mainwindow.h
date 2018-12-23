@@ -14,10 +14,6 @@
 Q_DECLARE_METATYPE(RLITarget)
 Q_DECLARE_METATYPE(RLIShipState)
 
-namespace Ui {
-class MainWindow;
-}
-
 class MainWindow : public QMainWindow
 {
   Q_OBJECT
@@ -33,8 +29,6 @@ protected slots:
   void onRLIWidgetInitialized();
 
 private:
-  Ui::MainWindow *ui;
-
   RadarDataSource*    _radar_ds;
   ShipDataSource*     _ship_ds;
   TargetDataSource*   _target_ds;

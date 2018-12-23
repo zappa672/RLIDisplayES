@@ -19,8 +19,11 @@ public slots:
   void finish();
 
 signals:
-  void updateData(int offset, int count, GLfloat* amps);
-  void updateData2(int offset, int count, GLfloat* amps);
+  void updateRadarData(int offset, int count, GLfloat* amps);
+  void updateTrailData(int offset, int count, GLfloat* amps);
+
+protected slots:
+  void timerEvent(QTimerEvent* e);
 
 private:
   bool loadData();
@@ -29,16 +32,19 @@ private:
   bool initWithDummy3(float* amps);
   bool initWithDummy4(float* amps);
 
-  bool finish_flag;
+  int _timerId = -1;
+
   GLfloat* file_amps1[2];
   GLfloat* file_amps2[2];
-  int  file_curr;
+
+  int _timer_period;
+  int _blocks_to_send;
+
+  int _file = 0;
+  int _offset = 0;
 
   int _peleng_size;
   int _bearings_per_cycle;
-
-  void worker();
-  QFuture<void> workerThread;
 };
 
 #endif // RADARDATASOURCE_H

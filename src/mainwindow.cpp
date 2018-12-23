@@ -1,10 +1,12 @@
 #include "mainwindow.h"
-#include "ui_mainwindow.h"
+
+#include <QDesktopWidget>
 
 #include "common/properties.h"
 
-MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow) {
-  ui->setupUi(this);
+MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
+  QDesktopWidget desktop;
+  this->setGeometry(desktop.screenGeometry());
 
   wgtRLI = new RLIDisplayWidget(this);
   wgtButtonPanel = new RLIControlWidget(wgtRLI, this);
@@ -33,8 +35,6 @@ MainWindow::~MainWindow() {
   delete _radar_ds;
   delete _ship_ds;
   delete _target_ds;
-
-  delete ui;
 }
 
 void MainWindow::resizeEvent(QResizeEvent* e) {

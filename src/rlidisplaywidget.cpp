@@ -44,10 +44,10 @@ RLIDisplayWidget::~RLIDisplayWidget() {
 
 
 void RLIDisplayWidget::setupRadarDataSource(RadarDataSource* rds) {
-  connect( rds, SIGNAL(updateData(int, int, GLfloat*))
+  connect( rds, SIGNAL(updateRadarData(int, int, GLfloat*))
          , _radarEngine, SLOT(updateData(int, int, GLfloat*)));
 
-  connect( rds, SIGNAL(updateData2(int, int, GLfloat*))
+  connect( rds, SIGNAL(updateTrailData(int, int, GLfloat*))
          , _tailsEngine, SLOT(updateData(int, int, GLfloat*)));
 }
 

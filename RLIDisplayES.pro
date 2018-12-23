@@ -106,7 +106,6 @@ HEADERS     += \
     src/layers/info/menuitem.h
 
 FORMS       += \
-    forms/mainwindow.ui \
     forms/rlicontrolwidget.ui
 
 RESOURCES   += \

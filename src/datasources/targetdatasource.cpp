@@ -4,8 +4,6 @@
 
 
 TargetDataSource::TargetDataSource(QObject *parent) : QObject(parent) {
-  _timerId = -1;
-
   RLITarget trgt;
 
   trgt.lost = false;

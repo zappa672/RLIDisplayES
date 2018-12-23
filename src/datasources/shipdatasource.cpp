@@ -3,8 +3,6 @@
 #include <qmath.h>
 
 ShipDataSource::ShipDataSource(QObject *parent) : QObject(parent) {
-  _timerId = -1;
-
   //longtitude
   _ship_state.position.setX( 15.123f + 0.25f );
   //latitude

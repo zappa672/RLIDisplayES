@@ -49,7 +49,7 @@ public slots:
   void finish();
 
 private:
-  int _timerId;
+  int _timerId = -1;
   QDateTime _startTime;
   QVector<RLITarget> _targets;
 };

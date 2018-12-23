@@ -18,10 +18,12 @@ void qSleep(int ms) {
 }
 
 RadarDataSource::RadarDataSource(QObject* parent) : QObject(parent) {
-  finish_flag = true;
+  //finish_flag = true;
 
   _peleng_size         = qApp->property(PROPERTY_PELENG_SIZE).toInt();
   _bearings_per_cycle  = qApp->property(PROPERTY_BEARINGS_PER_CYCLE).toInt();
+  _timer_period        = qApp->property(PROPERTY_DATA_DELAY).toInt();
+  _blocks_to_send      = qApp->property(PROPERTY_BLOCK_SIZE).toInt();
 
   file_amps1[0] = new GLfloat[_peleng_size*_bearings_per_cycle];
   file_amps1[1] = new GLfloat[_peleng_size*_bearings_per_cycle];
@@ -32,9 +34,7 @@ RadarDataSource::RadarDataSource(QObject* parent) : QObject(parent) {
 }
 
 RadarDataSource::~RadarDataSource() {
-  finish_flag = true;
-
-  while(workerThread.isRunning());
+  finish();
 
   delete file_amps1[0];
   delete file_amps1[1];
@@ -43,34 +43,33 @@ RadarDataSource::~RadarDataSource() {
 }
 
 void RadarDataSource::start() {
-  if (workerThread.isRunning())
+  if (_timerId != -1)
     return;
 
-  finish_flag = false;
-  workerThread = QtConcurrent::run(this, &RadarDataSource::worker);
+  _timerId = startTimer(_timer_period);
 }
 
 
 void RadarDataSource::finish() {
-  finish_flag = true;
+  if (_timerId == -1)
+    return;
+
+  killTimer(_timerId);
+  _timerId = -1;
 }
 
-void RadarDataSource::worker() {
-  int delay = qApp->property(PROPERTY_DATA_DELAY).toInt();
-  int BLOCK_TO_SEND = qApp->property(PROPERTY_BLOCK_SIZE).toInt();
-  int file = 0;
-  int offset = 0;
+void RadarDataSource::timerEvent(QTimerEvent* e) {
+  Q_UNUSED(e);
 
-  while(!finish_flag) {
-    qSleep(delay);
+  QtConcurrent::run([&]() {
+    emit updateRadarData(_offset, _blocks_to_send, &file_amps1[_file][_offset * _peleng_size]);
+    emit updateTrailData(_offset, _blocks_to_send, &file_amps2[_file][_offset * _peleng_size]);
+  });
 
-    emit updateData(offset, BLOCK_TO_SEND, &file_amps1[file][offset * _peleng_size]);
-    emit updateData2(offset, BLOCK_TO_SEND, &file_amps2[file][offset * _peleng_size]);
-
-    offset = (offset + BLOCK_TO_SEND) % _bearings_per_cycle;
-    if (offset == 0) file = 1 - file;
-  }
+  _offset = (_offset + _blocks_to_send) % _bearings_per_cycle;
+  if (_offset == 0) _file = 1 - _file;
 }
+
 
 
 bool RadarDataSource::loadData() {
