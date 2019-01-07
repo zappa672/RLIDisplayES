@@ -159,7 +159,7 @@ void MaskEngine::initBuffers() {
   initRectBuffers();
 }
 
-void MaskEngine::setBuffers(GLuint* vbo_ids, int count, GLfloat* angles, GLfloat* chars, GLfloat* orders, GLfloat* shifts) {
+void MaskEngine::setBuffers(GLuint* vbo_ids, ulong count, GLfloat* angles, GLfloat* chars, GLfloat* orders, GLfloat* shifts) {
   glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[MASK_ATTR_ANGLE]);
   glBufferData(GL_ARRAY_BUFFER, count*sizeof(GLfloat), angles, GL_DYNAMIC_DRAW);
 

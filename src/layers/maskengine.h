@@ -44,7 +44,7 @@ private:
   void initHoleBuffers();
 
   void bindBuffers(GLuint* vbo_ids);
-  void setBuffers(GLuint* vbo_ids, int count, GLfloat* angles, GLfloat* chars, GLfloat* orders, GLfloat* shifts);
+  void setBuffers(GLuint* vbo_ids, ulong count, GLfloat* angles, GLfloat* chars, GLfloat* orders, GLfloat* shifts);
 
   InfoFonts* _fonts;
 
@@ -82,7 +82,7 @@ private:
   GLuint vbo_ids_hole  [MASK_ATTR_COUNT];
   int _hole_point_count;
 
-  GLuint _unif_locs[MASK_UNIF_COUNT];
+  GLint _unif_locs[MASK_UNIF_COUNT];
   GLuint _attr_locs[MASK_ATTR_COUNT];
 };
 #endif // MASKENGINE_H

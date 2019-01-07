@@ -21,7 +21,6 @@ struct S52AreaLayer {
   bool is_color_uniform;
 
   QString pattern_ref;
-  //QString color_ref;
   int color_ind;
   // layer i-th area s52 pattern name
   std::vector<QString> pattern_refs;
@@ -29,9 +28,9 @@ struct S52AreaLayer {
   //std::vector<QString> color_refs;
   std::vector<float> color_inds;
   // layer i-th area triangles start index
-  std::vector<size_t>    start_inds;
+  std::vector<size_t> start_inds;
   // sequence of coords representing triangulated polygon
-  std::vector<float>  triangles;
+  std::vector<float> triangles;
 };
 
 struct S52LineLayer {
@@ -39,7 +38,6 @@ struct S52LineLayer {
   bool is_color_uniform;
 
   QString pattern_ref;
-  //QString color_ref;
   int color_ind;
   // layer i-th line s52 pattern name
   std::vector<QString> pattern_refs;
