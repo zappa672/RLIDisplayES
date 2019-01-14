@@ -36,13 +36,20 @@ TargetEngine::~TargetEngine() {
 }
 
 void TargetEngine::select(const GeoPos& coords, float scale) {
+  //qDebug() << "\n";
+  //qDebug() << "select" << coords.lat << coords.lon << scale;
+
   for (const QString& tag: _targets.keys()) {
     if (tag == _selected)
       continue;
 
+    //qDebug() << tag << _targets[tag].latitude << _targets[tag].longtitude;
     float dist = RLIMath::GCDistance(coords.lat, coords.lon, _targets[tag].latitude, _targets[tag].longtitude);
-    if ((dist / scale) < 32) {
+    //qDebug() << dist / scale;
+
+    if ((dist / scale) < 0.5) {
       _selected = tag;
+      //qDebug() << "selected" << _selected;
       emit selectedTargetUpdated(_selected, _targets[_selected]);
       return;
     }

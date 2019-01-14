@@ -46,7 +46,7 @@ void RadarDataSource::start() {
   if (_timerId != -1)
     return;
 
-  _timerId = startTimer(_timer_period);
+  _timerId = startTimer(_timer_period, Qt::PreciseTimer);
 }
 
 
@@ -59,12 +59,12 @@ void RadarDataSource::finish() {
 }
 
 void RadarDataSource::timerEvent(QTimerEvent* e) {
-  Q_UNUSED(e);
+  Q_UNUSED(e);    
 
-  QtConcurrent::run([&]() {
-    emit updateRadarData(_offset, _blocks_to_send, &file_amps1[_file][_offset * _peleng_size]);
-    emit updateTrailData(_offset, _blocks_to_send, &file_amps2[_file][_offset * _peleng_size]);
-  });
+  QtConcurrent::run([&](int offset, int file) {
+    emit updateRadarData(offset, _blocks_to_send, &file_amps1[file][offset * _peleng_size]);
+    emit updateTrailData(offset, _blocks_to_send, &file_amps2[file][offset * _peleng_size]);
+  }, _offset, _file);
 
   _offset = (_offset + _blocks_to_send) % _bearings_per_cycle;
   if (_offset == 0) _file = 1 - _file;

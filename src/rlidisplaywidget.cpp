@@ -45,10 +45,12 @@ RLIDisplayWidget::~RLIDisplayWidget() {
 
 void RLIDisplayWidget::setupRadarDataSource(RadarDataSource* rds) {
   connect( rds, SIGNAL(updateRadarData(int, int, GLfloat*))
-         , _radarEngine, SLOT(updateData(int, int, GLfloat*)));
+         , _radarEngine, SLOT(updateData(int, int, GLfloat*))
+         , Qt::QueuedConnection );
 
   connect( rds, SIGNAL(updateTrailData(int, int, GLfloat*))
-         , _tailsEngine, SLOT(updateData(int, int, GLfloat*)));
+         , _tailsEngine, SLOT(updateData(int, int, GLfloat*))
+         , Qt::QueuedConnection );
 }
 
 void RLIDisplayWidget::setupTargetDataSource(TargetDataSource* tds) {
