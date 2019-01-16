@@ -7,11 +7,11 @@ GeoPos RLIMath::pos_to_coords( const GeoPos& center_coords
                                , const QPointF& center_position
                                , const QPointF& position
                                , double scale ) {
+  double erad_pix = ERADM / scale;
+  QPointF pos_p = position - center_position;
 
-  QPointF metric_pos = (position - center_position) * scale;
-
-  double lat = degs(-metric_pos.y() / ERADM) + center_coords.lat;
-  double lon = degs(metric_pos.x() / (ERADM * rads(center_coords.lat))) + center_coords.lon;
+  double lat = degs(-pos_p.y() / erad_pix) + center_coords.lat;
+  double lon = degs(pos_p.x() / (erad_pix * cos(rads(center_coords.lat)))) + center_coords.lon;
 
   return { lat, lon };
 }
@@ -20,13 +20,10 @@ QPointF RLIMath::coords_to_pos( const GeoPos& center_coords
                               , const GeoPos& coords
                               , const QPointF& center_position
                               , double scale ) {
-
-  double y_m = -ERADM * rads(coords.lat - center_coords.lat);
-  double x_m = ERADM * cos(rads(center_coords.lat)) * rads(coords.lon - center_coords.lon);
-
-  QPointF pix_pos(floor(x_m / scale), floor(y_m / scale));
-
-  return pix_pos + center_position;
+  double erad_pix = ERADM / scale;
+  double y_p = -erad_pix * rads(coords.lat - center_coords.lat);
+  double x_p =  erad_pix * cos(rads(center_coords.lat)) * rads(coords.lon - center_coords.lon);
+  return QPointF(x_p, y_p) + center_position;
 }
 
 

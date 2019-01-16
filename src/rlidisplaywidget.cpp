@@ -334,13 +334,9 @@ void RLIDisplayWidget::paintLayers() {
   projection.setToIdentity();
   projection.ortho(0.f, width(), height(), 0.f, -1.f, 1.f);
 
-  const QSize& sz = _layout_manager.currentSize();
-
   QMatrix4x4 transform;
   transform.setToIdentity();
-  transform.translate( center.x() + (width() - sz.width()) / 2
-                     , center.y() + (height() - sz.height()) / 2
-                     , 0.f);
+  transform.translate( static_cast<float>(center.x()), static_cast<float>(center.y()), 0.f);
 
   _trgtEngine->draw(projection*transform, _state);
   _ctrlEngine->draw(projection*transform, _state);
@@ -389,25 +385,21 @@ void RLIDisplayWidget::drawRect(const QRectF& rect, GLuint textureId) {
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, textureId);
 
-  const QSize& sz = _layout_manager.currentSize();
-
   QMatrix4x4 transform;
   transform.setToIdentity();
-  transform.translate( (width() - sz.width()) / 2
-                     , (height() - sz.height()) / 2
-                     , 0.f);
+  transform.translate( 0.f, 0.f, 0.f );
 
   _program->setUniformValue("texture", 0);
   _program->setUniformValue("mvp_matrix", _projection*transform);
 
   glBindBuffer(GL_ARRAY_BUFFER, _vbo_ids[ATTR_POSITION]);
   glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-  glVertexAttribPointer( _attr_locs[ATTR_POSITION], 2,  GL_FLOAT, GL_FALSE, 0, (void*) (0 * sizeof(GLfloat)));
+  glVertexAttribPointer( _attr_locs[ATTR_POSITION], 2,  GL_FLOAT, GL_FALSE, 0, (void*) (0 * sizeof(GLfloat)) );
   glEnableVertexAttribArray(_attr_locs[ATTR_POSITION]);
 
   glBindBuffer(GL_ARRAY_BUFFER, _vbo_ids[ATTR_TEXCOORD]);
   glBufferData(GL_ARRAY_BUFFER, sizeof(texcoords), texcoords, GL_STATIC_DRAW);
-  glVertexAttribPointer( _attr_locs[ATTR_TEXCOORD], 2, GL_FLOAT, GL_FALSE, 0, (void*) (0 * sizeof(GLfloat)));
+  glVertexAttribPointer( _attr_locs[ATTR_TEXCOORD], 2, GL_FLOAT, GL_FALSE, 0, (void*) (0 * sizeof(GLfloat)) );
   glEnableVertexAttribArray(_attr_locs[ATTR_TEXCOORD]);
 
   glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
