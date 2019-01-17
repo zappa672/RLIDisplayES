@@ -6,10 +6,12 @@
 #include <QDateTime>
 #include <QTimerEvent>
 
+#include "../common/rlimath.h"
+
 struct RLIShipState {
-  QVector2D position { 0.f, 0.f };
-  float course { 0.f };
-  float speed { 0.f };
+  GeoPos position  { 0.0, 0.0 };
+  double course    { 0.0 };
+  double speed     { 0.0 };
 };
 
 

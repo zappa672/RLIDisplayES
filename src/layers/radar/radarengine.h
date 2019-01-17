@@ -22,7 +22,7 @@ public:
   inline QSize size()           const { return _fbo->size(); }
   inline GLuint textureId()     const { return _fbo->texture(); }
 
-  inline GLuint ampsVboId()     const { return _vbo_ids[ATTR_AMP]; }
+  inline GLuint ampsVboId()     const { return _vbo_ids[ATTR_AMPLITUDE]; }
   inline GLuint paletteTexId()  const { return _palette->texture(); }
 
   inline int pelengCount()      const { return _peleng_count; }
@@ -37,7 +37,7 @@ public slots:
   void clearTexture();
   void clearData();
 
-  void updateTexture();
+  void updateTexture(double north_shift);
   void updateData(int offset, int count, GLfloat* amps);
 
 private:
@@ -64,15 +64,25 @@ private:
   QOpenGLShaderProgram* _program;
 
   // OpenGL program attributres enum
-  enum { ATTR_POS = 0, ATTR_AMP = 1, ATTR_CNT = 2 } ;
-  // OpenGL program uniforms enum
-  enum { UNIF_MVP = 0, UNIF_TEX = 1, UNIF_THR = 2, UNIF_PLN = 3, UNIF_PCN = 4, UNIF_FBR = 5, UNIF_CNT = 6 } ;
+  enum { ATTR_POSITION  = 0
+       , ATTR_AMPLITUDE = 1
+       , ATTR_COUNT     = 2 } ;
 
-  GLuint _vbo_ids[ATTR_CNT];
+  // OpenGL program uniforms enum
+  enum { UNIF_MVP_MATRIX    = 0
+       , UNIF_TEXTURE       = 1
+       , UNIF_THREASHOLD    = 2
+       , UNIF_PELENG_LENGTH = 3
+       , UNIF_PELENG_COUNT  = 4
+       , UNIF_FBO_RADIUS    = 5
+       , UNIF_NORTH_SHIFT   = 6
+       , UNIF_COUNT         = 7 } ;
+
+  GLuint _vbo_ids[ATTR_COUNT];
   // OpenGL program uniforms locations
-  int _unif_locs[UNIF_CNT];
+  int _unif_locs[UNIF_COUNT];
   // OpenGL program attributres locations
-  int _attr_locs[ATTR_CNT];
+  int _attr_locs[ATTR_COUNT];
   GLuint _ind_vbo_id;
 
   // Palette

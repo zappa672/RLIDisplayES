@@ -19,7 +19,7 @@ RadarEngine::RadarEngine(int pel_count, int pel_len, int tex_radius, QOpenGLCont
   _has_data = false;
   _fbo = nullptr;
 
-  glGenBuffers(ATTR_CNT, _vbo_ids);
+  glGenBuffers(ATTR_COUNT, _vbo_ids);
   glGenBuffers(1, &_ind_vbo_id);
 
   _program = new QOpenGLShaderProgram();
@@ -35,7 +35,7 @@ RadarEngine::~RadarEngine() {
   delete _fbo;
   delete _program;
 
-  glDeleteBuffers(ATTR_CNT, _vbo_ids);
+  glDeleteBuffers(ATTR_COUNT, _vbo_ids);
   glDeleteBuffers(1, &_ind_vbo_id);
 
   delete _palette;
@@ -52,15 +52,16 @@ void RadarEngine::initShader() {
   _program->link();
   _program->bind();
 
-  _unif_locs[UNIF_MVP] = _program->uniformLocation("mvp_matrix");
-  _unif_locs[UNIF_TEX] = _program->uniformLocation("texture");
-  _unif_locs[UNIF_THR] = _program->uniformLocation("threashold");
-  _unif_locs[UNIF_PLN] = _program->uniformLocation("peleng_length");
-  _unif_locs[UNIF_PCN] = _program->uniformLocation("peleng_count");
-  _unif_locs[UNIF_FBR] = _program->uniformLocation("fbo_radius");
+  _unif_locs[UNIF_MVP_MATRIX]     = _program->uniformLocation("mvp_matrix");
+  _unif_locs[UNIF_TEXTURE]        = _program->uniformLocation("texture");
+  _unif_locs[UNIF_THREASHOLD]     = _program->uniformLocation("threashold");
+  _unif_locs[UNIF_PELENG_LENGTH]  = _program->uniformLocation("peleng_length");
+  _unif_locs[UNIF_PELENG_COUNT]   = _program->uniformLocation("peleng_count");
+  _unif_locs[UNIF_FBO_RADIUS]     = _program->uniformLocation("fbo_radius");
+  _unif_locs[UNIF_NORTH_SHIFT]    = _program->uniformLocation("north_shift");
 
-  _attr_locs[ATTR_POS] = _program->attributeLocation("position");
-  _attr_locs[ATTR_AMP] = _program->attributeLocation("amplitude");
+  _attr_locs[ATTR_POSITION] = _program->attributeLocation("position");
+  _attr_locs[ATTR_AMPLITUDE] = _program->attributeLocation("amplitude");
 
   _program->release();
 }
@@ -118,10 +119,10 @@ void RadarEngine::resizeTexture(int radius) {
 
 
 void RadarEngine::clearData() {
-  glBindBuffer(GL_ARRAY_BUFFER, _vbo_ids[ATTR_POS]);
+  glBindBuffer(GL_ARRAY_BUFFER, _vbo_ids[ATTR_POSITION]);
   glBufferData(GL_ARRAY_BUFFER, _peleng_count*_peleng_len*sizeof(GLfloat), _positions.data(), GL_STATIC_DRAW);
 
-  glBindBuffer(GL_ARRAY_BUFFER, _vbo_ids[ATTR_AMP]);
+  glBindBuffer(GL_ARRAY_BUFFER, _vbo_ids[ATTR_AMPLITUDE]);
   glBufferData(GL_ARRAY_BUFFER, _peleng_count*_peleng_len*sizeof(GLfloat), nullptr, GL_DYNAMIC_DRAW);
 
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ind_vbo_id);
@@ -138,7 +139,7 @@ void RadarEngine::clearData() {
 
 
 void RadarEngine::updateData(int offset, int count, GLfloat* amps) {
-  glBindBuffer(GL_ARRAY_BUFFER, _vbo_ids[ATTR_AMP]);
+  glBindBuffer(GL_ARRAY_BUFFER, _vbo_ids[ATTR_AMPLITUDE]);
   glBufferSubData(GL_ARRAY_BUFFER, offset*_peleng_len*sizeof(GLfloat), count*_peleng_len*sizeof(GLfloat), amps);
 
   // New last added peleng
@@ -171,7 +172,7 @@ void RadarEngine::clearTexture() {
 }
 
 
-void RadarEngine::updateTexture() {
+void RadarEngine::updateTexture(double north_shift) {
   if (!_has_data) {
     clearTexture();
     return;
@@ -213,13 +214,14 @@ void RadarEngine::updateTexture() {
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, _palette->texture());
 
-  glUniform1i(_unif_locs[UNIF_TEX], 0);
-  _program->setUniformValue(_unif_locs[UNIF_MVP], projection*transform);
-  glUniform1f(_unif_locs[UNIF_THR], 1.f);
+  glUniform1i(_unif_locs[UNIF_TEXTURE], 0);
+  _program->setUniformValue(_unif_locs[UNIF_MVP_MATRIX], projection*transform);
+  glUniform1f(_unif_locs[UNIF_THREASHOLD], 1.f);
 
-  glUniform1f(_unif_locs[UNIF_PLN], _peleng_len);
-  glUniform1f(_unif_locs[UNIF_PCN], _peleng_count);
-  glUniform1f(_unif_locs[UNIF_FBR], _fbo->width() / 2.f);
+  glUniform1f(_unif_locs[UNIF_PELENG_LENGTH], _peleng_len);
+  glUniform1f(_unif_locs[UNIF_PELENG_COUNT], _peleng_count);
+  glUniform1f(_unif_locs[UNIF_FBO_RADIUS], _fbo->width() / 2.f);
+  glUniform1f(_unif_locs[UNIF_NORTH_SHIFT], north_shift);
 
   if (first_peleng_to_draw <= last_peleng_to_draw) {
     drawPelengs(first_peleng_to_draw, last_peleng_to_draw);
@@ -245,13 +247,13 @@ void RadarEngine::drawPelengs(int first, int last) {
     glClear(GL_DEPTH_BUFFER_BIT);
   }
 
-  glBindBuffer(GL_ARRAY_BUFFER, _vbo_ids[ATTR_POS]);
-  glVertexAttribPointer(_attr_locs[ATTR_POS], 1, GL_FLOAT, GL_FALSE, 0, (void*) (0 * sizeof(GLfloat)));
-  glEnableVertexAttribArray(_attr_locs[ATTR_POS]);
+  glBindBuffer(GL_ARRAY_BUFFER, _vbo_ids[ATTR_POSITION]);
+  glVertexAttribPointer(_attr_locs[ATTR_POSITION], 1, GL_FLOAT, GL_FALSE, 0, (void*) (0 * sizeof(GLfloat)));
+  glEnableVertexAttribArray(_attr_locs[ATTR_POSITION]);
 
-  glBindBuffer(GL_ARRAY_BUFFER, _vbo_ids[ATTR_AMP]);
-  glVertexAttribPointer( _attr_locs[ATTR_AMP], 1, GL_FLOAT, GL_FALSE, 0, (void*) (0 * sizeof(GLfloat)));
-  glEnableVertexAttribArray(_attr_locs[ATTR_AMP]);
+  glBindBuffer(GL_ARRAY_BUFFER, _vbo_ids[ATTR_AMPLITUDE]);
+  glVertexAttribPointer( _attr_locs[ATTR_AMPLITUDE], 1, GL_FLOAT, GL_FALSE, 0, (void*) (0 * sizeof(GLfloat)));
+  glEnableVertexAttribArray(_attr_locs[ATTR_AMPLITUDE]);
 
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ind_vbo_id);
 

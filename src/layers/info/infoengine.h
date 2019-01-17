@@ -80,6 +80,8 @@ public slots:
 
   void secondChanged();
   void setFps(int fps);
+
+  void onCourseChanged(double course);
   void onPositionChanged(const GeoPos& position);
   void onTargetCountChanged(int count);
   void onSelectedTargetUpdated(const QString& tag, const RLITarget& trgt);

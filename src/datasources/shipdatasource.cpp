@@ -1,12 +1,10 @@
 #include "shipdatasource.h"
 
-#include <qmath.h>
+#include <cmath>
 
 ShipDataSource::ShipDataSource(QObject *parent) : QObject(parent) {
-  //longtitude
-  _ship_state.position.setX( 15.123f + 0.25f );
-  //latitude
-  _ship_state.position.setY( 145.66f );
+  _ship_state.position = GeoPos(15.123 + 0.25, 145.66);
+  _ship_state.course = 90;
 }
 
 ShipDataSource::~ShipDataSource() {
@@ -18,10 +16,11 @@ void ShipDataSource::timerEvent(QTimerEvent* e) {
 
   QDateTime now = QDateTime::currentDateTime();
 
-  //longtitude
-  _ship_state.position.setX( 15.123f + 0.25f * cos(_startTime.msecsTo(now)/60000.f) );
-  //latitude
-  _ship_state.position.setY( 145.66f + 0.25f * sin(_startTime.msecsTo(now)/60000.f) );
+  double lat = 15.123 + 0.25 * cos(_startTime.msecsTo(now)/60000.);
+  double lon = 145.66 + 0.25 * sin(_startTime.msecsTo(now)/60000.);
+
+  _ship_state.position = GeoPos(lat, lon);
+  _ship_state.course = fmod(90 + RLIMath::degs(_startTime.msecsTo(now)/60000.), 360);
 
   emit shipStateChanged(_ship_state);
 }

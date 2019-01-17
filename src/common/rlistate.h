@@ -28,24 +28,24 @@ struct RLIState {
   float emission  { 0.f };
 
   // Chart parameters
-  float       north_shift   { 0.f };
+  double      north_shift   { 0.0 };
   RadarScale  radar_scale   {};
-  float       chart_scale   { 100.0 };
+  double      chart_scale   { 100.0 };
   QPoint      center_shift  { 0, 0 };
 
   // Ship parameters
   GeoPos  ship_position { 0, 0 };
-  float   ship_speed    { 0 };
-  float   ship_course   { 0 };
+  double  ship_speed    { 0 };
+  double  ship_course   { 0 };
 
   // Controls parameters
-  GeoPos  visir_center_pos { 0, 0 };
-  float   vn_p          { 0 };
-  float   vn_cu         { 0 };
-  float   vd            { 0 };
-  QPoint  cursor_pos    { 0, 0 };
-  bool    show_circles  { false };
-  bool    show_parallel { false };
+  GeoPos  visir_center_pos  { 0, 0 };
+  float   vn_p              { 0 };
+  float   vn_cu             { 0 };
+  float   vd                { 0 };
+  QPoint  cursor_pos        { 0, 0 };
+  bool    show_circles      { false };
+  bool    show_parallel     { false };
 
 private:
   void save();

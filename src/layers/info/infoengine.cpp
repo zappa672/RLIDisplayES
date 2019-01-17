@@ -656,6 +656,8 @@ void InfoEngine::initBlockVd() {
   _blocks[RLI_PANEL_VD]->setText(RLI_PANEL_VD_TBL_0_1_TEXT_ID, RLI_STR_NM);
 }
 
+
+
 void InfoEngine::initBlockCourse() {
   _blocks[RLI_PANEL_COURSE]->setText(RLI_PANEL_COURSE_TBL_0_0_TEXT_ID, RLI_STR_GYRO_HDG);
   _blocks[RLI_PANEL_COURSE]->setText(RLI_PANEL_COURSE_TBL_0_1_TEXT_ID, QByteArray("0"));
@@ -664,6 +666,10 @@ void InfoEngine::initBlockCourse() {
   _blocks[RLI_PANEL_COURSE]->setText(RLI_PANEL_COURSE_TBL_1_0_TEXT_ID, RLI_STR_MAN_SPD);
   _blocks[RLI_PANEL_COURSE]->setText(RLI_PANEL_COURSE_TBL_1_1_TEXT_ID, QByteArray("0"));
   _blocks[RLI_PANEL_COURSE]->setText(RLI_PANEL_COURSE_TBL_1_2_TEXT_ID, RLI_STR_NM);
+}
+
+void InfoEngine::onCourseChanged(double course) {
+  _blocks[RLI_PANEL_COURSE]->setText(RLI_PANEL_COURSE_TBL_0_1_TEXT_ID, QString::number(course, 'd', 2).toLocal8Bit());
 }
 
 

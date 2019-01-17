@@ -356,8 +356,8 @@ void RLIDisplayWidget::paintLayers() {
 
 
 void RLIDisplayWidget::updateLayers() {
-  _radarEngine->updateTexture();
-  _tailsEngine->updateTexture();
+  _radarEngine->updateTexture(_state.north_shift);
+  _tailsEngine->updateTexture(_state.north_shift);
 
   QString colorScheme = _chart_mngr.refs()->getColorScheme();
   _chartEngine->update(_state, colorScheme);
@@ -417,7 +417,10 @@ void RLIDisplayWidget::onShipStateChanged(const RLIShipState& sst) {
   _state.ship_course    = sst.course;
   _state.ship_speed     = sst.speed;
 
+  _state.north_shift    = sst.course;
+
   _infoEngine->onPositionChanged(sst.position);
+  _infoEngine->onCourseChanged(sst.course);
 }
 
 
