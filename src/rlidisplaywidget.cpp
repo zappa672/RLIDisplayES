@@ -137,7 +137,7 @@ void RLIDisplayWidget::initializeGL() {
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Tails engine init finish";
 
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Mask engine init start";
-  _maskEngine = new MaskEngine(size(), _layout_manager.layout()->circle, _infoFonts, context(), this);
+  _maskEngine = new MaskEngine(size(), _layout_manager.layout()->circle, _infoFonts, context(), _state, this);
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Mask engine init finish";
 
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Chart engine init start";
@@ -248,7 +248,7 @@ void RLIDisplayWidget::resizeGL(int w, int h) {
   _tailsEngine->resizeTexture(circle_radius);
   _chartEngine->resize(circle_radius);
 
-  _maskEngine->resize(QSize(w, h), _layout_manager.layout()->circle);
+  _maskEngine->resize(QSize(w, h), _layout_manager.layout()->circle, _state);
   _menuEngine->resize(_layout_manager.layout()->menu);
   _magnEngine->resize(_layout_manager.layout()->magnifier);
   _infoEngine->resize(_layout_manager.layout());
@@ -336,7 +336,9 @@ void RLIDisplayWidget::paintLayers() {
 
   QMatrix4x4 transform;
   transform.setToIdentity();
-  transform.translate( static_cast<float>(center.x()), static_cast<float>(center.y()), 0.f);
+  transform.translate( static_cast<float>(center.x() + _state.center_shift.x())
+                     , static_cast<float>(center.y() + _state.center_shift.y())
+                     , 0.f);
 
   _trgtEngine->draw(projection*transform, _state);
   _ctrlEngine->draw(projection*transform, _state);
@@ -356,13 +358,14 @@ void RLIDisplayWidget::paintLayers() {
 
 
 void RLIDisplayWidget::updateLayers() {
-  _radarEngine->updateTexture(_state.north_shift);
-  _tailsEngine->updateTexture(_state.north_shift);
+  _radarEngine->updateTexture(_state);
+  _tailsEngine->updateTexture(_state);
 
   QString colorScheme = _chart_mngr.refs()->getColorScheme();
   _chartEngine->update(_state, colorScheme);
   _infoEngine->update(_infoFonts);
   _menuEngine->update();
+  _maskEngine->update(_state, false);
 
   if (_state.state == RLIWidgetState::RLISTATE_MAGNIFIER)
     _magnEngine->update( _radarEngine->pelengLength(), _radarEngine->pelengCount(), 90, 96 ); // min_pel, min_rad
@@ -430,6 +433,11 @@ void RLIDisplayWidget::mousePressEvent(QMouseEvent* event) {
                                                , _layout_manager.layout()->circle.center
                                                , event->pos()
                                                , _state.chart_scale );
+
+  auto diff = event->pos() - _layout_manager.layout()->circle.center;
+  QVector2D diffV(diff);
+  if (diffV.length() < 0.66f * _layout_manager.layout()->circle.radius)
+    _state.cursor_pos = diff;
 
   _trgtEngine->select(selected_coords, _state.chart_scale);
 }
@@ -565,6 +573,7 @@ void RLIDisplayWidget::keyPressEvent(QKeyEvent* event) {
 
   // Вынос центра
   case Qt::Key_C:
+    _state.center_shift = _state.cursor_pos;
     break;
 
   // Скрытое меню

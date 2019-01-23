@@ -73,6 +73,14 @@ void RadarDataSource::timerEvent(QTimerEvent* e) {
 
 
 bool RadarDataSource::loadData() {
+  //char file1[26] = "data/pelengs/r1nm3h0_4096";
+  //char file2[26] = "data/pelengs/r1nm6h0_4096";
+
+  //if (!loadObserves1(file2, file_amps1[0]))
+  //  return false;
+  //if (!loadObserves1(file2, file_amps1[1]))
+  //  return false;
+
   if (!initWithDummy1(file_amps1[0]))
     return false;
 
@@ -88,6 +96,36 @@ bool RadarDataSource::loadData() {
   return true;
 }
 
+bool RadarDataSource::loadObserves1(char* filename, GLfloat* amps) {
+  std::ifstream file(filename, std::ios::in | std::ios::binary | std::ios::ate);
+
+  // 16 and 3204 in bytes, we will use INT16
+  const int headerSize = 16 / 2;
+  const int dataSize = 3204 / 2;
+
+  if (file.is_open()) {
+    std::streampos size = file.tellg();
+    int16_t* memblock = new int16_t[size/2];
+
+    file.seekg(0, std::ios::beg);
+    file.read(reinterpret_cast<char*>(memblock), size);
+    file.close();
+
+    // Works only for _bearings_per_cycle = 4096, _peleng_size = 800
+    for (int i = 0; i < _bearings_per_cycle; i++) {
+      float div = memblock[headerSize + i*dataSize + 1];
+      for (int j = 0; j < _peleng_size; j++) {
+        amps[i*_peleng_size + j] = memblock[headerSize + i*dataSize + 2 + j] / div;
+      }
+    }
+
+    delete[] memblock;
+    return true;
+  }
+
+  std::cerr << "Unable to open file";
+  return false;
+}
 
 bool RadarDataSource::initWithDummy1(GLfloat* amps) {
   for (int i = 0; i < _bearings_per_cycle; i++)

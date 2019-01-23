@@ -27,6 +27,9 @@ protected slots:
 
 private:
   bool loadData();
+
+  bool loadObserves1(char* filename, GLfloat* amps);
+
   bool initWithDummy1(float* amps);
   bool initWithDummy2(float* amps);
   bool initWithDummy3(float* amps);

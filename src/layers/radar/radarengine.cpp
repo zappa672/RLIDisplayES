@@ -13,16 +13,9 @@ RadarEngine::RadarEngine(int pel_count, int pel_len, int tex_radius, QOpenGLCont
   : QObject(parent), QOpenGLFunctions(context) {
   initializeOpenGLFunctions();
 
-  _peleng_count = 0;
-  _peleng_len = 0;
-
-  _has_data = false;
-  _fbo = nullptr;
-
   glGenBuffers(ATTR_COUNT, _vbo_ids);
   glGenBuffers(1, &_ind_vbo_id);
 
-  _program = new QOpenGLShaderProgram();
   _palette = new RadarPalette(context, this);
 
   initShader();
@@ -83,7 +76,7 @@ void RadarEngine::fillCoordTable() {
   _positions.clear();
   _draw_indices.clear();
 
-  int total = _peleng_count*_peleng_len;
+  GLuint total = _peleng_count*_peleng_len;
 
   for (int index = 0; index < _peleng_count; index++) {
     for (int radius = 0; radius < _peleng_len; radius++) {
@@ -105,14 +98,12 @@ void RadarEngine::resizeTexture(int radius) {
   if (_fbo != nullptr && _fbo->width() == static_cast<int>(2*radius+1))
     return;
 
-  _radius = radius;
-
   delete _fbo;
 
   QOpenGLFramebufferObjectFormat format;
   format.setAttachment(QOpenGLFramebufferObject::Depth);
 
-  _fbo = new QOpenGLFramebufferObject(2*_radius+1, 2*_radius+1, format);
+  _fbo = new QOpenGLFramebufferObject(2*radius+1, 2*radius+1, format);
 
   clearTexture();
 }
@@ -172,11 +163,16 @@ void RadarEngine::clearTexture() {
 }
 
 
-void RadarEngine::updateTexture(double north_shift) {
+void RadarEngine::updateTexture(const RLIState& _rli_state) {
   if (!_has_data) {
     clearTexture();
     return;
   }
+
+  if (QVector2D(_center_shift - _rli_state.center_shift).length() > 0.5f) {
+      clearTexture();
+      _center_shift = _rli_state.center_shift;
+    }
 
   // Calculate which pelengs we should draw
   // --------------------------------------
@@ -207,7 +203,9 @@ void RadarEngine::updateTexture(double north_shift) {
 
   QMatrix4x4 transform;
   transform.setToIdentity();
-  transform.translate(_fbo->width() / 2.f, _fbo->height() / 2.f, 0.f);
+  transform.translate( _fbo->width() / 2.f + static_cast<float>(_center_shift.x())
+                     , _fbo->height() / 2.f + static_cast<float>(_center_shift.y())
+                     , 0.f);
 
   _program->bind();
 
@@ -221,7 +219,7 @@ void RadarEngine::updateTexture(double north_shift) {
   glUniform1f(_unif_locs[UNIF_PELENG_LENGTH], _peleng_len);
   glUniform1f(_unif_locs[UNIF_PELENG_COUNT], _peleng_count);
   glUniform1f(_unif_locs[UNIF_FBO_RADIUS], _fbo->width() / 2.f);
-  glUniform1f(_unif_locs[UNIF_NORTH_SHIFT], north_shift);
+  glUniform1f(_unif_locs[UNIF_NORTH_SHIFT], static_cast<float>(_rli_state.north_shift));
 
   if (first_peleng_to_draw <= last_peleng_to_draw) {
     drawPelengs(first_peleng_to_draw, last_peleng_to_draw);

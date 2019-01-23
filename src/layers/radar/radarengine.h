@@ -10,6 +10,7 @@
 #include <QOpenGLShaderProgram>
 #include <QOpenGLVertexArrayObject>
 
+#include "../../common/rlistate.h"
 #include "radarpalette.h"
 
 // Класс для отрисовки радарного круга
@@ -37,7 +38,7 @@ public slots:
   void clearTexture();
   void clearData();
 
-  void updateTexture(double north_shift);
+  void updateTexture(const RLIState& _rli_state);
   void updateData(int offset, int count, GLfloat* amps);
 
 private:
@@ -47,21 +48,22 @@ private:
 
   void drawPelengs(int first, int last);
 
-  bool _has_data;
+  bool _has_data = false;
 
-  // Radar parameters  
-  int _radius;
-  int _peleng_count, _peleng_len;
+  // Radar parameters
+  int _peleng_count = 0;
+  int _peleng_len   = 0;
 
   std::vector<GLuint> _draw_indices;
   std::vector<GLfloat> _positions;
 
   bool  _draw_circle;
   int  _last_drawn_peleng, _last_added_peleng;
+  QPointF _center_shift { 0.0, 0.0 };
 
   // OpenGL vars
-  QOpenGLFramebufferObject* _fbo;
-  QOpenGLShaderProgram* _program;
+  QOpenGLFramebufferObject* _fbo = nullptr;
+  QOpenGLShaderProgram* _program = new QOpenGLShaderProgram(this);
 
   // OpenGL program attributres enum
   enum { ATTR_POSITION  = 0

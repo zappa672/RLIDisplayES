@@ -7,7 +7,7 @@
 
 static double const PI = acos(-1);
 
-MaskEngine::MaskEngine(const QSize& sz, const RLICircleLayout& layout, InfoFonts* fonts, QOpenGLContext* context, QObject* parent)
+MaskEngine::MaskEngine(const QSize& sz, const RLICircleLayout& layout, InfoFonts* fonts, QOpenGLContext* context, const RLIState& _rli_state, QObject* parent)
   : QObject(parent), QOpenGLFunctions(context) {
 
   initializeOpenGLFunctions();
@@ -25,7 +25,7 @@ MaskEngine::MaskEngine(const QSize& sz, const RLICircleLayout& layout, InfoFonts
   _hole_point_count = 362;
 
   initShader();
-  resize(sz, layout);
+  resize(sz, layout, _rli_state);
 }
 
 MaskEngine::~MaskEngine() {
@@ -37,26 +37,33 @@ MaskEngine::~MaskEngine() {
   delete _program;
 }
 
-void MaskEngine::resize(const QSize& sz, const RLICircleLayout& layout) {
+void MaskEngine::resize(const QSize& sz, const RLICircleLayout& layout, const RLIState& _rli_state) {
   _font = layout.font;
   _hole_radius = layout.radius;
   _hole_center = layout.center;
-  _cursor_pos = _hole_center;
 
   delete _fbo;
   _fbo = new QOpenGLFramebufferObject(sz);
 
   initBuffers();
-  update();
+  update(_rli_state, true);
 }
 
 
-void MaskEngine::update() {
+void MaskEngine::update(const RLIState& _rli_state, bool forced) {
+  if (!forced
+    && fabs(_rli_state.north_shift - _angle_shift) < 1.0
+    && QVector2D(_center_shift - _rli_state.center_shift).length() < 1.f)
+    return;
+
+  _angle_shift = _rli_state.north_shift;
+  _center_shift = _rli_state.center_shift;
+
   _fbo->bind();
 
   glViewport(0, 0, _fbo->width(), _fbo->height());
 
-  glClearColor(0.12, 0.13, 0.10, 1.0);
+  glClearColor(0.12f, 0.13f, 0.10f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT);
 
   glDisable(GL_DEPTH_TEST);
@@ -74,10 +81,9 @@ void MaskEngine::update() {
   // Set uniforms
   // ---------------------------------------------------------------------
   _program->setUniformValue(_unif_locs[MASK_UNIF_MVP], projection);
-  glUniform1f(_unif_locs[MASK_UNIF_ANGLE_SHIFT], 0.f);
+  glUniform1f(_unif_locs[MASK_UNIF_ANGLE_SHIFT], _angle_shift);
   glUniform1f(_unif_locs[MASK_UNIF_CIRCLE_RADIUS], _hole_radius);
   glUniform2f(_unif_locs[MASK_UNIF_CIRCLE_POS], _hole_center.x(), _hole_center.y());
-  glUniform2f(_unif_locs[MASK_UNIF_CURSOR_POS], _cursor_pos.x(), _cursor_pos.y());
   glUniform4f(_unif_locs[MASK_UNIF_COLOR], 0.f, 1.f, 0.f, 1.f);
   // ---------------------------------------------------------------------
 
@@ -113,7 +119,9 @@ void MaskEngine::update() {
   // Draw hole
   // ---------------------------------------------------------------------
   glUniform4f(_unif_locs[MASK_UNIF_COLOR], 1.f, 1.f, 1.f, 0.f);
-  glUniform2f(_unif_locs[MASK_UNIF_CURSOR_POS], _hole_center.x(), _hole_center.y());
+  glUniform2f( _unif_locs[MASK_UNIF_CURSOR_POS]
+             , _hole_center.x() + _center_shift.x()
+             , _hole_center.y() + _center_shift.y());
 
   bindBuffers(vbo_ids_hole);
 

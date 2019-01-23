@@ -35,7 +35,7 @@ TargetEngine::~TargetEngine() {
   glDeleteBuffers(1, &_ind_vbo_id);
 }
 
-void TargetEngine::select(const GeoPos& coords, float scale) {
+void TargetEngine::select(const GeoPos& coords, double scale) {
   for (const QString& tag: _targets.keys()) {
     if (tag == _selected)
       continue;

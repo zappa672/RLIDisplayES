@@ -13,6 +13,8 @@
 #include <QOpenGLShaderProgram>
 
 #include "../common/rlilayout.h"
+#include "../common/rlistate.h"
+
 #include "info/infofonts.h"
 
 
@@ -20,19 +22,15 @@
 class MaskEngine : public QObject, protected QOpenGLFunctions {
   Q_OBJECT
 public:
-  MaskEngine(const QSize& sz, const RLICircleLayout& layout, InfoFonts* fonts, QOpenGLContext* context, QObject* parent = nullptr);
+  MaskEngine(const QSize& sz, const RLICircleLayout& layout, InfoFonts* fonts, QOpenGLContext* context, const RLIState& _rli_state, QObject* parent = nullptr);
   virtual ~MaskEngine();
 
-  void resize(const QSize& sz, const RLICircleLayout& layout);
+  void resize(const QSize& sz, const RLICircleLayout& layout, const RLIState& _rli_state);
 
   inline GLuint textureId()   { return _fbo->texture(); }
 
-  inline void setCursorPos(const QPoint& p)   { _cursor_pos = p; }
-
-  inline GLuint  getTextureId()   { return _fbo->texture(); }
-
 public slots:
-  void update();
+  void update(const RLIState& _rli_state, bool forced);
 
 private:
   void initBuffers();
@@ -48,10 +46,11 @@ private:
 
   InfoFonts* _fonts;
 
+  double    _angle_shift = 0.0;
   float     _hole_radius;
 
   QPointF   _hole_center;
-  QPointF   _cursor_pos;
+  QPointF   _center_shift { 0.0, 0.0 };
 
   QString   _font;
 

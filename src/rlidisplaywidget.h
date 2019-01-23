@@ -89,7 +89,7 @@ private:
   ChartManager     _chart_mngr      { this };
   RLILayoutManager _layout_manager  { "layouts.xml" };
 
-  InfoFonts*    _infoFonts;
+  InfoFonts*        _infoFonts;
 
   MaskEngine*       _maskEngine;
   RadarEngine*      _radarEngine;

@@ -63,9 +63,16 @@ void ControlsEngine::draw(const QMatrix4x4& mvp_mat, const RLIState& state) {
   }
 
 
-  _prog->setUniformValue(_unif_locs[CTRL_UNIF_MVP], mvp_mat);
+  transform.setToIdentity();
+  transform.translate( state.cursor_pos.x() - state.center_shift.x()
+                     , state.cursor_pos.y() - state.center_shift.y()
+                     , 0.f);
+  _prog->setUniformValue(_unif_locs[CTRL_UNIF_MVP], mvp_mat*transform);
 
   drawCursor(QColor(255, 0, 255, 255));
+
+
+  _prog->setUniformValue(_unif_locs[CTRL_UNIF_MVP], mvp_mat);
 
   // Область захвата
   drawRaySegment   (QColor(255, 255, 0, 255),  280.f,   48.f,  112.f);

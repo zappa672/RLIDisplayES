@@ -41,7 +41,7 @@ protected slots:
 public slots:
   void onTailsModeChanged(int mode, int minutes);
 
-  void select(const GeoPos& coords, float scale);
+  void select(const GeoPos& coords, double scale);
 
   void deleteTarget(QString tag);
   void updateTarget(QString tag, RLITarget target);
