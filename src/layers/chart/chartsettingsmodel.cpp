@@ -229,14 +229,10 @@ bool ChartSettingsModel::setData(const QModelIndex &index, const QVariant &value
   if (!index.isValid() || index.column() != 1)
     return false;
 
-  //qDebug() << role;
-
-  if (role == Qt::CheckStateRole) {
+  if (role == Qt::CheckStateRole)
     layers_settings[layer_order[index.row()]].visible = ((Qt::CheckState)value.toInt() == Qt::Checked);
-    return true;
-  }
 
-  return false;
+  return Qt::CheckStateRole == role;
 }
 
 Qt::ItemFlags ChartSettingsModel::flags(const QModelIndex &index) const {

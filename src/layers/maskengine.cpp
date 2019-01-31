@@ -38,21 +38,18 @@ MaskEngine::~MaskEngine() {
 }
 
 void MaskEngine::resize(const QSize& sz, const RLICircleLayout& layout, const RLIState& _rli_state) {
-  _font = layout.font;
-  _hole_radius = layout.radius;
-  _hole_center = layout.center;
+  _angle_shift = -360; // enforce update
 
   delete _fbo;
   _fbo = new QOpenGLFramebufferObject(sz);
 
   initBuffers();
-  update(_rli_state, true);
+  update(_rli_state, layout);
 }
 
 
-void MaskEngine::update(const RLIState& _rli_state, bool forced) {
-  if (!forced
-    && fabs(_rli_state.north_shift - _angle_shift) < 1.0
+void MaskEngine::update(const RLIState& _rli_state, const RLICircleLayout& layout) {
+  if ( fabs(_rli_state.north_shift - _angle_shift) < 1.0
     && QVector2D(_center_shift - _rli_state.center_shift).length() < 1.f)
     return;
 
@@ -82,9 +79,12 @@ void MaskEngine::update(const RLIState& _rli_state, bool forced) {
   // ---------------------------------------------------------------------
   _program->setUniformValue(_unif_locs[MASK_UNIF_MVP], projection);
   glUniform1f(_unif_locs[MASK_UNIF_ANGLE_SHIFT], _angle_shift);
-  glUniform1f(_unif_locs[MASK_UNIF_CIRCLE_RADIUS], _hole_radius);
-  glUniform2f(_unif_locs[MASK_UNIF_CIRCLE_POS], _hole_center.x(), _hole_center.y());
+  glUniform1f(_unif_locs[MASK_UNIF_CIRCLE_RADIUS], layout.radius);
+  glUniform2f(_unif_locs[MASK_UNIF_CIRCLE_POS], layout.center.x(), layout.center.y());
   glUniform4f(_unif_locs[MASK_UNIF_COLOR], 0.f, 1.f, 0.f, 1.f);
+  glUniform2f( _unif_locs[MASK_UNIF_CURSOR_POS]
+             , layout.center.x() + _center_shift.x()
+             , layout.center.y() + _center_shift.y());
   // ---------------------------------------------------------------------
 
   // Draw line marks
@@ -96,8 +96,8 @@ void MaskEngine::update(const RLIState& _rli_state, bool forced) {
 
   // Draw text mark
   // ---------------------------------------------------------------------
-  QSizeF font_size = _fonts->getFontSize(_font);
-  GLuint tex_id = _fonts->getTexture(_font)->textureId();
+  QSize font_size = _fonts->getFontSize(layout.font);
+  GLuint tex_id = _fonts->getTexture(layout.font)->textureId();
 
   bindBuffers(vbo_ids_text);
 
@@ -119,12 +119,7 @@ void MaskEngine::update(const RLIState& _rli_state, bool forced) {
   // Draw hole
   // ---------------------------------------------------------------------
   glUniform4f(_unif_locs[MASK_UNIF_COLOR], 1.f, 1.f, 1.f, 0.f);
-  glUniform2f( _unif_locs[MASK_UNIF_CURSOR_POS]
-             , _hole_center.x() + _center_shift.x()
-             , _hole_center.y() + _center_shift.y());
-
   bindBuffers(vbo_ids_hole);
-
   glDrawArrays(GL_TRIANGLE_FAN, 0, _hole_point_count+2);
   // ---------------------------------------------------------------------
 

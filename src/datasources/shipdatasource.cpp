@@ -5,6 +5,7 @@
 ShipDataSource::ShipDataSource(QObject *parent) : QObject(parent) {
   _ship_state.position = GeoPos(15.123 + 0.25, 145.66);
   _ship_state.course = 90;
+  _ship_state.course = 0;
 }
 
 ShipDataSource::~ShipDataSource() {

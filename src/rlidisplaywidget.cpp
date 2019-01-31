@@ -298,8 +298,8 @@ void RLIDisplayWidget::paintGL() {
   if (!_initialized)
     return;
 
-  paintLayers();
   updateLayers();
+  paintLayers();
 
   glFlush();
 }
@@ -365,7 +365,7 @@ void RLIDisplayWidget::updateLayers() {
   _chartEngine->update(_state, colorScheme);
   _infoEngine->update(_infoFonts);
   _menuEngine->update();
-  _maskEngine->update(_state, false);
+  _maskEngine->update(_state, _layout_manager.layout()->circle);
 
   if (_state.state == RLIWidgetState::RLISTATE_MAGNIFIER)
     _magnEngine->update( _radarEngine->pelengLength(), _radarEngine->pelengCount(), 90, 96 ); // min_pel, min_rad

@@ -30,7 +30,7 @@ public:
   inline GLuint textureId()   { return _fbo->texture(); }
 
 public slots:
-  void update(const RLIState& _rli_state, bool forced);
+  void update(const RLIState& _rli_state, const RLICircleLayout& layout);
 
 private:
   void initBuffers();
@@ -47,12 +47,7 @@ private:
   InfoFonts* _fonts;
 
   double    _angle_shift = 0.0;
-  float     _hole_radius;
-
-  QPointF   _hole_center;
   QPointF   _center_shift { 0.0, 0.0 };
-
-  QString   _font;
 
   QOpenGLFramebufferObject* _fbo;
   QOpenGLShaderProgram* _program;
