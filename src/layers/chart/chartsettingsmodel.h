@@ -58,15 +58,17 @@ public:
   bool isLayerVisible(const QString& layer_name);
   void setLayerVisibility(const QString& layer_name, bool val);
 
-  bool areSoundingsVisible();
-  void setSoundingsVisible(bool val);
+  inline bool areSoundingsVisible() const   { return display_soundings; }
+  inline void setSoundingsVisible(bool val) { display_soundings = val; }
 
-  float getShallowDepth(void);
-  void setShallowDepth(float val);
-  float getSafetyDepth(void);
-  void setSafetyDepth(float val);
-  float getDeepDepth(void);
-  void setDeepDepth(float val);
+  inline double getShallowDepth(void) const { return shallow_depth; }
+  inline void   setShallowDepth(double val) { shallow_depth = val; }
+
+  inline double getSafetyDepth(void) const  { return safety_depth; }
+  inline void   setSafetyDepth(double val)  { safety_depth = val; }
+
+  inline double getDeepDepth(void) const    { return deep_depth; }
+  inline void   setDeepDepth(double val)    { deep_depth = val; }
 
   inline ChartLayerDisplaySettings layerSettings(QString name) { return layers_settings.value(name, ChartLayerDisplaySettings()); }
 
@@ -80,9 +82,9 @@ private:
   QMap<QString, ChartLayerDisplaySettings> layers_settings;
   QStringList layer_order;
 
-  float shallow_depth;
-  float safety_depth;
-  float deep_depth;
+  double shallow_depth;
+  double safety_depth;
+  double deep_depth;
 };
 
 #endif // CHARTSETTINGSMODEL_H

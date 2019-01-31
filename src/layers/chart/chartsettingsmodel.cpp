@@ -45,13 +45,13 @@ void ChartSettingsModel::readDepths(QXmlStreamReader* xml) {
     switch (xml->readNext()) {
     case QXmlStreamReader::StartElement:
       if (xml->name() == "Shallow")
-        shallow_depth = xml->readElementText().toFloat();
+        shallow_depth = xml->readElementText().toDouble();
 
       if (xml->name() == "Safety")
-        safety_depth = xml->readElementText().toFloat();
+        safety_depth = xml->readElementText().toDouble();
 
       if (xml->name() == "Deep")
-        deep_depth = xml->readElementText().toFloat();
+        deep_depth = xml->readElementText().toDouble();
 
       break;
     case QXmlStreamReader::EndElement:
@@ -169,38 +169,6 @@ void ChartSettingsModel::setLayerVisibility(const QString& layer_name, bool val)
   layers_settings[layer_name].visible = val;
 }
 
-float ChartSettingsModel::getShallowDepth(void) {
-  return shallow_depth;
-}
-
-float ChartSettingsModel::getSafetyDepth(void) {
-  return safety_depth;
-}
-
-float ChartSettingsModel::getDeepDepth(void) {
-  return deep_depth;
-}
-
-void ChartSettingsModel::setShallowDepth(float val) {
-  shallow_depth = val;
-}
-
-void ChartSettingsModel::setSafetyDepth(float val) {
-  safety_depth = val;
-}
-
-void ChartSettingsModel::setDeepDepth(float val) {
-  deep_depth = val;
-}
-
-bool ChartSettingsModel::areSoundingsVisible() {
-  return display_soundings;
-}
-
-void ChartSettingsModel::setSoundingsVisible(bool val) {
-  display_soundings = val;
-}
-
 int ChartSettingsModel::rowCount(const QModelIndex& /*parent*/) const {
   return layer_order.size();
 }
@@ -230,7 +198,7 @@ bool ChartSettingsModel::setData(const QModelIndex &index, const QVariant &value
     return false;
 
   if (role == Qt::CheckStateRole)
-    layers_settings[layer_order[index.row()]].visible = ((Qt::CheckState)value.toInt() == Qt::Checked);
+    layers_settings[layer_order[index.row()]].visible = (static_cast<Qt::CheckState>(value.toInt()) == Qt::Checked);
 
   return Qt::CheckStateRole == role;
 }
@@ -239,16 +207,12 @@ Qt::ItemFlags ChartSettingsModel::flags(const QModelIndex &index) const {
   switch (index.column()) {
     case 0:
       return Qt::NoItemFlags;
-      break;
     case 1:
       return Qt::ItemIsEnabled | Qt::ItemIsUserCheckable;
-      break;
     case 2:
       return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
-      break;
     default:
       return Qt::NoItemFlags;
-      break;
   }
 }
 
@@ -259,25 +223,18 @@ QVariant ChartSettingsModel::headerData(int section, Qt::Orientation orientation
   switch (orientation) {
     case Qt::Vertical:
       return QVariant(section + 1);
-      break;
     case Qt::Horizontal:
       switch (section) {
         case 0:
           return QVariant("Name");
-          break;
         case 1:
           return QVariant("Visible");
-          break;
         case 2:
           return QVariant("Description");
-          break;
         default:
           return QVariant();
-          break;
-      }
-      break;
-    default:
-      return QVariant();
-      break;
+      }    
   }
+
+  return QVariant();
 }
