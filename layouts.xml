@@ -46,7 +46,7 @@
         <text name="text" rect="0x0x102x20" allign="center" font="F12X14B" color="0,252,252,255" />
       </panel>
 
-      <panel name="label1" pos="-244,44" size="112x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="1">
+      <panel name="orientation" pos="-244,44" size="112x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="1">
         <text name="text" rect="0x0x112x20" allign="center" font="F12X14B" color="0,252,252,255" />
       </panel>
 
@@ -221,7 +221,7 @@
         <text name="text" rect="0x0x102x20" allign="center" font="F12X14B" color="0,252,252,255" />
       </panel>
 
-      <panel name="label1" pos="-244,44" size="112x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="1">
+      <panel name="orientation" pos="-244,44" size="112x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="1">
         <text name="text" rect="0x0x112x20" allign="center" font="F12X14B" color="0,252,252,255" />
       </panel>
 
@@ -395,7 +395,7 @@
         <text name="text" rect="0x0x102x20" allign="center" font="F12X14B" color="0,252,252,255" />
       </panel>
 
-      <panel name="label1" pos="-244,44" size="112x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="1">
+      <panel name="orientation" pos="-244,44" size="112x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="1">
         <text name="text" rect="0x0x112x20" allign="center" font="F12X14B" color="0,252,252,255" />
       </panel>
 
@@ -569,7 +569,7 @@
         <text name="text" rect="0x0x102x20" allign="center" font="F12X14B" color="0,252,252,255" />
       </panel>
 
-      <panel name="label1" pos="-244,44" size="112x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="1">
+      <panel name="orientation" pos="-244,44" size="112x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="1">
         <text name="text" rect="0x0x112x20" allign="center" font="F12X14B" color="0,252,252,255" />
       </panel>
 
@@ -743,7 +743,7 @@
         <text name="text" rect="0x0x102x20" allign="center" font="F12X14B" color="0,252,252,255" />
       </panel>
 
-      <panel name="label1" pos="-244,44" size="112x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="1">
+      <panel name="orientation" pos="-244,44" size="112x20" border_width="1" border_color="64,252,0,255" back_color="0,0,0,255" text_count="1">
         <text name="text" rect="0x0x112x20" allign="center" font="F12X14B" color="0,252,252,255" />
       </panel>
 

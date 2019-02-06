@@ -13,7 +13,7 @@ static constexpr int RLI_PANEL_EMISSION_TEXT_ID = 0;
 
 static constexpr int RLI_PANEL_LABEL5_TEXT_ID   = 0;
 static constexpr int RLI_PANEL_BAND_TEXT_ID     = 0;
-static constexpr int RLI_PANEL_LABEL1_TEXT_ID   = 0;
+static constexpr int RLI_PANEL_ORIENTATION_TEXT_ID   = 0;
 static constexpr int RLI_PANEL_LABEL2_TEXT_ID   = 0;
 static constexpr int RLI_PANEL_LABEL3_TEXT_ID   = 0;
 static constexpr int RLI_PANEL_LABEL4_TEXT_ID   = 0;
@@ -135,8 +135,8 @@ const static std::map<int, std::map<QString, int>> panel_texts_map {
 , {  InfoEngine::RLI_PANEL_BAND,
     std::map<QString, int> { { "text", RLI_PANEL_BAND_TEXT_ID } }
   }
-, {  InfoEngine::RLI_PANEL_LABEL1,
-    std::map<QString, int> { { "text", RLI_PANEL_LABEL1_TEXT_ID } }
+, {  InfoEngine::RLI_PANEL_ORIENTATION,
+    std::map<QString, int> { { "text", RLI_PANEL_ORIENTATION_TEXT_ID } }
   }
 , {  InfoEngine::RLI_PANEL_LABEL2,
     std::map<QString, int> { { "text", RLI_PANEL_LABEL2_TEXT_ID } }
@@ -266,13 +266,13 @@ const static std::map<QString, int> panels_map {
 ,   { "apch",     InfoEngine::RLI_PANEL_APCH }
 ,   { "emission", InfoEngine::RLI_PANEL_EMISSION }
 
-,   { "label5",   InfoEngine::RLI_PANEL_LABEL5 }
-,   { "band",     InfoEngine::RLI_PANEL_BAND }
-,   { "label1",   InfoEngine::RLI_PANEL_LABEL1 }
-,   { "label2",   InfoEngine::RLI_PANEL_LABEL2 }
-,   { "label3",   InfoEngine::RLI_PANEL_LABEL3 }
-,   { "label4",   InfoEngine::RLI_PANEL_LABEL4 }
-,   { "fps",      InfoEngine::RLI_PANEL_FPS }
+,   { "label5",       InfoEngine::RLI_PANEL_LABEL5 }
+,   { "band",         InfoEngine::RLI_PANEL_BAND }
+,   { "orientation",  InfoEngine::RLI_PANEL_ORIENTATION }
+,   { "label2",       InfoEngine::RLI_PANEL_LABEL2 }
+,   { "label3",       InfoEngine::RLI_PANEL_LABEL3 }
+,   { "label4",       InfoEngine::RLI_PANEL_LABEL4 }
+,   { "fps",          InfoEngine::RLI_PANEL_FPS }
 
 ,   { "scale",    InfoEngine::RLI_PANEL_SCALE }
 ,   { "vn",       InfoEngine::RLI_PANEL_VN }
@@ -512,7 +512,7 @@ void InfoEngine::initBlocks() {
 
   initBlockLabel5();
   initBlockBand();
-  initBlockLabel1();
+  initBlockOrientation();
   initBlockLabel2();
   initBlockLabel3();
   initBlockLabel4();
@@ -576,7 +576,7 @@ void InfoEngine::updateEmission(float emission) {
 
 void InfoEngine::updateValueBar(RLIPanel id, float value) {
   int max_bar_width = _blocks[id]->geometry().width() - _blocks[id]->rectangles()["splitter"].geometry.x() - 2;
-  int bar_width = (value / 255.0) * max_bar_width;
+  int bar_width = static_cast<int>((value / 255.f) * max_bar_width);
 
   QRect bar = _blocks[id]->rectangles()["bar"].geometry;
 
@@ -594,8 +594,24 @@ void InfoEngine::initBlockBand() {
   _blocks[RLI_PANEL_BAND]->setText(RLI_PANEL_BAND_TEXT_ID, RLI_STR_S_BAND);
 }
 
-void InfoEngine::initBlockLabel1() {
-  _blocks[RLI_PANEL_LABEL1]->setText(RLI_PANEL_LABEL1_TEXT_ID, RLI_STR_NORTH);
+
+void InfoEngine::initBlockOrientation() {
+  _blocks[RLI_PANEL_ORIENTATION]->setText(RLI_PANEL_ORIENTATION_TEXT_ID, RLI_STR_NORTH);
+}
+
+void InfoEngine::onOrientationChanged(RLIOrientation orient) {
+  switch (orient) {
+    case RLIOrientation::RLIORIENT_HEAD:
+      _blocks[RLI_PANEL_ORIENTATION]->setText(RLI_PANEL_ORIENTATION_TEXT_ID, RLI_STR_HEAD);
+      break;
+    case RLIOrientation::RLIORIENT_NORTH:
+      _blocks[RLI_PANEL_ORIENTATION]->setText(RLI_PANEL_ORIENTATION_TEXT_ID, RLI_STR_NORTH);
+      break;
+    case RLIOrientation::RLIORIENT_COURSE:
+      _blocks[RLI_PANEL_ORIENTATION]->setText(RLI_PANEL_ORIENTATION_TEXT_ID, RLI_STR_COURSE);
+      break;
+  }
+
 }
 
 void InfoEngine::initBlockLabel2() {
@@ -669,7 +685,7 @@ void InfoEngine::initBlockCourse() {
 }
 
 void InfoEngine::onCourseChanged(double course) {
-  _blocks[RLI_PANEL_COURSE]->setText(RLI_PANEL_COURSE_TBL_0_1_TEXT_ID, QString::number(course, 'd', 2).toLocal8Bit());
+  _blocks[RLI_PANEL_COURSE]->setText(RLI_PANEL_COURSE_TBL_0_1_TEXT_ID, QString::number(course, 'd', 2).left(5).toLocal8Bit());
 }
 
 

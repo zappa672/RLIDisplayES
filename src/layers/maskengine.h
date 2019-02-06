@@ -30,7 +30,7 @@ public:
   inline GLuint textureId()   { return _fbo->texture(); }
 
 public slots:
-  void update(const RLIState& _rli_state, const RLICircleLayout& layout);
+  void update(const RLIState& rli_state, const RLICircleLayout& layout, bool forced);
 
 private:
   void initBuffers();
@@ -42,10 +42,11 @@ private:
   void initHoleBuffers();
 
   void bindBuffers(GLuint* vbo_ids);
-  void setBuffers(GLuint* vbo_ids, ulong count, GLfloat* angles, GLfloat* chars, GLfloat* orders, GLfloat* shifts);
+  void setBuffers(GLuint* vbo_ids, uint count, GLfloat* angles, GLfloat* chars, GLfloat* orders, GLfloat* shifts);
 
   InfoFonts* _fonts;
 
+  RLIOrientation _orient;
   double    _angle_shift = 0.0;
   QPointF   _center_shift { 0.0, 0.0 };
 
@@ -67,14 +68,17 @@ private:
        , MASK_UNIF_GLYPH_TEX = 7
        , MASK_UNIF_COUNT = 8 } ;
 
-  GLuint vbo_ids_mark  [MASK_ATTR_COUNT];
+  GLuint vbo_ids_mark   [MASK_ATTR_COUNT];
 
   GLuint _ind_vbo_id_text;
-  GLuint vbo_ids_text  [MASK_ATTR_COUNT];
-  int _text_point_count;
+  GLuint _ind_vbo_id_text2;
+  GLuint vbo_ids_text   [MASK_ATTR_COUNT];
+  GLuint vbo_ids_text2  [MASK_ATTR_COUNT];
+  uint _text_point_count;
+  uint _text_point_count2;
 
-  GLuint vbo_ids_hole  [MASK_ATTR_COUNT];
-  int _hole_point_count;
+  GLuint vbo_ids_hole   [MASK_ATTR_COUNT];
+  uint _hole_point_count;
 
   GLint _unif_locs[MASK_UNIF_COUNT];
   GLuint _attr_locs[MASK_ATTR_COUNT];

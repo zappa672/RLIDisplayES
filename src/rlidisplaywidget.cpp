@@ -365,7 +365,7 @@ void RLIDisplayWidget::updateLayers() {
   _chartEngine->update(_state, colorScheme);
   _infoEngine->update(_infoFonts);
   _menuEngine->update();
-  _maskEngine->update(_state, _layout_manager.layout()->circle);
+  _maskEngine->update(_state, _layout_manager.layout()->circle, false);
 
   if (_state.state == RLIWidgetState::RLISTATE_MAGNIFIER)
     _magnEngine->update( _radarEngine->pelengLength(), _radarEngine->pelengCount(), 90, 96 ); // min_pel, min_rad
@@ -586,20 +586,20 @@ void RLIDisplayWidget::keyPressEvent(QKeyEvent* event) {
 
   // Выбор цели
   case Qt::Key_Up:
-    _state.vd += 1.f;
+    _state.vd += 1.0;
     break;
 
   // ЛИД / ЛОД
   case Qt::Key_Down:
-    _state.vd = qMax(0.f, _state.vd - 1.f);
+    _state.vd = qMax(0.0, _state.vd - 1.0);
     break;
 
   case Qt::Key_Left:
-    _state.vn_p = fmod(_state.vn_p - 1.f, 360.f);
+    _state.vn_p = fmod(_state.vn_p - 1.0, 360.f);
     break;
 
   case Qt::Key_Right:
-    _state.vn_p = fmod(_state.vn_p + 1.f, 360.f);
+    _state.vn_p = fmod(_state.vn_p + 1.0, 360.f);
     break;
 
   // Захват
@@ -646,6 +646,18 @@ void RLIDisplayWidget::keyPressEvent(QKeyEvent* event) {
 
   //Курс / Север / Курс стаб
   case Qt::Key_H:
+    switch(_state.orientation) {
+      case RLIOrientation::RLIORIENT_HEAD:
+        _state.orientation = RLIOrientation::RLIORIENT_NORTH;
+        break;
+      case RLIOrientation::RLIORIENT_NORTH:
+        _state.orientation = RLIOrientation::RLIORIENT_COURSE;
+        break;
+      case RLIOrientation::RLIORIENT_COURSE:
+        _state.orientation = RLIOrientation::RLIORIENT_HEAD;
+        break;
+    }
+    _infoEngine->onOrientationChanged(_state.orientation);
     break;
 
   //ИД / ОД

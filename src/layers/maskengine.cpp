@@ -14,7 +14,9 @@ MaskEngine::MaskEngine(const QSize& sz, const RLICircleLayout& layout, InfoFonts
 
   glGenBuffers(MASK_ATTR_COUNT, vbo_ids_mark);
   glGenBuffers(1, &_ind_vbo_id_text);
+  glGenBuffers(1, &_ind_vbo_id_text2);
   glGenBuffers(MASK_ATTR_COUNT, vbo_ids_text);
+  glGenBuffers(MASK_ATTR_COUNT, vbo_ids_text2);
   glGenBuffers(MASK_ATTR_COUNT, vbo_ids_hole);
 
   _fonts = fonts;
@@ -44,17 +46,20 @@ void MaskEngine::resize(const QSize& sz, const RLICircleLayout& layout, const RL
   _fbo = new QOpenGLFramebufferObject(sz);
 
   initBuffers();
-  update(_rli_state, layout);
+  update(_rli_state, layout, true);
 }
 
 
-void MaskEngine::update(const RLIState& _rli_state, const RLICircleLayout& layout) {
-  if ( fabs(_rli_state.north_shift - _angle_shift) < 1.0
-    && QVector2D(_center_shift - _rli_state.center_shift).length() < 1.f)
+void MaskEngine::update(const RLIState& rli_state, const RLICircleLayout& layout, bool forced) {
+  if ( !forced
+    && fabs(rli_state.north_shift - _angle_shift) < 1.0
+    && QVector2D(_center_shift - rli_state.center_shift).length() < 1.f
+    && _orient == rli_state.orientation )
     return;
 
-  _angle_shift = _rli_state.north_shift;
-  _center_shift = _rli_state.center_shift;
+  _angle_shift = rli_state.north_shift;
+  _center_shift = rli_state.center_shift;
+  _orient = rli_state.orientation;
 
   _fbo->bind();
 
@@ -78,13 +83,12 @@ void MaskEngine::update(const RLIState& _rli_state, const RLICircleLayout& layou
   // Set uniforms
   // ---------------------------------------------------------------------
   _program->setUniformValue(_unif_locs[MASK_UNIF_MVP], projection);
-  glUniform1f(_unif_locs[MASK_UNIF_ANGLE_SHIFT], _angle_shift);
+  glUniform1f(_unif_locs[MASK_UNIF_ANGLE_SHIFT], static_cast<float>(_angle_shift));
   glUniform1f(_unif_locs[MASK_UNIF_CIRCLE_RADIUS], layout.radius);
   glUniform2f(_unif_locs[MASK_UNIF_CIRCLE_POS], layout.center.x(), layout.center.y());
   glUniform4f(_unif_locs[MASK_UNIF_COLOR], 0.f, 1.f, 0.f, 1.f);
-  glUniform2f( _unif_locs[MASK_UNIF_CURSOR_POS]
-             , layout.center.x() + _center_shift.x()
-             , layout.center.y() + _center_shift.y());
+  glUniform2f( _unif_locs[MASK_UNIF_CURSOR_POS], static_cast<float>(layout.center.x() + _center_shift.x())
+                                               , static_cast<float>(layout.center.y() + _center_shift.y()));
   // ---------------------------------------------------------------------
 
   // Draw line marks
@@ -99,16 +103,21 @@ void MaskEngine::update(const RLIState& _rli_state, const RLICircleLayout& layou
   QSize font_size = _fonts->getFontSize(layout.font);
   GLuint tex_id = _fonts->getTexture(layout.font)->textureId();
 
-  bindBuffers(vbo_ids_text);
-
   glUniform2f(_unif_locs[MASK_UNIF_FONT_SIZE], font_size.width(), font_size.height());
   glUniform1f(_unif_locs[MASK_UNIF_GLYPH_TEX], 0);
 
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, tex_id);
 
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ind_vbo_id_text);
-  glDrawElements(GL_TRIANGLES, 3*(_text_point_count/2), GL_UNSIGNED_INT, (const GLvoid*)(0 * sizeof(GLuint)));
+  if (rli_state.orientation == RLIOrientation::RLIORIENT_NORTH) {
+    bindBuffers(vbo_ids_text);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ind_vbo_id_text);
+    glDrawElements(GL_TRIANGLES, 3*(_text_point_count/2), GL_UNSIGNED_INT, reinterpret_cast<const GLvoid*>(0 * sizeof(GLuint)));
+  } else {
+    bindBuffers(vbo_ids_text2);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ind_vbo_id_text2);
+    glDrawElements(GL_TRIANGLES, 3*(_text_point_count2/2), GL_UNSIGNED_INT, reinterpret_cast<const GLvoid*>(0 * sizeof(GLuint)));
+  }
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
   glBindTexture(GL_TEXTURE_2D, 0);
@@ -120,7 +129,7 @@ void MaskEngine::update(const RLIState& _rli_state, const RLICircleLayout& layou
   // ---------------------------------------------------------------------
   glUniform4f(_unif_locs[MASK_UNIF_COLOR], 1.f, 1.f, 1.f, 0.f);
   bindBuffers(vbo_ids_hole);
-  glDrawArrays(GL_TRIANGLE_FAN, 0, _hole_point_count+2);
+  glDrawArrays(GL_TRIANGLE_FAN, 0, static_cast<int>(_hole_point_count+2));
   // ---------------------------------------------------------------------
 
   _program->release();
@@ -144,10 +153,10 @@ void MaskEngine::initShader() {
   _unif_locs[MASK_UNIF_FONT_SIZE]     = _program->uniformLocation("font_size");
   _unif_locs[MASK_UNIF_GLYPH_TEX]     = _program->uniformLocation("glyph_tex");
 
-  _attr_locs[MASK_ATTR_ANGLE]         = _program->attributeLocation("angle");
-  _attr_locs[MASK_ATTR_CHAR_VAL]      = _program->attributeLocation("char_val");
-  _attr_locs[MASK_ATTR_ORDER]         = _program->attributeLocation("order");
-  _attr_locs[MASK_ATTR_SHIFT]         = _program->attributeLocation("shift");
+  _attr_locs[MASK_ATTR_ANGLE]         = static_cast<GLuint>(_program->attributeLocation("angle"));
+  _attr_locs[MASK_ATTR_CHAR_VAL]      = static_cast<GLuint>(_program->attributeLocation("char_val"));
+  _attr_locs[MASK_ATTR_ORDER]         = static_cast<GLuint>(_program->attributeLocation("order"));
+  _attr_locs[MASK_ATTR_SHIFT]         = static_cast<GLuint>(_program->attributeLocation("shift"));
 
   _program->release();
 }
@@ -162,7 +171,7 @@ void MaskEngine::initBuffers() {
   initRectBuffers();
 }
 
-void MaskEngine::setBuffers(GLuint* vbo_ids, ulong count, GLfloat* angles, GLfloat* chars, GLfloat* orders, GLfloat* shifts) {
+void MaskEngine::setBuffers(GLuint* vbo_ids, uint count, GLfloat* angles, GLfloat* chars, GLfloat* orders, GLfloat* shifts) {
   glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[MASK_ATTR_ANGLE]);
   glBufferData(GL_ARRAY_BUFFER, count*sizeof(GLfloat), angles, GL_DYNAMIC_DRAW);
 
@@ -209,8 +218,8 @@ void MaskEngine::initHoleBuffers() {
   chars.push_back(0);
   shift.push_back(0);
 
-  for (int a = 0; a < _hole_point_count; a++) {
-    angle.push_back((static_cast<float>(a) / _hole_point_count) * 360);
+  for (uint a = 0; a < _hole_point_count; a++) {
+    angle.push_back((a * 360.f) / _hole_point_count);
     order.push_back(1);
     chars.push_back(0);
     shift.push_back(0);
@@ -248,42 +257,67 @@ void MaskEngine::initLineBuffers() {
 }
 
 void MaskEngine::initTextBuffers() {
-  QVector<GLfloat> angles;
-  QVector<GLfloat> chars;
-  QVector<GLfloat> orders;
-  QVector<GLfloat> shifts;
+  QVector<GLfloat> angles[2];
+  QVector<GLfloat> chars[2];
+  QVector<GLfloat> orders[2];
+  QVector<GLfloat> shifts[2];
 
   _text_point_count = 0;
 
   for (int i = 0; i < 360; i += 10) {
-    QByteArray tm = QString::number(i).toLocal8Bit();
+    QByteArray tm0 = QString::number(i).toLocal8Bit();
+    QByteArray tm1 = QString::number(i > 180 ? 360-i : i).toLocal8Bit();
 
-    for (int l = 0; l < tm.size(); l++) {
+    for (int l = 0; l < tm0.size(); l++) {
       for (int k = 0; k < 4; k++) {
-        angles.push_back(i);
-        chars.push_back(tm[l]);
-        orders.push_back(k);
-        shifts.push_back(l);
+        angles[0].push_back(i);
+        chars[0].push_back(tm0[l]);
+        orders[0].push_back(k);
+        shifts[0].push_back(l);
+      }
+    }
+
+    for (int l = 0; l < tm1.size(); l++) {
+      for (int k = 0; k < 4; k++) {
+        angles[1].push_back(i);
+        chars[1].push_back(tm1[l]);
+        orders[1].push_back(k);
+        shifts[1].push_back(l);
       }
     }
   }
 
-  _text_point_count = orders.size();
-  setBuffers(vbo_ids_text, _text_point_count, angles.data(), chars.data(), orders.data(), shifts.data());
+  _text_point_count = static_cast<uint>(orders[0].size());
+  setBuffers(vbo_ids_text, _text_point_count, angles[0].data(), chars[0].data(), orders[0].data(), shifts[0].data());
+  _text_point_count2 = static_cast<uint>(orders[1].size());
+  setBuffers(vbo_ids_text2, _text_point_count2, angles[1].data(), chars[1].data(), orders[1].data(), shifts[1].data());
 
 
-  std::vector<GLuint> draw_indices;
+  std::vector<GLuint> draw_indices[2];
 
-  for (int i = 0; i < _text_point_count; i += 4) {
-    draw_indices.push_back(i);
-    draw_indices.push_back(i+1);
-    draw_indices.push_back(i+2);
-    draw_indices.push_back(i);
-    draw_indices.push_back(i+2);
-    draw_indices.push_back(i+3);
+  for (uint i = 0; i < _text_point_count; i += 4) {
+    draw_indices[0].push_back(i);
+    draw_indices[0].push_back(i+1);
+    draw_indices[0].push_back(i+2);
+    draw_indices[0].push_back(i);
+    draw_indices[0].push_back(i+2);
+    draw_indices[0].push_back(i+3);
+  }
+
+  for (uint i = 0; i < _text_point_count2; i += 4) {
+    draw_indices[1].push_back(i);
+    draw_indices[1].push_back(i+1);
+    draw_indices[1].push_back(i+2);
+    draw_indices[1].push_back(i);
+    draw_indices[1].push_back(i+2);
+    draw_indices[1].push_back(i+3);
   }
 
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ind_vbo_id_text);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, draw_indices.size()*sizeof(GLuint), draw_indices.data(), GL_STATIC_DRAW);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6*_text_point_count*sizeof(GLuint), draw_indices[0].data(), GL_STATIC_DRAW);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ind_vbo_id_text2);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6*_text_point_count2*sizeof(GLuint), draw_indices[0].data(), GL_STATIC_DRAW);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }

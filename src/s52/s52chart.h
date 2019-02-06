@@ -45,11 +45,11 @@ struct S52LineLayer {
   //std::vector<QString> color_refs;
   std::vector<float> color_inds;
   // layer i-th line points start index
-  std::vector<int>    start_inds;
+  std::vector<size_t> start_inds;
   // sequence of coords representing polylines
-  std::vector<float>  points;
+  std::vector<float> points;
   // length of the line up to current point
-  std::vector<double>  distances;
+  std::vector<double> distances;
 };
 
 struct S52MarkLayer {

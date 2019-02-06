@@ -39,7 +39,7 @@ public:
 
   , RLI_PANEL_LABEL5    = 5
   , RLI_PANEL_BAND      = 6
-  , RLI_PANEL_LABEL1    = 7
+  , RLI_PANEL_ORIENTATION    = 7
   , RLI_PANEL_LABEL2    = 8
   , RLI_PANEL_LABEL3    = 9
   , RLI_PANEL_LABEL4    = 10
@@ -86,6 +86,7 @@ public slots:
   void onTargetCountChanged(int count);
   void onSelectedTargetUpdated(const QString& tag, const RLITarget& trgt);
   void onScaleChanged(const rli_scale_t* scale);
+  void onOrientationChanged(RLIOrientation orient);
 
 private:
   void updateBlock(InfoBlock* b, InfoFonts* fonts);
@@ -103,7 +104,7 @@ private:
 
   void initBlockLabel5();
   void initBlockBand();
-  void initBlockLabel1();
+  void initBlockOrientation();
   void initBlockLabel2();
   void initBlockLabel3();
   void initBlockLabel4();
