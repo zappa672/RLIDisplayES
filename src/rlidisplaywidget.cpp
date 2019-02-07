@@ -299,8 +299,9 @@ void RLIDisplayWidget::paintGL() {
     return;
 
   updateLayers();
-  paintLayers();
+  glFlush();
 
+  paintLayers();
   glFlush();
 }
 
@@ -421,6 +422,7 @@ void RLIDisplayWidget::onShipStateChanged(const RLIShipState& sst) {
   _state.ship_speed     = sst.speed;
 
   _state.north_shift    = sst.course;
+  _state.vn_cu          = sst.course;
 
   _infoEngine->onPositionChanged(sst.position);
   _infoEngine->onCourseChanged(sst.course);

@@ -13,17 +13,17 @@ MaskEngine::MaskEngine(const QSize& sz, const RLICircleLayout& layout, InfoFonts
   initializeOpenGLFunctions();
 
   glGenBuffers(MASK_ATTR_COUNT, vbo_ids_mark);
-  glGenBuffers(1, &_ind_vbo_id_text);
-  glGenBuffers(1, &_ind_vbo_id_text2);
-  glGenBuffers(MASK_ATTR_COUNT, vbo_ids_text);
-  glGenBuffers(MASK_ATTR_COUNT, vbo_ids_text2);
+  glGenBuffers(2, _ind_vbo_id_text);
+  glGenBuffers(MASK_ATTR_COUNT, vbo_ids_text[0]);
+  glGenBuffers(MASK_ATTR_COUNT, vbo_ids_text[1]);
   glGenBuffers(MASK_ATTR_COUNT, vbo_ids_hole);
 
   _fonts = fonts;
   _fbo = nullptr;
   _program = new QOpenGLShaderProgram();
 
-  _text_point_count = 0;
+  _text_point_count[0] = 0;
+  _text_point_count[1] = 0;
   _hole_point_count = 362;
 
   initShader();
@@ -32,8 +32,10 @@ MaskEngine::MaskEngine(const QSize& sz, const RLICircleLayout& layout, InfoFonts
 
 MaskEngine::~MaskEngine() {
   glDeleteBuffers(MASK_ATTR_COUNT, vbo_ids_mark);
-  glDeleteBuffers(MASK_ATTR_COUNT, vbo_ids_text);
+  glDeleteBuffers(MASK_ATTR_COUNT, vbo_ids_text[0]);
+  glDeleteBuffers(MASK_ATTR_COUNT, vbo_ids_text[1]);
   glDeleteBuffers(MASK_ATTR_COUNT, vbo_ids_hole);
+  glDeleteBuffers(2, _ind_vbo_id_text);
 
   delete _fbo;
   delete _program;
@@ -52,7 +54,7 @@ void MaskEngine::resize(const QSize& sz, const RLICircleLayout& layout, const RL
 
 void MaskEngine::update(const RLIState& rli_state, const RLICircleLayout& layout, bool forced) {
   if ( !forced
-    && fabs(rli_state.north_shift - _angle_shift) < 1.0
+    && fabs(rli_state.north_shift - _angle_shift) < 0.5
     && QVector2D(_center_shift - rli_state.center_shift).length() < 1.f
     && _orient == rli_state.orientation )
     return;
@@ -110,13 +112,13 @@ void MaskEngine::update(const RLIState& rli_state, const RLICircleLayout& layout
   glBindTexture(GL_TEXTURE_2D, tex_id);
 
   if (rli_state.orientation == RLIOrientation::RLIORIENT_NORTH) {
-    bindBuffers(vbo_ids_text);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ind_vbo_id_text);
-    glDrawElements(GL_TRIANGLES, 3*(_text_point_count/2), GL_UNSIGNED_INT, reinterpret_cast<const GLvoid*>(0 * sizeof(GLuint)));
+    bindBuffers(vbo_ids_text[0]);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ind_vbo_id_text[0]);
+    glDrawElements(GL_TRIANGLES, 3*(_text_point_count[0]/2), GL_UNSIGNED_INT, reinterpret_cast<const GLvoid*>(0 * sizeof(GLuint)));
   } else {
-    bindBuffers(vbo_ids_text2);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ind_vbo_id_text2);
-    glDrawElements(GL_TRIANGLES, 3*(_text_point_count2/2), GL_UNSIGNED_INT, reinterpret_cast<const GLvoid*>(0 * sizeof(GLuint)));
+    bindBuffers(vbo_ids_text[1]);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ind_vbo_id_text[1]);
+    glDrawElements(GL_TRIANGLES, 3*(_text_point_count[1]/2), GL_UNSIGNED_INT, reinterpret_cast<const GLvoid*>(0 * sizeof(GLuint)));
   }
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
@@ -262,62 +264,46 @@ void MaskEngine::initTextBuffers() {
   QVector<GLfloat> orders[2];
   QVector<GLfloat> shifts[2];
 
-  _text_point_count = 0;
-
   for (int i = 0; i < 360; i += 10) {
-    QByteArray tm0 = QString::number(i).toLocal8Bit();
-    QByteArray tm1 = QString::number(i > 180 ? 360-i : i).toLocal8Bit();
+    QByteArray tm[2] { QString::number(i).toLocal8Bit()
+                     , QString::number(i > 180 ? 360-i : i).toLocal8Bit() };
 
-    for (int l = 0; l < tm0.size(); l++) {
-      for (int k = 0; k < 4; k++) {
-        angles[0].push_back(i);
-        chars[0].push_back(tm0[l]);
-        orders[0].push_back(k);
-        shifts[0].push_back(l);
-      }
-    }
-
-    for (int l = 0; l < tm1.size(); l++) {
-      for (int k = 0; k < 4; k++) {
-        angles[1].push_back(i);
-        chars[1].push_back(tm1[l]);
-        orders[1].push_back(k);
-        shifts[1].push_back(l);
+    for (int j = 0; j < 2; j++) {
+      for (int l = 0; l < tm[j].size(); l++) {
+        for (int k = 0; k < 4; k++) {
+          angles[j].push_back(i);
+          chars[j].push_back(tm[j][l]);
+          orders[j].push_back(k);
+          shifts[j].push_back(l);
+        }
       }
     }
   }
 
-  _text_point_count = static_cast<uint>(orders[0].size());
-  setBuffers(vbo_ids_text, _text_point_count, angles[0].data(), chars[0].data(), orders[0].data(), shifts[0].data());
-  _text_point_count2 = static_cast<uint>(orders[1].size());
-  setBuffers(vbo_ids_text2, _text_point_count2, angles[1].data(), chars[1].data(), orders[1].data(), shifts[1].data());
+  _text_point_count[0] = static_cast<uint>(orders[0].size());
+  setBuffers(vbo_ids_text[0], _text_point_count[0], angles[0].data(), chars[0].data(), orders[0].data(), shifts[0].data());
+  _text_point_count[1] = static_cast<uint>(orders[1].size());
+  setBuffers(vbo_ids_text[1], _text_point_count[1], angles[1].data(), chars[1].data(), orders[1].data(), shifts[1].data());
 
 
   std::vector<GLuint> draw_indices[2];
 
-  for (uint i = 0; i < _text_point_count; i += 4) {
-    draw_indices[0].push_back(i);
-    draw_indices[0].push_back(i+1);
-    draw_indices[0].push_back(i+2);
-    draw_indices[0].push_back(i);
-    draw_indices[0].push_back(i+2);
-    draw_indices[0].push_back(i+3);
+  for (int k = 0; k < 2; k++) {
+    for (uint i = 0; i < _text_point_count[k]; i += 4) {
+      draw_indices[k].push_back(i);
+      draw_indices[k].push_back(i+1);
+      draw_indices[k].push_back(i+2);
+      draw_indices[k].push_back(i);
+      draw_indices[k].push_back(i+2);
+      draw_indices[k].push_back(i+3);
+    }
   }
 
-  for (uint i = 0; i < _text_point_count2; i += 4) {
-    draw_indices[1].push_back(i);
-    draw_indices[1].push_back(i+1);
-    draw_indices[1].push_back(i+2);
-    draw_indices[1].push_back(i);
-    draw_indices[1].push_back(i+2);
-    draw_indices[1].push_back(i+3);
-  }
-
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ind_vbo_id_text);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6*_text_point_count*sizeof(GLuint), draw_indices[0].data(), GL_STATIC_DRAW);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ind_vbo_id_text[0]);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6*_text_point_count[0]*sizeof(GLuint), draw_indices[0].data(), GL_STATIC_DRAW);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ind_vbo_id_text2);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6*_text_point_count2*sizeof(GLuint), draw_indices[0].data(), GL_STATIC_DRAW);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ind_vbo_id_text[1]);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6*_text_point_count[1]*sizeof(GLuint), draw_indices[1].data(), GL_STATIC_DRAW);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }

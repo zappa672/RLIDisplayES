@@ -55,7 +55,7 @@ void ControlsEngine::draw(const QMatrix4x4& mvp_mat, const RLIState& state) {
 
   // Визиры направления
   drawRaySegment(QColor(255, 192, 26, 255), state.vn_cu);
-  drawRaySegment(QColor(255, 192, 26, 255), state.vn_p);
+  drawRaySegment(QColor(255, 254, 255, 255), state.vn_p);
 
   if (state.show_parallel) {
     drawRaySegment(QColor(255, 255, 255, 255), state.vn_p, -2048.f, 2048.f,  state.vd);

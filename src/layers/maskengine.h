@@ -70,12 +70,9 @@ private:
 
   GLuint vbo_ids_mark   [MASK_ATTR_COUNT];
 
-  GLuint _ind_vbo_id_text;
-  GLuint _ind_vbo_id_text2;
-  GLuint vbo_ids_text   [MASK_ATTR_COUNT];
-  GLuint vbo_ids_text2  [MASK_ATTR_COUNT];
-  uint _text_point_count;
-  uint _text_point_count2;
+  GLuint _ind_vbo_id_text[2];
+  GLuint vbo_ids_text   [2][MASK_ATTR_COUNT];
+  uint _text_point_count[2];
 
   GLuint vbo_ids_hole   [MASK_ATTR_COUNT];
   uint _hole_point_count;
