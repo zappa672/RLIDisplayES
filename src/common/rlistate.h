@@ -24,10 +24,18 @@ enum class RLIOrientation {
 , RLIORIENT_COURSE   = 2
 };
 
+enum class RLIMode : char {
+  RLIMODE_T   = 'T'
+, RLIMODE_S   = 'S'
+, RLIMODE_X   = 'X'
+, RLIMODE_M   = 'M'
+} ;
+
 
 struct RLIState {
   RLIWidgetState state        { RLIWidgetState::RLISTATE_DEFAULT };
   RLIOrientation orientation  { RLIOrientation::RLIORIENT_NORTH };
+  RLIMode        mode         { RLIMode::RLIMODE_X };
 
   float gain                { 0.f };
   float water               { 0.f };

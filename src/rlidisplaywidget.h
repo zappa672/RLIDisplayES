@@ -55,7 +55,7 @@ public slots:
   void onApchChanged(float value);
   void onEmissionChanged(float value);
 
-protected slots:
+protected slots:  
   void initializeGL() override;
   void resizeGL(int w, int h) override;
   void paintGL() override;
@@ -78,6 +78,7 @@ private:
 
   void debugInfo();
   void initShaders();
+  void initModeTextures(const QString& path);
 
   void paintLayers();
   void updateLayers();
@@ -102,6 +103,7 @@ private:
   ControlsEngine*   _ctrlEngine;
   MagnifierEngine*  _magnEngine;
 
+  QMap<char, QOpenGLTexture*> _mode_textures;
 
   QOpenGLShaderProgram* _program;
 

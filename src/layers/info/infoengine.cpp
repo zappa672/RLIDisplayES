@@ -599,6 +599,30 @@ void InfoEngine::initBlockOrientation() {
   _blocks[RLI_PANEL_ORIENTATION]->setText(RLI_PANEL_ORIENTATION_TEXT_ID, RLI_STR_NORTH);
 }
 
+void InfoEngine::initBlockVn() {
+  _blocks[RLI_PANEL_VN]->setText(RLI_PANEL_VN_HEADER_TEXT_ID, RLI_STR_EBL);
+
+  _blocks[RLI_PANEL_VN]->setText(RLI_PANEL_VN_TBL_0_0_TEXT_ID, RLI_STR_B);
+  _blocks[RLI_PANEL_VN]->setText(RLI_PANEL_VN_TBL_0_1_TEXT_ID, QByteArray("0.00"));
+  _blocks[RLI_PANEL_VN]->setText(RLI_PANEL_VN_TBL_0_2_TEXT_ID, RLI_STR_DEGREE_SIGN);
+
+  _blocks[RLI_PANEL_VN]->setText(RLI_PANEL_VN_TBL_1_0_TEXT_ID, RLI_STR_CU);
+  _blocks[RLI_PANEL_VN]->setText(RLI_PANEL_VN_TBL_1_1_TEXT_ID, QByteArray("0.00"));
+  _blocks[RLI_PANEL_VN]->setText(RLI_PANEL_VN_TBL_1_2_TEXT_ID, RLI_STR_GRAD_RB);
+}
+
+void InfoEngine::initBlockCursor() {
+  _blocks[RLI_PANEL_CURSOR]->setText(RLI_PANEL_CURSOR_HEADER_TEXT_ID, RLI_STR_CURSOR);
+
+  _blocks[RLI_PANEL_CURSOR]->setText(RLI_PANEL_CURSOR_TBL_0_0_TEXT_ID, RLI_STR_BEARING);
+  _blocks[RLI_PANEL_CURSOR]->setText(RLI_PANEL_CURSOR_TBL_0_1_TEXT_ID, QByteArray("0.00"));
+  _blocks[RLI_PANEL_CURSOR]->setText(RLI_PANEL_CURSOR_TBL_0_2_TEXT_ID, RLI_STR_DEGREE_SIGN);
+
+  _blocks[RLI_PANEL_CURSOR]->setText(RLI_PANEL_CURSOR_TBL_1_0_TEXT_ID, RLI_STR_RANGE);
+  _blocks[RLI_PANEL_CURSOR]->setText(RLI_PANEL_CURSOR_TBL_1_1_TEXT_ID, QByteArray("0.00"));
+  _blocks[RLI_PANEL_CURSOR]->setText(RLI_PANEL_CURSOR_TBL_1_2_TEXT_ID, RLI_STR_NM);
+}
+
 void InfoEngine::onOrientationChanged(RLIOrientation orient) {
   switch (orient) {
     case RLIOrientation::RLIORIENT_HEAD:
@@ -612,7 +636,22 @@ void InfoEngine::onOrientationChanged(RLIOrientation orient) {
       break;
   }
 
+  if (orient == RLIOrientation::RLIORIENT_NORTH) {
+    _blocks[RLI_PANEL_VN]->setText(RLI_PANEL_VN_TBL_0_0_TEXT_ID, RLI_STR_B);
+    _blocks[RLI_PANEL_VN]->setText(RLI_PANEL_VN_TBL_0_1_TEXT_ID, QByteArray("0.00"));
+    _blocks[RLI_PANEL_VN]->setText(RLI_PANEL_VN_TBL_0_2_TEXT_ID, RLI_STR_DEGREE_SIGN);
+
+    _blocks[RLI_PANEL_CURSOR]->setText(RLI_PANEL_CURSOR_TBL_0_0_TEXT_ID, RLI_STR_BEARING);
+  } else {
+    _blocks[RLI_PANEL_VN]->setText(RLI_PANEL_VN_TBL_0_0_TEXT_ID, QByteArray(""));
+    _blocks[RLI_PANEL_VN]->setText(RLI_PANEL_VN_TBL_0_1_TEXT_ID, QByteArray(""));
+    _blocks[RLI_PANEL_VN]->setText(RLI_PANEL_VN_TBL_0_2_TEXT_ID, QByteArray(""));
+
+    _blocks[RLI_PANEL_CURSOR]->setText(RLI_PANEL_CURSOR_TBL_0_0_TEXT_ID, RLI_STR_HB);
+  }
 }
+
+
 
 void InfoEngine::initBlockLabel2() {
   _blocks[RLI_PANEL_LABEL2]->setText(RLI_PANEL_LABEL2_TEXT_ID, RLI_STR_RM);
@@ -652,18 +691,6 @@ void InfoEngine::onScaleChanged(const rli_scale_t* scale) {
 }
 
 
-
-void InfoEngine::initBlockVn() {
-  _blocks[RLI_PANEL_VN]->setText(RLI_PANEL_VN_HEADER_TEXT_ID, RLI_STR_EBL);
-
-  _blocks[RLI_PANEL_VN]->setText(RLI_PANEL_VN_TBL_0_0_TEXT_ID, RLI_STR_B);
-  _blocks[RLI_PANEL_VN]->setText(RLI_PANEL_VN_TBL_0_1_TEXT_ID, QByteArray("0.00"));
-  _blocks[RLI_PANEL_VN]->setText(RLI_PANEL_VN_TBL_0_2_TEXT_ID, RLI_STR_DEGREE_SIGN);
-
-  _blocks[RLI_PANEL_VN]->setText(RLI_PANEL_VN_TBL_1_0_TEXT_ID, RLI_STR_CU);
-  _blocks[RLI_PANEL_VN]->setText(RLI_PANEL_VN_TBL_1_1_TEXT_ID, QByteArray("0.00"));
-  _blocks[RLI_PANEL_VN]->setText(RLI_PANEL_VN_TBL_1_2_TEXT_ID, RLI_STR_GRAD_RB);
-}
 
 void InfoEngine::initBlockVd() {
   _blocks[RLI_PANEL_VD]->setText(RLI_PANEL_VD_HEADER_TEXT_ID, RLI_STR_VRM);
@@ -794,17 +821,4 @@ void InfoEngine::onSelectedTargetUpdated(const QString& tag, const RLITarget& tr
 
   _blocks[RLI_PANEL_TARGETS]->setText(RLI_PANEL_TARGETS_TBL_2_1_TEXT_ID, QString::number(trgt.course_grnd).left(6).toLatin1());
   _blocks[RLI_PANEL_TARGETS]->setText(RLI_PANEL_TARGETS_TBL_3_1_TEXT_ID, QString::number(trgt.speed_grnd).left(6).toLatin1());
-}
-
-
-void InfoEngine::initBlockCursor() {
-  _blocks[RLI_PANEL_CURSOR]->setText(RLI_PANEL_CURSOR_HEADER_TEXT_ID, RLI_STR_CURSOR);
-
-  _blocks[RLI_PANEL_CURSOR]->setText(RLI_PANEL_CURSOR_TBL_0_0_TEXT_ID, RLI_STR_BEARING);
-  _blocks[RLI_PANEL_CURSOR]->setText(RLI_PANEL_CURSOR_TBL_0_1_TEXT_ID, QByteArray("0.00"));
-  _blocks[RLI_PANEL_CURSOR]->setText(RLI_PANEL_CURSOR_TBL_0_2_TEXT_ID, RLI_STR_DEGREE_SIGN);
-
-  _blocks[RLI_PANEL_CURSOR]->setText(RLI_PANEL_CURSOR_TBL_1_0_TEXT_ID, RLI_STR_RANGE);
-  _blocks[RLI_PANEL_CURSOR]->setText(RLI_PANEL_CURSOR_TBL_1_1_TEXT_ID, QByteArray("0.00"));
-  _blocks[RLI_PANEL_CURSOR]->setText(RLI_PANEL_CURSOR_TBL_1_2_TEXT_ID, RLI_STR_NM);
 }

@@ -69,6 +69,7 @@ struct RLIInfoPanelLayout {
 struct RLICircleLayout {
   QPoint center;
   int radius;
+  int mode_symb_shift;
   QString font;
   QRect bounding_rect;
 };

@@ -149,6 +149,7 @@ RLICircleLayout RLILayoutManager::readCircleLayout(const QSize& scrn_sz, QXmlStr
   layout.center = parsePoint(scrn_sz, scrn_sz, attrs["center"]);
   layout.radius = attrs["radius"].toInt();
   layout.font = attrs["font"];
+  layout.mode_symb_shift = attrs["mode_symb_shift"].toInt();
 
   QPoint topLeft = layout.center - QPoint(layout.radius, layout.radius);
   QSize rectSize(2*layout.radius-1, 2*layout.radius-1);

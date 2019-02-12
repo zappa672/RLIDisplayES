@@ -40,6 +40,9 @@ RLIDisplayWidget::~RLIDisplayWidget() {
   delete _ctrlEngine;
 
   delete _program;
+
+  //for (auto tex : _mode_textures)
+  //  tex->destroy();
 }
 
 
@@ -175,6 +178,7 @@ void RLIDisplayWidget::initializeGL() {
 
   glGenBuffers(ATTR_COUNT, _vbo_ids);
   initShaders();
+  initModeTextures(tr("data/textures/symbols/"));
 
   emit initialized();
   _initialized = true;
@@ -225,6 +229,24 @@ void RLIDisplayWidget::initShaders() {
   _attr_locs[ATTR_TEXCOORD]   = _program->attributeLocation("a_texcoord");
 
   _program->release();
+}
+
+void RLIDisplayWidget::initModeTextures(const QString& path) {
+  for (QString fName : QDir(path).entryList(QStringList { "*.png" })) {
+    QString name = fName.right(fName.length() - fName.lastIndexOf("/") - 1).replace(".png", "");
+    QImage img = QImage(path + fName);
+
+    QOpenGLTexture* tex = new QOpenGLTexture(QOpenGLTexture::Target2D);
+
+    tex->setMipLevels(1);
+    tex->setMinificationFilter(QOpenGLTexture::Nearest);
+    tex->setMagnificationFilter(QOpenGLTexture::Nearest);
+    tex->setWrapMode(QOpenGLTexture::Repeat);
+
+    tex->setData(img, QOpenGLTexture::DontGenerateMipMaps);
+
+    _mode_textures.insert(name[0].toLatin1(), tex);
+  }
 }
 
 
@@ -319,17 +341,19 @@ void RLIDisplayWidget::paintLayers() {
   glClearColor(0.f, 0.f, 0.f, 1.f);
   glClear(GL_COLOR_BUFFER_BIT);
 
+  auto layout = _layout_manager.layout();
 
-  QPoint topLeft = _layout_manager.layout()->circle.bounding_rect.topLeft();
+  QPoint topLeft = layout->circle.bounding_rect.topLeft();
 
 
-  drawRect(QRect(topLeft, _chartEngine->size()), _chartEngine->textureId());
+  if (_state.orientation == RLIOrientation::RLIORIENT_NORTH)
+    drawRect(QRect(topLeft, _chartEngine->size()), _chartEngine->textureId());
 
   drawRect(QRect(topLeft, _radarEngine->size()), _radarEngine->textureId());
   drawRect(QRect(topLeft, _tailsEngine->size()), _tailsEngine->textureId());
 
 
-  QPointF center = _layout_manager.layout()->circle.center;
+  QPointF center = layout->circle.center;
 
   QMatrix4x4 projection;
   projection.setToIdentity();
@@ -355,6 +379,11 @@ void RLIDisplayWidget::paintLayers() {
 
   if (_state.state == RLIWidgetState::RLISTATE_MAGNIFIER)
     drawRect(_magnEngine->geometry(), _magnEngine->texture());
+
+  QOpenGLTexture* tex = _mode_textures[static_cast<const char>(_state.mode)];
+  drawRect( QRect( layout->circle.center + QPoint(-tex->width() / 2, layout->circle.mode_symb_shift)
+                 , QSize(tex->width(), tex->height()) )
+          , tex->textureId());
 }
 
 
@@ -651,12 +680,15 @@ void RLIDisplayWidget::keyPressEvent(QKeyEvent* event) {
     switch(_state.orientation) {
       case RLIOrientation::RLIORIENT_HEAD:
         _state.orientation = RLIOrientation::RLIORIENT_NORTH;
+        _state.mode = RLIMode::RLIMODE_X;
         break;
       case RLIOrientation::RLIORIENT_NORTH:
         _state.orientation = RLIOrientation::RLIORIENT_COURSE;
+        _state.mode = RLIMode::RLIMODE_S;
         break;
       case RLIOrientation::RLIORIENT_COURSE:
         _state.orientation = RLIOrientation::RLIORIENT_HEAD;
+        _state.mode = RLIMode::RLIMODE_T;
         break;
     }
     _infoEngine->onOrientationChanged(_state.orientation);

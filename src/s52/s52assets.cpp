@@ -26,9 +26,8 @@ S52Assets::S52Assets(QOpenGLContext* context, S52References* ref) : QOpenGLFunct
 }
 
 S52Assets::~S52Assets() {
-  //font_texture->destroy();
+  /*font_texture->destroy();
 
-  /*
   for (QOpenGLTexture* tex : pattern_textures)
     tex->destroy();
 
@@ -39,8 +38,7 @@ S52Assets::~S52Assets() {
     tex->destroy();
 
   for (QOpenGLTexture* tex : color_scheme_textures)
-    tex->destroy();
-  */
+    tex->destroy();*/
 }
 
 

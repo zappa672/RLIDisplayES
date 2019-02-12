@@ -2,7 +2,7 @@
 <layouts default="1280x1024" >
 
   <layout size="1280x1024" >
-    <circle     center="512,512"  radius="480"    font="F8X8B" />
+    <circle     center="512,512"  radius="480"    font="F8X8B" mode_symb_shift="120" />
     <menu       pos="-4,152"      size="236x262"  font="F12X14B" />
     <magnifier  pos="-10,155"     size="224x224" />
 
@@ -177,7 +177,7 @@
 
 
   <layout size="1440x1080" >
-    <circle center="540,540" radius="500" font="F8X8B" />
+    <circle center="540,540" radius="500" font="F8X8B" mode_symb_shift="120" />
     <menu pos="-4,152" size="236x262" font="F12X14B" />
     <magnifier pos="-10,155" size="224x224" />
 
@@ -351,7 +351,7 @@
   </layout>
 
   <layout size="1920x1080" >
-    <circle center="800,540" radius="514" font="F8X8B" />
+    <circle center="800,540" radius="514" font="F8X8B" mode_symb_shift="120" />
     <menu pos="-4,152" size="236x262" font="F12X14B" />
     <magnifier pos="-10,155" size="224x224" />
 
@@ -525,7 +525,7 @@
   </layout>
 
   <layout size="1024x768" >
-    <circle center="404,384" radius="360" font="F8X8B" />
+    <circle center="404,384" radius="360" font="F8X8B" mode_symb_shift="120" />
     <menu pos="-4,152" size="236x262" font="F12X14B" />
     <magnifier pos="-10,155" size="224x224" />
 
@@ -699,7 +699,7 @@
   </layout>
 
   <layout size="1366x768" >
-    <circle center="536,384" radius="360" font="F8X8B" />
+    <circle center="536,384" radius="360" font="F8X8B" mode_symb_shift="120"/>
     <menu pos="-4,152" size="236x262" font="F12X14B" />
     <magnifier pos="-10,155" size="224x224" />
 
