@@ -282,7 +282,7 @@ void RLIDisplayWidget::resizeGL(int w, int h) {
   _infoEngine->onSelectedTargetUpdated(_trgtEngine->selectedTag(), _trgtEngine->selectedTrgt());
 
   _infoEngine->onScaleChanged(_state.radar_scale.getCurScale());
-  _state.chart_scale = (_state.radar_scale.getCurScale()->len * 1852.f) / _layout_manager.layout()->circle.radius;
+  _state.chart_scale = (_state.radar_scale.getCurScale()->len * RLIMath::MILE2METER) / _layout_manager.layout()->circle.radius;
 
   _infoEngine->updateGain(_state.gain);
   _infoEngine->updateWater(_state.water);
@@ -455,6 +455,7 @@ void RLIDisplayWidget::onShipStateChanged(const RLIShipState& sst) {
 
   _infoEngine->onPositionChanged(sst.position);
   _infoEngine->onCourseChanged(sst.course);
+  _infoEngine->onVnChanged(_state);
 }
 
 
@@ -575,7 +576,7 @@ void RLIDisplayWidget::keyPressEvent(QKeyEvent* event) {
     if (_state.state == RLIWidgetState::RLISTATE_ROUTE_EDITION) {
       QPointF pos = QPointF( sin(RLIMath::rads(_state.vn_p)) * _state.vd
                            ,-cos(RLIMath::rads(_state.vn_p)) * _state.vd );
-      //float scale = (_rli_scale.len*1852.f) / _maskEngine->getRadius();
+      //float scale = (_rli_scale.len*RLIMath::MILE2METER) / _maskEngine->getRadius();
       GeoPos last_route_point = _routeEngine->getLastPoint();
       GeoPos cursor_coords = RLIMath::pos_to_coords( last_route_point, QPoint(0, 0), pos, _state.chart_scale);
       _state.visir_center_pos = cursor_coords;
@@ -586,7 +587,7 @@ void RLIDisplayWidget::keyPressEvent(QKeyEvent* event) {
 
     _state.radar_scale.prevScale();
     _infoEngine->onScaleChanged(_state.radar_scale.getCurScale());
-    _state.chart_scale = (_state.radar_scale.getCurScale()->len * 1852.f) / _layout_manager.layout()->circle.radius;
+    _state.chart_scale = (_state.radar_scale.getCurScale()->len * RLIMath::MILE2METER) / _layout_manager.layout()->circle.radius;
     break;
 
   // Шкала -
@@ -599,7 +600,7 @@ void RLIDisplayWidget::keyPressEvent(QKeyEvent* event) {
 
     _state.radar_scale.nextScale();
     _infoEngine->onScaleChanged(_state.radar_scale.getCurScale());
-    _state.chart_scale = (_state.radar_scale.getCurScale()->len * 1852.f) / _layout_manager.layout()->circle.radius;
+    _state.chart_scale = (_state.radar_scale.getCurScale()->len * RLIMath::MILE2METER) / _layout_manager.layout()->circle.radius;
     break;
 
   // Вынос центра
@@ -618,19 +619,23 @@ void RLIDisplayWidget::keyPressEvent(QKeyEvent* event) {
   // Выбор цели
   case Qt::Key_Up:
     _state.vd += 1.0;
+    _infoEngine->onVdChanged(_state);
     break;
 
   // ЛИД / ЛОД
   case Qt::Key_Down:
     _state.vd = qMax(0.0, _state.vd - 1.0);
+    _infoEngine->onVdChanged(_state);
     break;
 
   case Qt::Key_Left:
     _state.vn_p = fmod(_state.vn_p - 1.0, 360.f);
+    _infoEngine->onVnChanged(_state);
     break;
 
   case Qt::Key_Right:
     _state.vn_p = fmod(_state.vn_p + 1.0, 360.f);
+    _infoEngine->onVnChanged(_state);
     break;
 
   // Захват

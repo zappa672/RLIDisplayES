@@ -4,6 +4,7 @@
 #include <QDebug>
 #include <QDateTime>
 #include <QByteArray>
+#include <QKeyEvent>
 
 #include <QOpenGLFunctions>
 #include <QOpenGLFramebufferObject>

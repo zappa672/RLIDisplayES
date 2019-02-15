@@ -41,7 +41,7 @@ void ChartAreaEngine::setData(S52AreaLayer* layer, S52Assets* assets, S52Referen
   _color_ind = layer->color_ind;
 
   if ((!_is_color_uniform) || (!_is_pattern_uniform)) {
-    for (int i = 0; i < layer->start_inds.size(); i++) {
+    for (uint i = 0; i < layer->start_inds.size(); i++) {
       int fst_idx = layer->start_inds[i];
       int lst_idx = 0;
 

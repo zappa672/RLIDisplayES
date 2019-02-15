@@ -611,6 +611,13 @@ void InfoEngine::initBlockVn() {
   _blocks[RLI_PANEL_VN]->setText(RLI_PANEL_VN_TBL_1_2_TEXT_ID, RLI_STR_GRAD_RB);
 }
 
+void InfoEngine::onVnChanged(const RLIState& rliState) {
+  if (rliState.orientation == RLIOrientation::RLIORIENT_NORTH)
+    _blocks[RLI_PANEL_VN]->setText(RLI_PANEL_VN_TBL_0_1_TEXT_ID, QString::number(rliState.vn_p, 'd', 2).left(5).toLocal8Bit());
+
+  _blocks[RLI_PANEL_VN]->setText(RLI_PANEL_VN_TBL_1_1_TEXT_ID, QString::number(rliState.vn_cu, 'd', 2).left(5).toLocal8Bit());
+}
+
 void InfoEngine::initBlockCursor() {
   _blocks[RLI_PANEL_CURSOR]->setText(RLI_PANEL_CURSOR_HEADER_TEXT_ID, RLI_STR_CURSOR);
 
@@ -685,7 +692,7 @@ void InfoEngine::initBlockScale() {
   _blocks[RLI_PANEL_SCALE]->setText(RLI_PANEL_SCALE_UNITS_TEXT_ID, RLI_STR_NM);
 }
 
-void InfoEngine::onScaleChanged(const rli_scale_t* scale) {
+void InfoEngine::onScaleChanged(const RLIScale* scale) {
   _blocks[RLI_PANEL_SCALE]->setText(RLI_PANEL_SCALE_SCALE1_TEXT_ID, QByteArray(scale->display));
   _blocks[RLI_PANEL_SCALE]->setText(RLI_PANEL_SCALE_SCALE2_TEXT_ID, QByteArray(scale->dist_rng_display));
 }
@@ -697,6 +704,10 @@ void InfoEngine::initBlockVd() {
 
   _blocks[RLI_PANEL_VD]->setText(RLI_PANEL_VD_TBL_0_0_TEXT_ID, QByteArray("0.00"));
   _blocks[RLI_PANEL_VD]->setText(RLI_PANEL_VD_TBL_0_1_TEXT_ID, RLI_STR_NM);
+}
+
+void InfoEngine::onVdChanged(const RLIState& rliState) {
+  _blocks[RLI_PANEL_VD]->setText(RLI_PANEL_VD_TBL_0_0_TEXT_ID, QString::number(rliState.vd, 'd', 2).left(5).toLocal8Bit());
 }
 
 

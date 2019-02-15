@@ -85,8 +85,10 @@ public slots:
   void onPositionChanged(const GeoPos& position);
   void onTargetCountChanged(int count);
   void onSelectedTargetUpdated(const QString& tag, const RLITarget& trgt);
-  void onScaleChanged(const rli_scale_t* scale);
+  void onScaleChanged(const RLIScale* scale);
   void onOrientationChanged(RLIOrientation orient);
+  void onVnChanged(const RLIState& rliState);
+  void onVdChanged(const RLIState& rliState);
 
 private:
   void updateBlock(InfoBlock* b, InfoFonts* fonts);

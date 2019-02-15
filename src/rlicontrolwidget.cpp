@@ -192,7 +192,7 @@ void RLIControlWidget::on_btnModeInc_clicked() {
 
 /* ---- */
 void RLIControlWidget::on_btnOnOff1_clicked() {
-
+  postKeyEvent(QEvent::KeyPress, Qt::Key_Slash);
 }
 
 //Карта (Маршрут)
