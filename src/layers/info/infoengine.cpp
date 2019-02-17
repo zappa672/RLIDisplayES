@@ -630,6 +630,11 @@ void InfoEngine::initBlockCursor() {
   _blocks[RLI_PANEL_CURSOR]->setText(RLI_PANEL_CURSOR_TBL_1_2_TEXT_ID, RLI_STR_NM);
 }
 
+void InfoEngine::onCursorPosChanged(double dist, double angle) {
+  _blocks[RLI_PANEL_CURSOR]->setText(RLI_PANEL_CURSOR_TBL_0_1_TEXT_ID, QString::number(angle, 'd', 2).left(6).toLocal8Bit());
+  _blocks[RLI_PANEL_CURSOR]->setText(RLI_PANEL_CURSOR_TBL_1_1_TEXT_ID, QString::number(dist, 'd', 2).left(5).toLocal8Bit());
+}
+
 void InfoEngine::onOrientationChanged(RLIOrientation orient) {
   switch (orient) {
     case RLIOrientation::RLIORIENT_HEAD:

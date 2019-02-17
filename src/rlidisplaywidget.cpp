@@ -1,7 +1,7 @@
 #include "rlidisplaywidget.h"
 #include "mainwindow.h"
 
-#include <math.h>
+#include <QtMath>
 
 #include <QOpenGLTexture>
 
@@ -459,19 +459,26 @@ void RLIDisplayWidget::onShipStateChanged(const RLIShipState& sst) {
 }
 
 
-
-void RLIDisplayWidget::mousePressEvent(QMouseEvent* event) {
-  auto selected_coords = RLIMath::pos_to_coords( _state.ship_position
-                                               , _layout_manager.layout()->circle.center
-                                               , event->pos()
-                                               , _state.chart_scale );
-
+void RLIDisplayWidget::mouseMoveEvent(QMouseEvent* event) {
   auto diff = event->pos() - _layout_manager.layout()->circle.center;
   QVector2D diffV(diff);
   if (diffV.length() < 0.66f * _layout_manager.layout()->circle.radius)
     _state.cursor_pos = diff;
 
-  _trgtEngine->select(selected_coords, _state.chart_scale);
+  double bearing = RLIMath::degs(qAtan2(static_cast<double>(diffV.x()), static_cast<double>(-diffV.y())));
+
+  if (bearing < 0 && _state.orientation == RLIOrientation::RLIORIENT_NORTH)
+    bearing = 360 + bearing;
+
+  _infoEngine->onCursorPosChanged( static_cast<double>(diffV.length()), bearing );
+}
+
+void RLIDisplayWidget::mousePressEvent(QMouseEvent* event) {
+  auto coords = RLIMath::pos_to_coords( _state.ship_position
+                                      , _layout_manager.layout()->circle.center
+                                      , event->pos()
+                                      , _state.chart_scale );
+  _trgtEngine->select(coords, _state.chart_scale);
 }
 
 

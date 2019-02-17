@@ -47,6 +47,7 @@ signals:
 public slots:  
   void keyReleaseEvent(QKeyEvent* event) override;
   void keyPressEvent(QKeyEvent* event) override;
+  void mouseMoveEvent(QMouseEvent* event) override;
   void mousePressEvent(QMouseEvent* event) override;
 
   void onGainChanged(float value);

@@ -89,6 +89,7 @@ public slots:
   void onOrientationChanged(RLIOrientation orient);
   void onVnChanged(const RLIState& rliState);
   void onVdChanged(const RLIState& rliState);
+  void onCursorPosChanged(double dist, double angle);
 
 private:
   void updateBlock(InfoBlock* b, InfoFonts* fonts);
