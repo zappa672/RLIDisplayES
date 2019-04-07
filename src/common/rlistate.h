@@ -2,13 +2,10 @@
 #define RLISTATE_H
 
 #include <QObject>
-#include <QVector2D>
 #include <QPoint>
 
 #include "../common/radarscale.h"
 #include "../common/rlimath.h"
-
-#include "../datasources/shipdatasource.h"
 
 enum class RLIWidgetState {
   RLISTATE_DEFAULT        = 0
@@ -43,6 +40,8 @@ struct RLIState {
   float apch                { 0.f };
   float emission            { 0.f };
 
+  // Radar parameters
+
   // Chart parameters
   double      north_shift   { 0.0 };
   RadarScale  radar_scale   { };
@@ -63,9 +62,15 @@ struct RLIState {
   bool    show_circles      { false };
   bool    show_parallel     { false };
 
-private:
-  void save();
-  void restore();
+  // Radar parameters
+  int peleng_length   { 800 };
+  int peleng_count    { 4096 };
+
+  // Magnifier parameters
+  int magn_min_rad    { 96 };
+  int magn_min_peleng { 90 };
+  int magn_height     { 224 };
+  int magn_width      { 224 };
 };
 
 #endif // RLISTATE_H

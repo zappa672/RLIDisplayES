@@ -47,14 +47,19 @@ namespace RLIMath {
   constexpr inline double degs(double rad) { return rad * RAD2DEG; }
 
 
-  GeoPos pos_to_coords( const GeoPos& center_coords
-                      , const QPointF& center_position
-                      , const QPointF& position
-                      , double scale );
-  QPointF  coords_to_pos( const GeoPos& center_coords
-                        , const GeoPos& coords
-                        , const QPointF& center_position
-                        , double scale );
+  QPointF intersectRayCircle( QPointF circle_center
+                            , double radius
+                            , QPointF ray_start
+                            , double ray_angle);
+
+  GeoPos  pos_to_coords( const GeoPos& center_coords
+                       , const QPointF& center_position
+                       , const QPointF& position
+                       , double scale );
+  QPointF coords_to_pos( const GeoPos& center_coords
+                       , const GeoPos& coords
+                       , const QPointF& center_position
+                       , double scale );
 
   // Great circle distance and azimuth
   double GCDistance         (const GeoPos& p1, const GeoPos& p2);

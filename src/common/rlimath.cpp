@@ -3,10 +3,75 @@
 #include <cmath>
 #include "QDebug"
 
+QPointF RLIMath::intersectRayCircle( QPointF o
+                                   , double r
+                                   , QPointF p
+                                   , double phi) {
+  double dy = p.y()-o.y();
+  double dx = p.x()-o.x();
+  double r2 = r*r;
+
+  QPointF p1, p2;
+  double tp, tp2;
+  double a, b, c, d;
+
+  // Split solving intersection equation to prevent too big tan
+  if (std::abs(sin(phi)) > 0.5) {
+    tp = tan(phi - rads(90.0));
+    tp2 = tp*tp;
+
+    a = 1.0 + tp2;
+    b = 2.0 * (tp*dy - o.x() - tp2*p.x());
+    c = dy*dy + o.x()*o.x() + (tp*p.x())*(tp*p.x()) - 2.0*tp*p.x()*dy - r2;
+
+    d = b*b - 4.0*a*c;
+
+    if (d < 0.0) {
+      return o;
+    } else {
+      p1.setX( (-b + sqrt(d)) / (2.0 * a) );
+      p2.setX( (-b - sqrt(d)) / (2.0 * a) );
+
+      p1.setY( p.y() + tp * (p1.x() - p.x()) );
+      p2.setY( p.y() + tp * (p2.x() - p.x()) );
+
+      // To the right from hole center, choose
+      if (sin(phi) * (p1.x() - p.x()) > 0.0)
+        return p1;
+      else
+        return p2;
+    }
+  } else {
+    tp = tan(-phi);
+    tp2 = tp*tp;
+
+    a = 1.0 + tp2;
+    b = 2.0 * (tp*dx - o.y() - tp2*p.y());
+    c = dx*dx + o.y()*o.y() + (tp*p.y())*(tp*p.y()) - 2.0*tp*p.y()*dx - r2;
+
+    d = b*b - 4.0*a*c;
+
+    if (d < 0.0) {
+      return o;
+    } else {
+      p1.setY( (-b + sqrt(d)) / (2.0 * a) );
+      p2.setY( (-b - sqrt(d)) / (2.0 * a) );
+      p1.setX( p.x() + tp * (p1.y() - p.y()) );
+      p2.setX( p.x() + tp * (p2.y() - p.y()) );
+
+      // To the right from hole center, choose
+      if (cos(phi) * (p1.y() - p.y()) < 0.0)
+        return p1;
+      else
+        return p2;
+    }
+  }
+}
+
 GeoPos RLIMath::pos_to_coords( const GeoPos& center_coords
-                               , const QPointF& center_position
-                               , const QPointF& position
-                               , double scale ) {
+                             , const QPointF& center_position
+                             , const QPointF& position
+                             , double scale ) {
   double erad_pix = ERADM / scale;
   QPointF pos_p = position - center_position;
 

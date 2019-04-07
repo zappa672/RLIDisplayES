@@ -35,60 +35,68 @@ void ControlsEngine::draw(const QMatrix4x4& mvp_mat, const RLIState& state) {
 
   if (state.state == RLIWidgetState::RLISTATE_ROUTE_EDITION) {
     QPointF tr = RLIMath::coords_to_pos( state.ship_position, state.visir_center_pos, QPoint(0,0), state.chart_scale);
-    transform.translate( tr.x(), tr.y(), 0.f);
+    transform.translate( static_cast<GLfloat>(tr.x()), static_cast<GLfloat>(tr.y()), 0.f);
   }
 
   _prog->setUniformValue(_unif_locs[CTRL_UNIF_MVP], mvp_mat*transform);
 
 
   // Визир дальности
-  drawCircleSegment(QColor(255, 255, 255, 255),  state.vd);
+  drawCircleSegment(RLI_CNTR_COLOR_VD,  static_cast<float>(state.vd));
 
+  // Distance rings
   if (state.show_circles) {
-    drawCircleSegment(QColor(203, 67, 69, 255),  80.f);
-    drawCircleSegment(QColor(203, 67, 69, 255), 160.f);
-    drawCircleSegment(QColor(203, 67, 69, 255), 240.f);
-    drawCircleSegment(QColor(203, 67, 69, 255), 320.f);
-    drawCircleSegment(QColor(203, 67, 69, 255), 400.f);
-    drawCircleSegment(QColor(203, 67, 69, 255), 480.f);
+    for (float rad = 80; rad < 560; rad += 80)
+      drawCircleSegment(RLI_CNTR_COLOR_CIRCLES,  rad);
   }
+  // ----------------------
 
-  // Визиры направления
-  drawRaySegment(QColor(255, 192, 26, 255), state.vn_cu);
-  drawRaySegment(QColor(255, 254, 255, 255), state.vn_p);
+  // Direction rays
+  drawRaySegment(RLI_CNTR_COLOR_VN_CU, static_cast<float>(state.vn_cu));
+  drawRaySegment(RLI_CNTR_COLOR_VN_P , static_cast<float>(state.vn_p));
 
+
+
+  // ----------------------
+
+  // Parallel lines
   if (state.show_parallel) {
-    drawRaySegment(QColor(255, 255, 255, 255), state.vn_p, -2048.f, 2048.f,  state.vd);
-    drawRaySegment(QColor(255, 255, 255, 255), state.vn_p, -2048.f, 2048.f, -state.vd);
+    drawRaySegment(RLI_CNTR_COLOR_PAR_LINES, static_cast<float>(state.vn_p), -2048.f, 2048.f,  static_cast<float>(state.vd));
+    drawRaySegment(RLI_CNTR_COLOR_PAR_LINES, static_cast<float>(state.vn_p), -2048.f, 2048.f, -static_cast<float>(state.vd));
   }
+  // ----------------------
 
+  // Capture zone
+  drawRaySegment   (RLI_CNTR_COLOR_CAPT_AREA,  280.f,   48.f,  112.f);
+  drawRaySegment   (RLI_CNTR_COLOR_CAPT_AREA,  340.f,   48.f,  112.f);
+  drawCircleSegment(RLI_CNTR_COLOR_CAPT_AREA,   48.f,  280.f,  340.f);
+  drawCircleSegment(RLI_CNTR_COLOR_CAPT_AREA,  112.f,  280.f,  340.f);
+  // ----------------------
 
+  // Magnifier zone
+  float magn_min_angle = (state.magn_min_peleng / 4096.f) * 360.f;
+  float magn_max_angle = ((state.magn_min_peleng + state.magn_width) / 4096.f) * 360.f;
+
+  drawRaySegment   (RLI_CNTR_COLOR_MAGNIFIER, magn_min_angle,  state.magn_min_rad,  state.magn_min_rad + state.magn_height);
+  drawRaySegment   (RLI_CNTR_COLOR_MAGNIFIER, magn_max_angle,  state.magn_min_rad,  state.magn_min_rad + state.magn_height);
+  drawCircleSegment(RLI_CNTR_COLOR_MAGNIFIER, state.magn_min_rad  ,  magn_min_angle,  magn_max_angle);
+  drawCircleSegment(RLI_CNTR_COLOR_MAGNIFIER, state.magn_min_rad + state.magn_height ,  magn_min_angle,  magn_max_angle);
+  // ----------------------
+
+  // Cursor
+  QPointF cusor_shift = state.cursor_pos - state.center_shift;
   transform.setToIdentity();
-  transform.translate( state.cursor_pos.x() - state.center_shift.x()
-                     , state.cursor_pos.y() - state.center_shift.y()
-                     , 0.f);
+  transform.translate(cusor_shift.x(), cusor_shift.y() , 0.f);
   _prog->setUniformValue(_unif_locs[CTRL_UNIF_MVP], mvp_mat*transform);
 
-  drawCursor(QColor(255, 0, 255, 255));
-
-
-  _prog->setUniformValue(_unif_locs[CTRL_UNIF_MVP], mvp_mat);
-
-  // Область захвата
-  drawRaySegment   (QColor(255, 255, 0, 255),  280.f,   48.f,  112.f);
-  drawRaySegment   (QColor(255, 255, 0, 255),  340.f,   48.f,  112.f);
-  drawCircleSegment(QColor(255, 255, 0, 255),   48.f,  280.f,  340.f);
-  drawCircleSegment(QColor(255, 255, 0, 255),  112.f,  280.f,  340.f);
-
-  // Лупа
-  drawRaySegment   (QColor(0, 0, 255, 255), (90.f / 4096.f) * 360.f        ,  96.f                   ,  96.f + 224.f);
-  drawRaySegment   (QColor(0, 0, 255, 255), (90.f + 224.f / 4096.f) * 360.f,  96.f                   ,  96.f + 224.f);
-  drawCircleSegment(QColor(0, 0, 255, 255),  96.f                          ,  (90.f / 4096.f) * 360.f,  (90.f + 224.f / 4096.f) * 360.f);
-  drawCircleSegment(QColor(0, 0, 255, 255),  96.f + 224.f                  ,  (90.f / 4096.f) * 360.f,  (90.f + 224.f / 4096.f) * 360.f);
+  drawCursor(RLI_CNTR_COLOR_CURSOR);
+  // ----------------------
 
 
   _prog->release();
 }
+
+
 
 void ControlsEngine::initShaders() {
   _prog->addShaderFromSourceFile(QOpenGLShader::Vertex, SHADERS_PATH + "ctrl.vert.glsl");
@@ -156,18 +164,18 @@ void ControlsEngine::drawCircleSegment(const QColor& col, GLfloat radius, GLfloa
   glVertexAttrib1f(_attr_locs[CTRL_ATTR_RADIUS], radius);
   glDisableVertexAttribArray(_attr_locs[CTRL_ATTR_RADIUS]);
 
-  int frst_element = (int((min_angle / 360) * 720) + 720) % 720;
-  int last_element = (int((max_angle / 360) * 720) + 720) % 720;
+  int frst_element = (int((min_angle / 360) * 720) + 720) % 720 + 1;
+  int last_element = (int((max_angle / 360) * 720) + 720) % 720 + 1;
 
   if (last_element == 0)
     last_element = 720;
 
   if (last_element > frst_element) {
-      glBindBuffer(GL_ARRAY_BUFFER, _vbo_ids_circle[CTRL_ATTR_ANGLE]);
-      glVertexAttribPointer(_attr_locs[CTRL_ATTR_ANGLE], 1, GL_FLOAT, GL_FALSE, 0, (void*) (frst_element * sizeof(GLfloat)));
-      glEnableVertexAttribArray(_attr_locs[CTRL_ATTR_ANGLE]);
+    glBindBuffer(GL_ARRAY_BUFFER, _vbo_ids_circle[CTRL_ATTR_ANGLE]);
+    glVertexAttribPointer(_attr_locs[CTRL_ATTR_ANGLE], 1, GL_FLOAT, GL_FALSE, 0, (void*) (frst_element * sizeof(GLfloat)));
+    glEnableVertexAttribArray(_attr_locs[CTRL_ATTR_ANGLE]);
 
-      glDrawArrays(GL_LINE_STRIP, 0, last_element - frst_element);
+    glDrawArrays(GL_LINE_STRIP, 0, last_element - frst_element);
   }
 
   glBindBuffer(GL_ARRAY_BUFFER, 0);

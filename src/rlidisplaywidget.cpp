@@ -625,24 +625,44 @@ void RLIDisplayWidget::keyPressEvent(QKeyEvent* event) {
 
   // Выбор цели
   case Qt::Key_Up:
-    _state.vd += 1.0;
-    _infoEngine->onVdChanged(_state);
+    if (mod_keys & Qt::ControlModifier) {
+      if (_state.magn_min_rad + _state.magn_height < 800) {
+        _state.magn_min_rad += 1;
+      }
+    } else {
+      _state.vd += 1.0;
+      _infoEngine->onVdChanged(_state);
+    }
     break;
 
   // ЛИД / ЛОД
   case Qt::Key_Down:
-    _state.vd = qMax(0.0, _state.vd - 1.0);
-    _infoEngine->onVdChanged(_state);
+    if (mod_keys & Qt::ControlModifier) {
+      if (_state.magn_min_rad > 0) {
+        _state.magn_min_rad -= 1;
+      }
+    } else {
+      _state.vd = qMax(0.0, _state.vd - 1.0);
+      _infoEngine->onVdChanged(_state);
+    }
     break;
 
   case Qt::Key_Left:
-    _state.vn_p = fmod(_state.vn_p - 1.0, 360.f);
-    _infoEngine->onVnChanged(_state);
+    if (mod_keys & Qt::ControlModifier) {
+      _state.magn_min_peleng = (_state.magn_min_peleng - 1) % 4095;
+    } else {
+      _state.vn_p = fmod(_state.vn_p - 1.0, 360.0);
+      _infoEngine->onVnChanged(_state);
+    }
     break;
 
   case Qt::Key_Right:
-    _state.vn_p = fmod(_state.vn_p + 1.0, 360.f);
-    _infoEngine->onVnChanged(_state);
+    if (mod_keys & Qt::ControlModifier) {
+      _state.magn_min_peleng = (_state.magn_min_peleng + 1) % 4095;
+    } else {
+      _state.vn_p = fmod(_state.vn_p + 1.0, 360.0);
+      _infoEngine->onVnChanged(_state);
+    }
     break;
 
   // Захват

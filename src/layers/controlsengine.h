@@ -13,6 +13,17 @@
 #include "../common/rlistate.h"
 
 
+static const QColor RLI_CNTR_COLOR_PAR_LINES  (255, 255, 255, 255);
+static const QColor RLI_CNTR_COLOR_CAPT_AREA  (255, 255,   0, 255);
+static const QColor RLI_CNTR_COLOR_MAGNIFIER  (  0,   0, 255, 255);
+static const QColor RLI_CNTR_COLOR_CIRCLES    (203,  67,  69, 255);
+static const QColor RLI_CNTR_COLOR_CURSOR     (255,   0, 255, 255);
+static const QColor RLI_CNTR_COLOR_VN_CU      (255, 192,  26, 255);
+static const QColor RLI_CNTR_COLOR_CU         (  0, 255,   0, 255);
+static const QColor RLI_CNTR_COLOR_VN_P       (255, 254, 255, 255);
+static const QColor RLI_CNTR_COLOR_VD         (255, 255, 255, 255);
+
+
 class ControlsEngine : public QObject, protected QOpenGLFunctions {
   Q_OBJECT
 
@@ -43,8 +54,8 @@ private:
        , CTRL_UNIF_COLOR = 2
        , CTRL_UNIF_COUNT = 3 } ;
 
-  GLuint _attr_locs[CTRL_ATTR_COUNT];
-  GLuint _unif_locs[CTRL_UNIF_COUNT];
+  int _attr_locs[CTRL_ATTR_COUNT];
+  int _unif_locs[CTRL_UNIF_COUNT];
 
   GLuint _vbo_ids_cursor[CTRL_ATTR_COUNT];
   GLuint _vbo_ids_circle[CTRL_ATTR_COUNT];
