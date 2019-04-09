@@ -74,8 +74,8 @@ void ControlsEngine::draw(const QMatrix4x4& mvp_mat, const RLIState& state) {
   // ----------------------
 
   // Magnifier zone
-  float magn_min_angle = (state.magn_min_peleng / 4096.f) * 360.f;
-  float magn_max_angle = ((state.magn_min_peleng + state.magn_width) / 4096.f) * 360.f;
+  float magn_min_angle = (state.magn_min_peleng / 4096.f) * 360.f + state.north_shift;
+  float magn_max_angle = ((state.magn_min_peleng + state.magn_width) / 4096.f) * 360.f + state.north_shift;
 
   drawRaySegment   (RLI_CNTR_COLOR_MAGNIFIER, magn_min_angle,  state.magn_min_rad,  state.magn_min_rad + state.magn_height);
   drawRaySegment   (RLI_CNTR_COLOR_MAGNIFIER, magn_max_angle,  state.magn_min_rad,  state.magn_min_rad + state.magn_height);
@@ -105,12 +105,12 @@ void ControlsEngine::initShaders() {
   _prog->link();
   _prog->bind();
 
-  _attr_locs[CTRL_ATTR_ANGLE] = _prog->attributeLocation("angle");
-  _attr_locs[CTRL_ATTR_RADIUS] = _prog->attributeLocation("radius");
+  _attr_locs[CTRL_ATTR_ANGLE]       = _prog->attributeLocation("angle");
+  _attr_locs[CTRL_ATTR_RADIUS]      = _prog->attributeLocation("radius");
 
-  _unif_locs[CTRL_UNIF_MVP] = _prog->uniformLocation("mvp_matrix");
-  _unif_locs[CTRL_UNIF_COLOR] = _prog->uniformLocation("color");
-  _unif_locs[CTRL_UNIF_SHIFT] = _prog->uniformLocation("shift");
+  _unif_locs[CTRL_UNIF_MVP]         = _prog->uniformLocation("mvp_matrix");
+  _unif_locs[CTRL_UNIF_COLOR]       = _prog->uniformLocation("color");
+  _unif_locs[CTRL_UNIF_SHIFT]       = _prog->uniformLocation("shift");
 
   _prog->release();
 }
@@ -125,13 +125,14 @@ void ControlsEngine::initCursorBuffers() {
 }
 
 void ControlsEngine::initCircleBuffers() {
-  GLfloat angs[720];
+  std::vector<GLfloat> angs;
 
-  for (int i = 0; i < 720; i++)
-    angs[i] = (i / 719.f) * 360.f;
+  for (size_t i = 0; i < RLI_CNTR_CIRCLE_RESOLUTION; i++)
+    angs.push_back( (static_cast<float>(i) / RLI_CNTR_CIRCLE_RESOLUTION) * 360.f );
+  angs.push_back(0);
 
   glBindBuffer(GL_ARRAY_BUFFER, _vbo_ids_circle[CTRL_ATTR_ANGLE]);
-  glBufferData(GL_ARRAY_BUFFER, 720*sizeof(GLfloat), angs, GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, angs.size()*sizeof(GLfloat), angs.data(), GL_STATIC_DRAW);
 
   glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -159,23 +160,26 @@ void ControlsEngine::drawCircleSegment(const QColor& col, GLfloat radius, GLfloa
   glUniform1f(_unif_locs[CTRL_UNIF_SHIFT], 0.0);
   glUniform4f(_unif_locs[CTRL_UNIF_COLOR], col.redF(), col.greenF(), col.blueF(), col.alphaF());
 
-  glLineWidth(2.f);
+  glPointSize(1.f);
 
   glVertexAttrib1f(_attr_locs[CTRL_ATTR_RADIUS], radius);
   glDisableVertexAttribArray(_attr_locs[CTRL_ATTR_RADIUS]);
 
-  int frst_element = (int((min_angle / 360) * 720) + 720) % 720 + 1;
-  int last_element = (int((max_angle / 360) * 720) + 720) % 720 + 1;
+  int frst_element = (int((min_angle / 360) * RLI_CNTR_CIRCLE_RESOLUTION) + RLI_CNTR_CIRCLE_RESOLUTION) % RLI_CNTR_CIRCLE_RESOLUTION;
+  int last_element = (int((max_angle / 360) * RLI_CNTR_CIRCLE_RESOLUTION) + RLI_CNTR_CIRCLE_RESOLUTION) % RLI_CNTR_CIRCLE_RESOLUTION;
 
   if (last_element == 0)
-    last_element = 720;
+    last_element = RLI_CNTR_CIRCLE_RESOLUTION;
+
+  glBindBuffer(GL_ARRAY_BUFFER, _vbo_ids_circle[CTRL_ATTR_ANGLE]);
+  glVertexAttribPointer(_attr_locs[CTRL_ATTR_ANGLE], 1, GL_FLOAT, GL_FALSE, 0, (void*)(0 * sizeof(GLfloat)));
+  glEnableVertexAttribArray(_attr_locs[CTRL_ATTR_ANGLE]);
 
   if (last_element > frst_element) {
-    glBindBuffer(GL_ARRAY_BUFFER, _vbo_ids_circle[CTRL_ATTR_ANGLE]);
-    glVertexAttribPointer(_attr_locs[CTRL_ATTR_ANGLE], 1, GL_FLOAT, GL_FALSE, 0, (void*) (frst_element * sizeof(GLfloat)));
-    glEnableVertexAttribArray(_attr_locs[CTRL_ATTR_ANGLE]);
-
-    glDrawArrays(GL_LINE_STRIP, 0, last_element - frst_element);
+    glDrawArrays(GL_POINTS, frst_element, last_element - frst_element);
+  } else {
+    glDrawArrays(GL_POINTS, frst_element, RLI_CNTR_CIRCLE_RESOLUTION - frst_element);
+    glDrawArrays(GL_POINTS, 0, last_element);
   }
 
   glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -198,7 +202,7 @@ void ControlsEngine::drawRaySegment(const QColor& col, GLfloat angle, GLfloat mi
   glVertexAttribPointer(_attr_locs[CTRL_ATTR_RADIUS], 1, GL_FLOAT, GL_FALSE, 0, reinterpret_cast<const GLvoid*>(0));
   glEnableVertexAttribArray(_attr_locs[CTRL_ATTR_RADIUS]);
 
-  glLineWidth(2.f);
+  glLineWidth(1.f);
   glDrawArrays(GL_LINES, 0, 2);
 
   glBindBuffer(GL_ARRAY_BUFFER, 0);

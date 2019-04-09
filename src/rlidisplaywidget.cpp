@@ -350,7 +350,7 @@ void RLIDisplayWidget::paintLayers() {
     drawRect(QRect(topLeft, _chartEngine->size()), _chartEngine->textureId());
 
   drawRect(QRect(topLeft, _radarEngine->size()), _radarEngine->textureId());
-  drawRect(QRect(topLeft, _tailsEngine->size()), _tailsEngine->textureId());
+  //drawRect(QRect(topLeft, _tailsEngine->size()), _tailsEngine->textureId());
 
 
   QPointF center = layout->circle.center;
@@ -398,7 +398,10 @@ void RLIDisplayWidget::updateLayers() {
   _maskEngine->update(_state, _layout_manager.layout()->circle, false);
 
   if (_state.state == RLIWidgetState::RLISTATE_MAGNIFIER)
-    _magnEngine->update( _radarEngine->pelengLength(), _radarEngine->pelengCount(), 90, 96 ); // min_pel, min_rad
+    _magnEngine->update( _radarEngine->pelengLength()
+                       , _radarEngine->pelengCount()
+                       , _state.magn_min_peleng
+                       , _state.magn_min_rad );
 }
 
 
@@ -649,7 +652,7 @@ void RLIDisplayWidget::keyPressEvent(QKeyEvent* event) {
 
   case Qt::Key_Left:
     if (mod_keys & Qt::ControlModifier) {
-      _state.magn_min_peleng = (_state.magn_min_peleng - 1) % 4095;
+      _state.magn_min_peleng = (4096 + _state.magn_min_peleng - 1) % 4096;
     } else {
       _state.vn_p = fmod(_state.vn_p - 1.0, 360.0);
       _infoEngine->onVnChanged(_state);
@@ -658,7 +661,7 @@ void RLIDisplayWidget::keyPressEvent(QKeyEvent* event) {
 
   case Qt::Key_Right:
     if (mod_keys & Qt::ControlModifier) {
-      _state.magn_min_peleng = (_state.magn_min_peleng + 1) % 4095;
+      _state.magn_min_peleng = (4096 + _state.magn_min_peleng + 1) % 4096;
     } else {
       _state.vn_p = fmod(_state.vn_p + 1.0, 360.0);
       _infoEngine->onVnChanged(_state);
