@@ -350,7 +350,7 @@ void RLIDisplayWidget::paintLayers() {
     drawRect(QRect(topLeft, _chartEngine->size()), _chartEngine->textureId());
 
   drawRect(QRect(topLeft, _radarEngine->size()), _radarEngine->textureId());
-  //drawRect(QRect(topLeft, _tailsEngine->size()), _tailsEngine->textureId());
+  drawRect(QRect(topLeft, _tailsEngine->size()), _tailsEngine->textureId());
 
 
   QPointF center = layout->circle.center;

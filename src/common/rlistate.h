@@ -31,7 +31,7 @@ enum class RLIMode : char {
 
 struct RLIState {
   RLIWidgetState state        { RLIWidgetState::RLISTATE_DEFAULT };
-  RLIOrientation orientation  { RLIOrientation::RLIORIENT_COURSE };
+  RLIOrientation orientation  { RLIOrientation::RLIORIENT_NORTH };
   RLIMode        mode         { RLIMode::RLIMODE_X };
 
   float gain                { 0.f };

@@ -57,7 +57,8 @@ private:
   enum { MAGN_UNIF_MVP = 0
        , MAGN_UNIF_COLOR = 1
        , MAGN_UNIF_TEXTURE = 2
-       , MAGN_UNIF_COUNT = 3 } ;
+       , MAGN_UNIF_THREASHOLD = 3
+       , MAGN_UNIF_COUNT = 4 } ;
 
   GLuint _vbo_ids_border[MAGN_ATTR_COUNT];
   GLuint _vbo_ids_radar[MAGN_ATTR_COUNT];
