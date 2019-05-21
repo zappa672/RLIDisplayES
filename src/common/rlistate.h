@@ -57,6 +57,7 @@ struct RLIState {
   GeoPos  visir_center_pos  { 0, 0 };
   double  vn_p              { 0 };
   double  vn_cu             { 0 };
+  double  course_mark_angle { 0 };
   double  vd                { 0 };
   QPoint  cursor_pos        { 0, 0 };
   bool    show_circles      { false };

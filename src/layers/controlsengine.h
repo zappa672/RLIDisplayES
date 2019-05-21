@@ -11,6 +11,7 @@
 #include <QOpenGLShaderProgram>
 
 #include "../common/rlistate.h"
+#include "../common/rlilayout.h"
 
 
 class ControlsEngine : public QObject, protected QOpenGLFunctions {
@@ -20,18 +21,19 @@ public:
   explicit ControlsEngine(QOpenGLContext* context, QObject* parent = nullptr);
   virtual ~ControlsEngine();
 
-  void draw(const QMatrix4x4& mvp_mat, const RLIState& state);
+  void draw(const QMatrix4x4& mvp_mat, const RLIState& state, const RLICircleLayout& layout);
 
 private:
-  const QColor RLI_CNTR_COLOR_PAR_LINES  { 255, 255, 255, 255 };
-  const QColor RLI_CNTR_COLOR_CAPT_AREA  { 255, 255,   0, 255 };
-  const QColor RLI_CNTR_COLOR_MAGNIFIER  {   0,   0, 255, 255 };
-  const QColor RLI_CNTR_COLOR_CIRCLES    { 203,  67,  69, 255 };
-  const QColor RLI_CNTR_COLOR_CURSOR     { 255,   0, 255, 255 };
-  const QColor RLI_CNTR_COLOR_VN_CU      { 255, 192,  26, 255 };
-  const QColor RLI_CNTR_COLOR_CU         {   0, 255,   0, 255 };
-  const QColor RLI_CNTR_COLOR_VN_P       { 255, 254, 255, 255 };
-  const QColor RLI_CNTR_COLOR_VD         { 255, 255, 255, 255 };
+  const QColor RLI_CNTR_COLOR_PAR_LINES     { 255, 255, 255, 255 };
+  const QColor RLI_CNTR_COLOR_CAPT_AREA     { 255, 255,   0, 255 };
+  const QColor RLI_CNTR_COLOR_MAGNIFIER     {   0,   0, 255, 255 };
+  const QColor RLI_CNTR_COLOR_CIRCLES       { 203,  67,  69, 255 };
+  const QColor RLI_CNTR_COLOR_CURSOR        { 255,   0, 255, 255 };
+  const QColor RLI_CNTR_COLOR_VN_CU         { 255, 192,  26, 255 };
+  const QColor RLI_CNTR_COLOR_CU            {   0, 255,   0, 255 };
+  const QColor RLI_CNTR_COLOR_VN_P          { 255, 254, 255, 255 };
+  const QColor RLI_CNTR_COLOR_VD            { 255, 255, 255, 255 };
+  const QColor RLI_CNTR_COLOR_COURSE_MARKER { 255,   0,   0, 255 };
 
   const size_t RLI_CNTR_CIRCLE_RESOLUTION = 4096;
 

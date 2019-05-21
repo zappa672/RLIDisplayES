@@ -2,6 +2,8 @@
 #include "../common/properties.h"
 
 #include <vector>
+#include <cmath>
+
 #include "../common/rlimath.h"
 
 ControlsEngine::ControlsEngine(QOpenGLContext* context, QObject* parent) : QObject(parent), QOpenGLFunctions(context) {
@@ -27,7 +29,7 @@ ControlsEngine::~ControlsEngine() {
   delete _prog;
 }
 
-void ControlsEngine::draw(const QMatrix4x4& mvp_mat, const RLIState& state) {
+void ControlsEngine::draw(const QMatrix4x4& mvp_mat, const RLIState& state, const RLICircleLayout& layout) {
   _prog->bind();
 
   QMatrix4x4 transform;
@@ -86,10 +88,25 @@ void ControlsEngine::draw(const QMatrix4x4& mvp_mat, const RLIState& state) {
   // Cursor
   QPointF cusor_shift = state.cursor_pos - state.center_shift;
   transform.setToIdentity();
-  transform.translate(cusor_shift.x(), cusor_shift.y() , 0.f);
+  transform.translate(static_cast<GLfloat>(cusor_shift.x()), static_cast<GLfloat>(cusor_shift.y()), 0.f);
+  _prog->setUniformValue(_unif_locs[CTRL_UNIF_MVP], mvp_mat*transform);
+  drawCursor(RLI_CNTR_COLOR_CURSOR);
+  // ----------------------
+
+
+  // Course marker
+  glLineWidth(2.0f);
+  double rad = layout.radius - 6;
+  double phi = RLIMath::rads(state.course_mark_angle);
+  QPointF tr_cm(rad * std::sin(phi), -rad * std::cos(phi));
+
+  transform.setToIdentity();
+  transform.translate( static_cast<GLfloat>(tr_cm.x()), static_cast<GLfloat>(tr_cm.y()), 0.f);
   _prog->setUniformValue(_unif_locs[CTRL_UNIF_MVP], mvp_mat*transform);
 
-  drawCursor(RLI_CNTR_COLOR_CURSOR);
+  drawRaySegment(RLI_CNTR_COLOR_COURSE_MARKER, state.course_mark_angle-45, 0, 16, 0);
+  drawRaySegment(RLI_CNTR_COLOR_COURSE_MARKER,    state.course_mark_angle, 0, 16, 0);
+  drawRaySegment(RLI_CNTR_COLOR_COURSE_MARKER, state.course_mark_angle+45, 0, 16, 0);
   // ----------------------
 
 
@@ -160,7 +177,9 @@ void ControlsEngine::drawCircleSegment(const QColor& col, GLfloat radius, GLfloa
   glUniform1f(_unif_locs[CTRL_UNIF_SHIFT], 0.0);
   glUniform4f(_unif_locs[CTRL_UNIF_COLOR], col.redF(), col.greenF(), col.blueF(), col.alphaF());
 
+#if !(defined(GL_ES_VERSION_2_0) || defined(GL_ES_VERSION_3_0))
   glPointSize(1.f);
+#endif
 
   glVertexAttrib1f(_attr_locs[CTRL_ATTR_RADIUS], radius);
   glDisableVertexAttribArray(_attr_locs[CTRL_ATTR_RADIUS]);

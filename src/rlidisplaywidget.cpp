@@ -366,7 +366,7 @@ void RLIDisplayWidget::paintLayers() {
                      , 0.f);
 
   _trgtEngine->draw(projection*transform, _state);
-  _ctrlEngine->draw(projection*transform, _state);
+  _ctrlEngine->draw(projection*transform, _state, layout->circle);
   _routeEngine->draw(projection*transform, _state);
 
 
@@ -652,7 +652,11 @@ void RLIDisplayWidget::keyPressEvent(QKeyEvent* event) {
 
   case Qt::Key_Left:
     if (mod_keys & Qt::ControlModifier) {
-      _state.magn_min_peleng = (4096 + _state.magn_min_peleng - 1) % 4096;
+    _state.magn_min_peleng = (4096 + _state.magn_min_peleng - 1) % 4096;
+    } else if (mod_keys & Qt::AltModifier) {
+      _state.vn_cu = fmod(_state.vn_cu - 1.0, 360.0);
+    } else if (mod_keys & Qt::ShiftModifier) {
+      _state.course_mark_angle = fmod(_state.course_mark_angle - 1.0, 360.0);
     } else {
       _state.vn_p = fmod(_state.vn_p - 1.0, 360.0);
       _infoEngine->onVnChanged(_state);
@@ -662,6 +666,10 @@ void RLIDisplayWidget::keyPressEvent(QKeyEvent* event) {
   case Qt::Key_Right:
     if (mod_keys & Qt::ControlModifier) {
       _state.magn_min_peleng = (4096 + _state.magn_min_peleng + 1) % 4096;
+    } else if (mod_keys & Qt::AltModifier) {
+      _state.vn_cu = fmod(_state.vn_cu + 1.0, 360.0);
+    } else if (mod_keys & Qt::ShiftModifier) {
+      _state.course_mark_angle = fmod(_state.course_mark_angle + 1.0, 360.0);
     } else {
       _state.vn_p = fmod(_state.vn_p + 1.0, 360.0);
       _infoEngine->onVnChanged(_state);
