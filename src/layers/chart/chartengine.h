@@ -16,7 +16,10 @@
 #include "../../s52/s52references.h"
 
 #include "chartsettingsmodel.h"
-#include "chartlayers.h"
+#include "chartareaengine.h"
+#include "chartlineengine.h"
+#include "charttextengine.h"
+#include "chartmarkengine.h"
 #include "chartshaders.h"
 
 class ChartEngine : public QObject, protected QOpenGLFunctions {

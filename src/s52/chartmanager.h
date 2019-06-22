@@ -18,11 +18,12 @@ public:
 
   inline S52References* refs() {return _s52_refs; }
   inline int chartCount() { return _charts.size(); }
+
   inline QList<QString> chartNames() { return _charts.keys(); }
   inline S52Chart* getChart(const QString& name) { if (!_charts.contains(name)) return nullptr; return _charts[name]; }
 
 signals:
-  void new_chart_available(const QString& name);
+  void newChartAvailable(const QString& name);
 
 private:
   void chartLoadingWorker();

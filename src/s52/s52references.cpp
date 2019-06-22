@@ -5,29 +5,19 @@
 #include <QXmlStreamReader>
 
 
-S52References::S52References(QString file_name) {
-  QFile file(file_name);
+S52References::S52References(QString fileName) {
+  QFile file(fileName);
   file.open(QFile::ReadOnly);
   QXmlStreamReader* xml = new QXmlStreamReader(&file);
 
   while (!xml->atEnd()) {
     switch (xml->readNext()) {
     case QXmlStreamReader::StartElement:
-      if (xml->name() == "color-tables")
-        readColorTables(xml);
-
-      if (xml->name() == "lookups")
-        readLookUps(xml);
-
-      if (xml->name() == "line-styles")
-        readLineStyles(xml);
-
-      if (xml->name() == "patterns")
-        readPatterns(xml);
-
-      if (xml->name() == "symbols")
-        readSymbols(xml);
-
+      if (xml->name() == "color-tables")  readColorTables(xml);
+      if (xml->name() == "lookups")       readLookUps(xml);
+      if (xml->name() == "line-styles")   readLineStyles(xml);
+      if (xml->name() == "patterns")      readPatterns(xml);
+      if (xml->name() == "symbols")       readSymbols(xml);
       break;
 
     default:
@@ -36,48 +26,234 @@ S52References::S52References(QString file_name) {
   }
 
   file.close();
-  fillColorTables2();
+
+  fillColorTables();
+  //print();
 }
 
-int S52References::getColorIndex(const QString& color_ref) {
-  if (color_indices.contains(color_ref))
-    return color_indices[color_ref];
 
-  return -1;
+LookUp* S52References::findBestLookUp(const QString& name, OGRFeature* obj, LookUpTable tbl, bool bStrict) {
+  Q_UNUSED(obj);
+  Q_UNUSED(bStrict);
+
+  //obj->GetFieldAsString();
+
+  if ( !lookups.contains(tbl)
+    || !lookups[tbl].contains(name))
+    return nullptr;
+
+  QVector<LookUp*> lups = lookups[tbl][name];
+  LookUp* best = lookups.size() > 0 ? lups[0] : nullptr;
+
+  /*for (LookUp* lup: lookups) {
+
+  }*/
+
+  return best;
 }
 
-std::vector<float> S52References::getColorTable() {
-  return color_tables2[color_scheme];
-}
 
-void S52References::fillColorTables2() {
-  int current_index = 0;
-  QList<QString> table_names = color_tables.keys();
+/*
+LUPrec *s52plib::FindBestLUP( wxArrayOfLUPrec *LUPArray, unsigned int startIndex, unsigned int count, S57Obj *pObj, bool bStrict )
+{
+    int nATTMatch = 0;
+    int countATT = 0;
+    bool bmatch_found = false;
+
+    if( pObj->att_array == NULL )
+        goto check_LUP;       // object has no attributes to compare, so return "best" LUP
+
+    for( unsigned int i = 0; i < count; ++i ) {
+        LUPrec *LUPCandidate = LUPArray->Item( startIndex + i );
+
+        if( !LUPCandidate->ATTArray.size() )
+            continue;        // this LUP has no attributes coded
+
+        countATT = 0;
+        char *currATT = pObj->att_array;
+        int attIdx = 0;
+
+        for( unsigned int iLUPAtt = 0; iLUPAtt < LUPCandidate->ATTArray.size(); iLUPAtt++ ) {
+
+            // Get the LUP attribute name
+            char *slatc = LUPCandidate->ATTArray[iLUPAtt];
+
+            if( slatc && (strlen(slatc) < 6) )
+                goto next_LUP_Attr;         // LUP attribute value not UTF8 convertible (never seen in PLIB 3.x)
+
+            if( slatc ){
+                char *slatv = slatc + 6;
+                while( attIdx < pObj->n_attr ) {
+                    if( 0 == strncmp( slatc, currATT, 6 ) ) {
+                        //OK we have an attribute name match
+
+
+                        bool attValMatch = false;
+
+                        // special case (i)
+                        if( !strncmp( slatv, " ", 1 ) ) {        // any object value will match wild card (S52 para 8.3.3.4)
+                            ++countATT;
+                            goto next_LUP_Attr;
+                        }
+
+                        // special case (ii)
+                        //TODO  Find an ENC with "UNKNOWN" DRVAL1 or DRVAL2 and debug this code
+                        if( !strncmp( slatv, "?", 1) ){          // if LUP attribute value is "undefined"
+
+                        //  Match if the object does NOT contain this attribute
+                            goto next_LUP_Attr;
+                        }
+
+
+                        //checking against object attribute value
+                        S57attVal *v = ( pObj->attVal->Item( attIdx ) );
+
+                        switch( v->valType ){
+                            case OGR_INT: // S57 attribute type 'E' enumerated, 'I' integer
+                            {
+                                int LUP_att_val = atoi( slatv );
+                                if( LUP_att_val == *(int*) ( v->value ) )
+                                    attValMatch = true;
+                                break;
+                            }
+
+                            case OGR_INT_LST: // S57 attribute type 'L' list: comma separated integer
+                            {
+                                int a;
+                                char ss[41];
+                                strncpy( ss, slatv, 39 );
+                                ss[40] = '\0';
+                                char *s = &ss[0];
+
+                                int *b = (int*) v->value;
+                                sscanf( s, "%d", &a );
+
+                                while( *s != '\0' ) {
+                                    if( a == *b ) {
+                                        sscanf( ++s, "%d", &a );
+                                        b++;
+                                        attValMatch = true;
+
+                                    } else
+                                        attValMatch = false;
+                                }
+                                break;
+                            }
+                            case OGR_REAL: // S57 attribute type'F' float
+                            {
+                                double obj_val = *(double*) ( v->value );
+                                float att_val = atof( slatv );
+                                if( fabs( obj_val - att_val ) < 1e-6 )
+                                    if( obj_val == att_val  )
+                                        attValMatch = true;
+                                break;
+                            }
+
+                            case OGR_STR: // S57 attribute type'A' code string, 'S' free text
+                            {
+                                //    Strings must be exact match
+                                //    n.b. OGR_STR is used for S-57 attribute type 'L', comma-separated list
+
+                                //wxString cs( (char *) v->value, wxConvUTF8 ); // Attribute from object
+                                //if( LATTC.Mid( 6 ) == cs )
+                                if( !strcmp((char *) v->value, slatv))
+                                    attValMatch = true;
+                                break;
+                            }
+
+                            default:
+                                break;
+                        } //switch
+
+                        // value match
+                        if( attValMatch )
+                            ++countATT;
+
+                        goto next_LUP_Attr;
+                    } // if attribute name match
+
+                    //  Advance to the next S57obj attribute
+                    currATT += 6;
+                    ++attIdx;
+
+                } //while
+            } //if
+
+next_LUP_Attr:
+
+            currATT = pObj->att_array; // restart the object attribute list
+            attIdx = 0;
+        } // for iLUPAtt
+
+        //      Create a "match score", defined as fraction of candidate LUP attributes
+        //      actually matched by feature.
+        //      Used later for resolving "ties"
+
+        int nattr_matching_on_candidate = countATT;
+        int nattrs_on_candidate = LUPCandidate->ATTArray.size();
+        double candidate_score = ( 1. * nattr_matching_on_candidate )
+        / ( 1. * nattrs_on_candidate );
+
+        //       According to S52 specs, match must be perfect,
+        //         and the first 100% match is selected
+        if( candidate_score == 1.0 ) {
+            LUP = LUPCandidate;
+            bmatch_found = true;
+            break; // selects the first 100% match
+        }
+
+    } //for loop
+
+
+check_LUP:
+//  In strict mode, we require at least one attribute to match exactly
+
+    if( bStrict ) {
+        if( nATTMatch == 0 ) // nothing matched
+            LUP = NULL;
+    } else {
+        //      If no match found, return the first LUP in the list which has no attributes
+        if( !bmatch_found ) {
+            for( unsigned int j = 0; j < count; ++j ) {
+                LUPrec *LUPtmp = NULL;
+
+                LUPtmp = LUPArray->Item( startIndex + j );
+                if( !LUPtmp->ATTArray.size() ) {
+                    return LUPtmp;
+                }
+            }
+        }
+    }
+
+    return LUP;
+}
+*/
+
+
+void S52References::fillColorTables() {
+  uint current_index = 0;
+  QList<QString> table_names = colTbls.keys();
 
   // Loop 1, filling color_indices
-  for (int i = 0; i < table_names.size(); i++) {
-    QString table_ref = table_names[i];
-    QList<QString> color_names = color_tables[table_ref]->colors.keys();
+  for (QString table_ref: table_names) {
+    QList<QString> color_names = colTbls[table_ref]->colors.keys();
 
     for (int j = 0; j < color_names.size(); j++)
       if (!color_indices.contains(color_names[j]))
           color_indices.insert(color_names[j], current_index++);
   }
 
-  QList<QString> color_names = color_indices.keys();
-  // Loop 2, filling color_tables2
-  for (int i = 0; i < table_names.size(); i++) {
-    QString table_ref = table_names[i];
-    ColorTable* tbl = color_tables[table_ref];
-    std::vector<float> color_vec(3*color_indices.size());
+  // Loop 2, filling colTbls
+  for (ColorTable* tbl: colTbls) {
+    std::vector<float> color_vec(3u * static_cast<uint>(color_indices.size()));
 
-    for (int j = 0; j < color_names.size(); j++) {
-      int index = color_indices[color_names[j]];
+    for (QString col_name: color_indices.keys()) {
+      uint index = color_indices[col_name];
 
-      if (tbl->colors.contains(color_names[j])) {
-        color_vec[3*index+0] = tbl->colors[color_names[j]].redF();
-        color_vec[3*index+1] = tbl->colors[color_names[j]].greenF();
-        color_vec[3*index+2] = tbl->colors[color_names[j]].blueF();
+      if (tbl->colors.contains(col_name)) {
+        color_vec[3*index+0] = static_cast<float>(tbl->colors[col_name].redF());
+        color_vec[3*index+1] = static_cast<float>(tbl->colors[col_name].greenF());
+        color_vec[3*index+2] = static_cast<float>(tbl->colors[col_name].blueF());
       } else {
         color_vec[3*index+0] = 0;
         color_vec[3*index+1] = 0;
@@ -85,41 +261,31 @@ void S52References::fillColorTables2() {
       }
     }
 
-    color_tables2.insert(table_ref, color_vec);
+    tbl->table = color_vec;
   }
-
-  return;
 }
 
-const QPoint S52References::getSymbolIndex(const QString& symbol_ref) {
-  if (symbols.contains(symbol_ref))
-    return symbols[symbol_ref]->bitmap.graphics_location;
-  else
-    return QPoint(0, 0);
-}
 
-const QSize S52References::getSymbolDim(const QString& symbol_ref) {
-  if (symbols.contains(symbol_ref))
-    return symbols[symbol_ref]->bitmap.size;
-  else
-    return QSize(0, 0);
-}
-
-const QPoint S52References::getSymbolPivot(const QString& symbol_ref) {
-  if (symbols.contains(symbol_ref))
-    return symbols[symbol_ref]->bitmap.pivot;
-  else
-    return QPoint(0, 0);
-}
 
 void S52References::print(void) {
+
+  qDebug() << "";
+  qDebug() << "Lookups";
+  qDebug() << "------------------------";
+  qDebug() << "";
+  for (auto mp: lookups)
+    for (auto lps: mp)
+      for (LookUp* lp: lps)
+        qDebug() << lp->OBCL << lp->RCID;
+
+  /*
   qDebug() << "";
   qDebug() << "Color Tables";
   qDebug() << "------------------------";
   qDebug() << "";
-  for (int i = 0; i < color_tables.keys().size(); i++) {
-    QString table_key =  color_tables.keys()[i];
-    ColorTable* ct = color_tables[table_key];
+  for (int i = 0; i < colTbls.keys().size(); i++) {
+    QString table_key =  colTbls.keys()[i];
+    ColorTable* ct = colTbls[table_key];
 
     qDebug() << ct->name;
     qDebug() << ct->graphics_file;
@@ -148,7 +314,7 @@ void S52References::print(void) {
     qDebug() << "disp_prio: " << lp->disp_prio;
     qDebug() << "radar_prio: " << lp->radar_prio;
     qDebug() << "table_name: " << lp->table_name;
-    qDebug() << "instruction: " << lp->instruction;
+    qDebug() << "instruction: " << lp->instructions;
     qDebug() << "display_cat: " << lp->display_cat;
     qDebug() << "comment: " << lp->comment;
     qDebug() << "attr_refs: " << lp->attr_refs;
@@ -228,53 +394,24 @@ void S52References::print(void) {
 
     qDebug() << "";
   }
+  */
 }
 
 
 S52References::~S52References() {
-  for (int i = 0; i < color_tables.size(); i++)
-    delete color_tables[color_tables.keys()[i]];
+  for (auto ct: colTbls)
+    delete ct;
 
-  for (int i = 0; i < lookups.size(); i++)
-    delete lookups[lookups.keys()[i]];
-
-  for (int i = 0; i < line_styles.size(); i++)
-    delete line_styles[line_styles.keys()[i]];
-
-  for (int i = 0; i < patterns.size(); i++)
-    delete patterns[patterns.keys()[i]];
-
-  for (int i = 0; i < symbols.size(); i++)
-    delete symbols[symbols.keys()[i]];
+  for (auto mp: lookups)
+    for (auto lps: mp.values())
+      for (auto lp: lps)
+        delete lp;
 }
 
 
 void S52References::setColorScheme(const QString& name) {
-  if (color_tables.contains(name))
-    color_scheme = name;
-}
-
-QString S52References::getColorScheme() {
-  return color_scheme;
-}
-
-QStringList S52References::getColorSchemeNames() {
-    return QStringList(color_tables.keys());
-}
-
-QString S52References::getGraphicsFileName(const QString& scheme) {
-  return color_tables[scheme]->graphics_file;
-}
-
-
-const QColor S52References::getColor(const QString& color_ref) {
-  ColorTable* col_tbl = color_tables[color_scheme];
-
-  if (col_tbl->colors.contains(color_ref)) {
-    return col_tbl->colors[color_ref];
-  } else {
-    return QColor(255, 255, 255, 0);
-  }
+  if (colTbls.contains(name))
+    _color_scheme = name;
 }
 
 
@@ -302,7 +439,7 @@ void S52References::readColorTables(QXmlStreamReader* xml) {
       break;
     case QXmlStreamReader::EndElement:
       if (ct != nullptr && xml->name() == "color-table")
-        color_tables.insert(ct->name, ct);
+        colTbls.insert(ct->name, ct);
 
       if (xml->name() == "color-tables")
         return;
@@ -323,40 +460,49 @@ void S52References::readLookUps(QXmlStreamReader* xml) {
     case QXmlStreamReader::StartElement:
       if (xml->name() == "lookup") {
         lp = new LookUp();
-        lp->id = xml->attributes().value("id").toInt();
-        lp->rcid = xml->attributes().value("RCID").toInt();
-        lp->name = xml->attributes().value("name").toString();
+        lp->nSequence = xml->attributes().value("id").toInt();
+        lp->RCID = xml->attributes().value("RCID").toInt();
+        lp->OBCL = xml->attributes().value("name").toString();
         break;
       }
 
       if (lp != nullptr && xml->name() == "type")
-        lp->type = xml->readElementText();
+        lp->FTYP = CHART_OBJ_TYPE_MAP.value(xml->readElementText(), ChartObjectType::CHART_OBJ_TYPE_COUNT);
 
       if (lp != nullptr && xml->name() == "disp-prio")
-        lp->disp_prio = xml->readElementText();
+        lp->DPRI = CHART_DISP_PRIO_MAP.value(xml->readElementText(), ChartDispPrio::DISP_PRIO_NUM);
 
       if (lp != nullptr && xml->name() == "radar-prio")
-        lp->radar_prio = xml->readElementText();
+        lp->RPRI = CHART_RADAR_PRIO_MAP.value(xml->readElementText(), ChartRadarPrio::RAD_PRIO_NUM);
 
       if (lp != nullptr && xml->name() == "table-name")
-        lp->table_name = xml->readElementText();
+        lp->TNAM = LOOKUP_TYPE_MAP.value(xml->readElementText(), LookUpTable::LUP_TABLE_COUNT);
 
-      if (lp != nullptr && xml->name() == "attrib-code")
-        lp->attr_refs.append(xml->readElementText());
+      if (lp != nullptr && xml->name() == "attrib-code") {
+        int index = xml->attributes().value("index").toInt();
+        lp->ALST.insert(index, xml->readElementText());
+      }
 
       if (lp != nullptr && xml->name() == "instruction")
-        lp->instruction = xml->readElementText();
+        lp->INST = xml->readElementText().split(";");
 
       if (lp != nullptr && xml->name() == "display-cat")
-        lp->display_cat = xml->readElementText();
+        lp->DISC = CHART_DISPLAY_CAT_MAP.value(xml->readElementText(), ChartDisplayCat::DISP_CAT_MARINERS_OTHER);
 
       if (lp != nullptr && xml->name() == "comment")
-        lp->comment = xml->readElementText();
+        lp->LUCM = xml->readElementText().toInt();
 
       break;
     case QXmlStreamReader::EndElement:
-      if (lp != nullptr && xml->name() == "lookup")
-        lookups.insert(lp->rcid, lp);
+      if (lp != nullptr && xml->name() == "lookup") {
+        if (!lookups.contains(lp->TNAM))
+          lookups.insert(lp->TNAM, QMap<QString, QVector<LookUp*>>());
+
+        if (lookups[lp->TNAM].contains(lp->OBCL))
+          lookups[lp->TNAM][lp->OBCL].push_back(lp);
+        else
+          lookups[lp->TNAM].insert(lp->OBCL, QVector<LookUp*>{ lp });
+      }
 
       if (xml->name() == "lookups")
         return;
@@ -370,49 +516,49 @@ void S52References::readLookUps(QXmlStreamReader* xml) {
 
 
 void S52References::readLineStyles(QXmlStreamReader* xml) {
-  LineStyle* ls = nullptr;
+  LineStyle ls;
 
   while (!xml->atEnd()) {
     switch (xml->readNext()) {
     case QXmlStreamReader::StartElement:
       if (xml->name() == "line-style") {
-        ls = new LineStyle();
-        ls->rcid = xml->attributes().value("RCID").toInt();
+        ls = LineStyle();
+        ls.rcid = xml->attributes().value("RCID").toInt();
         break;
       }
 
-      if (ls != nullptr && xml->name() == "name")
-        ls->name = xml->readElementText();
+      if (xml->name() == "name")
+        ls.name = xml->readElementText();
 
-      if (ls != nullptr && xml->name() == "description")
-        ls->description = xml->readElementText();
+      if (xml->name() == "description")
+        ls.description = xml->readElementText();
 
-      if (ls != nullptr && xml->name() == "color-ref")
-        ls->color_ref = xml->readElementText();
+      if (xml->name() == "color-ref")
+        ls.color_ref = xml->readElementText();
 
       if (xml->name() == "vector")
-        ls->vector.size = QVector2D(xml->attributes().value("width").toInt()
+        ls.vector.size = QVector2D(xml->attributes().value("width").toInt()
                           , xml->attributes().value("height").toInt());
 
       if (xml->name() == "distance")
-        ls->vector.distance = QVector2D(xml->attributes().value("min").toInt()
+        ls.vector.distance = QVector2D(xml->attributes().value("min").toInt()
                               , xml->attributes().value("max").toInt());
 
       if (xml->name() == "pivot")
-        ls->vector.pivot = QVector2D(xml->attributes().value("x").toInt()
+        ls.vector.pivot = QVector2D(xml->attributes().value("x").toInt()
                            , xml->attributes().value("y").toInt());
 
       if (xml->name() == "origin")
-        ls->vector.origin = QVector2D(xml->attributes().value("x").toInt()
+        ls.vector.origin = QVector2D(xml->attributes().value("x").toInt()
                             , xml->attributes().value("y").toInt());
 
       if (xml->name() == "HPGL")
-        ls->vector.hpgl = xml->readElementText();
+        ls.vector.hpgl = xml->readElementText();
 
       break;
     case QXmlStreamReader::EndElement:
-      if (ls != nullptr && xml->name() == "line-style")
-        line_styles.insert(ls->rcid, ls);
+      if (xml->name() == "line-style")
+        line_styles.insert(ls.rcid, ls);
 
       if (xml->name() == "line-styles")
         return;
@@ -425,58 +571,58 @@ void S52References::readLineStyles(QXmlStreamReader* xml) {
 }
 
 void S52References::readPatterns(QXmlStreamReader* xml) {
-  Pattern* pn = nullptr;
+  Pattern pn;
 
   while (!xml->atEnd()) {
     switch (xml->readNext()) {
     case QXmlStreamReader::StartElement:
       if (xml->name() == "pattern") {
-        pn = new Pattern();
-        pn->rcid = xml->attributes().value("RCID").toInt();
+        pn = Pattern();
+        pn.rcid = xml->attributes().value("RCID").toInt();
         break;
       }
 
-      if (pn != nullptr && xml->name() == "name")
-        pn->name = xml->readElementText();
+      if (xml->name() == "name")
+        pn.name = xml->readElementText();
 
-      if (pn != nullptr && xml->name() == "definition")
-        pn->definition = xml->readElementText();
+      if (xml->name() == "definition")
+        pn.definition = xml->readElementText();
 
-      if (pn != nullptr && xml->name() == "filltype")
-        pn->filltype = xml->readElementText();
+      if (xml->name() == "filltype")
+        pn.filltype = xml->readElementText();
 
-      if (pn != nullptr && xml->name() == "spacing")
-        pn->spacing = xml->readElementText();
+      if (xml->name() == "spacing")
+        pn.spacing = xml->readElementText();
 
-      if (pn != nullptr && xml->name() == "description")
-        pn->description = xml->readElementText();
+      if (xml->name() == "description")
+        pn.description = xml->readElementText();
 
-      if (pn != nullptr && xml->name() == "color-ref")
-        pn->color_ref = xml->readElementText();
+      if (xml->name() == "color-ref")
+        pn.color_ref = xml->readElementText();
 
       if (xml->name() == "vector")
-        pn->vector.size = QVector2D(xml->attributes().value("width").toInt()
+        pn.vector.size = QVector2D(xml->attributes().value("width").toInt()
                           , xml->attributes().value("height").toInt());
 
       if (xml->name() == "distance")
-        pn->vector.distance = QVector2D(xml->attributes().value("min").toInt()
+        pn.vector.distance = QVector2D(xml->attributes().value("min").toInt()
                               , xml->attributes().value("max").toInt());
 
       if (xml->name() == "pivot")
-        pn->vector.pivot = QVector2D(xml->attributes().value("x").toInt()
+        pn.vector.pivot = QVector2D(xml->attributes().value("x").toInt()
                            , xml->attributes().value("y").toInt());
 
       if (xml->name() == "origin")
-        pn->vector.origin = QVector2D(xml->attributes().value("x").toInt()
+        pn.vector.origin = QVector2D(xml->attributes().value("x").toInt()
                             , xml->attributes().value("y").toInt());
 
       if (xml->name() == "HPGL")
-        pn->vector.hpgl = xml->readElementText();
+        pn.vector.hpgl = xml->readElementText();
 
       break;
     case QXmlStreamReader::EndElement:
-      if (pn != nullptr && xml->name() == "pattern")
-        patterns.insert(pn->rcid, pn);
+      if (xml->name() == "pattern")
+        patterns.insert(pn.rcid, pn);
 
       if (xml->name() == "patterns")
         return;
@@ -489,81 +635,75 @@ void S52References::readPatterns(QXmlStreamReader* xml) {
 }
 
 void S52References::readSymbols(QXmlStreamReader* xml) {
-  Symbol* sb = nullptr;
+  Symbol sb;
   bool vector_part_flag = false;
 
   while (!xml->atEnd()) {
     switch (xml->readNext()) {
-    case QXmlStreamReader::StartElement:
-      if (xml->name() == "symbol") {
-        sb = new Symbol();
-        sb->rcid = xml->attributes().value("RCID").toInt();break;
+    case QXmlStreamReader::StartElement: {
+      QStringRef name = xml->name();
+      auto attrs = xml->attributes();
+
+      if (name == "symbol") {
+        sb = Symbol();
+        sb.rcid = xml->attributes().value("RCID").toInt();break;
       }
 
-      if (sb != nullptr && xml->name() == "name")
-        sb->name = xml->readElementText();
+      if (name == "name")
+        sb.name = xml->readElementText();
 
-      if (sb != nullptr && xml->name() == "definition")
-        sb->definition = xml->readElementText();
+      if (name == "definition")
+        sb.definition = xml->readElementText();
 
-      if (sb != nullptr && xml->name() == "description")
-        sb->description = xml->readElementText();
+      if (name == "description")
+        sb.description = xml->readElementText();
 
-      if (sb != nullptr && xml->name() == "color-ref")
-        sb->color_ref = xml->readElementText();
+      if (name == "color-ref")
+        sb.color_ref = xml->readElementText();
 
-      if (xml->name() == "vector") {
-        sb->vector.size = QVector2D(xml->attributes().value("width").toInt()
-                                  , xml->attributes().value("height").toInt());
+      if (name == "vector") {
+        sb.vector.size = QVector2D(attrs.value("width").toInt(), attrs.value("height").toInt());
         vector_part_flag = true;
       }
 
-      if (xml->name() == "bitmap") {
-        sb->bitmap.size = QSize( xml->attributes().value("width").toInt()
-                               , xml->attributes().value("height").toInt());
+      if (name == "bitmap") {
+        sb.bitmap.size = QSize(attrs.value("width").toInt(), attrs.value("height").toInt());
         vector_part_flag = false;
       }
 
 
-      if (xml->name() == "distance") {
+      if (name == "distance") {
         if (vector_part_flag)
-          sb->vector.distance = QVector2D( xml->attributes().value("min").toInt()
-                                         , xml->attributes().value("max").toInt());
+          sb.vector.distance = QVector2D(attrs.value("min").toInt(), attrs.value("max").toInt());
         else
-          sb->bitmap.distance = QVector2D( xml->attributes().value("min").toInt()
-                                         , xml->attributes().value("max").toInt());
+          sb.bitmap.distance = QVector2D(attrs.value("min").toInt(), attrs.value("max").toInt());
       }
 
-      if (xml->name() == "pivot") {
+      if (name == "pivot") {
         if (vector_part_flag)
-          sb->vector.pivot = QVector2D( xml->attributes().value("x").toInt()
-                                      , xml->attributes().value("y").toInt());
-        else {
-          sb->bitmap.pivot = QPoint( xml->attributes().value("x").toInt()
-                                   , xml->attributes().value("y").toInt());
-        }
+          sb.vector.pivot = QVector2D(attrs.value("x").toInt(), attrs.value("y").toInt());
+        else
+          sb.bitmap.pivot = QPoint(attrs.value("x").toInt(), attrs.value("y").toInt());
       }
 
-      if (xml->name() == "origin") {
+      if (name == "origin") {
         if (vector_part_flag)
-          sb->vector.origin = QVector2D( xml->attributes().value("x").toInt()
-                                       , xml->attributes().value("y").toInt());
+          sb.vector.origin = QVector2D( attrs.value("x").toInt(), attrs.value("y").toInt());
         else
-          sb->bitmap.origin = QPoint( xml->attributes().value("x").toInt()
-                                    , xml->attributes().value("y").toInt());
+          sb.bitmap.origin = QPoint(attrs.value("x").toInt(), attrs.value("y").toInt());
       }
 
       if (xml->name() == "HPGL")
-        sb->vector.hpgl = xml->readElementText();
+        sb.vector.hpgl = xml->readElementText();
 
       if (xml->name() == "graphics-location")
-        sb->bitmap.graphics_location = QPoint( xml->attributes().value("x").toInt()
-                                             , xml->attributes().value("y").toInt());
+        sb.bitmap.graphics_location = QPoint(attrs.value("x").toInt(), attrs.value("y").toInt());
 
       break;
+    }
     case QXmlStreamReader::EndElement:
-      if (sb != nullptr && xml->name() == "symbol") {
-        symbols.insert(sb->name, sb);
+      if (xml->name() == "symbol") {
+        symbols.insert(sb.name, sb);
         break;
       }
 

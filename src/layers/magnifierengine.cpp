@@ -37,7 +37,7 @@ void MagnifierEngine::resize(const RLIMagnifierLayout& layout) {
   initRadarBuffers();
 }
 
-void MagnifierEngine::update(int pel_len, int pel_cnt, int min_pel, int min_rad) {
+void MagnifierEngine::update(const RLIState& s) {
   glViewport(0, 0, _fbo->width(), _fbo->height());
 
   _fbo->bind();
@@ -58,7 +58,7 @@ void MagnifierEngine::update(int pel_len, int pel_cnt, int min_pel, int min_rad)
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, _pal_tex_id);
 
-  drawPelengs(pel_len, pel_cnt, min_pel, min_rad);
+  drawPelengs(s.peleng_length, s.peleng_count, s.magn_min_peleng, s.magn_min_rad);
   drawBorder();
 
   glBindTexture(GL_TEXTURE_2D, 0);

@@ -115,7 +115,7 @@ private:
   S52SndgLayer* sndg_layer;
 
   // Reads OGRLayer, appends presented layers to one or more layer maps
-  bool readLayer(OGRLayer* poLayer);
+  bool readLayer(OGRLayer* poLayer, S52References* ref);
   bool readSoundingLayer(OGRLayer* poLayer, const QRectF& filterRect);
   bool readTextLayer(OGRLayer* poLayer);
 

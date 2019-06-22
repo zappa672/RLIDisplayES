@@ -30,6 +30,8 @@ S52Chart::S52Chart(char* file_name, S52References* ref) {
     OGRLayer* poLayer = poDS->GetLayer(i);
     QString layer_name = poLayer->GetName();
 
+    //qDebug() << "Reading layer #" << i << layer_name;
+
     QRectF fRect(QPointF(144.1, 13.7), QSizeF(3.0, 3.0));
     poLayer->SetSpatialFilterRect(fRect.left(), fRect.top(), fRect.right(), fRect.bottom());
 
@@ -64,8 +66,8 @@ S52Chart::S52Chart(char* file_name, S52References* ref) {
     }
 
     poLayer->ResetReading();
-    if (!readLayer(poLayer)) {
-      //qDebug() << "read failed";
+    if (!readLayer(poLayer, ref)) {
+      qDebug() << "Failed reading layer " + layer_name;
       return;
     }
   }
@@ -203,15 +205,22 @@ void S52Chart::clear() {
   delete sndg_layer;
 }
 
-bool S52Chart::readLayer(OGRLayer* poLayer) {
+bool S52Chart::readLayer(OGRLayer* poLayer, S52References* ref) {
   QString layer_name = QString(poLayer->GetName());
-  //qDebug() << layer_name;
+  qDebug() << "Reading" << layer_name;
 
   OGRFeature* poFeature = nullptr;
 
   S52AreaLayer* area_layer;
   S52LineLayer* line_layer;
   S52MarkLayer* mark_layer;
+
+  //auto lrDfn = poLayer->GetLayerDefn();
+  //for (int fldId = 0; fldId < lrDfn->GetFieldCount(); fldId++) {
+  //  auto fldDfn = lrDfn->GetFieldDefn(fldId);
+  //  qDebug() << fldDfn->GetNameRef()
+  //           << fldDfn->GetFieldTypeName(fldDfn->GetType());
+  //}
 
   if (area_layers.contains(layer_name))
     area_layer = area_layers[layer_name];
@@ -244,17 +253,40 @@ bool S52Chart::readLayer(OGRLayer* poLayer) {
     mark_layer->symbol_ref = "-";
   }
 
+  //RCID Integer
+  //PRIM Integer
+  //GRUP Integer
+  //OBJL Integer
+  //RVER Integer
+  //AGEN Integer
+  //FIDN Integer
+  //FIDS Integer
+  //LNAM String
+  //LNAM_REFS StringList
+  //FFPT_RIND IntegerList
+
+  //int rcidInd = poLayer->GetLayerDefn()->GetFieldIndex("OBJL");
+  //qDebug() << "OBJL Field Index:" << rcidInd;
+
   while( (poFeature = poLayer->GetNextFeature()) != nullptr ) {
+    LookUp* lp = ref->findBestLookUp(layer_name, poFeature, LookUpTable::LUP_TABLE_PLAIN_BOUNDARIES, true);
+    if (lp == nullptr)
+      qDebug() << "not found";
+    else
+      qDebug() << lp->RCID << lp->OBCL;
+
     for (int i = 0; i < poFeature->GetGeomFieldCount(); i++) {
       OGRGeometry* geom = poFeature->GetGeomFieldRef(i);
       OGRwkbGeometryType geom_type = geom->getGeometryType();
+      //qDebug() << poFeature->GetFieldAsInteger(rcidInd);
 
       if (geom_type == wkbPolygon) {
         fillLineParams(layer_name, line_layer, poFeature);
         line_layer->start_inds.push_back(line_layer->points.size());
 
-        OGRPolygon* poly = (OGRPolygon*) geom;
-        if (!readOGRLine((OGRLineString*) poly->getExteriorRing(), line_layer->points, line_layer->distances))
+        OGRPolygon* poly = static_cast<OGRPolygon*>(geom);
+        OGRLineString* extRing = static_cast<OGRLineString*>(poly->getExteriorRing());
+        if (!readOGRLine(extRing, line_layer->points, line_layer->distances))
           return false;
 
         fillAreaParams(layer_name, area_layer, poFeature);

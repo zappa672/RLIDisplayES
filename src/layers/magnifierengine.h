@@ -11,6 +11,7 @@
 #include <QOpenGLFramebufferObject>
 #include <QOpenGLShaderProgram>
 
+#include "../common/rlistate.h"
 #include "../common/rlilayout.h"
 
 
@@ -32,7 +33,7 @@ public:
 private slots:
 
 public slots:
-  void update(int pel_len, int pel_cnt, int min_pel, int min_rad);
+  void update(const RLIState& state);
 
 private:
   void initShaders();

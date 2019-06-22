@@ -189,7 +189,7 @@ void RLIDisplayWidget::initializeGL() {
 
 
   _chart_mngr.loadCharts();
-  connect( &_chart_mngr, SIGNAL(new_chart_available(QString)), SLOT(onNewChartAvailable(QString)));
+  connect( &_chart_mngr, SIGNAL(newChartAvailable(QString)), SLOT(onNewChartAvailable(QString)));
 
   connect( _menuEngine, SIGNAL(radarBrightnessChanged(int))
          , _radarEngine, SLOT(onBrightnessChanged(int)));
@@ -349,8 +349,8 @@ void RLIDisplayWidget::paintLayers() {
   if (_state.orientation == RLIOrientation::RLIORIENT_NORTH)
     drawRect(QRect(topLeft, _chartEngine->size()), _chartEngine->textureId());
 
-  drawRect(QRect(topLeft, _radarEngine->size()), _radarEngine->textureId());
-  drawRect(QRect(topLeft, _tailsEngine->size()), _tailsEngine->textureId());
+  //drawRect(QRect(topLeft, _radarEngine->size()), _radarEngine->textureId());
+  //drawRect(QRect(topLeft, _tailsEngine->size()), _tailsEngine->textureId());
 
 
   QPointF center = layout->circle.center;
@@ -365,12 +365,12 @@ void RLIDisplayWidget::paintLayers() {
                      , static_cast<float>(center.y() + _state.center_shift.y())
                      , 0.f);
 
-  _trgtEngine->draw(projection*transform, _state);
-  _ctrlEngine->draw(projection*transform, _state, layout->circle);
-  _routeEngine->draw(projection*transform, _state);
+  //_trgtEngine->draw(projection*transform, _state);
+  //_ctrlEngine->draw(projection*transform, _state, layout->circle);
+  //_routeEngine->draw(projection*transform, _state);
 
 
-  drawRect(rect(), _maskEngine->textureId());
+  //drawRect(rect(), _maskEngine->textureId());
 
   for (InfoBlock* block: _infoEngine->blocks())
     drawRect(block->geometry(), block->fbo()->texture());
@@ -380,10 +380,10 @@ void RLIDisplayWidget::paintLayers() {
   if (_state.state == RLIWidgetState::RLISTATE_MAGNIFIER)
     drawRect(_magnEngine->geometry(), _magnEngine->texture());
 
-  QOpenGLTexture* tex = _mode_textures[static_cast<const char>(_state.mode)];
-  drawRect( QRect( layout->circle.center + QPoint(-tex->width() / 2, layout->circle.mode_symb_shift)
-                 , QSize(tex->width(), tex->height()) )
-          , tex->textureId());
+  //QOpenGLTexture* tex = _mode_textures[static_cast<const char>(_state.mode)];
+  //drawRect( QRect( layout->circle.center + QPoint(-tex->width() / 2, layout->circle.mode_symb_shift)
+  //               , QSize(tex->width(), tex->height()) )
+  //        , tex->textureId());
 }
 
 
@@ -398,10 +398,7 @@ void RLIDisplayWidget::updateLayers() {
   _maskEngine->update(_state, _layout_manager.layout()->circle, false);
 
   if (_state.state == RLIWidgetState::RLISTATE_MAGNIFIER)
-    _magnEngine->update( _radarEngine->pelengLength()
-                       , _radarEngine->pelengCount()
-                       , _state.magn_min_peleng
-                       , _state.magn_min_rad );
+    _magnEngine->update(_state);
 }
 
 

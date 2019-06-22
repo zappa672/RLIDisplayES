@@ -26,6 +26,10 @@ unix:LIBS += -lgdal  -lrt
 
 
 SOURCES     += \
+    src/layers/chart/chartareaengine.cpp \
+    src/layers/chart/chartlineengine.cpp \
+    src/layers/chart/chartmarkengine.cpp \
+    src/layers/chart/charttextengine.cpp \
     src/main.cpp \
     src/mainwindow.cpp \
     src/rlicontrolwidget.cpp \
@@ -54,7 +58,6 @@ SOURCES     += \
     src/layers/radar/radarpalette.cpp \
     src/layers/chart/chartsettingsmodel.cpp \
     src/layers/chart/chartengine.cpp \
-    src/layers/chart/chartlayers.cpp \
     src/layers/chart/chartshaders.cpp \
     src/layers/maskengine.cpp \        
     src/layers/routeengine.cpp \
@@ -66,6 +69,10 @@ SOURCES     += \
 
 
 HEADERS     += \
+    src/layers/chart/chartareaengine.h \
+    src/layers/chart/chartlineengine.h \
+    src/layers/chart/chartmarkengine.h \
+    src/layers/chart/charttextengine.h \
     src/mainwindow.h \
     src/rlicontrolwidget.h \
     src/rlidisplaywidget.h \
@@ -94,7 +101,6 @@ HEADERS     += \
     src/layers/radar/radarengine.h \
     src/layers/radar/radarpalette.h \
     src/layers/chart/chartengine.h \
-    src/layers/chart/chartlayers.h \
     src/layers/chart/chartshaders.h \
     src/layers/chart/chartsettingsmodel.h \
     src/layers/maskengine.h \    
@@ -117,5 +123,6 @@ OTHER_FILES += \
 
 DISTFILES += \
     layouts.xml \
-    chart_disp_conf.xml
+    chart_disp_conf.xml \
+    res/s52/chartsymbols.xml
 
