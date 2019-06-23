@@ -1,6 +1,8 @@
 #ifndef S52CHART_H
 #define S52CHART_H
 
+#include "ogr_core.h"
+
 #include <QtOpenGL>
 #include <QMap>
 #include <QRectF>
@@ -9,6 +11,7 @@
 #include <vector>
 #include "s52references.h"
 
+
 class OGRLayer;
 class OGRPoint;
 class OGRFeature;
@@ -16,12 +19,13 @@ class OGRPolygon;
 class OGRLineString;
 
 
+
 struct S52AreaLayer {
   bool is_pattern_uniform;
   bool is_color_uniform;
 
   QString pattern_ref;
-  int color_ind;
+  uint color_ind;
   // layer i-th area s52 pattern name
   std::vector<QString> pattern_refs;
   // layer i-th area s52 color token
@@ -38,7 +42,8 @@ struct S52LineLayer {
   bool is_color_uniform;
 
   QString pattern_ref;
-  int color_ind;
+  uint color_ind;
+
   // layer i-th line s52 pattern name
   std::vector<QString> pattern_refs;
   // layer i-th line s52 color token
@@ -82,21 +87,21 @@ public:
   S52Chart(char* file_name, S52References* ref);
   ~S52Chart();
 
-  QList<QString> getAreaLayerNames();
-  QList<QString> getLineLayerNames();
-  QList<QString> getMarkLayerNames();
-  QList<QString> getTextLayerNames();
+  inline const QList<QString> areaLayerNames() const { return area_layers.keys(); }
+  inline const QList<QString> lineLayerNames() const { return line_layers.keys(); }
+  inline const QList<QString> markLayerNames() const { return mark_layers.keys(); }
+  inline const QList<QString> textLayerNames() const { return text_layers.keys(); }
 
-  S52AreaLayer* getAreaLayer(QString name);
-  S52LineLayer* getLineLayer(QString name);
-  S52MarkLayer* getMarkLayer(QString name);
-  S52TextLayer* getTextLayer(QString name);
-  S52SndgLayer* getSndgLayer();
+  inline S52AreaLayer* areaLayer(QString name) const { return area_layers.value(name, nullptr); }
+  inline S52LineLayer* lineLayer(QString name) const { return line_layers.value(name, nullptr); }
+  inline S52MarkLayer* markLayer(QString name) const { return mark_layers.value(name, nullptr); }
+  inline S52TextLayer* textLayer(QString name) const { return text_layers.value(name, nullptr); }
+  inline S52SndgLayer* sndgLayer()             const { return sndg_layer; }
 
-  float getMinLat();
-  float getMaxLat();
-  float getMinLon();
-  float getMaxLon();
+  inline float minLat() const { return min_lat; }
+  inline float maxLat() const { return max_lat; }
+  inline float minLon() const { return min_lon; }
+  inline float maxLon() const { return max_lon; }
 
 private:
   bool isOk;
@@ -119,6 +124,8 @@ private:
   bool readSoundingLayer(OGRLayer* poLayer, const QRectF& filterRect);
   bool readTextLayer(OGRLayer* poLayer);
 
+  QMap<QString, QVariant> getOGRFeatureAttributes(OGRFeature* obj, const QMap<QString, std::pair<int, OGRFieldType>>& fields);
+
   // Reading and tesselating OGRPolygon, append result to triangles
   bool readOGRPolygon(OGRPolygon* poGeom, std::vector<float>& triangles);
   // Reading OGRLine, append result to points
@@ -126,7 +133,7 @@ private:
 
   void fillLineParams(QString& layer_name, S52LineLayer* layer, OGRFeature* poFeature);
   void fillAreaParams(QString& layer_name, S52AreaLayer* layer, OGRFeature* poFeature);
-  void fillMarkParams(QString& layer_name, S52MarkLayer* layer, OGRFeature* poFeature);
+  void fillMarkParams(S52MarkLayer* layer, LookUp* lp);
 
   QString getAreaColorRef(QString& layer_name, OGRFeature* poFeature);
   QString getAreaPatternRef(QString& layer_name, OGRFeature* poFeature);
@@ -134,7 +141,7 @@ private:
   QString getLineColorRef(QString& layer_name, OGRFeature* poFeature);
   QString getLinePatternRef(QString& layer_name, OGRFeature* poFeature);
 
-  QString getMarkSymbolRef(QString& layer_name, OGRFeature* poFeature);
+  QString getMarkSymbolRef(LookUp* lp);
 
   bool isAreaColorUniform(QString& layer_name);
   bool isAreaPatternUniform(QString& layer_name);

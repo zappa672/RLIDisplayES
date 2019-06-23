@@ -1,6 +1,7 @@
 #include "s52chart.h"
 
 #include <QDebug>
+#include <QList>
 #include <ogrsf_frmts.h>
 
 #include "../common/triangulate.h"
@@ -33,7 +34,7 @@ S52Chart::S52Chart(char* file_name, S52References* ref) {
     //qDebug() << "Reading layer #" << i << layer_name;
 
     QRectF fRect(QPointF(144.1, 13.7), QSizeF(3.0, 3.0));
-    poLayer->SetSpatialFilterRect(fRect.left(), fRect.top(), fRect.right(), fRect.bottom());
+    //poLayer->SetSpatialFilterRect(fRect.left(), fRect.top(), fRect.right(), fRect.bottom());
 
     if (layer_name == "M_COVR") {
       OGREnvelope oExt;
@@ -92,8 +93,8 @@ bool S52Chart::readTextLayer(OGRLayer* poLayer) {
 
     if (name.trimmed().length() > 0) {
       poFeature->StealGeometry()->Centroid(&centroid);
-      layer->points.push_back(centroid.getY());
-      layer->points.push_back(centroid.getX());
+      layer->points.push_back(static_cast<float>(centroid.getY()));
+      layer->points.push_back(static_cast<float>(centroid.getX()));
       layer->texts.push_back(name.trimmed());
     }
 
@@ -105,9 +106,6 @@ bool S52Chart::readTextLayer(OGRLayer* poLayer) {
   return true;
 }
 
-S52SndgLayer* S52Chart::getSndgLayer() {
-  return sndg_layer;
-}
 
 bool S52Chart::readSoundingLayer(OGRLayer* poLayer, const QRectF& filterRect) {
   OGRFeature* poFeature = nullptr;
@@ -123,16 +121,16 @@ bool S52Chart::readSoundingLayer(OGRLayer* poLayer, const QRectF& filterRect) {
       OGRwkbGeometryType geom_type = geom->getGeometryType();
 
       if (geom_type == wkbMultiPoint25D) {
-        OGRMultiPoint* mp = (OGRMultiPoint*) geom;
+        OGRMultiPoint* mp = static_cast<OGRMultiPoint*>(geom);
 
         for (int j = 0; j < mp->getNumGeometries(); j++) {
-          OGRPoint *p = (OGRPoint *) mp->getGeometryRef(j);
+          OGRPoint* p = static_cast<OGRPoint*>(mp->getGeometryRef(j));
 
-          if (filterRect.contains(p->getX(), p->getY())) {
-            sndg_layer->points.push_back(p->getY());
-            sndg_layer->points.push_back(p->getX());
-            sndg_layer->depths.push_back(p->getZ());
-          }
+          //if (filterRect.contains(p->getX(), p->getY()))
+          sndg_layer->points.push_back(static_cast<float>(p->getY()));
+          sndg_layer->points.push_back(static_cast<float>(p->getX()));
+          sndg_layer->depths.push_back(p->getZ());
+          //}
         }
       }
     }
@@ -142,55 +140,6 @@ bool S52Chart::readSoundingLayer(OGRLayer* poLayer, const QRectF& filterRect) {
 
   return true;
 }
-
-QList<QString> S52Chart::getAreaLayerNames() {
-  return area_layers.keys();
-}
-
-QList<QString> S52Chart::getLineLayerNames() {
-  return line_layers.keys();
-}
-
-QList<QString> S52Chart::getMarkLayerNames() {
-  return mark_layers.keys();
-}
-
-QList<QString> S52Chart::getTextLayerNames() {
-  return text_layers.keys();
-}
-
-S52AreaLayer* S52Chart::getAreaLayer(QString name) {
-  return area_layers[name];
-}
-
-S52LineLayer* S52Chart::getLineLayer(QString name) {
-  return line_layers[name];
-}
-
-S52MarkLayer* S52Chart::getMarkLayer(QString name) {
-  return mark_layers[name];
-}
-
-S52TextLayer* S52Chart::getTextLayer(QString name) {
-  return text_layers[name];
-}
-
-float S52Chart::getMinLat() {
-  return min_lat;
-}
-
-float S52Chart::getMaxLat() {
-  return max_lat;
-}
-
-float S52Chart::getMinLon() {
-  return min_lon;
-}
-
-float S52Chart::getMaxLon() {
-  return max_lon;
-}
-
 
 void S52Chart::clear() {
   for (int i = 0; i < area_layers.keys().size(); i++)
@@ -205,9 +154,59 @@ void S52Chart::clear() {
   delete sndg_layer;
 }
 
+
+QMap<QString, QVariant> S52Chart::getOGRFeatureAttributes(OGRFeature* obj, const QMap<QString, std::pair<int, OGRFieldType>>& fields) {
+  QMap<QString, QVariant> featAttrs;
+
+  int fldListCount;
+  QList<QVariant> lst;
+
+  for(auto fName: fields.keys()) {
+    auto fldDef = fields[fName];
+    switch (fldDef.second) {
+      case OFTInteger:
+        featAttrs.insert(fName, obj->GetFieldAsInteger(fldDef.first));
+        break;
+      case OFTString:
+        featAttrs.insert(fName, obj->GetFieldAsString(fldDef.first));
+        break;
+      case OFTReal:
+        featAttrs.insert(fName, obj->GetFieldAsDouble(fldDef.first));
+        break;
+      case OFTIntegerList: {
+        const int* ivals = obj->GetFieldAsIntegerList(fldDef.first, &fldListCount);
+        for (int i = 0; i < fldListCount; i++)
+          lst.push_back(ivals[i]);
+        featAttrs.insert(fName, QVariant(lst));
+        break;
+      }
+      case OFTRealList: {
+          const double* dvals = obj->GetFieldAsDoubleList(fldDef.first, &fldListCount);
+          for (int i = 0; i < fldListCount; i++)
+            lst.push_back(dvals[i]);
+          featAttrs.insert(fName, QVariant(lst));
+          break;
+      }
+      case OFTStringList:
+      case OFTDate:
+      case OFTTime:
+      case OFTDateTime:
+      case OFTBinary:
+      case OFTWideString:
+      case OFTWideStringList:
+        break;
+    }
+  }
+
+  return featAttrs;
+}
+
 bool S52Chart::readLayer(OGRLayer* poLayer, S52References* ref) {
   QString layer_name = QString(poLayer->GetName());
-  qDebug() << "Reading" << layer_name;
+  //qDebug() << "\t\t---------------------------";
+  //qDebug() << "\t\t---------------------------";
+  //qDebug() << "\t\t---------------------------";
+  //qDebug() << "Reading" << layer_name;
 
   OGRFeature* poFeature = nullptr;
 
@@ -215,12 +214,14 @@ bool S52Chart::readLayer(OGRLayer* poLayer, S52References* ref) {
   S52LineLayer* line_layer;
   S52MarkLayer* mark_layer;
 
-  //auto lrDfn = poLayer->GetLayerDefn();
-  //for (int fldId = 0; fldId < lrDfn->GetFieldCount(); fldId++) {
-  //  auto fldDfn = lrDfn->GetFieldDefn(fldId);
-  //  qDebug() << fldDfn->GetNameRef()
-  //           << fldDfn->GetFieldTypeName(fldDfn->GetType());
-  //}
+  QMap<QString, std::pair<int, OGRFieldType>> fields;
+  auto lrDfn = poLayer->GetLayerDefn();
+  for (int fldId = 0; fldId < lrDfn->GetFieldCount(); fldId++) {
+    auto fldDfn = lrDfn->GetFieldDefn(fldId);
+    //qDebug() << fldDfn->GetNameRef()
+    //         << fldDfn->GetFieldTypeName(fldDfn->GetType());
+    fields.insert(fldDfn->GetNameRef(), std::pair<int, OGRFieldType>(fldId, fldDfn->GetType()));
+  }
 
   if (area_layers.contains(layer_name))
     area_layer = area_layers[layer_name];
@@ -230,7 +231,7 @@ bool S52Chart::readLayer(OGRLayer* poLayer, S52References* ref) {
     area_layer->is_color_uniform = isAreaColorUniform(layer_name);
     area_layer->is_pattern_uniform = isAreaPatternUniform(layer_name);
     area_layer->pattern_ref = "-";
-    area_layer->color_ind = -1;
+    area_layer->color_ind = -1u;
   }
 
   if (line_layers.contains(layer_name))
@@ -241,7 +242,7 @@ bool S52Chart::readLayer(OGRLayer* poLayer, S52References* ref) {
     line_layer->is_color_uniform = isLineColorUniform(layer_name);
     line_layer->is_pattern_uniform = isLinePatternUniform(layer_name);
     line_layer->pattern_ref = "-";
-    line_layer->color_ind = -1;
+    line_layer->color_ind = -1u;
   }
 
   if (mark_layers.contains(layer_name))
@@ -253,32 +254,45 @@ bool S52Chart::readLayer(OGRLayer* poLayer, S52References* ref) {
     mark_layer->symbol_ref = "-";
   }
 
-  //RCID Integer
-  //PRIM Integer
-  //GRUP Integer
-  //OBJL Integer
-  //RVER Integer
-  //AGEN Integer
-  //FIDN Integer
-  //FIDS Integer
-  //LNAM String
-  //LNAM_REFS StringList
-  //FFPT_RIND IntegerList
-
-  //int rcidInd = poLayer->GetLayerDefn()->GetFieldIndex("OBJL");
-  //qDebug() << "OBJL Field Index:" << rcidInd;
-
   while( (poFeature = poLayer->GetNextFeature()) != nullptr ) {
-    LookUp* lp = ref->findBestLookUp(layer_name, poFeature, LookUpTable::LUP_TABLE_PLAIN_BOUNDARIES, true);
-    if (lp == nullptr)
-      qDebug() << "not found";
-    else
-      qDebug() << lp->RCID << lp->OBCL;
-
     for (int i = 0; i < poFeature->GetGeomFieldCount(); i++) {
       OGRGeometry* geom = poFeature->GetGeomFieldRef(i);
       OGRwkbGeometryType geom_type = geom->getGeometryType();
-      //qDebug() << poFeature->GetFieldAsInteger(rcidInd);
+
+      LookUpTable tbl = LookUpTable::LUP_TABLE_PAPER_CHART;
+
+      //qDebug() << "\t\t-------------";
+      //qDebug() << "\t\t-------------";
+      //qDebug() << "Reading next feature\n";
+
+      switch (geom_type) {
+        case wkbLineString:
+          tbl = LookUpTable::LUP_TABLE_LINES;
+          //qDebug() << "wkbLineString";
+          break;
+        case wkbPoint:
+          tbl = LookUpTable::LUP_TABLE_PAPER_CHART; // Can be set to SIMPLIFIED
+          //qDebug() << "wkbPoint";
+          break;
+        case wkbPolygon:
+          tbl = LookUpTable::LUP_TABLE_PLAIN_BOUNDARIES; // Can be set to SYMBOLYZED_BOUNDARIES
+          //qDebug() << "wkbPolygon";
+          break;
+        default:
+          break;
+      }
+
+      auto featAttrs = getOGRFeatureAttributes(poFeature, fields);
+      //qDebug() << featAttrs;
+
+      LookUp* lp = ref->findBestLookUp(layer_name, featAttrs, tbl);
+      /*
+      if (lp == nullptr)
+        qDebug() << "not found";
+      else
+        qDebug() << lp->RCID << lp->OBCL;
+      */
+
 
       if (geom_type == wkbPolygon) {
         fillLineParams(layer_name, line_layer, poFeature);
@@ -300,15 +314,15 @@ bool S52Chart::readLayer(OGRLayer* poLayer, S52References* ref) {
         fillLineParams(layer_name, line_layer, poFeature);
         line_layer->start_inds.push_back(line_layer->points.size());
 
-        if (!readOGRLine((OGRLineString*) geom, line_layer->points, line_layer->distances))
+        if (!readOGRLine(static_cast<OGRLineString*>(geom), line_layer->points, line_layer->distances))
           return false;
       }
 
       if (geom_type == wkbPoint) {
-        fillMarkParams(layer_name, mark_layer, poFeature);
-        OGRPoint* p = (OGRPoint*) geom;
-        mark_layer->points.push_back(p->getY());
-        mark_layer->points.push_back(p->getX());
+        fillMarkParams(mark_layer, lp);
+        OGRPoint* p = static_cast<OGRPoint*>(geom);
+        mark_layer->points.push_back(static_cast<float>(p->getY()));
+        mark_layer->points.push_back(static_cast<float>(p->getX()));
       }
     }
 
@@ -333,7 +347,7 @@ void S52Chart::fillLineParams(QString& layer_name, S52LineLayer* layer, OGRFeatu
   else if (!layer->is_pattern_uniform)
     layer->pattern_refs.push_back(getLineColorRef(layer_name, poFeature));
 
-  if (layer->is_color_uniform && layer->color_ind == -1)
+  if (layer->is_color_uniform && layer->color_ind == -1u)
     layer->color_ind = _ref->getColorIndex(getAreaColorRef(layer_name, nullptr));
   else if (!layer->is_color_uniform)
     layer->color_inds.push_back(_ref->getColorIndex(getAreaColorRef(layer_name, poFeature)));
@@ -345,17 +359,17 @@ void S52Chart::fillAreaParams(QString& layer_name, S52AreaLayer* layer, OGRFeatu
   else if (!layer->is_pattern_uniform)
     layer->pattern_refs.push_back(getAreaColorRef(layer_name, poFeature));
 
-  if (layer->is_color_uniform && layer->color_ind == -1)
+  if (layer->is_color_uniform && layer->color_ind == -1u)
     layer->color_ind = _ref->getColorIndex(getAreaColorRef(layer_name, nullptr));
   else if (!layer->is_color_uniform)
     layer->color_inds.push_back(_ref->getColorIndex(getAreaColorRef(layer_name, poFeature)));
 }
 
-void S52Chart::fillMarkParams(QString& layer_name, S52MarkLayer* layer, OGRFeature* poFeature) {
-  if (layer->is_uniform && layer->symbol_ref == "-")
-    layer->symbol_ref = getMarkSymbolRef(layer_name, nullptr);
-  else if (!layer->is_uniform)
-    layer->symbol_refs.push_back(getMarkSymbolRef(layer_name, poFeature));
+void S52Chart::fillMarkParams(S52MarkLayer* layer, LookUp* lp) {
+  if (layer->is_uniform)
+    layer->symbol_ref = getMarkSymbolRef(lp);
+  else
+    layer->symbol_refs.push_back(getMarkSymbolRef(lp));
 }
 
 // !!!!
@@ -661,32 +675,10 @@ QString S52Chart::getLinePatternRef(QString& layer_name, OGRFeature* poFeature) 
   return "SOLID";
 }
 
-QString S52Chart::getMarkSymbolRef(QString& layer_name, OGRFeature* poFeature) {
-  Q_UNUSED(poFeature);
-
-  if (layer_name == "WATTUR")
-    return "WATTUR02";
-
-  if (layer_name == "WRECKS")
-    return "WRECKS05";
-
-  if (layer_name == "BOYINB")
-    return "BOYINB01";
-
-  if (layer_name == "RDOSTA")
-    return "RDOSTA02";
-
-  if (layer_name == "LIGHTS")
-    return "LIGHTS94";
-
-   if (layer_name == "LNDMRK")
-     return "MSTCON14";
-
-   if (layer_name == "UWTROC")
-     return "UWTROC03";
-
-   if (layer_name == "OBSTRN")
-     return "ISODGR51";
+QString S52Chart::getMarkSymbolRef(LookUp* lp) {
+  for (QString instr: lp->INST)
+    if (instr.startsWith("SY"))
+      return instr.mid(3, 8);
 
   return "QUESMRK1";
 }

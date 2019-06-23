@@ -53,8 +53,8 @@ private:
 
   QPoint _center_shift { 0, 0 };
   GeoPos _center { 0, 0 };
-  float _scale { 10 };
-  float _angle { 0 };
+  double _scale { 10 };
+  double _angle { 0 };
 
   S52Assets* assets;  
   QOpenGLFramebufferObject* _fbo = nullptr;

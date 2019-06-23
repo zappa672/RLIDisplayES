@@ -92,8 +92,8 @@ void ChartEngine::clearChartData() {
 
 
 void ChartEngine::setAreaLayers(S52Chart* chrt, S52References* ref) {
-  for (QString layer_name : chrt->getAreaLayerNames()) {
-    S52AreaLayer* layer = chrt->getAreaLayer(layer_name);
+  for (QString layer_name : chrt->areaLayerNames()) {
+    S52AreaLayer* layer = chrt->areaLayer(layer_name);
     ChartLayerDisplaySettings clds = settings->layerSettings(layer_name);
 
     if (!clds.visible)
@@ -107,8 +107,8 @@ void ChartEngine::setAreaLayers(S52Chart* chrt, S52References* ref) {
 }
 
 void ChartEngine::setLineLayers(S52Chart* chrt, S52References* ref) {
-  for (QString layer_name : chrt->getLineLayerNames()) {
-    S52LineLayer* layer = chrt->getLineLayer(layer_name);
+  for (QString layer_name : chrt->lineLayerNames()) {
+    S52LineLayer* layer = chrt->lineLayer(layer_name);
     ChartLayerDisplaySettings clds = settings->layerSettings(layer_name);
 
     if (!clds.visible)
@@ -125,8 +125,8 @@ void ChartEngine::setLineLayers(S52Chart* chrt, S52References* ref) {
 void ChartEngine::setTextLayers(S52Chart* chrt, S52References* ref) {
   Q_UNUSED(ref);
 
-  for (QString layer_name : chrt->getTextLayerNames()) {
-    S52TextLayer* layer = chrt->getTextLayer(layer_name);
+  for (QString layer_name : chrt->textLayerNames()) {
+    S52TextLayer* layer = chrt->textLayer(layer_name);
     ChartLayerDisplaySettings clds = settings->layerSettings(layer_name);
 
     if (!clds.visible)
@@ -141,8 +141,8 @@ void ChartEngine::setTextLayers(S52Chart* chrt, S52References* ref) {
 
 
 void ChartEngine::setMarkLayers(S52Chart* chrt, S52References* ref) {
-  for (QString layer_name : chrt->getMarkLayerNames()) {
-    S52MarkLayer* layer = chrt->getMarkLayer(layer_name);
+  for (QString layer_name : chrt->markLayerNames()) {
+    S52MarkLayer* layer = chrt->markLayer(layer_name);
     ChartLayerDisplaySettings clds = settings->layerSettings(layer_name);
 
     if (!clds.visible)
@@ -159,14 +159,14 @@ void ChartEngine::setSndgLayer(S52Chart* chrt, S52References* ref) {
   if (!mark_engines.contains("SOUNDG"))
     mark_engines["SOUNDG"] = new ChartMarkEngine(_context);
 
-  mark_engines["SOUNDG"]->setData(chrt->getSndgLayer(), assets, ref, 1000);
+  mark_engines["SOUNDG"]->setData(chrt->sndgLayer(), assets, ref, 1000);
 }
 
 
 void ChartEngine::update(const RLIState& state, const QString& color_scheme) {
   auto center = state.ship_position;
-  float scale = state.chart_scale;
-  float angle = state.north_shift;
+  double scale = state.chart_scale;
+  double angle = state.north_shift;
   const QPoint& center_shift = state.center_shift;
 
   bool need_update = ( _force_update
@@ -232,10 +232,10 @@ void ChartEngine::drawAreaLayers(const QMatrix4x4& mvp_matrix, const QString& co
   QOpenGLTexture* pattern_tex = assets->getAreaPatternTex(color_scheme);
   QOpenGLTexture* color_scheme_tex = assets->getColorSchemeTex(color_scheme);
 
-  prog->setUniformValue(shaders->getAreaUniformLoc(COMMON_UNIFORMS_CENTER), _center.lat, _center.lon);
-  prog->setUniformValue(shaders->getAreaUniformLoc(COMMON_UNIFORMS_SCALE), _scale);
-  prog->setUniformValue(shaders->getAreaUniformLoc(COMMON_UNIFORMS_NORTH), _angle);
-  prog->setUniformValue(shaders->getAreaUniformLoc(COMMON_UNIFORMS_PATTERN_TEX_DIM), pattern_tex->width(), pattern_tex->height());
+  glUniform2f(shaders->getLineUniformLoc(COMMON_UNIFORMS_CENTER), static_cast<GLfloat>(_center.lat), static_cast<GLfloat>(_center.lon));
+  glUniform1f(shaders->getAreaUniformLoc(COMMON_UNIFORMS_SCALE), static_cast<GLfloat>(_scale));
+  glUniform1f(shaders->getAreaUniformLoc(COMMON_UNIFORMS_NORTH), static_cast<GLfloat>(_angle));
+  glUniform2f(shaders->getAreaUniformLoc(COMMON_UNIFORMS_PATTERN_TEX_DIM), pattern_tex->width(), pattern_tex->height());
   prog->setUniformValue(shaders->getAreaUniformLoc(COMMON_UNIFORMS_MVP_MATRIX), mvp_matrix);
 
   glActiveTexture(GL_TEXTURE0);
@@ -271,10 +271,10 @@ void ChartEngine::drawLineLayers(const QMatrix4x4& mvp_matrix, const QString& co
   QOpenGLShaderProgram* prog = shaders->getChartLineProgram();
   prog->bind();
 
-  prog->setUniformValue(shaders->getLineUniformLoc(COMMON_UNIFORMS_CENTER), _center.lat, _center.lon);
-  prog->setUniformValue(shaders->getLineUniformLoc(COMMON_UNIFORMS_SCALE), _scale);
-  prog->setUniformValue(shaders->getLineUniformLoc(COMMON_UNIFORMS_NORTH), _angle);
-  prog->setUniformValue(shaders->getLineUniformLoc(COMMON_UNIFORMS_PATTERN_TEX_DIM), pattern_tex->width(), pattern_tex->height());
+  glUniform2f(shaders->getLineUniformLoc(COMMON_UNIFORMS_CENTER), static_cast<GLfloat>(_center.lat), static_cast<GLfloat>(_center.lon));
+  glUniform1f(shaders->getLineUniformLoc(COMMON_UNIFORMS_SCALE), static_cast<GLfloat>(_scale));
+  glUniform1f(shaders->getLineUniformLoc(COMMON_UNIFORMS_NORTH), static_cast<GLfloat>(_angle));
+  glUniform2f(shaders->getLineUniformLoc(COMMON_UNIFORMS_PATTERN_TEX_DIM), pattern_tex->width(), pattern_tex->height());
   prog->setUniformValue(shaders->getLineUniformLoc(COMMON_UNIFORMS_MVP_MATRIX), mvp_matrix);
 
   glActiveTexture(GL_TEXTURE0);
@@ -310,9 +310,9 @@ void ChartEngine::drawTextLayers(const QMatrix4x4& mvp_matrix) {
   QOpenGLShaderProgram* prog = shaders->getChartTextProgram();
   prog->bind();
 
-  glUniform2f(shaders->getTextUniformLoc(COMMON_UNIFORMS_CENTER), _center.lat, _center.lon);
-  glUniform1f(shaders->getTextUniformLoc(COMMON_UNIFORMS_SCALE), _scale);
-  glUniform1f(shaders->getTextUniformLoc(COMMON_UNIFORMS_NORTH), _angle);
+  glUniform2f(shaders->getLineUniformLoc(COMMON_UNIFORMS_CENTER), static_cast<GLfloat>(_center.lat), static_cast<GLfloat>(_center.lon));
+  glUniform1f(shaders->getTextUniformLoc(COMMON_UNIFORMS_SCALE), static_cast<GLfloat>(_scale));
+  glUniform1f(shaders->getTextUniformLoc(COMMON_UNIFORMS_NORTH), static_cast<GLfloat>(_angle));
   prog->setUniformValue(shaders->getTextUniformLoc(COMMON_UNIFORMS_MVP_MATRIX), mvp_matrix);
 
   glUniform1i(shaders->getTextUniformLoc(COMMON_UNIFORMS_PATTERN_TEX_ID), 0);
@@ -342,9 +342,9 @@ void ChartEngine::drawMarkLayers(const QMatrix4x4& mvp_matrix, const QString& co
 
   QOpenGLTexture* pattern_tex = assets->getSymbolTex(color_scheme);
 
-  glUniform2f(shaders->getMarkUniformLoc(COMMON_UNIFORMS_CENTER), _center.lat, _center.lon);
-  glUniform1f(shaders->getMarkUniformLoc(COMMON_UNIFORMS_SCALE), _scale);
-  glUniform1f(shaders->getMarkUniformLoc(COMMON_UNIFORMS_NORTH), _angle);
+  glUniform2f(shaders->getLineUniformLoc(COMMON_UNIFORMS_CENTER), static_cast<GLfloat>(_center.lat), static_cast<GLfloat>(_center.lon));
+  glUniform1f(shaders->getMarkUniformLoc(COMMON_UNIFORMS_SCALE), static_cast<GLfloat>(_scale));
+  glUniform1f(shaders->getMarkUniformLoc(COMMON_UNIFORMS_NORTH), static_cast<GLfloat>(_angle));
   glUniform2f(shaders->getMarkUniformLoc(COMMON_UNIFORMS_PATTERN_TEX_DIM), pattern_tex->width(), pattern_tex->height());
   prog->setUniformValue(shaders->getMarkUniformLoc(COMMON_UNIFORMS_MVP_MATRIX), mvp_matrix);
 

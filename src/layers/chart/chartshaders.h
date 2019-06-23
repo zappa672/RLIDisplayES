@@ -87,17 +87,15 @@ public:
   inline QOpenGLShaderProgram* getChartTextProgram() { return chart_text_program; }
   inline QOpenGLShaderProgram* getChartMarkProgram() { return chart_mark_program; }
 
-  GLuint getAreaUniformLoc(unsigned int index);
-  GLuint getAreaAttributeLoc(unsigned int index);
+  inline int getAreaUniformLoc(unsigned int ind) const { return (ind < AREA_UNIFORMS_COUNT) ? area_unif_locs[ind] : 0; }
+  inline int getLineUniformLoc(unsigned int ind) const { return (ind < LINE_UNIFORMS_COUNT) ? line_unif_locs[ind] : 0; }
+  inline int getTextUniformLoc(unsigned int ind) const { return (ind < TEXT_UNIFORMS_COUNT) ? text_unif_locs[ind] : 0; }
+  inline int getMarkUniformLoc(unsigned int ind) const { return (ind < MARK_UNIFORMS_COUNT) ? mark_unif_locs[ind] : 0; }
 
-  GLuint getLineUniformLoc(unsigned int index);
-  GLuint getLineAttributeLoc(unsigned int index);
-
-  GLuint getTextUniformLoc(unsigned int index);
-  GLuint getTextAttributeLoc(unsigned int index);
-
-  GLuint getMarkUniformLoc(unsigned int index);
-  GLuint getMarkAttributeLoc(unsigned int index);
+  inline int getAreaAttributeLoc(unsigned int ind) const { return (ind < AREA_ATTRIBUTES_COUNT) ? area_attr_locs[ind] : 0; }
+  inline int getLineAttributeLoc(unsigned int ind) const { return (ind < LINE_ATTRIBUTES_COUNT) ? line_attr_locs[ind] : 0; }
+  inline int getTextAttributeLoc(unsigned int ind) const { return (ind < TEXT_ATTRIBUTES_COUNT) ? text_attr_locs[ind] : 0; }
+  inline int getMarkAttributeLoc(unsigned int ind) const { return (ind < MARK_ATTRIBUTES_COUNT) ? mark_attr_locs[ind] : 0; }
 
 private:
   void initChartAreaProgram();

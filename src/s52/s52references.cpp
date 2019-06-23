@@ -1,5 +1,7 @@
 #include "s52references.h"
 
+#include <qmath.h>
+
 #include <QFile>
 #include <QDebug>
 #include <QXmlStreamReader>
@@ -28,181 +30,114 @@ S52References::S52References(QString fileName) {
   file.close();
 
   fillColorTables();
+
   //print();
 }
 
 
-LookUp* S52References::findBestLookUp(const QString& name, OGRFeature* obj, LookUpTable tbl, bool bStrict) {
-  Q_UNUSED(obj);
-  Q_UNUSED(bStrict);
+LookUp* S52References::findBestLookUp(const QString& name, const QMap<QString, QVariant>& objAttrs, LookUpTable tbl) {
+  QVector<LookUp*> lups = lookups[tbl].value(name, QVector<LookUp*>());
+  LookUp* best = nullptr;
+  int countATT = 0;
 
-  //obj->GetFieldAsString();
+  // Loop through the available lookups for the feature
+  for (LookUp* lup: lups) {
+    //qDebug() << "";
+    //qDebug() << "Check lookup candidate " << lup->OBCL << lup->RCID;
+    //qDebug() << lup->ALST;
 
-  if ( !lookups.contains(tbl)
-    || !lookups[tbl].contains(name))
-    return nullptr;
+    countATT = 0;
 
-  QVector<LookUp*> lups = lookups[tbl][name];
-  LookUp* best = lookups.size() > 0 ? lups[0] : nullptr;
+    for (const QString& lupAttr: lup->ALST) {
+      QString lupAttrName = lupAttr.left(6);
+      QString lupAttrVal = lupAttr.right(lupAttr.length() - 6).trimmed();
 
-  /*for (LookUp* lup: lookups) {
+      //qDebug() << "lupAttr" << lupAttrName << lupAttrVal;
+      if (objAttrs.contains(lupAttrName)) {
+        bool attValMatch = false;
 
-  }*/
+        // special case (i)
+        if (lupAttrVal.isEmpty()) {  //No value to check, go to next lup_attr
+          ++countATT;
+          //qDebug() << "attr existing match";
+          continue;
+        }
+
+        // special case (ii)
+        //TODO  Find an ENC with "UNKNOWN" DRVAL1 or DRVAL2 and debug this code
+        // Match if the object does NOT contain this attribute
+        if( lupAttrVal == QString("?") ) {  // if LUP attribute value is "undefined"
+          //qDebug() << "undefined attrval";
+          continue;
+        }
+
+        QVariant objAttrVal = objAttrs[lupAttr.left(6)];
+        //qDebug() << objAttrVal;
+        switch (objAttrVal.type()) {
+          case QVariant::Int:
+            if (lupAttrVal.toInt() == objAttrVal.toInt()) {
+              //qDebug() << "int match";
+              attValMatch = true;
+            }
+            break;
+          case QVariant::Double:
+            if(std::abs(lupAttrVal.toDouble() - objAttrVal.toDouble()) < 1e-6 ) {
+              //qDebug() << "double match";
+              attValMatch = true;
+            }
+            break;
+          case QVariant::String:
+            if (lupAttrVal.trimmed() == objAttrVal.toString().trimmed()) {
+              //qDebug() << "string match";
+              attValMatch = true;
+            }
+            break;
+          case QVariant::List: {
+            auto lupAttrLst = lupAttrVal.split(",");
+            auto objAttrLst = objAttrVal.toList();
+
+            if (lupAttrLst.size() == objAttrLst.size()) {
+              for (int i = 0; i < lupAttrLst.size(); i++)
+                if (lupAttrLst[i].toInt() != objAttrLst[i].toInt())
+                  break;
+
+              //qDebug() << "string match";
+              attValMatch = true;
+            }
+
+            break;
+          }
+          default:
+            break;
+          }
+
+        if (attValMatch)
+          ++countATT;
+        //else
+        //  qDebug() << "attr not match";
+      } else {
+        //qDebug() << "attr not found";
+      }
+    }
+
+    // According to S52 specs, match must be perfect,
+    // and the first 100% match is selected
+    if (countATT == lup->ALST.size()) { // Full match
+      best = lup;
+      //qDebug() << "match lookup: " << lup->RCID;
+      break;
+    }
+  }
+
+  //if (countATT != best->ALST.size())
+  //  qDebug() << "lookup not found";
 
   return best;
 }
 
 
 /*
-LUPrec *s52plib::FindBestLUP( wxArrayOfLUPrec *LUPArray, unsigned int startIndex, unsigned int count, S57Obj *pObj, bool bStrict )
-{
-    int nATTMatch = 0;
-    int countATT = 0;
-    bool bmatch_found = false;
 
-    if( pObj->att_array == NULL )
-        goto check_LUP;       // object has no attributes to compare, so return "best" LUP
-
-    for( unsigned int i = 0; i < count; ++i ) {
-        LUPrec *LUPCandidate = LUPArray->Item( startIndex + i );
-
-        if( !LUPCandidate->ATTArray.size() )
-            continue;        // this LUP has no attributes coded
-
-        countATT = 0;
-        char *currATT = pObj->att_array;
-        int attIdx = 0;
-
-        for( unsigned int iLUPAtt = 0; iLUPAtt < LUPCandidate->ATTArray.size(); iLUPAtt++ ) {
-
-            // Get the LUP attribute name
-            char *slatc = LUPCandidate->ATTArray[iLUPAtt];
-
-            if( slatc && (strlen(slatc) < 6) )
-                goto next_LUP_Attr;         // LUP attribute value not UTF8 convertible (never seen in PLIB 3.x)
-
-            if( slatc ){
-                char *slatv = slatc + 6;
-                while( attIdx < pObj->n_attr ) {
-                    if( 0 == strncmp( slatc, currATT, 6 ) ) {
-                        //OK we have an attribute name match
-
-
-                        bool attValMatch = false;
-
-                        // special case (i)
-                        if( !strncmp( slatv, " ", 1 ) ) {        // any object value will match wild card (S52 para 8.3.3.4)
-                            ++countATT;
-                            goto next_LUP_Attr;
-                        }
-
-                        // special case (ii)
-                        //TODO  Find an ENC with "UNKNOWN" DRVAL1 or DRVAL2 and debug this code
-                        if( !strncmp( slatv, "?", 1) ){          // if LUP attribute value is "undefined"
-
-                        //  Match if the object does NOT contain this attribute
-                            goto next_LUP_Attr;
-                        }
-
-
-                        //checking against object attribute value
-                        S57attVal *v = ( pObj->attVal->Item( attIdx ) );
-
-                        switch( v->valType ){
-                            case OGR_INT: // S57 attribute type 'E' enumerated, 'I' integer
-                            {
-                                int LUP_att_val = atoi( slatv );
-                                if( LUP_att_val == *(int*) ( v->value ) )
-                                    attValMatch = true;
-                                break;
-                            }
-
-                            case OGR_INT_LST: // S57 attribute type 'L' list: comma separated integer
-                            {
-                                int a;
-                                char ss[41];
-                                strncpy( ss, slatv, 39 );
-                                ss[40] = '\0';
-                                char *s = &ss[0];
-
-                                int *b = (int*) v->value;
-                                sscanf( s, "%d", &a );
-
-                                while( *s != '\0' ) {
-                                    if( a == *b ) {
-                                        sscanf( ++s, "%d", &a );
-                                        b++;
-                                        attValMatch = true;
-
-                                    } else
-                                        attValMatch = false;
-                                }
-                                break;
-                            }
-                            case OGR_REAL: // S57 attribute type'F' float
-                            {
-                                double obj_val = *(double*) ( v->value );
-                                float att_val = atof( slatv );
-                                if( fabs( obj_val - att_val ) < 1e-6 )
-                                    if( obj_val == att_val  )
-                                        attValMatch = true;
-                                break;
-                            }
-
-                            case OGR_STR: // S57 attribute type'A' code string, 'S' free text
-                            {
-                                //    Strings must be exact match
-                                //    n.b. OGR_STR is used for S-57 attribute type 'L', comma-separated list
-
-                                //wxString cs( (char *) v->value, wxConvUTF8 ); // Attribute from object
-                                //if( LATTC.Mid( 6 ) == cs )
-                                if( !strcmp((char *) v->value, slatv))
-                                    attValMatch = true;
-                                break;
-                            }
-
-                            default:
-                                break;
-                        } //switch
-
-                        // value match
-                        if( attValMatch )
-                            ++countATT;
-
-                        goto next_LUP_Attr;
-                    } // if attribute name match
-
-                    //  Advance to the next S57obj attribute
-                    currATT += 6;
-                    ++attIdx;
-
-                } //while
-            } //if
-
-next_LUP_Attr:
-
-            currATT = pObj->att_array; // restart the object attribute list
-            attIdx = 0;
-        } // for iLUPAtt
-
-        //      Create a "match score", defined as fraction of candidate LUP attributes
-        //      actually matched by feature.
-        //      Used later for resolving "ties"
-
-        int nattr_matching_on_candidate = countATT;
-        int nattrs_on_candidate = LUPCandidate->ATTArray.size();
-        double candidate_score = ( 1. * nattr_matching_on_candidate )
-        / ( 1. * nattrs_on_candidate );
-
-        //       According to S52 specs, match must be perfect,
-        //         and the first 100% match is selected
-        if( candidate_score == 1.0 ) {
-            LUP = LUPCandidate;
-            bmatch_found = true;
-            break; // selects the first 100% match
-        }
-
-    } //for loop
 
 
 check_LUP:
@@ -520,42 +455,42 @@ void S52References::readLineStyles(QXmlStreamReader* xml) {
 
   while (!xml->atEnd()) {
     switch (xml->readNext()) {
-    case QXmlStreamReader::StartElement:
-      if (xml->name() == "line-style") {
+    case QXmlStreamReader::StartElement: {
+      QStringRef name = xml->name();
+      auto attrs = xml->attributes();
+
+      if (name == "line-style") {
         ls = LineStyle();
-        ls.rcid = xml->attributes().value("RCID").toInt();
+        ls.rcid = attrs.value("RCID").toInt();
         break;
       }
 
-      if (xml->name() == "name")
+      if (name == "name")
         ls.name = xml->readElementText();
 
-      if (xml->name() == "description")
+      if (name == "description")
         ls.description = xml->readElementText();
 
-      if (xml->name() == "color-ref")
+      if (name == "color-ref")
         ls.color_ref = xml->readElementText();
 
-      if (xml->name() == "vector")
-        ls.vector.size = QVector2D(xml->attributes().value("width").toInt()
-                          , xml->attributes().value("height").toInt());
+      if (name == "vector")
+        ls.vector.size = QVector2D(attrs.value("width").toInt(), attrs.value("height").toInt());
 
-      if (xml->name() == "distance")
-        ls.vector.distance = QVector2D(xml->attributes().value("min").toInt()
-                              , xml->attributes().value("max").toInt());
+      if (name == "distance")
+        ls.vector.distance = QVector2D(attrs.value("min").toInt(), attrs.value("max").toInt());
 
-      if (xml->name() == "pivot")
-        ls.vector.pivot = QVector2D(xml->attributes().value("x").toInt()
-                           , xml->attributes().value("y").toInt());
+      if (name == "pivot")
+        ls.vector.pivot = QVector2D(attrs.value("x").toInt(), attrs.value("y").toInt());
 
-      if (xml->name() == "origin")
-        ls.vector.origin = QVector2D(xml->attributes().value("x").toInt()
-                            , xml->attributes().value("y").toInt());
+      if (name == "origin")
+        ls.vector.origin = QVector2D(attrs.value("x").toInt(), attrs.value("y").toInt());
 
-      if (xml->name() == "HPGL")
+      if (name == "HPGL")
         ls.vector.hpgl = xml->readElementText();
 
       break;
+    }
     case QXmlStreamReader::EndElement:
       if (xml->name() == "line-style")
         line_styles.insert(ls.rcid, ls);
@@ -575,51 +510,51 @@ void S52References::readPatterns(QXmlStreamReader* xml) {
 
   while (!xml->atEnd()) {
     switch (xml->readNext()) {
-    case QXmlStreamReader::StartElement:
-      if (xml->name() == "pattern") {
+    case QXmlStreamReader::StartElement: {
+      QStringRef name = xml->name();
+      auto attrs = xml->attributes();
+
+      if (name == "pattern") {
         pn = Pattern();
-        pn.rcid = xml->attributes().value("RCID").toInt();
+        pn.rcid = attrs.value("RCID").toInt();
         break;
       }
 
-      if (xml->name() == "name")
+      if (name == "name")
         pn.name = xml->readElementText();
 
-      if (xml->name() == "definition")
+      if (name == "definition")
         pn.definition = xml->readElementText();
 
-      if (xml->name() == "filltype")
+      if (name == "filltype")
         pn.filltype = xml->readElementText();
 
-      if (xml->name() == "spacing")
+      if (name == "spacing")
         pn.spacing = xml->readElementText();
 
-      if (xml->name() == "description")
+      if (name == "description")
         pn.description = xml->readElementText();
 
-      if (xml->name() == "color-ref")
+      if (name == "color-ref")
         pn.color_ref = xml->readElementText();
 
-      if (xml->name() == "vector")
-        pn.vector.size = QVector2D(xml->attributes().value("width").toInt()
-                          , xml->attributes().value("height").toInt());
+      if (name == "vector")
+        pn.vector.size = QVector2D(attrs.value("width").toInt(), attrs.value("height").toInt());
 
-      if (xml->name() == "distance")
-        pn.vector.distance = QVector2D(xml->attributes().value("min").toInt()
-                              , xml->attributes().value("max").toInt());
+      if (name == "distance")
+        pn.vector.distance = QVector2D(attrs.value("min").toInt(), attrs.value("max").toInt());
 
-      if (xml->name() == "pivot")
-        pn.vector.pivot = QVector2D(xml->attributes().value("x").toInt()
-                           , xml->attributes().value("y").toInt());
+      if (name == "pivot")
+        pn.vector.pivot = QVector2D(attrs.value("x").toInt(), attrs.value("y").toInt());
 
-      if (xml->name() == "origin")
-        pn.vector.origin = QVector2D(xml->attributes().value("x").toInt()
-                            , xml->attributes().value("y").toInt());
+      if (name == "origin")
+        pn.vector.origin = QVector2D(attrs.value("x").toInt(), attrs.value("y").toInt());
 
-      if (xml->name() == "HPGL")
+      if (name == "HPGL")
         pn.vector.hpgl = xml->readElementText();
 
       break;
+    }
     case QXmlStreamReader::EndElement:
       if (xml->name() == "pattern")
         patterns.insert(pn.rcid, pn);
@@ -646,7 +581,7 @@ void S52References::readSymbols(QXmlStreamReader* xml) {
 
       if (name == "symbol") {
         sb = Symbol();
-        sb.rcid = xml->attributes().value("RCID").toInt();break;
+        sb.rcid = attrs.value("RCID").toInt();break;
       }
 
       if (name == "name")
@@ -688,7 +623,7 @@ void S52References::readSymbols(QXmlStreamReader* xml) {
 
       if (name == "origin") {
         if (vector_part_flag)
-          sb.vector.origin = QVector2D( attrs.value("x").toInt(), attrs.value("y").toInt());
+          sb.vector.origin = QVector2D(attrs.value("x").toInt(), attrs.value("y").toInt());
         else
           sb.bitmap.origin = QPoint(attrs.value("x").toInt(), attrs.value("y").toInt());
       }

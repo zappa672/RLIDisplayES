@@ -3,8 +3,6 @@
 
 #include <vector>
 
-#include <ogr_feature.h>
-
 #include <QObject>
 #include <QMap>
 #include <QList>
@@ -200,7 +198,7 @@ public:
   S52References(QString filename);
   ~S52References(void);
 
-  LookUp* findBestLookUp(const QString& name, OGRFeature* obj, LookUpTable tbl, bool bStrict);
+  LookUp* findBestLookUp(const QString& name, const QMap<QString, QVariant>& objAttrs, LookUpTable tbl);
 
   inline QString getGraphicsFileName(const QString& scheme) const {return colTbls[scheme]->graphics_file;}
 

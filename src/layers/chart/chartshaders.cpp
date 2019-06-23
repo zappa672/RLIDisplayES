@@ -19,41 +19,6 @@ ChartShaders::~ChartShaders() {
 
 
 
-
-GLuint ChartShaders::getAreaUniformLoc(unsigned int index) {
-  return (index < AREA_UNIFORMS_COUNT) ? area_unif_locs[index] : 0;
-}
-
-GLuint ChartShaders::getAreaAttributeLoc(unsigned int index) {
-  return (index < AREA_ATTRIBUTES_COUNT) ? area_attr_locs[index]: 0;
-}
-
-GLuint ChartShaders::getLineUniformLoc(unsigned int index) {
-  return (index < LINE_UNIFORMS_COUNT) ? line_unif_locs[index] : 0;
-}
-
-GLuint ChartShaders::getLineAttributeLoc(unsigned int index) {
-  return (index < LINE_ATTRIBUTES_COUNT) ? line_attr_locs[index]: 0;
-}
-
-GLuint ChartShaders::getTextUniformLoc(unsigned int index) {
-  return (index < TEXT_UNIFORMS_COUNT) ? text_unif_locs[index] : 0;
-}
-
-GLuint ChartShaders::getTextAttributeLoc(unsigned int index) {
-  return (index < TEXT_ATTRIBUTES_COUNT) ? text_attr_locs[index] : 0;
-}
-
-GLuint ChartShaders::getMarkUniformLoc(unsigned int index) {
-  return (index < MARK_UNIFORMS_COUNT) ? mark_unif_locs[index] : 0;
-}
-
-GLuint ChartShaders::getMarkAttributeLoc(unsigned int index) {
-  return (index < MARK_ATTRIBUTES_COUNT) ? mark_attr_locs[index] : 0;
-}
-
-
-
 void ChartShaders::initChartAreaProgram() {
   chart_area_program = new QOpenGLShaderProgram();
 
