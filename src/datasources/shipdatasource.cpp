@@ -3,7 +3,7 @@
 #include <cmath>
 
 ShipDataSource::ShipDataSource(QObject *parent) : QObject(parent) {
-  _ship_state.position = GeoPos(15.123 + 0.25, 145.66);
+  _ship_state.position = GeoPos(13.23 + 0.25, 144.38 + 0.25);
   _ship_state.course = 90;
   _ship_state.course = 0;
 }
@@ -13,6 +13,8 @@ ShipDataSource::~ShipDataSource() {
 }
 
 void ShipDataSource::timerEvent(QTimerEvent* e) {
+  return;
+
   Q_UNUSED(e);
 
   QDateTime now = QDateTime::currentDateTime();

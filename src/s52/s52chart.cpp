@@ -201,12 +201,16 @@ QMap<QString, QVariant> S52Chart::getOGRFeatureAttributes(OGRFeature* obj, const
   return featAttrs;
 }
 
+
+extern
+
+
 bool S52Chart::readLayer(OGRLayer* poLayer, S52References* ref) {
   QString layer_name = QString(poLayer->GetName());
-  //qDebug() << "\t\t---------------------------";
-  //qDebug() << "\t\t---------------------------";
-  //qDebug() << "\t\t---------------------------";
-  //qDebug() << "Reading" << layer_name;
+  qDebug() << "\t\t---------------------------";
+  qDebug() << "\t\t---------------------------";
+  qDebug() << "\t\t---------------------------";
+  qDebug() << "Reading" << layer_name;
 
   OGRFeature* poFeature = nullptr;
 
@@ -245,14 +249,8 @@ bool S52Chart::readLayer(OGRLayer* poLayer, S52References* ref) {
     line_layer->color_ind = -1u;
   }
 
-  if (mark_layers.contains(layer_name))
-    mark_layer = mark_layers[layer_name];
-  else {
-    mark_layer = new S52MarkLayer();
+  mark_layer = mark_layers.value(layer_name, new S52MarkLayer());
 
-    mark_layer->is_uniform = isMarkSymbolUniform(layer_name);
-    mark_layer->symbol_ref = "-";
-  }
 
   while( (poFeature = poLayer->GetNextFeature()) != nullptr ) {
     for (int i = 0; i < poFeature->GetGeomFieldCount(); i++) {
@@ -261,37 +259,76 @@ bool S52Chart::readLayer(OGRLayer* poLayer, S52References* ref) {
 
       LookUpTable tbl = LookUpTable::LUP_TABLE_PAPER_CHART;
 
-      //qDebug() << "\t\t-------------";
-      //qDebug() << "\t\t-------------";
-      //qDebug() << "Reading next feature\n";
+      qDebug() << "\t\t-------------";
+      qDebug() << "\t\t-------------";
+      qDebug() << "Reading next feature\n";
 
       switch (geom_type) {
         case wkbLineString:
           tbl = LookUpTable::LUP_TABLE_LINES;
-          //qDebug() << "wkbLineString";
+          qDebug() << "wkbLineString";
           break;
         case wkbPoint:
           tbl = LookUpTable::LUP_TABLE_PAPER_CHART; // Can be set to SIMPLIFIED
-          //qDebug() << "wkbPoint";
+          qDebug() << "wkbPoint";
           break;
         case wkbPolygon:
           tbl = LookUpTable::LUP_TABLE_PLAIN_BOUNDARIES; // Can be set to SYMBOLYZED_BOUNDARIES
-          //qDebug() << "wkbPolygon";
+          qDebug() << "wkbPolygon";
           break;
         default:
           break;
       }
 
       auto featAttrs = getOGRFeatureAttributes(poFeature, fields);
-      //qDebug() << featAttrs;
+      qDebug() << featAttrs;
 
-      LookUp* lp = ref->findBestLookUp(layer_name, featAttrs, tbl);
-      /*
-      if (lp == nullptr)
-        qDebug() << "not found";
-      else
-        qDebug() << lp->RCID << lp->OBCL;
-      */
+      LookUp lp = ref->findBestLookUp(layer_name, featAttrs, tbl);
+      if (lp.RCID == -1)
+        continue;
+
+      for (auto instr: lp.INST) {
+        RastRuleType type = RAST_RULE_TYPE_MAP.value(instr.left(2), RastRuleType::RUL_NONE);
+
+        switch (type) {
+          case RastRuleType::RUL_SYM_PT:  //SY, Simple point symbol
+            if (geom_type == wkbPoint) {
+              OGRPoint* p = static_cast<OGRPoint*>(geom);
+              mark_layer->symbol_refs.push_back(instr.split("(")[1].split(")")[0]);
+              mark_layer->points.push_back(static_cast<float>(p->getY()));
+              mark_layer->points.push_back(static_cast<float>(p->getX()));
+            }
+
+            break;
+          case RastRuleType::RUL_CND_SY:  //CS, Conditional point symbol
+
+            break;
+          // Simple line
+          case RastRuleType::RUL_SIM_LN:  //LS
+            break;
+          // Conditional line
+          case RastRuleType::RUL_COM_LN:  //LC
+            break;
+          // Simple spatial area
+          case RastRuleType::RUL_ARE_CO:  //AC
+            break;
+          // Conditional spatial area
+          case RastRuleType::RUL_ARE_PA:  //AP
+            break;
+          // SHOWTEXT
+          case RastRuleType::RUL_TXT_TX:  //TX
+          case RastRuleType::RUL_TXT_TE:  //TE
+          case RastRuleType::RUL_NONE:
+          case RastRuleType::RUL_MUL_SG:  //MP, Special Case for MultPoint Soundings
+          case RastRuleType::RUL_ARC_2C:  //CA, Special Case for Circular Arc,  (opencpn private)
+            break;
+        }
+      }
+
+
+
+      //std::vector<RastRules> *ruleList; // rasterization rule list
+
 
 
       if (geom_type == wkbPolygon) {
@@ -317,13 +354,14 @@ bool S52Chart::readLayer(OGRLayer* poLayer, S52References* ref) {
         if (!readOGRLine(static_cast<OGRLineString*>(geom), line_layer->points, line_layer->distances))
           return false;
       }
-
+      /*
       if (geom_type == wkbPoint) {
         fillMarkParams(mark_layer, lp);
         OGRPoint* p = static_cast<OGRPoint*>(geom);
         mark_layer->points.push_back(static_cast<float>(p->getY()));
         mark_layer->points.push_back(static_cast<float>(p->getX()));
       }
+      */
     }
 
     OGRFeature::DestroyFeature( poFeature );
@@ -365,12 +403,6 @@ void S52Chart::fillAreaParams(QString& layer_name, S52AreaLayer* layer, OGRFeatu
     layer->color_inds.push_back(_ref->getColorIndex(getAreaColorRef(layer_name, poFeature)));
 }
 
-void S52Chart::fillMarkParams(S52MarkLayer* layer, LookUp* lp) {
-  if (layer->is_uniform)
-    layer->symbol_ref = getMarkSymbolRef(lp);
-  else
-    layer->symbol_refs.push_back(getMarkSymbolRef(lp));
-}
 
 // !!!!
 // TODO: add hole support
@@ -673,14 +705,6 @@ QString S52Chart::getLinePatternRef(QString& layer_name, OGRFeature* poFeature) 
 
   //Default
   return "SOLID";
-}
-
-QString S52Chart::getMarkSymbolRef(LookUp* lp) {
-  for (QString instr: lp->INST)
-    if (instr.startsWith("SY"))
-      return instr.mid(3, 8);
-
-  return "QUESMRK1";
 }
 
 bool S52Chart::isAreaColorUniform(QString& layer_name) {

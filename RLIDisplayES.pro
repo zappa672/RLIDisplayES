@@ -41,7 +41,7 @@ SOURCES     += \
     src/common/rlilayout.cpp \
     src/common/rlistate.cpp \
     src/common/radarscale.cpp \
-    \    
+    \
     src/datasources/radardatasource.cpp \
     src/datasources/shipdatasource.cpp \
     src/datasources/targetdatasource.cpp \
@@ -50,6 +50,7 @@ SOURCES     += \
     src/s52/s52chart.cpp \
     src/s52/s52assets.cpp \
     src/s52/s52references.cpp \
+    src/s52/s52condsymb.cpp \
     \
     src/layers/info/infofonts.cpp \
     src/layers/info/infoengine.cpp \

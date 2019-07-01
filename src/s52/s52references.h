@@ -111,6 +111,41 @@ static const QMap<QString, ChartDisplayCat> CHART_DISPLAY_CAT_MAP
 
 
 
+#define MASK_POINT      1
+#define MASK_LINE       2
+#define MASK_AREA       4
+#define MASK_MPS        8
+#define MASK_ALL        MASK_POINT + MASK_LINE + MASK_AREA + MASK_MPS
+
+// Rasterization rule types
+enum class RastRuleType {
+  RUL_NONE     // no rule type (init)
+, RUL_TXT_TX   // TX
+, RUL_TXT_TE   // TE
+, RUL_SYM_PT   // SY
+, RUL_SIM_LN   // LS
+, RUL_COM_LN   // LC
+, RUL_ARE_CO   // AC
+, RUL_ARE_PA   // AP
+, RUL_CND_SY   // CS
+, RUL_MUL_SG   // Multipoint Sounding
+, RUL_ARC_2C   // Circular Arc, used for sector lights, opencpn private
+};
+
+static const QMap<QString, RastRuleType> RAST_RULE_TYPE_MAP
+{ { "CA" , RastRuleType::RUL_ARC_2C }
+, { "MP" , RastRuleType::RUL_MUL_SG }
+, { "TX" , RastRuleType::RUL_TXT_TX }
+, { "TE" , RastRuleType::RUL_TXT_TE }
+, { "SY" , RastRuleType::RUL_SYM_PT }
+, { "LS" , RastRuleType::RUL_SIM_LN }
+, { "LC" , RastRuleType::RUL_COM_LN }
+, { "AC" , RastRuleType::RUL_ARE_CO }
+, { "AP" , RastRuleType::RUL_ARE_PA }
+, { "CS" , RastRuleType::RUL_CND_SY } };
+
+
+
 
 struct ColorTable {
   QString name;
@@ -119,16 +154,10 @@ struct ColorTable {
   std::vector<float> table;
 };
 
-/*
-class LUPrec{
-public:
-   Rules          *ruleList;        // rasterization rule list
-};*/
-
 
 struct LookUp {
   int        nSequence;   // A sequence number, indicating order of encounter in the PLIB file
-  int             RCID;   // record identifier
+  int             RCID = -1;   // record identifier
 
   QStringList     INST;   // Instruction Field (rules)
   QStringList     ALST;   // Array of LUP Attributes
@@ -144,10 +173,10 @@ struct LookUp {
 };
 
 struct VectorSymbol {
-  QVector2D size;
+  QSize size;
   QVector2D distance;
-  QVector2D pivot;
-  QVector2D origin;
+  QPoint pivot;
+  QPoint origin;
   QString hpgl;
 };
 
@@ -174,19 +203,19 @@ struct Pattern {
 };
 
 struct BitmapSymbol {
-  QSize     size { 0, 0 };
-  QVector2D distance { 0, 0 };
-  QPoint    pivot { 0, 0 };
-  QPoint    origin { 0, 0 };
+  QSize     size      { 0, 0 };
+  QVector2D distance  { 0, 0 };
+  QPoint    pivot     { 0, 0 };
+  QPoint    origin    { 0, 0 };
   QPoint    graphics_location { 0, 0 };
 };
 
 struct Symbol {
-  int rcid { 0 };
-  QString name {};
+  int rcid            { 0 };
+  QString name        {};
   QString description {};
-  QString definition {};
-  QString color_ref {};
+  QString definition  {};
+  QString color_ref   {};
 
   VectorSymbol vector {};
   BitmapSymbol bitmap {};
@@ -198,20 +227,20 @@ public:
   S52References(QString filename);
   ~S52References(void);
 
-  LookUp* findBestLookUp(const QString& name, const QMap<QString, QVariant>& objAttrs, LookUpTable tbl);
+  LookUp findBestLookUp(const QString& name, const QMap<QString, QVariant>& objAttrs, LookUpTable tbl);
 
-  inline QString getGraphicsFileName(const QString& scheme) const {return colTbls[scheme]->graphics_file;}
+  inline QString getGraphicsFileName(const QString& scheme) const {return _colTbls[scheme]->graphics_file;}
 
   void setColorScheme(const QString& name);
-  QColor getColor(const QString& color_ref) const { return colTbls[_color_scheme]->colors.value(color_ref, QColor(255, 255, 255, 0)); }
+  QColor getColor(const QString& color_ref) const { return _colTbls[_colorScheme]->colors.value(color_ref, QColor(255, 255, 255, 0)); }
 
-  inline QStringList  getColorSchemeNames() const { return QStringList(colTbls.keys()); }
-  inline QString      getColorScheme     () const { return _color_scheme; }
+  inline QStringList  getColorSchemeNames() const { return QStringList(_colTbls.keys()); }
+  inline QString      getColorScheme     () const { return _colorScheme; }
 
-  inline uint               getColorIndex    (const QString& ref)     const { return color_indices.value(ref, -1u); }
-  inline int                getColorsCount   ()                       const { return color_indices.size(); }
-  inline ColorTable*        getColorTable    (const QString& scheme)  const { return colTbls[scheme]; }
-  inline std::vector<float> getCurrColorTable()                       const { return colTbls[_color_scheme]->table; }
+  inline uint               getColorIndex    (const QString& ref)     const { return _colorIndices.value(ref, -1u); }
+  inline int                getColorsCount   ()                       const { return _colorIndices.size(); }
+  inline ColorTable*        getColorTable    (const QString& scheme)  const { return _colTbls[scheme]; }
+  inline std::vector<float> getCurrColorTable()                       const { return _colTbls[_colorScheme]->table; }
 
   inline const QPoint  getSymbolIndex(const QString& ref) const { return symbols.value(ref, Symbol()).bitmap.graphics_location; }
   inline const QSize   getSymbolSize (const QString& ref) const { return symbols.value(ref, Symbol()).bitmap.size; }
@@ -227,12 +256,12 @@ private:
   void readPatterns   (QXmlStreamReader* xml);
   void readSymbols    (QXmlStreamReader* xml);
 
-  QString _color_scheme;
+  QString _colorScheme;
 
-  QMap<QString, uint> color_indices;
-  QMap<QString, ColorTable*> colTbls;
+  QMap<QString, uint> _colorIndices;
+  QMap<QString, ColorTable*> _colTbls;
 
-  QMap<LookUpTable, QMap<QString, QVector<LookUp*>>> lookups;
+  QMap<LookUpTable, QMap<QString, QVector<LookUp>>> lookups;
 
   QMap<int, LineStyle>  line_styles;
   QMap<int, Pattern>    patterns;

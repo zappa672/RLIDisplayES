@@ -626,9 +626,10 @@ void RLIDisplayWidget::keyPressEvent(QKeyEvent* event) {
   // Выбор цели
   case Qt::Key_Up:
     if (mod_keys & Qt::ControlModifier) {
-      if (_state.magn_min_rad + _state.magn_height < 800) {
+      _state.ship_position.lat += 0.010;
+      /*if (_state.magn_min_rad + _state.magn_height < 800) {
         _state.magn_min_rad += 1;
-      }
+      }*/
     } else {
       _state.vd += 1.0;
       _infoEngine->onVdChanged(_state);
@@ -638,9 +639,10 @@ void RLIDisplayWidget::keyPressEvent(QKeyEvent* event) {
   // ЛИД / ЛОД
   case Qt::Key_Down:
     if (mod_keys & Qt::ControlModifier) {
-      if (_state.magn_min_rad > 0) {
+      _state.ship_position.lat -= 0.010;
+      /*if (_state.magn_min_rad > 0) {
         _state.magn_min_rad -= 1;
-      }
+      }*/
     } else {
       _state.vd = qMax(0.0, _state.vd - 1.0);
       _infoEngine->onVdChanged(_state);
@@ -649,7 +651,8 @@ void RLIDisplayWidget::keyPressEvent(QKeyEvent* event) {
 
   case Qt::Key_Left:
     if (mod_keys & Qt::ControlModifier) {
-    _state.magn_min_peleng = (4096 + _state.magn_min_peleng - 1) % 4096;
+      _state.ship_position.lon -= 0.005;
+      //_state.magn_min_peleng = (4096 + _state.magn_min_peleng - 1) % 4096;
     } else if (mod_keys & Qt::AltModifier) {
       _state.vn_cu = fmod(_state.vn_cu - 1.0, 360.0);
     } else if (mod_keys & Qt::ShiftModifier) {
@@ -662,7 +665,8 @@ void RLIDisplayWidget::keyPressEvent(QKeyEvent* event) {
 
   case Qt::Key_Right:
     if (mod_keys & Qt::ControlModifier) {
-      _state.magn_min_peleng = (4096 + _state.magn_min_peleng + 1) % 4096;
+      _state.ship_position.lon += 0.005;
+      //_state.magn_min_peleng = (4096 + _state.magn_min_peleng + 1) % 4096;
     } else if (mod_keys & Qt::AltModifier) {
       _state.vn_cu = fmod(_state.vn_cu + 1.0, 360.0);
     } else if (mod_keys & Qt::ShiftModifier) {

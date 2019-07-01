@@ -44,15 +44,9 @@ void ChartMarkEngine::setData(S52MarkLayer* layer, S52References* ref, int displ
   QPointF tex_coord;
 
   for (unsigned int i = 0; i < (layer->points.size() / 2); i++) {
-    if (layer->is_uniform) {
-      orig = ref->getSymbolIndex(layer->symbol_ref);
-      size = ref->getSymbolSize(layer->symbol_ref);
-      pivt = ref->getSymbolPivot(layer->symbol_ref);
-    } else {
-      orig = ref->getSymbolIndex(layer->symbol_refs[i]);
-      size = ref->getSymbolSize(layer->symbol_refs[i]);
-      pivt = ref->getSymbolPivot(layer->symbol_refs[i]);
-    }
+    orig = ref->getSymbolIndex(layer->symbol_refs[i]);
+    size = ref->getSymbolSize(layer->symbol_refs[i]);
+    pivt = ref->getSymbolPivot(layer->symbol_refs[i]);
 
     for (int k = 0; k < 4; k++) {
       world_coords.push_back(layer->points[2*i+0]);

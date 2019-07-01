@@ -58,8 +58,6 @@ struct S52LineLayer {
 };
 
 struct S52MarkLayer {
-  bool is_uniform;
-  QString symbol_ref;
   // layer i-th point s52 symbol name
   std::vector<QString> symbol_refs;
   // sequence of point coords (lat, lon)
@@ -133,15 +131,12 @@ private:
 
   void fillLineParams(QString& layer_name, S52LineLayer* layer, OGRFeature* poFeature);
   void fillAreaParams(QString& layer_name, S52AreaLayer* layer, OGRFeature* poFeature);
-  void fillMarkParams(S52MarkLayer* layer, LookUp* lp);
 
   QString getAreaColorRef(QString& layer_name, OGRFeature* poFeature);
   QString getAreaPatternRef(QString& layer_name, OGRFeature* poFeature);
 
   QString getLineColorRef(QString& layer_name, OGRFeature* poFeature);
   QString getLinePatternRef(QString& layer_name, OGRFeature* poFeature);
-
-  QString getMarkSymbolRef(LookUp* lp);
 
   bool isAreaColorUniform(QString& layer_name);
   bool isAreaPatternUniform(QString& layer_name);
