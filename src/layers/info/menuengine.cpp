@@ -3,13 +3,13 @@
 
 #include <QColor>
 
-const QColor MENU_LOCKED_ITEM_COLOR   (0xB4, 0xB4, 0xB4);
-const QColor MENU_DISABLED_ITEM_COLOR (0xFC, 0x54, 0x54);
-const QColor MENU_TEXT_STATIC_COLOR   (0x00, 0xFC, 0xFC);
-const QColor MENU_TEXT_DYNAMIC_COLOR  (0xFC, 0xFC, 0x54);
+static const QColor MENU_LOCKED_ITEM_COLOR   (0xB4, 0xB4, 0xB4);
+static const QColor MENU_DISABLED_ITEM_COLOR (0xFC, 0x54, 0x54);
+static const QColor MENU_TEXT_STATIC_COLOR   (0x00, 0xFC, 0xFC);
+static const QColor MENU_TEXT_DYNAMIC_COLOR  (0xFC, 0xFC, 0x54);
 
-const QColor MENU_BORDER_COLOR        (0x40, 0xFC, 0x00);
-const QColor MENU_BACKGRD_COLOR       (0x00, 0x00, 0x00);
+static const QColor MENU_BORDER_COLOR        (0x40, 0xFC, 0x00);
+static const QColor MENU_BACKGRD_COLOR       (0x00, 0x00, 0x00);
 
 
 MenuEngine::MenuEngine(const RLIMenuLayout& layout, QOpenGLContext* context, QObject* parent)
@@ -450,18 +450,18 @@ MenuEngine::~MenuEngine() {
 
 void MenuEngine::onStateChanged(RLIWidgetState state) {
   switch (state) {
-  case RLIWidgetState::RLISTATE_MAIN_MENU:
+  case RLIWidgetState::MAIN_MENU:
       _menu = _main_menu;
       break;
-  case RLIWidgetState::RLISTATE_CONFIG_MENU:
+  case RLIWidgetState::CONFIG_MENU:
       _menu = _cnfg_menu;
       break;
-  case RLIWidgetState::RLISTATE_DEFAULT:
-  case RLIWidgetState::RLISTATE_MAGNIFIER:
+  case RLIWidgetState::DEFAULT:
+  case RLIWidgetState::MAGNIFIER:
       _selection_active = false;
       _menu = nullptr;
       break;
-  case RLIWidgetState::RLISTATE_ROUTE_EDITION:
+  case RLIWidgetState::ROUTE_EDITION:
   default:
       break;
   }

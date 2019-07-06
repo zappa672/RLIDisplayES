@@ -111,7 +111,7 @@ void MaskEngine::update(const RLIState& rli_state, const RLICircleLayout& layout
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, tex_id);
 
-  if (rli_state.orientation == RLIOrientation::RLIORIENT_NORTH) {
+  if (rli_state.orientation == RLIOrientation::NORTH) {
     bindBuffers(vbo_ids_text[0]);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ind_vbo_id_text[0]);
     glDrawElements(GL_TRIANGLES, 3*(_text_point_count[0]/2), GL_UNSIGNED_INT, reinterpret_cast<const GLvoid*>(0 * sizeof(GLuint)));

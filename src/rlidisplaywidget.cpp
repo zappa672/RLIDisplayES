@@ -346,7 +346,7 @@ void RLIDisplayWidget::paintLayers() {
   QPoint topLeft = layout->circle.bounding_rect.topLeft();
 
 
-  if (_state.orientation == RLIOrientation::RLIORIENT_NORTH)
+  if (_state.orientation == RLIOrientation::NORTH)
     drawRect(QRect(topLeft, _chartEngine->size()), _chartEngine->textureId());
 
   //drawRect(QRect(topLeft, _radarEngine->size()), _radarEngine->textureId());
@@ -377,7 +377,7 @@ void RLIDisplayWidget::paintLayers() {
 
   drawRect(_menuEngine->geometry(), _menuEngine->texture());
 
-  if (_state.state == RLIWidgetState::RLISTATE_MAGNIFIER)
+  if (_state.state == RLIWidgetState::MAGNIFIER)
     drawRect(_magnEngine->geometry(), _magnEngine->texture());
 
   //QOpenGLTexture* tex = _mode_textures[static_cast<const char>(_state.mode)];
@@ -397,7 +397,7 @@ void RLIDisplayWidget::updateLayers() {
   _menuEngine->update();
   _maskEngine->update(_state, _layout_manager.layout()->circle, false);
 
-  if (_state.state == RLIWidgetState::RLISTATE_MAGNIFIER)
+  if (_state.state == RLIWidgetState::MAGNIFIER)
     _magnEngine->update(_state);
 }
 
@@ -467,7 +467,7 @@ void RLIDisplayWidget::mouseMoveEvent(QMouseEvent* event) {
 
   double bearing = RLIMath::degs(qAtan2(static_cast<double>(diffV.x()), static_cast<double>(-diffV.y())));
 
-  if (bearing < 0 && _state.orientation == RLIOrientation::RLIORIENT_NORTH)
+  if (bearing < 0 && _state.orientation == RLIOrientation::NORTH)
     bearing = 360 + bearing;
 
   _infoEngine->onCursorPosChanged( static_cast<double>(diffV.length()), bearing );
@@ -508,11 +508,11 @@ void RLIDisplayWidget::onRouteEditionStarted() {
   _routeEngine->clearCurrentRoute();
   _routeEngine->addPointToCurrent(_state.ship_position);
   _state.visir_center_pos = _state.ship_position;
-  _state.state = RLIWidgetState::RLISTATE_ROUTE_EDITION;
+  _state.state = RLIWidgetState::ROUTE_EDITION;
 }
 
 void RLIDisplayWidget::onRouteEditionFinished() {
-  _state.state = RLIWidgetState::RLISTATE_MAIN_MENU;
+  _state.state = RLIWidgetState::MAIN_MENU;
 }
 
 
@@ -526,9 +526,9 @@ void RLIDisplayWidget::keyPressEvent(QKeyEvent* event) {
   pressedKeys.insert(event->key());
   auto mod_keys = event->modifiers();
 
-  if (   _state.state == RLIWidgetState::RLISTATE_MAIN_MENU
-      || _state.state == RLIWidgetState::RLISTATE_CONFIG_MENU
-      || _state.state == RLIWidgetState::RLISTATE_ROUTE_EDITION )
+  if (   _state.state == RLIWidgetState::MAIN_MENU
+      || _state.state == RLIWidgetState::CONFIG_MENU
+      || _state.state == RLIWidgetState::ROUTE_EDITION )
     _menuEngine->onKeyPressed(event);
 
   switch(event->key()) {
@@ -563,16 +563,16 @@ void RLIDisplayWidget::keyPressEvent(QKeyEvent* event) {
   // Меню
   case Qt::Key_W:
     if(pressedKeys.contains(Qt::Key_B)) {
-      if (_state.state == RLIWidgetState::RLISTATE_CONFIG_MENU)
-        _state.state = RLIWidgetState::RLISTATE_DEFAULT;
-      else if (_state.state == RLIWidgetState::RLISTATE_DEFAULT)
-        _state.state = RLIWidgetState::RLISTATE_CONFIG_MENU;
+      if (_state.state == RLIWidgetState::CONFIG_MENU)
+        _state.state = RLIWidgetState::DEFAULT;
+      else if (_state.state == RLIWidgetState::DEFAULT)
+        _state.state = RLIWidgetState::CONFIG_MENU;
 
     } else {
-      if (_state.state == RLIWidgetState::RLISTATE_MAIN_MENU)
-        _state.state = RLIWidgetState::RLISTATE_DEFAULT;
-      else if (_state.state == RLIWidgetState::RLISTATE_DEFAULT)
-        _state.state = RLIWidgetState::RLISTATE_MAIN_MENU;
+      if (_state.state == RLIWidgetState::MAIN_MENU)
+        _state.state = RLIWidgetState::DEFAULT;
+      else if (_state.state == RLIWidgetState::DEFAULT)
+        _state.state = RLIWidgetState::MAIN_MENU;
     }
 
     _menuEngine->onStateChanged(_state.state);
@@ -580,7 +580,7 @@ void RLIDisplayWidget::keyPressEvent(QKeyEvent* event) {
 
   // Шкала +
   case Qt::Key_Plus:
-    if (_state.state == RLIWidgetState::RLISTATE_ROUTE_EDITION) {
+    if (_state.state == RLIWidgetState::ROUTE_EDITION) {
       QPointF pos = QPointF( sin(RLIMath::rads(_state.vn_p)) * _state.vd
                            ,-cos(RLIMath::rads(_state.vn_p)) * _state.vd );
       //float scale = (_rli_scale.len*RLIMath::MILE2METER) / _maskEngine->getRadius();
@@ -599,7 +599,7 @@ void RLIDisplayWidget::keyPressEvent(QKeyEvent* event) {
 
   // Шкала -
   case Qt::Key_Minus:
-    if (_state.state == RLIWidgetState::RLISTATE_ROUTE_EDITION) {
+    if (_state.state == RLIWidgetState::ROUTE_EDITION) {
       _routeEngine->removePointFromCurrent();
       _state.visir_center_pos = _routeEngine->getLastPoint();
       break;
@@ -693,10 +693,10 @@ void RLIDisplayWidget::keyPressEvent(QKeyEvent* event) {
 
   //Электронная лупа
   case Qt::Key_L:
-    if ( _state.state == RLIWidgetState::RLISTATE_DEFAULT )
-      _state.state = RLIWidgetState::RLISTATE_MAGNIFIER;
-    else if ( _state.state == RLIWidgetState::RLISTATE_MAGNIFIER )
-      _state.state = RLIWidgetState::RLISTATE_DEFAULT;
+    if ( _state.state == RLIWidgetState::DEFAULT )
+      _state.state = RLIWidgetState::MAGNIFIER;
+    else if ( _state.state == RLIWidgetState::MAGNIFIER )
+      _state.state = RLIWidgetState::DEFAULT;
     break;
 
   //Обзор
@@ -722,17 +722,17 @@ void RLIDisplayWidget::keyPressEvent(QKeyEvent* event) {
   //Курс / Север / Курс стаб
   case Qt::Key_H:
     switch(_state.orientation) {
-      case RLIOrientation::RLIORIENT_HEAD:
-        _state.orientation = RLIOrientation::RLIORIENT_NORTH;
-        _state.mode = RLIMode::RLIMODE_X;
+      case RLIOrientation::HEAD:
+        _state.orientation = RLIOrientation::NORTH;
+        _state.mode = RLIMode::X;
         break;
-      case RLIOrientation::RLIORIENT_NORTH:
-        _state.orientation = RLIOrientation::RLIORIENT_COURSE;
-        _state.mode = RLIMode::RLIMODE_S;
+      case RLIOrientation::NORTH:
+        _state.orientation = RLIOrientation::COURSE;
+        _state.mode = RLIMode::S;
         break;
-      case RLIOrientation::RLIORIENT_COURSE:
-        _state.orientation = RLIOrientation::RLIORIENT_HEAD;
-        _state.mode = RLIMode::RLIMODE_T;
+      case RLIOrientation::COURSE:
+        _state.orientation = RLIOrientation::HEAD;
+        _state.mode = RLIMode::T;
         break;
     }
     _infoEngine->onOrientationChanged(_state.orientation);

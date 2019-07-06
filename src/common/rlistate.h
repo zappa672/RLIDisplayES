@@ -7,32 +7,38 @@
 #include "../common/radarscale.h"
 #include "../common/rlimath.h"
 
+enum class RLIDepthUnit {
+  FEET    = 0
+, METER   = 1
+, FATHOM  = 2
+};
+
 enum class RLIWidgetState {
-  RLISTATE_DEFAULT        = 0
-, RLISTATE_MAIN_MENU      = 1
-, RLISTATE_CONFIG_MENU    = 2
-, RLISTATE_MAGNIFIER      = 3
-, RLISTATE_ROUTE_EDITION  = 4
+  DEFAULT        = 0
+, MAIN_MENU      = 1
+, CONFIG_MENU    = 2
+, MAGNIFIER      = 3
+, ROUTE_EDITION  = 4
 };
 
 enum class RLIOrientation {
-  RLIORIENT_HEAD     = 0
-, RLIORIENT_NORTH    = 1
-, RLIORIENT_COURSE   = 2
+  HEAD     = 0
+, NORTH    = 1
+, COURSE   = 2
 };
 
 enum class RLIMode : char {
-  RLIMODE_T   = 'T'
-, RLIMODE_S   = 'S'
-, RLIMODE_X   = 'X'
-, RLIMODE_M   = 'M'
+  T   = 'T'
+, S   = 'S'
+, X   = 'X'
+, M   = 'M'
 } ;
 
 
 struct RLIState {
-  RLIWidgetState state        { RLIWidgetState::RLISTATE_DEFAULT };
-  RLIOrientation orientation  { RLIOrientation::RLIORIENT_NORTH };
-  RLIMode        mode         { RLIMode::RLIMODE_X };
+  RLIWidgetState state        { RLIWidgetState::DEFAULT };
+  RLIOrientation orientation  { RLIOrientation::NORTH };
+  RLIMode        mode         { RLIMode::X };
 
   float gain                { 0.f };
   float water               { 0.f };

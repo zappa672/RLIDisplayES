@@ -2,10 +2,11 @@
 
 #include <QDebug>
 #include <QList>
-#include <ogrsf_frmts.h>
 
 #include "../common/triangulate.h"
 #include "../common/rlimath.h"
+
+#include "s57condsymb.h"
 
 using namespace RLIMath;
 
@@ -67,7 +68,7 @@ S52Chart::S52Chart(char* file_name, S52References* ref) {
     }
 
     poLayer->ResetReading();
-    if (!readLayer(poLayer, ref)) {
+    if (!readLayer(poLayer, ref, poDS)) {
       qDebug() << "Failed reading layer " + layer_name;
       return;
     }
@@ -205,7 +206,7 @@ QMap<QString, QVariant> S52Chart::getOGRFeatureAttributes(OGRFeature* obj, const
 extern
 
 
-bool S52Chart::readLayer(OGRLayer* poLayer, S52References* ref) {
+bool S52Chart::readLayer(OGRLayer* poLayer, S52References* ref, OGRDataSource* ds) {
   QString layer_name = QString(poLayer->GetName());
   qDebug() << "\t\t---------------------------";
   qDebug() << "\t\t---------------------------";
@@ -268,10 +269,13 @@ bool S52Chart::readLayer(OGRLayer* poLayer, S52References* ref) {
           tbl = LookUpTable::LUP_TABLE_LINES;
           qDebug() << "wkbLineString";
           break;
-        case wkbPoint:
+        case wkbPoint: {
           tbl = LookUpTable::LUP_TABLE_PAPER_CHART; // Can be set to SIMPLIFIED
           qDebug() << "wkbPoint";
+          OGRPoint* p = static_cast<OGRPoint*>(geom);
+          qDebug() << p->getX() << p->getY() << p->getZ();
           break;
+        }
         case wkbPolygon:
           tbl = LookUpTable::LUP_TABLE_PLAIN_BOUNDARIES; // Can be set to SYMBOLYZED_BOUNDARIES
           qDebug() << "wkbPolygon";
@@ -287,6 +291,25 @@ bool S52Chart::readLayer(OGRLayer* poLayer, S52References* ref) {
       if (lp.RCID == -1)
         continue;
 
+      qDebug() << "initial INSTR " << lp.INST;
+
+      // Expand cond symb
+      QStringList extraInstr;
+      for (auto instr: lp.INST) {
+        RastRuleType type = RAST_RULE_TYPE_MAP.value(instr.left(2), RastRuleType::RUL_NONE);
+
+        if (type == RastRuleType::RUL_CND_SY) {
+          QString symbName = instr.split("(")[1].split(")")[0];
+          qDebug() << "parseCondSymb";
+          QString exp = expandCondSymb(symbName, poFeature, geom_type, &lp, ds);
+          qDebug() << exp;
+          extraInstr << exp.split(";", QString::SkipEmptyParts);
+        }
+      }
+
+      lp.INST << extraInstr;
+      qDebug() << "final INSTR " << lp.INST;
+
       for (auto instr: lp.INST) {
         RastRuleType type = RAST_RULE_TYPE_MAP.value(instr.left(2), RastRuleType::RUL_NONE);
 
@@ -297,11 +320,8 @@ bool S52Chart::readLayer(OGRLayer* poLayer, S52References* ref) {
               mark_layer->symbol_refs.push_back(instr.split("(")[1].split(")")[0]);
               mark_layer->points.push_back(static_cast<float>(p->getY()));
               mark_layer->points.push_back(static_cast<float>(p->getX()));
+              qDebug() << "add mark" << instr.split("(")[1].split(")")[0] << p->getX() << p->getY();
             }
-
-            break;
-          case RastRuleType::RUL_CND_SY:  //CS, Conditional point symbol
-
             break;
           // Simple line
           case RastRuleType::RUL_SIM_LN:  //LS
@@ -321,6 +341,7 @@ bool S52Chart::readLayer(OGRLayer* poLayer, S52References* ref) {
           case RastRuleType::RUL_NONE:
           case RastRuleType::RUL_MUL_SG:  //MP, Special Case for MultPoint Soundings
           case RastRuleType::RUL_ARC_2C:  //CA, Special Case for Circular Arc,  (opencpn private)
+          case RastRuleType::RUL_CND_SY: //CS, Conditional point symbol
             break;
         }
       }
@@ -354,14 +375,6 @@ bool S52Chart::readLayer(OGRLayer* poLayer, S52References* ref) {
         if (!readOGRLine(static_cast<OGRLineString*>(geom), line_layer->points, line_layer->distances))
           return false;
       }
-      /*
-      if (geom_type == wkbPoint) {
-        fillMarkParams(mark_layer, lp);
-        OGRPoint* p = static_cast<OGRPoint*>(geom);
-        mark_layer->points.push_back(static_cast<float>(p->getY()));
-        mark_layer->points.push_back(static_cast<float>(p->getX()));
-      }
-      */
     }
 
     OGRFeature::DestroyFeature( poFeature );

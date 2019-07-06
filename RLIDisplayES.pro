@@ -50,7 +50,7 @@ SOURCES     += \
     src/s52/s52chart.cpp \
     src/s52/s52assets.cpp \
     src/s52/s52references.cpp \
-    src/s52/s52condsymb.cpp \
+    src/s52/s57condsymb.cpp \
     \
     src/layers/info/infofonts.cpp \
     src/layers/info/infoengine.cpp \
@@ -60,7 +60,7 @@ SOURCES     += \
     src/layers/chart/chartsettingsmodel.cpp \
     src/layers/chart/chartengine.cpp \
     src/layers/chart/chartshaders.cpp \
-    src/layers/maskengine.cpp \        
+    src/layers/maskengine.cpp \
     src/layers/routeengine.cpp \
     src/layers/targetengine.cpp \    
     src/layers/controlsengine.cpp \
@@ -86,7 +86,7 @@ HEADERS     += \
     src/common/rlistringnames.h \
     src/common/rlistate.h \
     src/common/radarscale.h \
-    \    
+    \
     src/datasources/radardatasource.h \
     src/datasources/targetdatasource.h \
     src/datasources/shipdatasource.h \
@@ -95,6 +95,7 @@ HEADERS     += \
     src/s52/s52chart.h \
     src/s52/s52assets.h \
     src/s52/s52references.h \
+    src/s52/s57condsymb.h \
     \
     src/layers/info/infofonts.h \
     src/layers/info/infoengine.h \

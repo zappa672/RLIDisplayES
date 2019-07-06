@@ -35,7 +35,7 @@ void ControlsEngine::draw(const QMatrix4x4& mvp_mat, const RLIState& state, cons
   QMatrix4x4 transform;
   transform.setToIdentity();
 
-  if (state.state == RLIWidgetState::RLISTATE_ROUTE_EDITION) {
+  if (state.state == RLIWidgetState::ROUTE_EDITION) {
     QPointF tr = RLIMath::coords_to_pos( state.ship_position, state.visir_center_pos, QPoint(0,0), state.chart_scale);
     transform.translate( static_cast<GLfloat>(tr.x()), static_cast<GLfloat>(tr.y()), 0.f);
   }

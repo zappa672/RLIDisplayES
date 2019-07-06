@@ -612,7 +612,7 @@ void InfoEngine::initBlockVn() {
 }
 
 void InfoEngine::onVnChanged(const RLIState& rliState) {
-  if (rliState.orientation == RLIOrientation::RLIORIENT_NORTH)
+  if (rliState.orientation == RLIOrientation::NORTH)
     _blocks[RLI_PANEL_VN]->setText(RLI_PANEL_VN_TBL_0_1_TEXT_ID, QString::number(rliState.vn_p, 'd', 2).left(5).toLocal8Bit());
 
   _blocks[RLI_PANEL_VN]->setText(RLI_PANEL_VN_TBL_1_1_TEXT_ID, QString::number(rliState.vn_cu, 'd', 2).left(5).toLocal8Bit());
@@ -637,18 +637,18 @@ void InfoEngine::onCursorPosChanged(double dist, double angle) {
 
 void InfoEngine::onOrientationChanged(RLIOrientation orient) {
   switch (orient) {
-    case RLIOrientation::RLIORIENT_HEAD:
+    case RLIOrientation::HEAD:
       _blocks[RLI_PANEL_ORIENTATION]->setText(RLI_PANEL_ORIENTATION_TEXT_ID, RLI_STR_HEAD);
       break;
-    case RLIOrientation::RLIORIENT_NORTH:
+    case RLIOrientation::NORTH:
       _blocks[RLI_PANEL_ORIENTATION]->setText(RLI_PANEL_ORIENTATION_TEXT_ID, RLI_STR_NORTH);
       break;
-    case RLIOrientation::RLIORIENT_COURSE:
+    case RLIOrientation::COURSE:
       _blocks[RLI_PANEL_ORIENTATION]->setText(RLI_PANEL_ORIENTATION_TEXT_ID, RLI_STR_COURSE);
       break;
   }
 
-  if (orient == RLIOrientation::RLIORIENT_NORTH) {
+  if (orient == RLIOrientation::NORTH) {
     _blocks[RLI_PANEL_VN]->setText(RLI_PANEL_VN_TBL_0_0_TEXT_ID, RLI_STR_B);
     _blocks[RLI_PANEL_VN]->setText(RLI_PANEL_VN_TBL_0_1_TEXT_ID, QByteArray("0.00"));
     _blocks[RLI_PANEL_VN]->setText(RLI_PANEL_VN_TBL_0_2_TEXT_ID, RLI_STR_DEGREE_SIGN);

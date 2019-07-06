@@ -1,7 +1,7 @@
 #ifndef S52CHART_H
 #define S52CHART_H
 
-#include "ogr_core.h"
+#include "ogrsf_frmts.h"
 
 #include <QtOpenGL>
 #include <QMap>
@@ -118,7 +118,7 @@ private:
   S52SndgLayer* sndg_layer;
 
   // Reads OGRLayer, appends presented layers to one or more layer maps
-  bool readLayer(OGRLayer* poLayer, S52References* ref);
+  bool readLayer(OGRLayer* poLayer, S52References* ref, OGRDataSource* ds);
   bool readSoundingLayer(OGRLayer* poLayer, const QRectF& filterRect);
   bool readTextLayer(OGRLayer* poLayer);
 

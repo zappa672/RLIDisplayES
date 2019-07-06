@@ -613,7 +613,7 @@
             <Id>86</Id>
             <Name>OBSTRN</Name>
             <Descrption>Obstruction</Descrption>
-            <Display>False</Display>
+            <Display>True</Display>
             <Order>87</Order>
         </Layer>
         <Layer>
