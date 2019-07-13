@@ -25,7 +25,8 @@ void ChartManager::chartLoadingWorker() {
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Charts loading started";
 
   QDir dir("data/charts");
-  dir.setNameFilters(QStringList("*.000"));
+  //dir.setNameFilters(QStringList("*.000"));
+  dir.setNameFilters(QStringList("US2SP01M.000"));
   dir.setFilter(QDir::Files | QDir::NoDotAndDotDot | QDir::NoSymLinks);
 
   QStringList fileList = dir.entryList();

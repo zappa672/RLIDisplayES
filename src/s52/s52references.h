@@ -13,100 +13,113 @@
 #include <QString>
 #include <QStringList>
 
+#include "../common/rlistate.h"
+
+const static RLIDepthUnit m_nDepthUnitDisplay = RLIDepthUnit::METER; // feet/meters
+
+const static bool S52_MAR_TWO_SHADES = true;
+
+const static double CONST_SHALLOW_DEPTH = 5.0;
+const static double CONST_SAFETY_DEPTH  = 10.0;
+const static double CONST_DEEP_DEPTH    = 25.0;
+
+enum class LookUpTable {
+  SIMPLIFIED             = 'L' //points
+, PAPER_CHART            = 'R' //points
+, LINES                  = 'S' //lines
+, PLAIN_BOUNDARIES       = 'N' //areas
+, SYMBOLYZED_BOUNDARIES  = 'O' //areas
+, COUNT                  = 5
+};
+
+const static LookUpTable CONST_SYMB_LOOKUP = LookUpTable::PAPER_CHART; // Can be set to SIMPLIFIED
+const static LookUpTable CONST_AREA_LOOKUP = LookUpTable::PLAIN_BOUNDARIES; // Can be set to SYMBOLYZED_BOUNDARIES
+
+
 class QXmlStreamReader;
 
 
 
-
-enum class LookUpTable {
-    LUP_TABLE_SIMPLIFIED             = 'L' //points
-  , LUP_TABLE_PAPER_CHART            = 'R' //points
-  , LUP_TABLE_LINES                  = 'S' //lines
-  , LUP_TABLE_PLAIN_BOUNDARIES       = 'N' //areas
-  , LUP_TABLE_SYMBOLYZED_BOUNDARIES  = 'O' //areas
-  , LUP_TABLE_COUNT                  = 5
-};
-
 static const QMap<QString, LookUpTable> LOOKUP_TYPE_MAP
-{ { "Lines"     , LookUpTable::LUP_TABLE_LINES }
-, { "Symbolized", LookUpTable::LUP_TABLE_SYMBOLYZED_BOUNDARIES }
-, { "Plain"     , LookUpTable::LUP_TABLE_PLAIN_BOUNDARIES }
-, { "Simplified", LookUpTable::LUP_TABLE_SIMPLIFIED }
-, { "Paper"     , LookUpTable::LUP_TABLE_PAPER_CHART } };
+{ { "Lines"     , LookUpTable::LINES }
+, { "Symbolized", LookUpTable::SYMBOLYZED_BOUNDARIES }
+, { "Plain"     , LookUpTable::PLAIN_BOUNDARIES }
+, { "Simplified", LookUpTable::SIMPLIFIED }
+, { "Paper"     , LookUpTable::PAPER_CHART } };
 
 
 
 // Addressed Object Type
 enum class ChartObjectType {
-  CHART_OBJ_TYPE_POINT  = 'P'
-, CHART_OBJ_TYPE_LINES  = 'L'
-, CHART_OBJ_TYPE_AREAS  = 'A'
-, CHART_OBJ_TYPE_COUNT  = 3     // number of object type
+  POINT  = 'P'
+, LINE   = 'L'
+, AREA   = 'A'
+, COUNT  = 3     // number of object type
 };
 
 static const QMap<QString, ChartObjectType> CHART_OBJ_TYPE_MAP
-{ { "Line" , ChartObjectType::CHART_OBJ_TYPE_LINES }
-, { "Point", ChartObjectType::CHART_OBJ_TYPE_POINT }
-, { "Area" , ChartObjectType::CHART_OBJ_TYPE_AREAS } };
+{ { "Line" , ChartObjectType::LINE  }
+, { "Point", ChartObjectType::POINT }
+, { "Area" , ChartObjectType::AREA  } };
 
 
 
 // Display Priority
 enum class ChartDispPrio {
-  DISP_PRIO_NODATA          = 0   // no data fill area pattern
-, DISP_PRIO_GROUP1          = 1   // S57 group 1 filled areas
-, DISP_PRIO_AREA_1          = 2   // superimposed areas
-, DISP_PRIO_AREA_2          = 3   // superimposed areas also water features
-, DISP_PRIO_SYMB_POINT      = 4   // point symbol also land features
-, DISP_PRIO_SYMB_LINE       = 5   // line symbol also restricted areas
-, DISP_PRIO_SYMB_AREA       = 6   // area symbol also traffic areas
-, DISP_PRIO_ROUTING         = 7   // routeing lines
-, DISP_PRIO_HAZARDS         = 8   // hazards
-, DISP_PRIO_MARINERS        = 9   // VRM, EBL, own ship
-, DISP_PRIO_NUM             = 10  // number of priority levels
+  NODATA          = 0   // no data fill area pattern
+, GROUP1          = 1   // S57 group 1 filled areas
+, AREA_1          = 2   // superimposed areas
+, AREA_2          = 3   // superimposed areas also water features
+, SYMB_POINT      = 4   // point symbol also land features
+, SYMB_LINE       = 5   // line symbol also restricted areas
+, SYMB_AREA       = 6   // area symbol also traffic areas
+, ROUTING         = 7   // routeing lines
+, HAZARDS         = 8   // hazards
+, MARINERS        = 9   // VRM, EBL, own ship
+, NUM             = 10  // number of priority levels
 };
 
 static const QMap<QString, ChartDispPrio> CHART_DISP_PRIO_MAP
-{ { "Hazards"     , ChartDispPrio::DISP_PRIO_HAZARDS }
-, { "Group 1"     , ChartDispPrio::DISP_PRIO_GROUP1 }
-, { "Line Symbol" , ChartDispPrio::DISP_PRIO_SYMB_LINE }
-, { "Point Symbol", ChartDispPrio::DISP_PRIO_SYMB_POINT }
-, { "Area 1"      , ChartDispPrio::DISP_PRIO_AREA_1 }
-, { "Routing"     , ChartDispPrio::DISP_PRIO_ROUTING }
-, { "Mariners"    , ChartDispPrio::DISP_PRIO_MARINERS }
-, { "Area 2"      , ChartDispPrio::DISP_PRIO_AREA_2 }
-, { "Area Symbol" , ChartDispPrio::DISP_PRIO_SYMB_AREA }
-, { "No data"     , ChartDispPrio::DISP_PRIO_HAZARDS } };
+{ { "Hazards"     , ChartDispPrio::HAZARDS }
+, { "Group 1"     , ChartDispPrio::GROUP1 }
+, { "Line Symbol" , ChartDispPrio::SYMB_LINE }
+, { "Point Symbol", ChartDispPrio::SYMB_POINT }
+, { "Area 1"      , ChartDispPrio::AREA_1 }
+, { "Routing"     , ChartDispPrio::ROUTING }
+, { "Mariners"    , ChartDispPrio::MARINERS }
+, { "Area 2"      , ChartDispPrio::AREA_2 }
+, { "Area Symbol" , ChartDispPrio::SYMB_AREA }
+, { "No data"     , ChartDispPrio::HAZARDS } };
 
 
 
 // RADAR Priority
 enum class ChartRadarPrio {
-  RAD_PRIO_OVER = 'O'  // presentation on top of RADAR
-, RAD_PRIO_SUPP = 'S'  // presentation suppressed by RADAR
-, RAD_PRIO_NUM  = 2
+  OVER = 'O'  // presentation on top of RADAR
+, SUPP = 'S'  // presentation suppressed by RADAR
+, NUM  = 2
 };
 
 static const QMap<QString, ChartRadarPrio> CHART_RADAR_PRIO_MAP
-{ { "On Top"    , ChartRadarPrio::RAD_PRIO_OVER }
-, { "Supressed" , ChartRadarPrio::RAD_PRIO_SUPP } };
+{ { "On Top"    , ChartRadarPrio::OVER }
+, { "Supressed" , ChartRadarPrio::SUPP } };
 
 
 // display category type
 enum class ChartDisplayCat {
-  DISP_CAT_DISPLAYBASE          = 'D'  //
-, DISP_CAT_STANDARD             = 'S'  //
-, DISP_CAT_OTHER                = 'O'  // O for OTHER
-, DISP_CAT_MARINERS_STANDARD    = 'M'  // Mariner specified
-, DISP_CAT_MARINERS_OTHER              // value not defined
+  DISPLAYBASE          = 'D'  //
+, STANDARD             = 'S'  //
+, OTHER                = 'O'  // O for OTHER
+, MARINERS_STANDARD    = 'M'  // Mariner specified
+, MARINERS_OTHER              // value not defined
 };
 
 
 static const QMap<QString, ChartDisplayCat> CHART_DISPLAY_CAT_MAP
-{ { "Displaybase" , ChartDisplayCat::DISP_CAT_DISPLAYBASE }
-, { "Standard"    , ChartDisplayCat::DISP_CAT_STANDARD }
-, { "Other"       , ChartDisplayCat::DISP_CAT_OTHER }
-, { "Mariners"    , ChartDisplayCat::DISP_CAT_MARINERS_STANDARD } };
+{ { "Displaybase" , ChartDisplayCat::DISPLAYBASE }
+, { "Standard"    , ChartDisplayCat::STANDARD }
+, { "Other"       , ChartDisplayCat::OTHER }
+, { "Mariners"    , ChartDisplayCat::MARINERS_STANDARD } };
 
 
 
@@ -119,30 +132,30 @@ static const QMap<QString, ChartDisplayCat> CHART_DISPLAY_CAT_MAP
 
 // Rasterization rule types
 enum class RastRuleType {
-  RUL_NONE     // no rule type (init)
-, RUL_TXT_TX   // TX
-, RUL_TXT_TE   // TE
-, RUL_SYM_PT   // SY
-, RUL_SIM_LN   // LS
-, RUL_COM_LN   // LC
-, RUL_ARE_CO   // AC
-, RUL_ARE_PA   // AP
-, RUL_CND_SY   // CS
-, RUL_MUL_SG   // Multipoint Sounding
-, RUL_ARC_2C   // Circular Arc, used for sector lights, opencpn private
+  NONE     // no rule type (init)
+, TXT_TX   // TX
+, TXT_TE   // TE
+, SYM_PT   // SY
+, SIM_LN   // LS
+, COM_LN   // LC
+, ARE_CO   // AC
+, ARE_PA   // AP
+, CND_SY   // CS
+, MUL_SG   // Multipoint Sounding
+, ARC_2C   // Circular Arc, used for sector lights, opencpn private
 };
 
 static const QMap<QString, RastRuleType> RAST_RULE_TYPE_MAP
-{ { "CA" , RastRuleType::RUL_ARC_2C }
-, { "MP" , RastRuleType::RUL_MUL_SG }
-, { "TX" , RastRuleType::RUL_TXT_TX }
-, { "TE" , RastRuleType::RUL_TXT_TE }
-, { "SY" , RastRuleType::RUL_SYM_PT }
-, { "LS" , RastRuleType::RUL_SIM_LN }
-, { "LC" , RastRuleType::RUL_COM_LN }
-, { "AC" , RastRuleType::RUL_ARE_CO }
-, { "AP" , RastRuleType::RUL_ARE_PA }
-, { "CS" , RastRuleType::RUL_CND_SY } };
+{ { "CA" , RastRuleType::ARC_2C }
+, { "MP" , RastRuleType::MUL_SG }
+, { "TX" , RastRuleType::TXT_TX }
+, { "TE" , RastRuleType::TXT_TE }
+, { "SY" , RastRuleType::SYM_PT }
+, { "LS" , RastRuleType::SIM_LN }
+, { "LC" , RastRuleType::COM_LN }
+, { "AC" , RastRuleType::ARE_CO }
+, { "AP" , RastRuleType::ARE_PA }
+, { "CS" , RastRuleType::CND_SY } };
 
 
 

@@ -53,7 +53,7 @@ LookUp S52References::findBestLookUp(const QString& name, const QMap<QString, QV
   // Loop through the available lookups for the feature
   for (LookUp lup: lups) {
     //qDebug() << "";
-    qDebug() << "Check lookup candidate " << lup.OBCL << lup.RCID << lup.INST;
+    //qDebug() << "Check lookup candidate " << lup.OBCL << lup.RCID << lup.INST;
     //qDebug() << lup->ALST;
 
     countATT = 0;
@@ -145,34 +145,6 @@ LookUp S52References::findBestLookUp(const QString& name, const QMap<QString, QV
   return best;
 }
 
-
-/*
-
-
-
-check_LUP:
-//  In strict mode, we require at least one attribute to match exactly
-
-    if( bStrict ) {
-        if( nATTMatch == 0 ) // nothing matched
-            LUP = NULL;
-    } else {
-        //      If no match found, return the first LUP in the list which has no attributes
-        if( !bmatch_found ) {
-            for( unsigned int j = 0; j < count; ++j ) {
-                LUPrec *LUPtmp = NULL;
-
-                LUPtmp = LUPArray->Item( startIndex + j );
-                if( !LUPtmp->ATTArray.size() ) {
-                    return LUPtmp;
-                }
-            }
-        }
-    }
-
-    return LUP;
-}
-*/
 
 
 void S52References::fillColorTables() {
@@ -407,16 +379,16 @@ void S52References::readLookUps(QXmlStreamReader* xml) {
       }
 
       if (xml->name() == "type")
-        lp.FTYP = CHART_OBJ_TYPE_MAP.value(xml->readElementText(), ChartObjectType::CHART_OBJ_TYPE_COUNT);
+        lp.FTYP = CHART_OBJ_TYPE_MAP.value(xml->readElementText(), ChartObjectType::COUNT);
 
       if (xml->name() == "disp-prio")
-        lp.DPRI = CHART_DISP_PRIO_MAP.value(xml->readElementText(), ChartDispPrio::DISP_PRIO_NUM);
+        lp.DPRI = CHART_DISP_PRIO_MAP.value(xml->readElementText(), ChartDispPrio::NUM);
 
       if (xml->name() == "radar-prio")
-        lp.RPRI = CHART_RADAR_PRIO_MAP.value(xml->readElementText(), ChartRadarPrio::RAD_PRIO_NUM);
+        lp.RPRI = CHART_RADAR_PRIO_MAP.value(xml->readElementText(), ChartRadarPrio::NUM);
 
       if (xml->name() == "table-name")
-        lp.TNAM = LOOKUP_TYPE_MAP.value(xml->readElementText(), LookUpTable::LUP_TABLE_COUNT);
+        lp.TNAM = LOOKUP_TYPE_MAP.value(xml->readElementText(), LookUpTable::COUNT);
 
       if (xml->name() == "attrib-code") {
         int index = xml->attributes().value("index").toInt();
@@ -427,7 +399,7 @@ void S52References::readLookUps(QXmlStreamReader* xml) {
         lp.INST = xml->readElementText().split(";");
 
       if (xml->name() == "display-cat")
-        lp.DISC = CHART_DISPLAY_CAT_MAP.value(xml->readElementText(), ChartDisplayCat::DISP_CAT_MARINERS_OTHER);
+        lp.DISC = CHART_DISPLAY_CAT_MAP.value(xml->readElementText(), ChartDisplayCat::MARINERS_OTHER);
 
       if (xml->name() == "comment")
         lp.LUCM = xml->readElementText().toInt();

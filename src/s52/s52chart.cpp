@@ -27,9 +27,24 @@ S52Chart::S52Chart(char* file_name, S52References* ref) {
   if (poDS == nullptr)
     return;
 
-  // iterate through
+  // DEPCNT max VALDCO
+  OGRLayer* poLayer = poDS->GetLayerByName("DEPCNT");
+  OGRFeature* feat = nullptr;
+  QVector<double> valdcoVec;
+  poLayer->ResetReading();
+  while ((feat = poLayer->GetNextFeature()) != nullptr)
+    if (feat->GetFieldIndex("VALDCO") >= 0)
+      valdcoVec << feat->GetFieldAsDouble("VALDCO");
+  qSort(valdcoVec);
+  for (auto v: valdcoVec)
+    if (v > CONST_SAFETY_DEPTH) {
+      _m_next_safe_cnt = v;
+      break;
+    }
+
+  // iterate through chart layers
   for( int i = 0; i < poDS->GetLayerCount(); i++ ) {
-    OGRLayer* poLayer = poDS->GetLayer(i);
+    poLayer = poDS->GetLayer(i);
     QString layer_name = poLayer->GetName();
 
     //qDebug() << "Reading layer #" << i << layer_name;
@@ -208,10 +223,10 @@ extern
 
 bool S52Chart::readLayer(OGRLayer* poLayer, S52References* ref, OGRDataSource* ds) {
   QString layer_name = QString(poLayer->GetName());
-  qDebug() << "\t\t---------------------------";
-  qDebug() << "\t\t---------------------------";
-  qDebug() << "\t\t---------------------------";
-  qDebug() << "Reading" << layer_name;
+  //qDebug() << "\t\t---------------------------";
+  //qDebug() << "\t\t---------------------------";
+  //qDebug() << "\t\t---------------------------";
+  //qDebug() << "Reading" << layer_name << QDateTime::currentDateTime();
 
   OGRFeature* poFeature = nullptr;
 
@@ -254,94 +269,113 @@ bool S52Chart::readLayer(OGRLayer* poLayer, S52References* ref, OGRDataSource* d
 
 
   while( (poFeature = poLayer->GetNextFeature()) != nullptr ) {
+    QString objName = poFeature->GetDefnRef()->GetName();
+
     for (int i = 0; i < poFeature->GetGeomFieldCount(); i++) {
       OGRGeometry* geom = poFeature->GetGeomFieldRef(i);
       OGRwkbGeometryType geom_type = geom->getGeometryType();
 
-      LookUpTable tbl = LookUpTable::LUP_TABLE_PAPER_CHART;
+      floatingATONArray.clear();
+      rigidATONArray.clear();
+      if (geom_type == wkbPoint) {
+        if (objName == "LITFLT" || objName == "LITVES" || objName.left(3) == "BOY")
+          floatingATONArray << poFeature->GetFieldAsInteger("RCID");
 
-      qDebug() << "\t\t-------------";
-      qDebug() << "\t\t-------------";
-      qDebug() << "Reading next feature\n";
+        if (objName.left(3) == "BCN")
+          rigidATONArray << poFeature->GetFieldAsInteger("RCID");
+      }
+
+      LookUpTable tbl = LookUpTable::PAPER_CHART;
+
+      //qDebug() << "\t\t-------------";
+      //qDebug() << "\t\t-------------";
+      //qDebug() << "Reading next feature\n";
 
       switch (geom_type) {
         case wkbLineString:
-          tbl = LookUpTable::LUP_TABLE_LINES;
-          qDebug() << "wkbLineString";
+          tbl = LookUpTable::LINES;
+          //qDebug() << "wkbLineString";
           break;
         case wkbPoint: {
-          tbl = LookUpTable::LUP_TABLE_PAPER_CHART; // Can be set to SIMPLIFIED
-          qDebug() << "wkbPoint";
+          tbl = CONST_SYMB_LOOKUP;
+          //qDebug() << "wkbPoint";
           OGRPoint* p = static_cast<OGRPoint*>(geom);
-          qDebug() << p->getX() << p->getY() << p->getZ();
+          //qDebug() << p->getX() << p->getY() << p->getZ();
           break;
         }
         case wkbPolygon:
-          tbl = LookUpTable::LUP_TABLE_PLAIN_BOUNDARIES; // Can be set to SYMBOLYZED_BOUNDARIES
-          qDebug() << "wkbPolygon";
+          tbl = CONST_AREA_LOOKUP;
+          //qDebug() << "wkbPolygon";
           break;
         default:
           break;
       }
 
       auto featAttrs = getOGRFeatureAttributes(poFeature, fields);
-      qDebug() << featAttrs;
+      //qDebug() << featAttrs;
 
       LookUp lp = ref->findBestLookUp(layer_name, featAttrs, tbl);
       if (lp.RCID == -1)
         continue;
 
-      qDebug() << "initial INSTR " << lp.INST;
+      //qDebug() << "initial INSTR " << lp.INST;
 
       // Expand cond symb
       QStringList extraInstr;
       for (auto instr: lp.INST) {
-        RastRuleType type = RAST_RULE_TYPE_MAP.value(instr.left(2), RastRuleType::RUL_NONE);
+        RastRuleType type = RAST_RULE_TYPE_MAP.value(instr.left(2), RastRuleType::NONE);
 
-        if (type == RastRuleType::RUL_CND_SY) {
+        if (type == RastRuleType::CND_SY) {
           QString symbName = instr.split("(")[1].split(")")[0];
-          qDebug() << "parseCondSymb";
-          QString exp = expandCondSymb(symbName, poFeature, geom_type, &lp, ds);
-          qDebug() << exp;
+          QString exp = expandCondSymb( symbName
+                                      , poFeature
+                                      , geom
+                                      , &lp
+                                      , ds
+                                      , ref
+                                      , featAttrs
+                                      , _m_next_safe_cnt
+                                      , floatingATONArray
+                                      , rigidATONArray);
           extraInstr << exp.split(";", QString::SkipEmptyParts);
         }
       }
 
       lp.INST << extraInstr;
-      qDebug() << "final INSTR " << lp.INST;
+      //qDebug() << "final INSTR " << lp.INST;
 
       for (auto instr: lp.INST) {
-        RastRuleType type = RAST_RULE_TYPE_MAP.value(instr.left(2), RastRuleType::RUL_NONE);
+        RastRuleType type = RAST_RULE_TYPE_MAP.value(instr.left(2), RastRuleType::NONE);
 
         switch (type) {
-          case RastRuleType::RUL_SYM_PT:  //SY, Simple point symbol
+          case RastRuleType::SYM_PT:  //SY, Simple point symbol
             if (geom_type == wkbPoint) {
               OGRPoint* p = static_cast<OGRPoint*>(geom);
               mark_layer->symbol_refs.push_back(instr.split("(")[1].split(")")[0]);
               mark_layer->points.push_back(static_cast<float>(p->getY()));
               mark_layer->points.push_back(static_cast<float>(p->getX()));
-              qDebug() << "add mark" << instr.split("(")[1].split(")")[0] << p->getX() << p->getY();
+              //qDebug() << "add mark" << instr.split("(")[1].split(")")[0] << p->getX() << p->getY();
             }
             break;
           // Simple line
-          case RastRuleType::RUL_SIM_LN:  //LS
+          case RastRuleType::SIM_LN:  //LS
             break;
           // Conditional line
-          case RastRuleType::RUL_COM_LN:  //LC
+          case RastRuleType::COM_LN:  //LC
             break;
           // Simple spatial area
-          case RastRuleType::RUL_ARE_CO:  //AC
+          case RastRuleType::ARE_CO:  //AC
             break;
           // Conditional spatial area
-          case RastRuleType::RUL_ARE_PA:  //AP
+          case RastRuleType::ARE_PA:  //AP
             break;
           // SHOWTEXT
-          case RastRuleType::RUL_TXT_TX:  //TX
-          case RastRuleType::RUL_TXT_TE:  //TE
-          case RastRuleType::RUL_NONE:
-          case RastRuleType::RUL_MUL_SG:  //MP, Special Case for MultPoint Soundings
-          case RastRuleType::RUL_ARC_2C:  //CA, Special Case for Circular Arc,  (opencpn private)
-          case RastRuleType::RUL_CND_SY: //CS, Conditional point symbol
+          case RastRuleType::TXT_TX:  //TX
+          case RastRuleType::TXT_TE:  //TE
+          case RastRuleType::NONE:
+          case RastRuleType::MUL_SG:  //MP, Special Case for MultPoint Soundings
+          case RastRuleType::ARC_2C:  //CA, Special Case for Circular Arc,  (opencpn private)
+          case RastRuleType::CND_SY:  //CS, Conditional point symbol
             break;
         }
       }

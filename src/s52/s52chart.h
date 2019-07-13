@@ -106,6 +106,10 @@ private:
   S52References* _ref;
   void clear();
 
+  QSet<int> floatingATONArray;
+  QSet<int> rigidATONArray;
+  double _m_next_safe_cnt = 1.0e6;
+
   // Chart dimension
   float min_lat, max_lat;
   float min_lon, max_lon;
