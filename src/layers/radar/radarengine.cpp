@@ -53,8 +53,8 @@ void RadarEngine::initShader() {
   _unif_locs[UNIF_FBO_RADIUS]     = _program->uniformLocation("fbo_radius");
   _unif_locs[UNIF_NORTH_SHIFT]    = _program->uniformLocation("north_shift");
 
-  _attr_locs[ATTR_POSITION] = _program->attributeLocation("position");
-  _attr_locs[ATTR_AMPLITUDE] = _program->attributeLocation("amplitude");
+  _attr_locs[ATTR_POSITION]       = _program->attributeLocation("position");
+  _attr_locs[ATTR_AMPLITUDE]      = _program->attributeLocation("amplitude");
 
   _program->release();
 }

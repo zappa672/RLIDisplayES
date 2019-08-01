@@ -50,7 +50,7 @@ S52Chart::S52Chart(char* file_name, S52References* ref) {
     //qDebug() << "Reading layer #" << i << layer_name;
 
     QRectF fRect(QPointF(144.1, 13.7), QSizeF(3.0, 3.0));
-    //poLayer->SetSpatialFilterRect(fRect.left(), fRect.top(), fRect.right(), fRect.bottom());
+    poLayer->SetSpatialFilterRect(fRect.left(), fRect.top(), fRect.right(), fRect.bottom());
 
     if (layer_name == "M_COVR") {
       OGREnvelope oExt;
@@ -226,7 +226,8 @@ bool S52Chart::readLayer(OGRLayer* poLayer, S52References* ref, OGRDataSource* d
   //qDebug() << "\t\t---------------------------";
   //qDebug() << "\t\t---------------------------";
   //qDebug() << "\t\t---------------------------";
-  //qDebug() << "Reading" << layer_name << QDateTime::currentDateTime();
+  qDebug() << "Reading" << layer_name << QDateTime::currentDateTime();
+  QSet<QString> debugFinalRastRules;
 
   OGRFeature* poFeature = nullptr;
 
@@ -299,7 +300,7 @@ bool S52Chart::readLayer(OGRLayer* poLayer, S52References* ref, OGRDataSource* d
         case wkbPoint: {
           tbl = CONST_SYMB_LOOKUP;
           //qDebug() << "wkbPoint";
-          OGRPoint* p = static_cast<OGRPoint*>(geom);
+          //OGRPoint* p = static_cast<OGRPoint*>(geom);
           //qDebug() << p->getX() << p->getY() << p->getZ();
           break;
         }
@@ -345,6 +346,8 @@ bool S52Chart::readLayer(OGRLayer* poLayer, S52References* ref, OGRDataSource* d
       //qDebug() << "final INSTR " << lp.INST;
 
       for (auto instr: lp.INST) {
+        debugFinalRastRules << instr;
+
         RastRuleType type = RAST_RULE_TYPE_MAP.value(instr.left(2), RastRuleType::NONE);
 
         switch (type) {
@@ -422,6 +425,9 @@ bool S52Chart::readLayer(OGRLayer* poLayer, S52References* ref, OGRDataSource* d
 
   if (mark_layer->points.size() > 0)
     mark_layers[layer_name] = mark_layer;
+
+  for (QString rule: debugFinalRastRules)
+    qDebug() << rule;
 
   return true;
 }
