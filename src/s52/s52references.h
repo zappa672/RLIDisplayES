@@ -216,22 +216,23 @@ struct Pattern {
 };
 
 struct BitmapSymbol {
-  QSize     size      { 0, 0 };
-  QVector2D distance  { 0, 0 };
-  QPoint    pivot     { 0, 0 };
-  QPoint    origin    { 0, 0 };
-  QPoint    graphics_location { 0, 0 };
+  QSize     size;
+  QVector2D distance;
+  QPoint    pivot;
+  QPoint    origin;
+  QPoint    graphics_location;
 };
 
 struct Symbol {
-  int rcid            { 0 };
-  QString name        {};
-  QString description {};
-  QString definition  {};
-  QString color_ref   {};
+  int rcid;
 
-  VectorSymbol vector {};
-  BitmapSymbol bitmap {};
+  QString name;
+  QString description;
+  QString definition;
+  QString color_ref;
+
+  VectorSymbol vector;
+  BitmapSymbol bitmap;
 };
 
 
