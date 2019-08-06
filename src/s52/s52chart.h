@@ -123,7 +123,7 @@ private:
 
   // Reads OGRLayer, appends presented layers to one or more layer maps
   bool readLayer(OGRLayer* poLayer, S52References* ref, OGRDataSource* ds);
-  bool readSoundingLayer(OGRLayer* poLayer, const QRectF& filterRect);
+  bool readSoundingLayer(OGRLayer* poLayer, const OGRGeometry* spatFilter);
   bool readTextLayer(OGRLayer* poLayer);
 
   QMap<QString, QVariant> getOGRFeatureAttributes(OGRFeature* obj, const QMap<QString, std::pair<int, OGRFieldType>>& fields);
@@ -132,6 +132,9 @@ private:
   bool readOGRPolygon(OGRPolygon* poGeom, std::vector<float>& triangles);
   // Reading OGRLine, append result to points
   bool readOGRLine(OGRLineString* poGeom, std::vector<float>& points, std::vector<double>& distances);
+
+
+
 
   void fillLineParams(QString& layer_name, S52LineLayer* layer, OGRFeature* poFeature);
   void fillAreaParams(QString& layer_name, S52AreaLayer* layer, OGRFeature* poFeature);

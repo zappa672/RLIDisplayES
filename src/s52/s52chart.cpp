@@ -51,6 +51,7 @@ S52Chart::S52Chart(char* file_name, S52References* ref) {
 
     QRectF fRect(QPointF(144.1, 13.7), QSizeF(3.0, 3.0));
     poLayer->SetSpatialFilterRect(fRect.left(), fRect.top(), fRect.right(), fRect.bottom());
+    OGRGeometry* spatFilter = poLayer->GetSpatialFilter();
 
     if (layer_name == "M_COVR") {
       OGREnvelope oExt;
@@ -68,7 +69,7 @@ S52Chart::S52Chart(char* file_name, S52References* ref) {
 
     poLayer->ResetReading();
     if (layer_name == "SOUNDG") {
-      if (!readSoundingLayer(poLayer, fRect))
+      if (!readSoundingLayer(poLayer, spatFilter))
         return;
 
       continue;
@@ -123,7 +124,7 @@ bool S52Chart::readTextLayer(OGRLayer* poLayer) {
 }
 
 
-bool S52Chart::readSoundingLayer(OGRLayer* poLayer, const QRectF& filterRect) {
+bool S52Chart::readSoundingLayer(OGRLayer* poLayer, const OGRGeometry* spatFilter) {
   OGRFeature* poFeature = nullptr;
 
   if (sndg_layer != nullptr)
