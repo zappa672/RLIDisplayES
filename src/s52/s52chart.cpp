@@ -3,6 +3,8 @@
 #include <QDebug>
 #include <QList>
 
+#include <algorithm>
+
 #include "../common/triangulate.h"
 #include "../common/rlimath.h"
 
@@ -35,7 +37,7 @@ S52Chart::S52Chart(char* file_name, S52References* ref) {
   while ((feat = poLayer->GetNextFeature()) != nullptr)
     if (feat->GetFieldIndex("VALDCO") >= 0)
       valdcoVec << feat->GetFieldAsDouble("VALDCO");
-  qSort(valdcoVec);
+  std::sort(valdcoVec.begin(), valdcoVec.end());
   for (auto v: valdcoVec)
     if (v > CONST_SAFETY_DEPTH) {
       _m_next_safe_cnt = v;
@@ -49,9 +51,9 @@ S52Chart::S52Chart(char* file_name, S52References* ref) {
 
     //qDebug() << "Reading layer #" << i << layer_name;
 
-    QRectF fRect(QPointF(144.1, 13.7), QSizeF(3.0, 3.0));
-    poLayer->SetSpatialFilterRect(fRect.left(), fRect.top(), fRect.right(), fRect.bottom());
-    OGRGeometry* spatFilter = poLayer->GetSpatialFilter();
+    //QRectF fRect(QPointF(144.1, 13.7), QSizeF(20.0, 20.0));
+    //poLayer->SetSpatialFilterRect(fRect.left(), fRect.top(), fRect.right(), fRect.bottom());
+    OGRGeometry* spatFilter = nullptr; //poLayer->GetSpatialFilter();
 
     if (layer_name == "M_COVR") {
       OGREnvelope oExt;
@@ -143,7 +145,7 @@ bool S52Chart::readSoundingLayer(OGRLayer* poLayer, const OGRGeometry* spatFilte
         for (int j = 0; j < mp->getNumGeometries(); j++) {
           OGRPoint* p = static_cast<OGRPoint*>(mp->getGeometryRef(j));
 
-          if (spatFilter->Contains(p)) {
+          if (spatFilter == nullptr || spatFilter->Contains(p)) {
             sndg_layer->points.push_back(static_cast<float>(p->getY()));
             sndg_layer->points.push_back(static_cast<float>(p->getX()));
             sndg_layer->depths.push_back(p->getZ());
@@ -441,10 +443,10 @@ bool S52Chart::addLineToLayer(S52LineLayer* layer, const QString& ptrn_ref, cons
 bool S52Chart::addAreaToLayer(S52AreaLayer* layer, const QString& ptrn_ref, const QString& col_ref, ChartDispPrio dpri, OGRPolygon* poly) {
   layer->pattern_refs.push_back(ptrn_ref);
   layer->color_inds.push_back(_ref->getColorIndex(col_ref));
+  layer->disp_prio.push_back(static_cast<float>(dpri));
   layer->start_inds.push_back(layer->triangles.size());
 
-  if (!readOGRPolygon(poly, layer->triangles))
-    return false;
+  return readOGRPolygon(poly, layer->triangles);
 }
 
 
@@ -607,8 +609,8 @@ bool S52Chart::readOGRPolygon(OGRPolygon* poGeom, std::vector<float> &triangles)
 
       for(int i = 0 ; i < 3 ; i++) {
         int ivp = ivs[i];
-        triangles.push_back(geoPt[ivp].y);
-        triangles.push_back(geoPt[ivp].x);
+        triangles.push_back(static_cast<float>(geoPt[ivp].y));
+        triangles.push_back(static_cast<float>(geoPt[ivp].x));
       }
     }
 
@@ -633,7 +635,10 @@ bool S52Chart::readOGRLine(OGRLineString* poGeom, std::vector<float> &ps, std::v
     ps.push_back(static_cast<float>(p.getX()));
 
     if (i != 0)
-      distances.push_back(GCDistance(ps[ps.size() - 4], ps[ps.size() - 3], ps[ps.size() - 2], ps[ps.size() - 1]));
+      distances.push_back( GCDistance( static_cast<double>(ps[ps.size() - 4])
+                                     , static_cast<double>(ps[ps.size() - 3])
+                                     , static_cast<double>(ps[ps.size() - 2])
+                                     , static_cast<double>(ps[ps.size() - 1]) ) );
     else
       distances.push_back(0);
   }

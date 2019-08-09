@@ -26,8 +26,8 @@ ChartEngine::~ChartEngine() {
     delete engine;
   for (ChartLineEngine* engine : line_engines)
     delete engine;
-  for (ChartTextEngine* engine : text_engines)
-    delete engine;
+//  for (ChartTextEngine* engine : text_engines)
+//    delete engine;
   for (ChartMarkEngine* engine : mark_engines)
     delete engine;
 
@@ -68,9 +68,9 @@ void ChartEngine::setChart(S52Chart* chrt, S52References* ref) {
 
   setAreaLayers(chrt, ref);
   setLineLayers(chrt, ref);
-  setTextLayers(chrt, ref);
+  //setTextLayers(chrt, ref);
   setMarkLayers(chrt, ref);
-  setSndgLayer(chrt, ref);
+  //setSndgLayer(chrt, ref);
 
   _ready = true;
   _force_update = true;
@@ -82,8 +82,8 @@ void ChartEngine::clearChartData() {
     engine->clearData();
   for (ChartLineEngine* engine : line_engines)
     engine->clearData();
-  for (ChartTextEngine* engine : text_engines)
-    engine->clearData();
+  //for (ChartTextEngine* engine : text_engines)
+  //  engine->clearData();
   for (ChartMarkEngine* engine : mark_engines)
     engine->clearData();
 
@@ -122,22 +122,22 @@ void ChartEngine::setLineLayers(S52Chart* chrt, S52References* ref) {
 }
 
 
-void ChartEngine::setTextLayers(S52Chart* chrt, S52References* ref) {
-  Q_UNUSED(ref);
+//void ChartEngine::setTextLayers(S52Chart* chrt, S52References* ref) {
+//  Q_UNUSED(ref);
 
-  for (QString layer_name : chrt->textLayerNames()) {
-    S52TextLayer* layer = chrt->textLayer(layer_name);
-    ChartLayerDisplaySettings clds = settings->layerSettings(layer_name);
+//  for (QString layer_name : chrt->textLayerNames()) {
+//    S52TextLayer* layer = chrt->textLayer(layer_name);
+//    ChartLayerDisplaySettings clds = settings->layerSettings(layer_name);
 
-    if (!clds.visible)
-      continue;
+//    if (!clds.visible)
+//      continue;
 
-    if (!text_engines.contains(layer_name))
-      text_engines[layer_name] = new ChartTextEngine(_context);
+//    if (!text_engines.contains(layer_name))
+//      text_engines[layer_name] = new ChartTextEngine(_context);
 
-    text_engines[layer_name]->setData(layer, clds.order);
-  }
-}
+//    text_engines[layer_name]->setData(layer, clds.order);
+//  }
+//}
 
 
 void ChartEngine::setMarkLayers(S52Chart* chrt, S52References* ref) {
@@ -155,12 +155,12 @@ void ChartEngine::setMarkLayers(S52Chart* chrt, S52References* ref) {
   }
 }
 
-void ChartEngine::setSndgLayer(S52Chart* chrt, S52References* ref) {
-  if (!mark_engines.contains("SOUNDG"))
-    mark_engines["SOUNDG"] = new ChartMarkEngine(_context);
+//void ChartEngine::setSndgLayer(S52Chart* chrt, S52References* ref) {
+//  if (!mark_engines.contains("SOUNDG"))
+//    mark_engines["SOUNDG"] = new ChartMarkEngine(_context);
 
-  mark_engines["SOUNDG"]->setData(chrt->sndgLayer(), assets, ref, 1000);
-}
+//  mark_engines["SOUNDG"]->setData(chrt->sndgLayer(), assets, ref, 1000);
+//}
 
 
 void ChartEngine::update(const RLIState& state, const QString& color_scheme) {
@@ -320,10 +320,12 @@ void ChartEngine::drawTextLayers(const QMatrix4x4& mvp_matrix) {
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, font_tex->textureId());
 
+  /*
   for (ChartTextEngine* textEngine : text_engines) {
     prog->setUniformValue(shaders->getTextUniformLoc(COMMON_UNIFORMS_DISPLAY_ORDER), 0.f);
     textEngine->draw(shaders);
   }
+    */
 
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, 0);
