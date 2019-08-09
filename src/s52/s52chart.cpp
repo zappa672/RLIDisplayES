@@ -143,11 +143,11 @@ bool S52Chart::readSoundingLayer(OGRLayer* poLayer, const OGRGeometry* spatFilte
         for (int j = 0; j < mp->getNumGeometries(); j++) {
           OGRPoint* p = static_cast<OGRPoint*>(mp->getGeometryRef(j));
 
-          //if (filterRect.contains(p->getX(), p->getY()))
-          sndg_layer->points.push_back(static_cast<float>(p->getY()));
-          sndg_layer->points.push_back(static_cast<float>(p->getX()));
-          sndg_layer->depths.push_back(p->getZ());
-          //}
+          if (spatFilter->Contains(p)) {
+            sndg_layer->points.push_back(static_cast<float>(p->getY()));
+            sndg_layer->points.push_back(static_cast<float>(p->getX()));
+            sndg_layer->depths.push_back(p->getZ());
+          }
         }
       }
     }
@@ -224,17 +224,15 @@ extern
 
 bool S52Chart::readLayer(OGRLayer* poLayer, S52References* ref, OGRDataSource* ds) {
   QString layer_name = QString(poLayer->GetName());
-  //qDebug() << "\t\t---------------------------";
-  //qDebug() << "\t\t---------------------------";
-  //qDebug() << "\t\t---------------------------";
   qDebug() << "Reading" << layer_name << QDateTime::currentDateTime();
   QSet<QString> debugFinalRastRules;
 
   OGRFeature* poFeature = nullptr;
 
-  S52AreaLayer* area_layer;
-  S52LineLayer* line_layer;
-  S52MarkLayer* mark_layer;
+  S52AreaLayer* area_layer = new S52AreaLayer();
+  S52LineLayer* line_layer = new S52LineLayer();
+  S52MarkLayer* mark_layer = new S52MarkLayer();
+
 
   QMap<QString, std::pair<int, OGRFieldType>> fields;
   auto lrDfn = poLayer->GetLayerDefn();
@@ -244,31 +242,6 @@ bool S52Chart::readLayer(OGRLayer* poLayer, S52References* ref, OGRDataSource* d
     //         << fldDfn->GetFieldTypeName(fldDfn->GetType());
     fields.insert(fldDfn->GetNameRef(), std::pair<int, OGRFieldType>(fldId, fldDfn->GetType()));
   }
-
-  if (area_layers.contains(layer_name))
-    area_layer = area_layers[layer_name];
-  else {
-    area_layer = new S52AreaLayer();
-
-    area_layer->is_color_uniform = isAreaColorUniform(layer_name);
-    area_layer->is_pattern_uniform = isAreaPatternUniform(layer_name);
-    area_layer->pattern_ref = "-";
-    area_layer->color_ind = -1u;
-  }
-
-  if (line_layers.contains(layer_name))
-    line_layer = line_layers[layer_name];
-  else {
-    line_layer = new S52LineLayer();
-
-    line_layer->is_color_uniform = isLineColorUniform(layer_name);
-    line_layer->is_pattern_uniform = isLinePatternUniform(layer_name);
-    line_layer->pattern_ref = "-";
-    line_layer->color_ind = -1u;
-  }
-
-  mark_layer = mark_layers.value(layer_name, new S52MarkLayer());
-
 
   while( (poFeature = poLayer->GetNextFeature()) != nullptr ) {
     QString objName = poFeature->GetDefnRef()->GetName();
@@ -289,38 +262,26 @@ bool S52Chart::readLayer(OGRLayer* poLayer, S52References* ref, OGRDataSource* d
 
       LookUpTable tbl = LookUpTable::PAPER_CHART;
 
-      //qDebug() << "\t\t-------------";
-      //qDebug() << "\t\t-------------";
-      //qDebug() << "Reading next feature\n";
-
       switch (geom_type) {
         case wkbLineString:
           tbl = LookUpTable::LINES;
-          //qDebug() << "wkbLineString";
           break;
         case wkbPoint: {
           tbl = CONST_SYMB_LOOKUP;
-          //qDebug() << "wkbPoint";
-          //OGRPoint* p = static_cast<OGRPoint*>(geom);
-          //qDebug() << p->getX() << p->getY() << p->getZ();
           break;
         }
         case wkbPolygon:
           tbl = CONST_AREA_LOOKUP;
-          //qDebug() << "wkbPolygon";
           break;
         default:
           break;
       }
 
       auto featAttrs = getOGRFeatureAttributes(poFeature, fields);
-      //qDebug() << featAttrs;
 
       LookUp lp = ref->findBestLookUp(layer_name, featAttrs, tbl);
       if (lp.RCID == -1)
         continue;
-
-      //qDebug() << "initial INSTR " << lp.INST;
 
       // Expand cond symb
       QStringList extraInstr;
@@ -352,66 +313,100 @@ bool S52Chart::readLayer(OGRLayer* poLayer, S52References* ref, OGRDataSource* d
         RastRuleType type = RAST_RULE_TYPE_MAP.value(instr.left(2), RastRuleType::NONE);
 
         switch (type) {
-          case RastRuleType::SYM_PT:  //SY, Simple point symbol
+
+          //Simple point symbol, example: SY(CHINFO06)
+          case RastRuleType::SYM_PT: {
             if (geom_type == wkbPoint) {
               OGRPoint* p = static_cast<OGRPoint*>(geom);
               mark_layer->symbol_refs.push_back(instr.split("(")[1].split(")")[0]);
+              mark_layer->disp_prio.push_back(static_cast<float>(lp.DPRI));
               mark_layer->points.push_back(static_cast<float>(p->getY()));
               mark_layer->points.push_back(static_cast<float>(p->getX()));
               //qDebug() << "add mark" << instr.split("(")[1].split(")")[0] << p->getX() << p->getY();
             }
             break;
-          // Simple line
-          case RastRuleType::SIM_LN:  //LS
+          }
+
+          // Simple line, example: LS(DASH,1,CHGRD)
+          case RastRuleType::SIM_LN: {
+            QStringList instr_ls = (instr.split("(")[1].split(")")[0]).split(",");
+            QString ptrn_ref = instr_ls[0];
+            QString col_ref = instr_ls[2];
+
+            if (geom_type == wkbPolygon) {
+              OGRPolygon* poly = static_cast<OGRPolygon*>(geom);
+              if (!addLineToLayer(line_layer, ptrn_ref, col_ref, lp.DPRI, poly->getExteriorRing()))
+                return false;
+
+              for(int iir = 0 ; iir < poly->getNumInteriorRings(); iir++) {
+                if (!addLineToLayer(line_layer, ptrn_ref, col_ref, lp.DPRI, poly->getInteriorRing(iir)))
+                  return false;
+              }
+            }
+
+            if (geom_type == wkbLineString) {
+              OGRLineString* line = static_cast<OGRLineString*>(geom);
+              if (!addLineToLayer(line_layer, instr_ls[0], instr_ls[2], lp.DPRI, line))
+                return false;
+            }
+
             break;
-          // Conditional line
-          case RastRuleType::COM_LN:  //LC
+          }
+
+          // Pattern line, example: LC(CBLSUB06)
+          case RastRuleType::COM_LN: {
+            QString ptrn_ref = instr.split("(")[1].split(")")[0];
+
+            if (geom_type == wkbPolygon) {
+              OGRPolygon* poly = static_cast<OGRPolygon*>(geom);
+              OGRLineString* ring = static_cast<OGRLineString*>(poly->getExteriorRing());
+
+              if (!addLineToLayer(line_layer, ptrn_ref, "CHBLK", lp.DPRI, ring))
+                return false;
+
+              for(int iir = 0 ; iir < poly->getNumInteriorRings(); iir++)
+                if (!addLineToLayer(line_layer, ptrn_ref, "CHBLK", lp.DPRI, poly->getInteriorRing(iir)))
+                  return false;
+            }
+
+            if (geom_type == wkbLineString)
+              if (!addLineToLayer(line_layer, ptrn_ref, "CHBLK", lp.DPRI, static_cast<OGRLineString*>(geom)))
+                return false;
+
             break;
-          // Simple spatial area
-          case RastRuleType::ARE_CO:  //AC
+          }
+
+          // Simple spatial area, example: AC(DEPDW)
+          case RastRuleType::ARE_CO: {
+            QString col_ref = instr.split("(")[1].split(")")[0];
+
+            if (geom_type == wkbPolygon)
+              if (!addAreaToLayer(area_layer, "", col_ref, lp.DPRI, static_cast<OGRPolygon*>(geom)))
+                return false;
+
             break;
-          // Conditional spatial area
-          case RastRuleType::ARE_PA:  //AP
+          }
+
+          // Pattern spatial area, example: AP(FOULAR01)
+          case RastRuleType::ARE_PA:  {
+            QString ptrn_ref = instr.split("(")[1].split(")")[0];
+
+            if (geom_type == wkbPolygon)
+              if (!addAreaToLayer(area_layer, ptrn_ref, "CHBLK", lp.DPRI, static_cast<OGRPolygon*>(geom)))
+                return false;
+
             break;
+          }
+
           // SHOWTEXT
           case RastRuleType::TXT_TX:  //TX
           case RastRuleType::TXT_TE:  //TE
-          case RastRuleType::NONE:
           case RastRuleType::MUL_SG:  //MP, Special Case for MultPoint Soundings
           case RastRuleType::ARC_2C:  //CA, Special Case for Circular Arc,  (opencpn private)
+          case RastRuleType::NONE:
           case RastRuleType::CND_SY:  //CS, Conditional point symbol
             break;
         }
-      }
-
-
-
-      //std::vector<RastRules> *ruleList; // rasterization rule list
-
-
-
-      if (geom_type == wkbPolygon) {
-        fillLineParams(layer_name, line_layer, poFeature);
-        line_layer->start_inds.push_back(line_layer->points.size());
-
-        OGRPolygon* poly = static_cast<OGRPolygon*>(geom);
-        OGRLineString* extRing = static_cast<OGRLineString*>(poly->getExteriorRing());
-        if (!readOGRLine(extRing, line_layer->points, line_layer->distances))
-          return false;
-
-        fillAreaParams(layer_name, area_layer, poFeature);
-        area_layer->start_inds.push_back(area_layer->triangles.size());
-
-        if (!readOGRPolygon(poly, area_layer->triangles))
-          return false;
-      }
-
-      if (geom_type == wkbLineString) {
-        fillLineParams(layer_name, line_layer, poFeature);
-        line_layer->start_inds.push_back(line_layer->points.size());
-
-        if (!readOGRLine(static_cast<OGRLineString*>(geom), line_layer->points, line_layer->distances))
-          return false;
       }
     }
 
@@ -433,33 +428,26 @@ bool S52Chart::readLayer(OGRLayer* poLayer, S52References* ref, OGRDataSource* d
   return true;
 }
 
-void S52Chart::fillLineParams(QString& layer_name, S52LineLayer* layer, OGRFeature* poFeature) {
-  if (layer->is_pattern_uniform && layer->pattern_ref == "-")
-    layer->pattern_ref = getLinePatternRef(layer_name, nullptr);
-  else if (!layer->is_pattern_uniform)
-    layer->pattern_refs.push_back(getLineColorRef(layer_name, poFeature));
 
-  if (layer->is_color_uniform && layer->color_ind == -1u)
-    layer->color_ind = _ref->getColorIndex(getAreaColorRef(layer_name, nullptr));
-  else if (!layer->is_color_uniform)
-    layer->color_inds.push_back(_ref->getColorIndex(getAreaColorRef(layer_name, poFeature)));
+bool S52Chart::addLineToLayer(S52LineLayer* layer, const QString& ptrn_ref, const QString& col_ref, ChartDispPrio dpri, OGRLineString* line) {
+  layer->pattern_refs.push_back(ptrn_ref);
+  layer->color_inds.push_back(_ref->getColorIndex(col_ref));
+  layer->disp_prio.push_back(static_cast<float>(dpri));
+  layer->start_inds.push_back(layer->points.size());
+
+  return readOGRLine(line, layer->points, layer->distances);
 }
 
-void S52Chart::fillAreaParams(QString& layer_name, S52AreaLayer* layer, OGRFeature* poFeature) {
-  if (layer->is_pattern_uniform && layer->pattern_ref == "-")
-    layer->pattern_ref = getAreaPatternRef(layer_name, nullptr);
-  else if (!layer->is_pattern_uniform)
-    layer->pattern_refs.push_back(getAreaColorRef(layer_name, poFeature));
+bool S52Chart::addAreaToLayer(S52AreaLayer* layer, const QString& ptrn_ref, const QString& col_ref, ChartDispPrio dpri, OGRPolygon* poly) {
+  layer->pattern_refs.push_back(ptrn_ref);
+  layer->color_inds.push_back(_ref->getColorIndex(col_ref));
+  layer->start_inds.push_back(layer->triangles.size());
 
-  if (layer->is_color_uniform && layer->color_ind == -1u)
-    layer->color_ind = _ref->getColorIndex(getAreaColorRef(layer_name, nullptr));
-  else if (!layer->is_color_uniform)
-    layer->color_inds.push_back(_ref->getColorIndex(getAreaColorRef(layer_name, poFeature)));
+  if (!readOGRPolygon(poly, layer->triangles))
+    return false;
 }
 
 
-// !!!!
-// TODO: add hole support
 bool S52Chart::readOGRPolygon(OGRPolygon* poGeom, std::vector<float> &triangles) {
   // Make a quick sanity check of the polygon coherence
   // ----------------------------------------------------------------
@@ -502,7 +490,7 @@ bool S52Chart::readOGRPolygon(OGRPolygon* poGeom, std::vector<float> &triangles)
   m_ncnt += nint;
 
   // Allocate cntr array
-  int *cntr = (int *)malloc(m_ncnt * sizeof(int));
+  int* cntr = static_cast<int *>( malloc(static_cast<uint>(m_ncnt) * sizeof(int)) );
 
   // Get total number of points(vertices)
   int npta  = poGeom->getExteriorRing()->getNumPoints();
@@ -513,7 +501,7 @@ bool S52Chart::readOGRPolygon(OGRPolygon* poGeom, std::vector<float> &triangles)
     npta += nptr + 2;
   }
 
-  point_t *geoPt = (point_t*)calloc((npta + 1) * sizeof(point_t), 1);     // vertex array
+  point_t* geoPt = static_cast<point_t*>(calloc(static_cast<uint>(npta + 1) * sizeof(point_t), 1));     // vertex array
 
   // Create input structures
 
@@ -521,7 +509,7 @@ bool S52Chart::readOGRPolygon(OGRPolygon* poGeom, std::vector<float> &triangles)
   int npte  = poGeom->getExteriorRing()->getNumPoints();
   cntr[0] = npte;
 
-  point_t *ppt = geoPt;
+  point_t* ppt = geoPt;
   ppt->x = 0.; ppt->y = 0.;
   ppt++;                            // vertex 0 is unused
 
@@ -531,7 +519,7 @@ bool S52Chart::readOGRPolygon(OGRPolygon* poGeom, std::vector<float> &triangles)
   double x0, y0, x, y;
   OGRPoint p;
 
-  if(cw) {
+  if (cw) {
     poGeom->getExteriorRing()->getPoint(0, &p);
     x0 = p.getX();
     y0 = p.getY();
@@ -607,7 +595,7 @@ bool S52Chart::readOGRPolygon(OGRPolygon* poGeom, std::vector<float> &triangles)
     }
   }
 
-  polyout* polys = triangulate_polygon(m_ncnt, cntr, (double (*)[2])geoPt);
+  polyout* polys = triangulate_polygon(m_ncnt, cntr, (double(*)[2])(geoPt));
   polyout* pck = polys;
 
   while(pck != nullptr) {
@@ -624,7 +612,7 @@ bool S52Chart::readOGRPolygon(OGRPolygon* poGeom, std::vector<float> &triangles)
       }
     }
 
-    pck = (polyout *)pck->poly_next;
+    pck = static_cast<polyout*>(pck->poly_next);
   }
 
   delete polys;
@@ -652,148 +640,3 @@ bool S52Chart::readOGRLine(OGRLineString* poGeom, std::vector<float> &ps, std::v
 
   return true;
 }
-
-
-
-QString S52Chart::getAreaColorRef(QString& layer_name, OGRFeature* poFeature) {
-  if (layer_name == "LNDARE"
-   || layer_name == "LNDRGN"
-   || layer_name == "SLCONS")
-    return "LANDA";
-
-  if (layer_name == "M_COVR")
-    return "NODTA";
-
-  if (layer_name == "FAIRWY")
-    return "DEPMS";
-
-  if (layer_name == "RIVERS" ||
-      layer_name == "LAKARE")
-    return "DEPVS";
-
-  if (layer_name == "DEPARE") {
-    // TODO: avoid hardcode
-    // shallow_contour_val
-    double shc = 2.0;
-    // safety_contour_val
-    double sfc = 20.0;
-    // deep_contour_val
-    double dpc = 30.0;
-
-    QString pattern = "DEPIT";
-
-    if (poFeature == nullptr)
-      return pattern;
-
-    double dep_range_min = poFeature->GetFieldAsDouble("DRVAL1");
-    double dep_range_max = poFeature->GetFieldAsDouble("DRVAL2");
-
-    if (dep_range_min >= 0 && dep_range_max > 0)
-      pattern = "DEPVS";
-    if (dep_range_min >= shc && dep_range_max > shc)
-      pattern = "DEPMS";
-    if (dep_range_min >= sfc && dep_range_max > sfc)
-      pattern = "DEPMD";
-    if (dep_range_min >= dpc && dep_range_max > dpc)
-      pattern = "DEPDW";
-
-    return pattern;
-  }
-
-  return "CHBLK";
-}
-
-QString S52Chart::getAreaPatternRef(QString& layer_name, OGRFeature* poFeature) {
-  Q_UNUSED(poFeature);
-
-//  if (layer_name == "DEPARE" ||
-//      layer_name == "RIVERS" ||
-//      layer_name == "LAKARE")
-//    return "";
-
-//  if (layer_name == "DEPARE")
-//    return "RCKLDG01";
-
-  if (layer_name == "SBDARE")
-    return "RCKLDG01";
-
-  if (layer_name == "BUAARE")
-    return "RCKLDG01";
-
-  //Default
-  return "";
-}
-
-
-QString S52Chart::getLineColorRef(QString& layer_name, OGRFeature* poFeature) {
-  Q_UNUSED(poFeature);
-
-  if (layer_name == "DEPARE" || layer_name == "DEPCNT")
-    return "DEPSC";
-
-  if (layer_name == "RIVERS")
-    return "CHBLK";
-
-  if (layer_name == "WATTUR")
-    return "LITRD";
-
-  //Default
-  return "CHBLK";
-}
-
-QString S52Chart::getLinePatternRef(QString& layer_name, OGRFeature* poFeature) {
-  Q_UNUSED(poFeature);
-
-  if (layer_name == "RIVERS"
-   || layer_name == "LAKARE")
-    return "DOTTED";
-
-  if (layer_name == "FAIRWY")
-    return "PLNRTE03";
-
-  if (layer_name == "DEPCNT" ||
-      layer_name == "DEPARE" ||
-      layer_name == "WATTUR")
-    return "DASHED";
-
-
-  //Default
-  return "SOLID";
-}
-
-bool S52Chart::isAreaColorUniform(QString& layer_name) {
-  if (layer_name == "DEPARE")
-      return false;
-
-  //Default
-  return true;
-}
-
-bool S52Chart::isLineColorUniform(QString& layer_name) {
-  Q_UNUSED(layer_name);
-
-  //Default
-  return true;
-}
-
-bool S52Chart::isAreaPatternUniform(QString& layer_name) {
-  Q_UNUSED(layer_name);
-
-  //Default
-  return true;
-}
-
-bool S52Chart::isLinePatternUniform(QString& layer_name) {
-  Q_UNUSED(layer_name);
-
-  //Default
-  return true;
-}
-
-bool S52Chart::isMarkSymbolUniform(QString& layer_name) {
-  Q_UNUSED(layer_name);
-
-  //Default
-  return true;
-}
-

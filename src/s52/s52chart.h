@@ -11,7 +11,6 @@
 #include <vector>
 #include "s52references.h"
 
-
 class OGRLayer;
 class OGRPoint;
 class OGRFeature;
@@ -19,56 +18,33 @@ class OGRPolygon;
 class OGRLineString;
 
 
+struct S52AreaLayer {  
+  std::vector<QString>  pattern_refs;   // layer i-th area s52 pattern name
+  std::vector<float>    color_inds;     // layer i-th area s52 color token
+  std::vector<float>    disp_prio;
+  std::vector<size_t>   start_inds;     // layer i-th area triangles start index
+  std::vector<float>    triangles;      // sequence of coords representing triangulated polygon
 
-struct S52AreaLayer {
-  bool is_pattern_uniform;
-  bool is_color_uniform;
-
-  QString pattern_ref;
-  uint color_ind;
-  // layer i-th area s52 pattern name
-  std::vector<QString> pattern_refs;
-  // layer i-th area s52 color token
-  //std::vector<QString> color_refs;
-  std::vector<float> color_inds;
-  // layer i-th area triangles start index
-  std::vector<size_t> start_inds;
-  // sequence of coords representing triangulated polygon
-  std::vector<float> triangles;
 };
 
 struct S52LineLayer {
-  bool is_pattern_uniform;
-  bool is_color_uniform;
-
-  QString pattern_ref;
-  uint color_ind;
-
-  // layer i-th line s52 pattern name
-  std::vector<QString> pattern_refs;
-  // layer i-th line s52 color token
-  //std::vector<QString> color_refs;
-  std::vector<float> color_inds;
-  // layer i-th line points start index
-  std::vector<size_t> start_inds;
-  // sequence of coords representing polylines
-  std::vector<float> points;
-  // length of the line up to current point
-  std::vector<double> distances;
+  std::vector<QString>  pattern_refs;   // layer i-th line s52 pattern name
+  std::vector<float>    color_inds;     // layer i-th line s52 color token
+  std::vector<float>    disp_prio;
+  std::vector<size_t>   start_inds;     // layer i-th line points start index
+  std::vector<float>    points;         // sequence of coords representing polylines
+  std::vector<double>   distances;      // length of the line up to current point
 };
 
-struct S52MarkLayer {
-  // layer i-th point s52 symbol name
-  std::vector<QString> symbol_refs;
-  // sequence of point coords (lat, lon)
-  std::vector<float> points;
+struct S52MarkLayer {  
+  std::vector<QString>  symbol_refs;    // layer i-th point s52 symbol name
+  std::vector<float>    points;         // sequence of point coords (lat, lon)
+  std::vector<float>    disp_prio;
 };
 
 struct S52TextLayer {
-  // text marks
-  std::vector<QString> texts;
-  // sequence of point coords (lat, lon)
-  std::vector<float> points;
+  std::vector<QString>  texts;          // text marks
+  std::vector<float>    points;         // sequence of point coords (lat, lon)
 };
 
 // Sounding values
@@ -128,30 +104,13 @@ private:
 
   QMap<QString, QVariant> getOGRFeatureAttributes(OGRFeature* obj, const QMap<QString, std::pair<int, OGRFieldType>>& fields);
 
+  bool addAreaToLayer(S52AreaLayer* layer, const QString& ptrn_ref, const QString& col_ref, ChartDispPrio dpri, OGRPolygon* poly);
   // Reading and tesselating OGRPolygon, append result to triangles
   bool readOGRPolygon(OGRPolygon* poGeom, std::vector<float>& triangles);
+
+  bool addLineToLayer(S52LineLayer* layer, const QString& ptrn_ref, const QString& col_ref, ChartDispPrio dpri, OGRLineString* line);
   // Reading OGRLine, append result to points
   bool readOGRLine(OGRLineString* poGeom, std::vector<float>& points, std::vector<double>& distances);
-
-
-
-
-  void fillLineParams(QString& layer_name, S52LineLayer* layer, OGRFeature* poFeature);
-  void fillAreaParams(QString& layer_name, S52AreaLayer* layer, OGRFeature* poFeature);
-
-  QString getAreaColorRef(QString& layer_name, OGRFeature* poFeature);
-  QString getAreaPatternRef(QString& layer_name, OGRFeature* poFeature);
-
-  QString getLineColorRef(QString& layer_name, OGRFeature* poFeature);
-  QString getLinePatternRef(QString& layer_name, OGRFeature* poFeature);
-
-  bool isAreaColorUniform(QString& layer_name);
-  bool isAreaPatternUniform(QString& layer_name);
-
-  bool isLineColorUniform(QString& layer_name);
-  bool isLinePatternUniform(QString& layer_name);
-
-  bool isMarkSymbolUniform(QString& layer_name);
 };
 
 #endif // S52CHART_H

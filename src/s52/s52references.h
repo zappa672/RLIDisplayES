@@ -32,7 +32,7 @@ enum class LookUpTable {
 , COUNT                  = 5
 };
 
-const static LookUpTable CONST_SYMB_LOOKUP = LookUpTable::PAPER_CHART; // Can be set to SIMPLIFIED
+const static LookUpTable CONST_SYMB_LOOKUP = LookUpTable::PAPER_CHART;      // Can be set to SIMPLIFIED
 const static LookUpTable CONST_AREA_LOOKUP = LookUpTable::PLAIN_BOUNDARIES; // Can be set to SYMBOLYZED_BOUNDARIES
 
 
@@ -65,7 +65,7 @@ static const QMap<QString, ChartObjectType> CHART_OBJ_TYPE_MAP
 
 
 // Display Priority
-enum class ChartDispPrio {
+enum class ChartDispPrio: int {
   NODATA          = 0   // no data fill area pattern
 , GROUP1          = 1   // S57 group 1 filled areas
 , AREA_1          = 2   // superimposed areas

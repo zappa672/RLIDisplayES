@@ -29,13 +29,6 @@ private:
 
   GLuint point_count;
   int _display_order;
-
-  bool is_pattern_uniform;
-  QPoint patternIdx;
-  QSize  patternDim;
-
-  bool is_color_uniform;
-  GLfloat color_ind;
 };
 
 

@@ -5,9 +5,6 @@ ChartLineEngine::ChartLineEngine(QOpenGLContext* context) : QOpenGLFunctions(con
 
   point_count = 0;
 
-  is_pattern_uniform = false;
-  is_color_uniform = false;
-
   glGenBuffers(LINE_ATTRIBUTES_COUNT, vbo_ids);
   glGenBuffers(1, &_ind_vbo_id);
 }
@@ -43,17 +40,6 @@ void ChartLineEngine::setData(S52LineLayer* layer, S52Assets* assets, S52Referen
   std::vector<GLfloat> tex_inds;
   std::vector<GLfloat> tex_dims;
 
-  if (layer->is_pattern_uniform) {
-    is_pattern_uniform = true;
-    patternIdx = assets->getLinePatternLocation(ref->getColorScheme(), layer->pattern_ref);
-    patternDim = assets->getLinePatternSize(ref->getColorScheme(), layer->pattern_ref);
-  }
-
-  if (layer->is_color_uniform) {
-    is_color_uniform = true;
-    color_ind = layer->color_ind;
-  }
-
   for (unsigned int i = 0; i < layer->start_inds.size(); i++) {
     int fst_idx = layer->start_inds[i];
     int lst_idx = 0;
@@ -66,12 +52,8 @@ void ChartLineEngine::setData(S52LineLayer* layer, S52Assets* assets, S52Referen
     if (lst_idx <= fst_idx)
       continue;
 
-    QPoint tex_ind;
-    QSize tex_dim;
-    if (!is_pattern_uniform) {
-      tex_ind = assets->getLinePatternLocation(ref->getColorScheme(), layer->pattern_refs[i]);
-      tex_dim = assets->getLinePatternSize(ref->getColorScheme(), layer->pattern_refs[i]);
-    }
+    QPoint tex_ind = assets->getLinePatternLocation(ref->getColorScheme(), layer->pattern_refs[i]);
+    QSize  tex_dim = assets->getLinePatternSize(ref->getColorScheme(), layer->pattern_refs[i]);
 
     for (int j = fst_idx; j < lst_idx - 2; j += 2) {
       for (int k = 0; k < 4; k++) {
@@ -82,16 +64,11 @@ void ChartLineEngine::setData(S52LineLayer* layer, S52Assets* assets, S52Referen
         point_ords.push_back(k);
         distances.push_back(layer->distances[j/2]);
 
-        if (!is_color_uniform) {
-          color_inds.push_back(layer->color_inds[i]);
-        }
-
-        if (!is_pattern_uniform) {
-          tex_inds.push_back(tex_ind.x());
-          tex_inds.push_back(tex_ind.y());
-          tex_dims.push_back(tex_dim.width());
-          tex_dims.push_back(tex_dim.height());
-        }
+        color_inds.push_back(layer->color_inds[i]);
+        tex_inds.push_back(tex_ind.x());
+        tex_inds.push_back(tex_ind.y());
+        tex_dims.push_back(tex_dim.width());
+        tex_dims.push_back(tex_dim.height());
       }
     }
   }
@@ -110,18 +87,14 @@ void ChartLineEngine::setData(S52LineLayer* layer, S52Assets* assets, S52Referen
   glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[LINE_ATTRIBUTES_ORDER]);
   glBufferData(GL_ARRAY_BUFFER, point_ords.size() * sizeof(GLfloat), &point_ords[0], GL_STATIC_DRAW);
 
-  if (!is_pattern_uniform) {
-    glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[LINE_ATTRIBUTES_PATTERN_INDEX]);
-    glBufferData(GL_ARRAY_BUFFER, tex_inds.size() * sizeof(GLfloat), &tex_inds[0], GL_STATIC_DRAW);
+  glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[LINE_ATTRIBUTES_PATTERN_INDEX]);
+  glBufferData(GL_ARRAY_BUFFER, tex_inds.size() * sizeof(GLfloat), &tex_inds[0], GL_STATIC_DRAW);
 
-    glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[LINE_ATTRIBUTES_PATTERN_DIM]);
-    glBufferData(GL_ARRAY_BUFFER, tex_dims.size() * sizeof(GLfloat), &tex_dims[0], GL_STATIC_DRAW);
-  }
+  glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[LINE_ATTRIBUTES_PATTERN_DIM]);
+  glBufferData(GL_ARRAY_BUFFER, tex_dims.size() * sizeof(GLfloat), &tex_dims[0], GL_STATIC_DRAW);
 
-  if (!is_color_uniform) {
-    glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[LINE_ATTRIBUTES_COLOR_INDEX]);
-    glBufferData(GL_ARRAY_BUFFER, color_inds.size() * sizeof(GLfloat), &color_inds[0], GL_STATIC_DRAW);
-  }
+  glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[LINE_ATTRIBUTES_COLOR_INDEX]);
+  glBufferData(GL_ARRAY_BUFFER, color_inds.size() * sizeof(GLfloat), &color_inds[0], GL_STATIC_DRAW);
 
   glBindBuffer(GL_ARRAY_BUFFER, 0);
 
@@ -161,30 +134,17 @@ void ChartLineEngine::draw(ChartShaders* shaders) {
   glVertexAttribPointer(shaders->getLineAttributeLoc(LINE_ATTRIBUTES_ORDER), 1, GL_FLOAT, GL_FALSE, 0, (void *) 0);
   glEnableVertexAttribArray(shaders->getLineAttributeLoc(LINE_ATTRIBUTES_ORDER));
 
-  if (!is_pattern_uniform) {
-    glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[LINE_ATTRIBUTES_PATTERN_INDEX]);
-    glVertexAttribPointer(shaders->getLineAttributeLoc(LINE_ATTRIBUTES_PATTERN_INDEX), 2, GL_FLOAT, GL_FALSE, 0, (void *) 0);
-    glEnableVertexAttribArray(shaders->getLineAttributeLoc(LINE_ATTRIBUTES_PATTERN_INDEX));
+  glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[LINE_ATTRIBUTES_PATTERN_INDEX]);
+  glVertexAttribPointer(shaders->getLineAttributeLoc(LINE_ATTRIBUTES_PATTERN_INDEX), 2, GL_FLOAT, GL_FALSE, 0, (void *) 0);
+  glEnableVertexAttribArray(shaders->getLineAttributeLoc(LINE_ATTRIBUTES_PATTERN_INDEX));
 
-    glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[LINE_ATTRIBUTES_PATTERN_DIM]);
-    glVertexAttribPointer(shaders->getLineAttributeLoc(LINE_ATTRIBUTES_PATTERN_DIM), 2, GL_FLOAT, GL_FALSE, 0, (void *) 0);
-    glEnableVertexAttribArray(shaders->getLineAttributeLoc(LINE_ATTRIBUTES_PATTERN_DIM));
-  } else {
-    glVertexAttrib2f(shaders->getLineAttributeLoc(LINE_ATTRIBUTES_PATTERN_INDEX), patternIdx.x(), patternIdx.y());
-    glVertexAttrib2f(shaders->getLineAttributeLoc(LINE_ATTRIBUTES_PATTERN_DIM), patternDim.width(), patternDim.height());
+  glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[LINE_ATTRIBUTES_PATTERN_DIM]);
+  glVertexAttribPointer(shaders->getLineAttributeLoc(LINE_ATTRIBUTES_PATTERN_DIM), 2, GL_FLOAT, GL_FALSE, 0, (void *) 0);
+  glEnableVertexAttribArray(shaders->getLineAttributeLoc(LINE_ATTRIBUTES_PATTERN_DIM));
 
-    glDisableVertexAttribArray(shaders->getLineAttributeLoc(LINE_ATTRIBUTES_PATTERN_INDEX));
-    glDisableVertexAttribArray(shaders->getLineAttributeLoc(LINE_ATTRIBUTES_PATTERN_DIM));
-  }
-
-  if (!is_color_uniform) {
-    glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[LINE_ATTRIBUTES_COLOR_INDEX]);
-    glVertexAttribPointer(shaders->getLineAttributeLoc(LINE_ATTRIBUTES_COLOR_INDEX), 1, GL_FLOAT, GL_FALSE, 0, (void *) 0);
-    glEnableVertexAttribArray(shaders->getLineAttributeLoc(LINE_ATTRIBUTES_COLOR_INDEX));
-  } else {
-    glVertexAttrib1f(shaders->getLineAttributeLoc(LINE_ATTRIBUTES_COLOR_INDEX), color_ind);
-    glDisableVertexAttribArray(shaders->getLineAttributeLoc(LINE_ATTRIBUTES_COLOR_INDEX));
-  }
+  glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[LINE_ATTRIBUTES_COLOR_INDEX]);
+  glVertexAttribPointer(shaders->getLineAttributeLoc(LINE_ATTRIBUTES_COLOR_INDEX), 1, GL_FLOAT, GL_FALSE, 0, (void *) 0);
+  glEnableVertexAttribArray(shaders->getLineAttributeLoc(LINE_ATTRIBUTES_COLOR_INDEX));
 
   glBindBuffer(GL_ARRAY_BUFFER, 0);
 

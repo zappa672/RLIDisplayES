@@ -27,14 +27,7 @@ private:
   GLuint _vbo_ids[AREA_ATTRIBUTES_COUNT];
 
   int _point_count;
-  int _display_order;
-
-  bool _is_pattern_uniform;
-  QPointF _patternLocation;
-  QSizeF _patternSize;
-
-  bool _is_color_uniform;
-  GLfloat _color_ind;
+  int _display_order;  
 };
 
 #endif // CHARTAREAENGINE_H
