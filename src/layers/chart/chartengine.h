@@ -32,11 +32,10 @@ public:
   void resize(int radius);
   inline QSize size() { return _fbo->size(); }
 
-  void setChart(S52Chart* chrt, S52References* ref);
+  void setChart(S52::Chart* chrt, S52References* ref);
   void update(const RLIState& state, const QString& color_scheme);
 
   inline GLuint textureId() { return _fbo->texture(); }
-  //inline void forceUpdate() { _force_update = true; }
 
 private:
   void clearChartData();
@@ -66,15 +65,15 @@ private:
   void drawTextLayers(const QMatrix4x4& mvp_matrix);
   void drawMarkLayers(const QMatrix4x4& mvp_matrix, const QString& color_scheme);
 
-  void setAreaLayers(S52Chart* chrt, S52References* ref);
-  void setLineLayers(S52Chart* chrt, S52References* ref);
-  //void setTextLayers(S52Chart* chrt, S52References* ref);
-  void setMarkLayers(S52Chart* chrt, S52References* ref);
-  //void setSndgLayer(S52Chart* chrt, S52References* ref);
+  void setAreaLayers(S52::Chart* chrt, S52References* ref);
+  void setLineLayers(S52::Chart* chrt, S52References* ref);
+  void setTextLayers(S52::Chart* chrt, S52References* ref);
+  void setMarkLayers(S52::Chart* chrt, S52References* ref);
+  void setSndgLayer(S52::Chart* chrt, S52References* ref);
 
   QMap<QString, ChartAreaEngine*>  area_engines;
   QMap<QString, ChartLineEngine*>  line_engines;
-  //QMap<QString, ChartTextEngine*>  text_engines;
+  QMap<QString, ChartTextEngine*>  text_engines;
   QMap<QString, ChartMarkEngine*>  mark_engines;
 };
 

@@ -13,7 +13,7 @@ ChartManager::ChartManager(QObject *parent) : QObject(parent) {
 }
 
 ChartManager::~ChartManager() {
-  for (S52Chart* chart : _charts)
+  for (S52::Chart* chart : _charts)
     delete chart;
 }
 
@@ -39,7 +39,7 @@ void ChartManager::chartLoadingWorker() {
       c_chart_path[j] = chart_path[j].toLatin1();
     c_chart_path[chart_path.size()] = '\0';
 
-    S52Chart* chart = new S52Chart(c_chart_path, _s52_refs);
+    S52::Chart* chart = new S52::Chart(c_chart_path, _s52_refs);
 
     _charts.insert(fileList[i], chart);
     delete[] c_chart_path;

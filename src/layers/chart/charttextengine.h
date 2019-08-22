@@ -18,7 +18,7 @@ public:
   virtual ~ChartTextEngine();
 
   void clearData();
-  void setData(S52TextLayer* layer, int display_order);
+  void setData(S52::TextLayer* layer, int display_order);
 
   void draw(ChartShaders* shaders);
   inline int displayOrder() { return _display_order; }
@@ -28,7 +28,7 @@ private:
   int _display_order;
 
   GLuint _ind_vbo_id;
-  GLuint vbo_ids[TEXT_ATTRIBUTES_COUNT];
+  GLuint vbo_ids[TEXT_ATTR_COUNT];
 };
 
 

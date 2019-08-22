@@ -5,8 +5,7 @@
 #include "common/properties.h"
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
-  QDesktopWidget desktop;
-  this->setGeometry(desktop.screenGeometry());
+  setGeometry(QGuiApplication::screens()[0]->geometry());
 
   wgtRLI = new RLIDisplayWidget(this);
   wgtButtonPanel = new RLIControlWidget(wgtRLI, this);

@@ -2,6 +2,8 @@
 
 #include <QXmlStreamReader>
 
+#include <algorithm>
+
 ChartSettingsModel::ChartSettingsModel(const QString& file_path, QObject *parent) : QAbstractTableModel(parent), file(file_path) {
   load();
 }
@@ -32,7 +34,7 @@ void ChartSettingsModel::load(void) {
   }
 
   QList<ChartLayerDisplaySettings> settings = layers_settings.values();
-  qSort(settings);
+  std::sort(settings.begin(), settings.end());
 
   for (int i = 0; i < settings.size(); i++)
     layer_order.push_back(settings[i].name);

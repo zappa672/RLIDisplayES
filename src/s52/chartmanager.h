@@ -20,7 +20,7 @@ public:
   inline int chartCount() { return _charts.size(); }
 
   inline QList<QString> chartNames() { return _charts.keys(); }
-  inline S52Chart* getChart(const QString& name) { if (!_charts.contains(name)) return nullptr; return _charts[name]; }
+  inline S52::Chart* getChart(const QString& name) { if (!_charts.contains(name)) return nullptr; return _charts[name]; }
 
 signals:
   void newChartAvailable(const QString& name);
@@ -28,7 +28,7 @@ signals:
 private:
   void chartLoadingWorker();
 
-  QMap<QString, S52Chart*> _charts;
+  QMap<QString, S52::Chart*> _charts;
   S52References* _s52_refs;
 };
 
