@@ -18,13 +18,13 @@ public:
   virtual ~ChartAreaEngine();
 
   void clearData();
-  void setData(S52AreaLayer* layer, S52Assets* assets, S52References* ref, int display_order);
+  void setData(S52::AreaLayer* layer, S52Assets* assets, S52References* ref, int display_order);
 
   void draw(ChartShaders* shaders);
   inline int displayOrder() { return _display_order; }
 
 private:
-  GLuint _vbo_ids[AREA_ATTRIBUTES_COUNT];
+  GLuint _vbo_ids[AREA_ATTR_COUNT];
 
   int _point_count;
   int _display_order;  

@@ -21,13 +21,13 @@ ChartEngine::ChartEngine(int tex_radius, S52References* ref, QOpenGLContext* con
 }
 
 ChartEngine::~ChartEngine() {
-  for (ChartAreaEngine* engine: area_engines)
+  for (auto engine: area_engines)
     delete engine;
-  for (ChartLineEngine* engine: line_engines)
+  for (auto engine: line_engines)
     delete engine;
-  for (ChartTextEngine* engine: text_engines)
+  for (auto engine: text_engines)
     delete engine;
-  for (ChartMarkEngine* engine: mark_engines)
+  for (auto engine: mark_engines)
     delete engine;
 
   delete _fbo;
@@ -60,7 +60,7 @@ void ChartEngine::resize(int radius) {
 }
 
 
-void ChartEngine::setChart(S52Chart* chrt, S52References* ref) {
+void ChartEngine::setChart(S52::Chart* chrt, S52References* ref) {
   _ready = false;
 
   clearChartData();
@@ -95,47 +95,45 @@ void ChartEngine::clearChartData() {
 }
 
 
-void ChartEngine::setAreaLayers(S52Chart* chrt, S52References* ref) {
+void ChartEngine::setAreaLayers(S52::Chart* chrt, S52References* ref) {
   for (QString layer_name : chrt->areaLayerNames()) {
-    S52AreaLayer* layer = chrt->areaLayer(layer_name);
+    S52::AreaLayer* layer = chrt->areaLayer(layer_name);
     ChartAreaEngine* engine = new ChartAreaEngine(_context);
     engine->setData(layer, assets, ref, layer->disp_prio[0]);
     area_engines.push_back(engine);
   }
 }
 
-void ChartEngine::setLineLayers(S52Chart* chrt, S52References* ref) {
+void ChartEngine::setLineLayers(S52::Chart* chrt, S52References* ref) {
   for (QString layer_name : chrt->lineLayerNames()) {
-    S52LineLayer* layer = chrt->lineLayer(layer_name);
+    S52::LineLayer* layer = chrt->lineLayer(layer_name);
     ChartLineEngine* engine = new ChartLineEngine(_context);
     engine->setData(layer, assets, ref, 10 + layer->disp_prio[0]);
     line_engines.push_back(engine);
   }
 }
 
-
-void ChartEngine::setTextLayers(S52Chart* chrt, S52References* ref) {
+void ChartEngine::setTextLayers(S52::Chart* chrt, S52References* ref) {
   Q_UNUSED(ref);
 
   for (QString layer_name : chrt->textLayerNames()) {
-    S52TextLayer* layer = chrt->textLayer(layer_name);
+    S52::TextLayer* layer = chrt->textLayer(layer_name);
     ChartTextEngine* engine = new ChartTextEngine(_context);
     engine->setData(layer, 30);
     text_engines.push_back(engine);
   }
 }
 
-
-void ChartEngine::setMarkLayers(S52Chart* chrt, S52References* ref) {
+void ChartEngine::setMarkLayers(S52::Chart* chrt, S52References* ref) {
   for (QString layer_name : chrt->markLayerNames()) {
-    S52MarkLayer* layer = chrt->markLayer(layer_name);
+    S52::MarkLayer* layer = chrt->markLayer(layer_name);
     ChartMarkEngine* engine = new ChartMarkEngine(_context);
     engine->setData(layer, ref, 20 + layer->disp_prio[0]);
     mark_engines.push_back(engine);
   }
 }
 
-void ChartEngine::setSndgLayer(S52Chart* chrt, S52References* ref) {
+void ChartEngine::setSndgLayer(S52::Chart* chrt, S52References* ref) {
   ChartMarkEngine* engine = new ChartMarkEngine(_context);
   engine->setData(chrt->sndgLayer(), assets, ref, 100);
   mark_engines.push_back(engine);
@@ -204,29 +202,29 @@ void ChartEngine::drawAreaLayers(const QMatrix4x4& mvp_matrix, const QString& co
   glClearDepthf(0.f);
   glClear(GL_DEPTH_BUFFER_BIT);
 
-  QOpenGLShaderProgram* prog = shaders->getChartAreaProgram();
+  QOpenGLShaderProgram* prog = shaders->getAreaProgram();
 
   prog->bind();
 
   QOpenGLTexture* pattern_tex = assets->getAreaPatternTex(color_scheme);
   QOpenGLTexture* color_scheme_tex = assets->getColorSchemeTex(color_scheme);
 
-  glUniform2f(shaders->getLineUniformLoc(COMMON_UNIFORMS_CENTER), static_cast<GLfloat>(_center.lat), static_cast<GLfloat>(_center.lon));
-  glUniform1f(shaders->getAreaUniformLoc(COMMON_UNIFORMS_SCALE), static_cast<GLfloat>(_scale));
-  glUniform1f(shaders->getAreaUniformLoc(COMMON_UNIFORMS_NORTH), static_cast<GLfloat>(_angle));
-  glUniform2f(shaders->getAreaUniformLoc(COMMON_UNIFORMS_PATTERN_TEX_DIM), pattern_tex->width(), pattern_tex->height());
-  prog->setUniformValue(shaders->getAreaUniformLoc(COMMON_UNIFORMS_MVP_MATRIX), mvp_matrix);
+  glUniform2f(shaders->getLineUnifLoc(COMMON_UNIF_CENTER), static_cast<GLfloat>(_center.lat), static_cast<GLfloat>(_center.lon));
+  glUniform1f(shaders->getAreaUnifLoc(COMMON_UNIF_SCALE), static_cast<GLfloat>(_scale));
+  glUniform1f(shaders->getAreaUnifLoc(COMMON_UNIF_NORTH), static_cast<GLfloat>(_angle));
+  glUniform2f(shaders->getAreaUnifLoc(COMMON_UNIF_PATTERN_TEX_DIM), pattern_tex->width(), pattern_tex->height());
+  prog->setUniformValue(shaders->getAreaUnifLoc(COMMON_UNIF_MVP_MATRIX), mvp_matrix);
 
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, pattern_tex->textureId());
-  prog->setUniformValue(shaders->getAreaUniformLoc(COMMON_UNIFORMS_PATTERN_TEX_ID), 0);
+  prog->setUniformValue(shaders->getAreaUnifLoc(COMMON_UNIF_PATTERN_TEX_ID), 0);
 
   glActiveTexture(GL_TEXTURE1);
   glBindTexture(GL_TEXTURE_2D, color_scheme_tex->textureId());
-  prog->setUniformValue(shaders->getAreaUniformLoc(AREA_UNIFORMS_COLOR_TABLE_TEX), 1);
+  prog->setUniformValue(shaders->getAreaUnifLoc(AREA_UNIF_COLOR_TABLE_TEX), 1);
 
   for (ChartAreaEngine* areaEngine : area_engines) {
-    prog->setUniformValue(shaders->getAreaUniformLoc(COMMON_UNIFORMS_DISPLAY_ORDER), static_cast<float>(areaEngine->displayOrder()));
+    prog->setUniformValue(shaders->getAreaUnifLoc(COMMON_UNIF_DISPLAY_ORDER), static_cast<float>(areaEngine->displayOrder()));
     areaEngine->draw(shaders);
   }
 
@@ -247,25 +245,25 @@ void ChartEngine::drawLineLayers(const QMatrix4x4& mvp_matrix, const QString& co
   QOpenGLTexture* pattern_tex = assets->getLinePatternTex(color_scheme);
   QOpenGLTexture* color_scheme_tex = assets->getColorSchemeTex(color_scheme);
 
-  QOpenGLShaderProgram* prog = shaders->getChartLineProgram();
+  QOpenGLShaderProgram* prog = shaders->getLineProgram();
   prog->bind();
 
-  glUniform2f(shaders->getLineUniformLoc(COMMON_UNIFORMS_CENTER), static_cast<GLfloat>(_center.lat), static_cast<GLfloat>(_center.lon));
-  glUniform1f(shaders->getLineUniformLoc(COMMON_UNIFORMS_SCALE), static_cast<GLfloat>(_scale));
-  glUniform1f(shaders->getLineUniformLoc(COMMON_UNIFORMS_NORTH), static_cast<GLfloat>(_angle));
-  glUniform2f(shaders->getLineUniformLoc(COMMON_UNIFORMS_PATTERN_TEX_DIM), pattern_tex->width(), pattern_tex->height());
-  prog->setUniformValue(shaders->getLineUniformLoc(COMMON_UNIFORMS_MVP_MATRIX), mvp_matrix);
+  glUniform2f(shaders->getLineUnifLoc(COMMON_UNIF_CENTER), static_cast<GLfloat>(_center.lat), static_cast<GLfloat>(_center.lon));
+  glUniform1f(shaders->getLineUnifLoc(COMMON_UNIF_SCALE), static_cast<GLfloat>(_scale));
+  glUniform1f(shaders->getLineUnifLoc(COMMON_UNIF_NORTH), static_cast<GLfloat>(_angle));
+  glUniform2f(shaders->getLineUnifLoc(COMMON_UNIF_PATTERN_TEX_DIM), pattern_tex->width(), pattern_tex->height());
+  prog->setUniformValue(shaders->getLineUnifLoc(COMMON_UNIF_MVP_MATRIX), mvp_matrix);
 
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, pattern_tex->textureId());
-  glUniform1i(shaders->getLineUniformLoc(COMMON_UNIFORMS_PATTERN_TEX_ID), 0);
+  glUniform1i(shaders->getLineUnifLoc(COMMON_UNIF_PATTERN_TEX_ID), 0);
 
   glActiveTexture(GL_TEXTURE1);
   glBindTexture(GL_TEXTURE_2D, color_scheme_tex->textureId());
-  glUniform1i(shaders->getLineUniformLoc(LINE_UNIFORMS_COLOR_TABLE_TEX), 1);
+  glUniform1i(shaders->getLineUnifLoc(LINE_UNIF_COLOR_TABLE_TEX), 1);
 
   for (ChartLineEngine* lineEngine : line_engines) {
-    glUniform1f(shaders->getLineUniformLoc(COMMON_UNIFORMS_DISPLAY_ORDER), lineEngine->displayOrder());
+    glUniform1f(shaders->getLineUnifLoc(COMMON_UNIF_DISPLAY_ORDER), lineEngine->displayOrder());
     lineEngine->draw(shaders);
   }
 
@@ -286,21 +284,21 @@ void ChartEngine::drawTextLayers(const QMatrix4x4& mvp_matrix) {
 
   QOpenGLTexture* font_tex = assets->getFontTexId();
 
-  QOpenGLShaderProgram* prog = shaders->getChartTextProgram();
+  QOpenGLShaderProgram* prog = shaders->getTextProgram();
   prog->bind();
 
-  glUniform2f(shaders->getLineUniformLoc(COMMON_UNIFORMS_CENTER), static_cast<GLfloat>(_center.lat), static_cast<GLfloat>(_center.lon));
-  glUniform1f(shaders->getTextUniformLoc(COMMON_UNIFORMS_SCALE), static_cast<GLfloat>(_scale));
-  glUniform1f(shaders->getTextUniformLoc(COMMON_UNIFORMS_NORTH), static_cast<GLfloat>(_angle));
-  prog->setUniformValue(shaders->getTextUniformLoc(COMMON_UNIFORMS_MVP_MATRIX), mvp_matrix);
+  glUniform2f(shaders->getLineUnifLoc(COMMON_UNIF_CENTER), static_cast<GLfloat>(_center.lat), static_cast<GLfloat>(_center.lon));
+  glUniform1f(shaders->getTextUnifLoc(COMMON_UNIF_SCALE), static_cast<GLfloat>(_scale));
+  glUniform1f(shaders->getTextUnifLoc(COMMON_UNIF_NORTH), static_cast<GLfloat>(_angle));
+  prog->setUniformValue(shaders->getTextUnifLoc(COMMON_UNIF_MVP_MATRIX), mvp_matrix);
 
-  glUniform1i(shaders->getTextUniformLoc(COMMON_UNIFORMS_PATTERN_TEX_ID), 0);
+  glUniform1i(shaders->getTextUnifLoc(COMMON_UNIF_PATTERN_TEX_ID), 0);
 
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, font_tex->textureId());
 
   for (ChartTextEngine* textEngine : text_engines) {
-    prog->setUniformValue(shaders->getTextUniformLoc(COMMON_UNIFORMS_DISPLAY_ORDER), 0.f);
+    prog->setUniformValue(shaders->getTextUnifLoc(COMMON_UNIF_DISPLAY_ORDER), 0.f);
     textEngine->draw(shaders);
   }
 
@@ -316,24 +314,24 @@ void ChartEngine::drawMarkLayers(const QMatrix4x4& mvp_matrix, const QString& co
   glClearDepthf(0.f);
   glClear(GL_DEPTH_BUFFER_BIT);
 
-  QOpenGLShaderProgram* prog = shaders->getChartMarkProgram();
+  QOpenGLShaderProgram* prog = shaders->getMarkProgram();
   prog->bind();
 
   QOpenGLTexture* pattern_tex = assets->getSymbolTex(color_scheme);
 
-  glUniform2f(shaders->getLineUniformLoc(COMMON_UNIFORMS_CENTER), static_cast<GLfloat>(_center.lat), static_cast<GLfloat>(_center.lon));
-  glUniform1f(shaders->getMarkUniformLoc(COMMON_UNIFORMS_SCALE), static_cast<GLfloat>(_scale));
-  glUniform1f(shaders->getMarkUniformLoc(COMMON_UNIFORMS_NORTH), static_cast<GLfloat>(_angle));
-  glUniform2f(shaders->getMarkUniformLoc(COMMON_UNIFORMS_PATTERN_TEX_DIM), pattern_tex->width(), pattern_tex->height());
-  prog->setUniformValue(shaders->getMarkUniformLoc(COMMON_UNIFORMS_MVP_MATRIX), mvp_matrix);
+  glUniform2f(shaders->getLineUnifLoc(COMMON_UNIF_CENTER), static_cast<GLfloat>(_center.lat), static_cast<GLfloat>(_center.lon));
+  glUniform1f(shaders->getMarkUnifLoc(COMMON_UNIF_SCALE), static_cast<GLfloat>(_scale));
+  glUniform1f(shaders->getMarkUnifLoc(COMMON_UNIF_NORTH), static_cast<GLfloat>(_angle));
+  glUniform2f(shaders->getMarkUnifLoc(COMMON_UNIF_PATTERN_TEX_DIM), pattern_tex->width(), pattern_tex->height());
+  prog->setUniformValue(shaders->getMarkUnifLoc(COMMON_UNIF_MVP_MATRIX), mvp_matrix);
 
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, pattern_tex->textureId());
 
-  glUniform1i(shaders->getMarkUniformLoc(COMMON_UNIFORMS_PATTERN_TEX_ID), 0);
+  glUniform1i(shaders->getMarkUnifLoc(COMMON_UNIF_PATTERN_TEX_ID), 0);
 
   for (ChartMarkEngine* markEngine : mark_engines) {
-    prog->setUniformValue(shaders->getMarkUniformLoc(COMMON_UNIFORMS_DISPLAY_ORDER), static_cast<float>(markEngine->displayOrder()));
+    prog->setUniformValue(shaders->getMarkUnifLoc(COMMON_UNIF_DISPLAY_ORDER), static_cast<float>(markEngine->displayOrder()));
     markEngine->draw(shaders);
   }
 

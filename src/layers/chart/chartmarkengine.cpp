@@ -5,19 +5,19 @@ ChartMarkEngine::ChartMarkEngine(QOpenGLContext* context) : QOpenGLFunctions(con
 
   point_count = 0;
 
-  glGenBuffers(MARK_ATTRIBUTES_COUNT, vbo_ids);
+  glGenBuffers(MARK_ATTR_COUNT, vbo_ids);
   glGenBuffers(1, &_ind_vbo_id);
 }
 
 ChartMarkEngine::~ChartMarkEngine() {
-  glDeleteBuffers(MARK_ATTRIBUTES_COUNT, vbo_ids);
+  glDeleteBuffers(MARK_ATTR_COUNT, vbo_ids);
   glDeleteBuffers(1, &_ind_vbo_id);
 }
 
 void ChartMarkEngine::clearData() {
   point_count = 0;
 
-  for (int i = 0; i < MARK_ATTRIBUTES_COUNT; i++) {
+  for (int i = 0; i < MARK_ATTR_COUNT; i++) {
     glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[i]);
     glBufferData(GL_ARRAY_BUFFER, 0, nullptr, GL_STATIC_DRAW);
   }
@@ -29,7 +29,7 @@ void ChartMarkEngine::clearData() {
 }
 
 
-void ChartMarkEngine::setData(S52MarkLayer* layer, S52References* ref, int display_order) {
+void ChartMarkEngine::setData(S52::MarkLayer* layer, S52References* ref, int display_order) {
   _display_order = display_order;
 
   std::vector<GLfloat> world_coords;
@@ -43,7 +43,7 @@ void ChartMarkEngine::setData(S52MarkLayer* layer, S52References* ref, int displ
   QPointF vertex_offset;
   QPointF tex_coord;
 
-  for (unsigned int i = 0; i < (layer->points.size() / 2); i++) {
+  for (size_t i = 0; i < (layer->points.size() / 2); i++) {
     orig = ref->getSymbolIndex(layer->symbol_refs[i]);
     size = ref->getSymbolSize(layer->symbol_refs[i]);
     pivt = ref->getSymbolPivot(layer->symbol_refs[i]);
@@ -87,13 +87,13 @@ void ChartMarkEngine::setupBuffers( const std::vector<GLfloat>& world_coords
                                   , const std::vector<GLfloat>& vertex_offsets
                                   , const std::vector<GLfloat>& tex_coords )
 {
-  glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[MARK_ATTRIBUTES_WORLD_COORDS]);
+  glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[MARK_ATTR_WORLD_COORDS]);
   glBufferData(GL_ARRAY_BUFFER, world_coords.size() * sizeof(GLfloat), &world_coords[0], GL_STATIC_DRAW);
 
-  glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[MARK_ATTRIBUTES_VERTEX_OFFSET]);
+  glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[MARK_ATTR_VERTEX_OFFSET]);
   glBufferData(GL_ARRAY_BUFFER, vertex_offsets.size() * sizeof(GLfloat), &vertex_offsets[0], GL_STATIC_DRAW);
 
-  glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[MARK_ATTRIBUTES_TEX_COORDS]);
+  glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[MARK_ATTR_TEX_COORDS]);
   glBufferData(GL_ARRAY_BUFFER, tex_coords.size() * sizeof(GLfloat), &tex_coords[0], GL_STATIC_DRAW);
 
   glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -114,7 +114,7 @@ void ChartMarkEngine::setupBuffers( const std::vector<GLfloat>& world_coords
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
-void ChartMarkEngine::setData(S52SndgLayer* layer, S52Assets* assets, S52References* ref, int display_order) {
+void ChartMarkEngine::setData(S52::SndgLayer* layer, S52Assets* assets, S52References* ref, int display_order) {
   Q_UNUSED(assets);
 
   _display_order = display_order;
@@ -130,7 +130,7 @@ void ChartMarkEngine::setData(S52SndgLayer* layer, S52Assets* assets, S52Referen
   QPointF tex_coord;
 
 
-  for (unsigned int i = 0; i < (layer->points.size() / 2); i++) {
+  for (size_t i = 0; i < (layer->points.size() / 2); i++) {
     QString depth = QString::number(layer->depths[i], 'f', 1);
 
     bool frac = false;
@@ -195,17 +195,17 @@ void ChartMarkEngine::draw(ChartShaders* shaders) {
   if (point_count <= 0)
     return;
 
-  glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[MARK_ATTRIBUTES_WORLD_COORDS]);
-  glVertexAttribPointer(shaders->getMarkAttributeLoc(MARK_ATTRIBUTES_WORLD_COORDS), 2, GL_FLOAT, GL_FALSE, 0, (void *) 0);
-  glEnableVertexAttribArray(shaders->getMarkAttributeLoc(MARK_ATTRIBUTES_WORLD_COORDS));
+  glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[MARK_ATTR_WORLD_COORDS]);
+  glVertexAttribPointer(shaders->getMarkAttrLoc(MARK_ATTR_WORLD_COORDS), 2, GL_FLOAT, GL_FALSE, 0, (void *) 0);
+  glEnableVertexAttribArray(shaders->getMarkAttrLoc(MARK_ATTR_WORLD_COORDS));
 
-  glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[MARK_ATTRIBUTES_VERTEX_OFFSET]);
-  glVertexAttribPointer(shaders->getMarkAttributeLoc(MARK_ATTRIBUTES_VERTEX_OFFSET), 2, GL_FLOAT, GL_FALSE, 0, (void *) 0);
-  glEnableVertexAttribArray(shaders->getMarkAttributeLoc(MARK_ATTRIBUTES_VERTEX_OFFSET));
+  glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[MARK_ATTR_VERTEX_OFFSET]);
+  glVertexAttribPointer(shaders->getMarkAttrLoc(MARK_ATTR_VERTEX_OFFSET), 2, GL_FLOAT, GL_FALSE, 0, (void *) 0);
+  glEnableVertexAttribArray(shaders->getMarkAttrLoc(MARK_ATTR_VERTEX_OFFSET));
 
-  glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[MARK_ATTRIBUTES_TEX_COORDS]);
-  glVertexAttribPointer(shaders->getMarkAttributeLoc(MARK_ATTRIBUTES_TEX_COORDS), 2, GL_FLOAT, GL_FALSE, 0, (void *) 0);
-  glEnableVertexAttribArray(shaders->getMarkAttributeLoc(MARK_ATTRIBUTES_TEX_COORDS));
+  glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[MARK_ATTR_TEX_COORDS]);
+  glVertexAttribPointer(shaders->getMarkAttrLoc(MARK_ATTR_TEX_COORDS), 2, GL_FLOAT, GL_FALSE, 0, (void *) 0);
+  glEnableVertexAttribArray(shaders->getMarkAttrLoc(MARK_ATTR_TEX_COORDS));
 
   glBindBuffer(GL_ARRAY_BUFFER, 0);
 

@@ -43,19 +43,15 @@ RadarDataSource::~RadarDataSource() {
 }
 
 void RadarDataSource::start() {
-  if (_timerId != -1)
-    return;
-
-  _timerId = startTimer(_timer_period, Qt::PreciseTimer);
+  if (_timerId == -1)
+    _timerId = startTimer(_timer_period, Qt::PreciseTimer);
 }
 
-
 void RadarDataSource::finish() {
-  if (_timerId == -1)
-    return;
-
-  killTimer(_timerId);
-  _timerId = -1;
+  if (_timerId != -1) {
+    killTimer(_timerId);
+    _timerId = -1;
+  }
 }
 
 void RadarDataSource::timerEvent(QTimerEvent* e) {

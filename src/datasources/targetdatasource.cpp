@@ -49,19 +49,17 @@ TargetDataSource::~TargetDataSource() {
 }
 
 void TargetDataSource::start() {
-  if (_timerId != -1)
-    return;
-
-  _startTime = QDateTime::currentDateTime();
-  _timerId = startTimer(200);
+  if (_timerId == -1) {
+    _startTime = QDateTime::currentDateTime();
+    _timerId = startTimer(200);
+  }
 }
 
 void TargetDataSource::finish() {
-  if (_timerId == -1)
-    return;
-
-  killTimer(_timerId);
-  _timerId = -1;
+  if (_timerId != -1) {
+    killTimer(_timerId);
+    _timerId = -1;
+  }
 }
 
 const float PI = 3.14159265359f;

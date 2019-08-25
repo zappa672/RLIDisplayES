@@ -4,117 +4,117 @@
 ChartShaders::ChartShaders(QOpenGLContext* context) : QOpenGLFunctions(context) {
   initializeOpenGLFunctions();
 
-  initChartAreaProgram();
-  initChartLineProgram();
-  initChartMarkProgram();
-  initChartTextProgram();
+  initAreaProgram();
+  initLineProgram();
+  initMarkProgram();
+  initTextProgram();
 }
 
 ChartShaders::~ChartShaders() {
-  delete chart_area_program;
-  delete chart_line_program;
-  delete chart_text_program;
-  delete chart_mark_program;
+  delete area_program;
+  delete line_program;
+  delete text_program;
+  delete mark_program;
 }
 
 
 
-void ChartShaders::initChartAreaProgram() {
-  chart_area_program = new QOpenGLShaderProgram();
+void ChartShaders::initAreaProgram() {
+  area_program = new QOpenGLShaderProgram();
 
-  chart_area_program->addShaderFromSourceFile(QOpenGLShader::Vertex, SHADERS_PATH + "chart_area.vert.glsl");
-  chart_area_program->addShaderFromSourceFile(QOpenGLShader::Fragment, SHADERS_PATH + "chart_area.frag.glsl");
-  chart_area_program->link();
-  chart_area_program->bind();
+  area_program->addShaderFromSourceFile(QOpenGLShader::Vertex, SHADERS_PATH + "chart_area.vert.glsl");
+  area_program->addShaderFromSourceFile(QOpenGLShader::Fragment, SHADERS_PATH + "chart_area.frag.glsl");
+  area_program->link();
+  area_program->bind();
 
-  area_unif_locs[COMMON_UNIFORMS_NORTH]            = chart_area_program->uniformLocation("north");
-  area_unif_locs[COMMON_UNIFORMS_CENTER]           = chart_area_program->uniformLocation("center");
-  area_unif_locs[COMMON_UNIFORMS_SCALE]            = chart_area_program->uniformLocation("scale");
-  area_unif_locs[COMMON_UNIFORMS_PATTERN_TEX_ID]   = chart_area_program->uniformLocation("pattern_tex");
-  area_unif_locs[COMMON_UNIFORMS_PATTERN_TEX_DIM]  = chart_area_program->uniformLocation("assetdim");
-  area_unif_locs[COMMON_UNIFORMS_MVP_MATRIX]       = chart_area_program->uniformLocation("mvp_matrix");
-  area_unif_locs[COMMON_UNIFORMS_DISPLAY_ORDER]    = chart_area_program->uniformLocation("display_order");
-  area_unif_locs[AREA_UNIFORMS_COLOR_TABLE_TEX]    = chart_area_program->uniformLocation("color_table_tex");
+  area_unif_locs[COMMON_UNIF_NORTH]            = area_program->uniformLocation("north");
+  area_unif_locs[COMMON_UNIF_CENTER]           = area_program->uniformLocation("center");
+  area_unif_locs[COMMON_UNIF_SCALE]            = area_program->uniformLocation("scale");
+  area_unif_locs[COMMON_UNIF_PATTERN_TEX_ID]   = area_program->uniformLocation("pattern_tex");
+  area_unif_locs[COMMON_UNIF_PATTERN_TEX_DIM]  = area_program->uniformLocation("assetdim");
+  area_unif_locs[COMMON_UNIF_MVP_MATRIX]       = area_program->uniformLocation("mvp_matrix");
+  area_unif_locs[COMMON_UNIF_DISPLAY_ORDER]    = area_program->uniformLocation("display_order");
+  area_unif_locs[AREA_UNIF_COLOR_TABLE_TEX]    = area_program->uniformLocation("color_table_tex");
 
-  area_attr_locs[AREA_ATTRIBUTES_COORDS]         = chart_area_program->attributeLocation("coords");
-  area_attr_locs[AREA_ATTRIBUTES_COLOR_INDEX]    = chart_area_program->attributeLocation("color_index");
-  area_attr_locs[AREA_ATTRIBUTES_PATTERN_INDEX]  = chart_area_program->attributeLocation("tex_origin");
-  area_attr_locs[AREA_ATTRIBUTES_PATTERN_DIM]    = chart_area_program->attributeLocation("tex_dim");
+  area_attr_locs[AREA_ATTR_COORDS]         = area_program->attributeLocation("coords");
+  area_attr_locs[AREA_ATTR_COLOR_INDEX]    = area_program->attributeLocation("color_index");
+  area_attr_locs[AREA_ATTR_PATTERN_INDEX]  = area_program->attributeLocation("tex_origin");
+  area_attr_locs[AREA_ATTR_PATTERN_DIM]    = area_program->attributeLocation("tex_dim");
 
-  chart_area_program->release();
+  area_program->release();
 }
 
 
-void ChartShaders::initChartLineProgram() {
-  chart_line_program = new QOpenGLShaderProgram();
+void ChartShaders::initLineProgram() {
+  line_program = new QOpenGLShaderProgram();
 
-  chart_line_program->addShaderFromSourceFile(QOpenGLShader::Vertex, SHADERS_PATH + "chart_line.vert.glsl");
-  chart_line_program->addShaderFromSourceFile(QOpenGLShader::Fragment, SHADERS_PATH + "chart_line.frag.glsl");
-  chart_line_program->link();
-  chart_line_program->bind();
+  line_program->addShaderFromSourceFile(QOpenGLShader::Vertex, SHADERS_PATH + "chart_line.vert.glsl");
+  line_program->addShaderFromSourceFile(QOpenGLShader::Fragment, SHADERS_PATH + "chart_line.frag.glsl");
+  line_program->link();
+  line_program->bind();
 
-  line_unif_locs[COMMON_UNIFORMS_NORTH]            = chart_line_program->uniformLocation("north");
-  line_unif_locs[COMMON_UNIFORMS_CENTER]           = chart_line_program->uniformLocation("center");
-  line_unif_locs[COMMON_UNIFORMS_SCALE]            = chart_line_program->uniformLocation("scale");
-  line_unif_locs[COMMON_UNIFORMS_PATTERN_TEX_ID]   = chart_line_program->uniformLocation("pattern_tex");
-  line_unif_locs[COMMON_UNIFORMS_PATTERN_TEX_DIM]  = chart_line_program->uniformLocation("assetdim");
-  line_unif_locs[COMMON_UNIFORMS_MVP_MATRIX]       = chart_line_program->uniformLocation("mvp_matrix");
-  line_unif_locs[COMMON_UNIFORMS_DISPLAY_ORDER]    = chart_line_program->uniformLocation("display_order");
-  line_unif_locs[LINE_UNIFORMS_COLOR_TABLE_TEX]    = chart_line_program->uniformLocation("color_table_tex");
+  line_unif_locs[COMMON_UNIF_NORTH]            = line_program->uniformLocation("north");
+  line_unif_locs[COMMON_UNIF_CENTER]           = line_program->uniformLocation("center");
+  line_unif_locs[COMMON_UNIF_SCALE]            = line_program->uniformLocation("scale");
+  line_unif_locs[COMMON_UNIF_PATTERN_TEX_ID]   = line_program->uniformLocation("pattern_tex");
+  line_unif_locs[COMMON_UNIF_PATTERN_TEX_DIM]  = line_program->uniformLocation("assetdim");
+  line_unif_locs[COMMON_UNIF_MVP_MATRIX]       = line_program->uniformLocation("mvp_matrix");
+  line_unif_locs[COMMON_UNIF_DISPLAY_ORDER]    = line_program->uniformLocation("display_order");
+  line_unif_locs[LINE_UNIF_COLOR_TABLE_TEX]    = line_program->uniformLocation("color_table_tex");
 
-  line_attr_locs[LINE_ATTRIBUTES_COORDS1]        = chart_line_program->attributeLocation("coords1");
-  line_attr_locs[LINE_ATTRIBUTES_COORDS2]        = chart_line_program->attributeLocation("coords2");
-  line_attr_locs[LINE_ATTRIBUTES_DISTANCE]       = chart_line_program->attributeLocation("dist");
-  line_attr_locs[LINE_ATTRIBUTES_ORDER]          = chart_line_program->attributeLocation("order");
-  line_attr_locs[LINE_ATTRIBUTES_COLOR_INDEX]    = chart_line_program->attributeLocation("color_index");
-  line_attr_locs[LINE_ATTRIBUTES_PATTERN_INDEX]  = chart_line_program->attributeLocation("tex_orig");
-  line_attr_locs[LINE_ATTRIBUTES_PATTERN_DIM]    = chart_line_program->attributeLocation("tex_dim");
+  line_attr_locs[LINE_ATTR_COORDS1]        = line_program->attributeLocation("coords1");
+  line_attr_locs[LINE_ATTR_COORDS2]        = line_program->attributeLocation("coords2");
+  line_attr_locs[LINE_ATTR_DISTANCE]       = line_program->attributeLocation("dist");
+  line_attr_locs[LINE_ATTR_ORDER]          = line_program->attributeLocation("order");
+  line_attr_locs[LINE_ATTR_COLOR_INDEX]    = line_program->attributeLocation("color_index");
+  line_attr_locs[LINE_ATTR_PATTERN_INDEX]  = line_program->attributeLocation("tex_orig");
+  line_attr_locs[LINE_ATTR_PATTERN_DIM]    = line_program->attributeLocation("tex_dim");
 
-  chart_line_program->release();
+  line_program->release();
 }
 
-void ChartShaders::initChartTextProgram() {
-  chart_text_program = new QOpenGLShaderProgram();
+void ChartShaders::initTextProgram() {
+  text_program = new QOpenGLShaderProgram();
 
-  chart_text_program->addShaderFromSourceFile(QOpenGLShader::Vertex, SHADERS_PATH + "chart_text.vert.glsl");
-  chart_text_program->addShaderFromSourceFile(QOpenGLShader::Fragment, SHADERS_PATH + "chart_text.frag.glsl");
-  chart_text_program->link();
-  chart_text_program->bind();
+  text_program->addShaderFromSourceFile(QOpenGLShader::Vertex, SHADERS_PATH + "chart_text.vert.glsl");
+  text_program->addShaderFromSourceFile(QOpenGLShader::Fragment, SHADERS_PATH + "chart_text.frag.glsl");
+  text_program->link();
+  text_program->bind();
 
-  text_unif_locs[COMMON_UNIFORMS_NORTH]          = chart_text_program->uniformLocation("north");
-  text_unif_locs[COMMON_UNIFORMS_CENTER]         = chart_text_program->uniformLocation("center");
-  text_unif_locs[COMMON_UNIFORMS_SCALE]          = chart_text_program->uniformLocation("scale");
-  text_unif_locs[COMMON_UNIFORMS_PATTERN_TEX_ID] = chart_text_program->uniformLocation("glyph_tex");
-  text_unif_locs[COMMON_UNIFORMS_MVP_MATRIX]     = chart_text_program->uniformLocation("mvp_matrix");
-  text_unif_locs[COMMON_UNIFORMS_DISPLAY_ORDER]  = chart_text_program->uniformLocation("display_order");
+  text_unif_locs[COMMON_UNIF_NORTH]          = text_program->uniformLocation("north");
+  text_unif_locs[COMMON_UNIF_CENTER]         = text_program->uniformLocation("center");
+  text_unif_locs[COMMON_UNIF_SCALE]          = text_program->uniformLocation("scale");
+  text_unif_locs[COMMON_UNIF_PATTERN_TEX_ID] = text_program->uniformLocation("glyph_tex");
+  text_unif_locs[COMMON_UNIF_MVP_MATRIX]     = text_program->uniformLocation("mvp_matrix");
+  text_unif_locs[COMMON_UNIF_DISPLAY_ORDER]  = text_program->uniformLocation("display_order");
 
-  text_attr_locs[TEXT_ATTRIBUTES_COORDS]         = chart_text_program->attributeLocation("coords");
-  text_attr_locs[TEXT_ATTRIBUTES_POINT_ORDER]    = chart_text_program->attributeLocation("point_order");
-  text_attr_locs[TEXT_ATTRIBUTES_CHAR_SHIFT]     = chart_text_program->attributeLocation("char_shift");
-  text_attr_locs[TEXT_ATTRIBUTES_CHAR_VALUE]     = chart_text_program->attributeLocation("char_val");
+  text_attr_locs[TEXT_ATTR_COORDS]         = text_program->attributeLocation("coords");
+  text_attr_locs[TEXT_ATTR_POINT_ORDER]    = text_program->attributeLocation("point_order");
+  text_attr_locs[TEXT_ATTR_CHAR_SHIFT]     = text_program->attributeLocation("char_shift");
+  text_attr_locs[TEXT_ATTR_CHAR_VALUE]     = text_program->attributeLocation("char_val");
 
-  chart_text_program->release();
+  text_program->release();
 }
 
-void ChartShaders::initChartMarkProgram() {
-  chart_mark_program = new QOpenGLShaderProgram();
+void ChartShaders::initMarkProgram() {
+  mark_program = new QOpenGLShaderProgram();
 
-  chart_mark_program->addShaderFromSourceFile(QOpenGLShader::Vertex, SHADERS_PATH + "chart_mark.vert.glsl");
-  chart_mark_program->addShaderFromSourceFile(QOpenGLShader::Fragment, SHADERS_PATH + "chart_mark.frag.glsl");
-  chart_mark_program->link();
-  chart_mark_program->bind();
+  mark_program->addShaderFromSourceFile(QOpenGLShader::Vertex, SHADERS_PATH + "chart_mark.vert.glsl");
+  mark_program->addShaderFromSourceFile(QOpenGLShader::Fragment, SHADERS_PATH + "chart_mark.frag.glsl");
+  mark_program->link();
+  mark_program->bind();
 
-  mark_unif_locs[COMMON_UNIFORMS_NORTH]            = chart_mark_program->uniformLocation("north");
-  mark_unif_locs[COMMON_UNIFORMS_CENTER]           = chart_mark_program->uniformLocation("center");
-  mark_unif_locs[COMMON_UNIFORMS_SCALE]            = chart_mark_program->uniformLocation("scale");
-  mark_unif_locs[COMMON_UNIFORMS_PATTERN_TEX_ID]   = chart_mark_program->uniformLocation("pattern_tex");
-  mark_unif_locs[COMMON_UNIFORMS_PATTERN_TEX_DIM]  = chart_mark_program->uniformLocation("assetdim");
-  mark_unif_locs[COMMON_UNIFORMS_MVP_MATRIX]       = chart_mark_program->uniformLocation("mvp_matrix");
-  mark_unif_locs[COMMON_UNIFORMS_DISPLAY_ORDER]    = chart_mark_program->uniformLocation("display_order");
+  mark_unif_locs[COMMON_UNIF_NORTH]            = mark_program->uniformLocation("north");
+  mark_unif_locs[COMMON_UNIF_CENTER]           = mark_program->uniformLocation("center");
+  mark_unif_locs[COMMON_UNIF_SCALE]            = mark_program->uniformLocation("scale");
+  mark_unif_locs[COMMON_UNIF_PATTERN_TEX_ID]   = mark_program->uniformLocation("pattern_tex");
+  mark_unif_locs[COMMON_UNIF_PATTERN_TEX_DIM]  = mark_program->uniformLocation("assetdim");
+  mark_unif_locs[COMMON_UNIF_MVP_MATRIX]       = mark_program->uniformLocation("mvp_matrix");
+  mark_unif_locs[COMMON_UNIF_DISPLAY_ORDER]    = mark_program->uniformLocation("display_order");
 
-  mark_attr_locs[MARK_ATTRIBUTES_WORLD_COORDS]   = chart_mark_program->attributeLocation("coords");
-  mark_attr_locs[MARK_ATTRIBUTES_VERTEX_OFFSET]  = chart_mark_program->attributeLocation("vertex_offset");
-  mark_attr_locs[MARK_ATTRIBUTES_TEX_COORDS]     = chart_mark_program->attributeLocation("tex_coords");
+  mark_attr_locs[MARK_ATTR_WORLD_COORDS]   = mark_program->attributeLocation("coords");
+  mark_attr_locs[MARK_ATTR_VERTEX_OFFSET]  = mark_program->attributeLocation("vertex_offset");
+  mark_attr_locs[MARK_ATTR_TEX_COORDS]     = mark_program->attributeLocation("tex_coords");
 
-  chart_mark_program->release();
+  mark_program->release();
 }

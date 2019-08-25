@@ -29,17 +29,15 @@ void ShipDataSource::timerEvent(QTimerEvent* e) {
 }
 
 void ShipDataSource::start() {
-  if (_timerId != -1)
-    return;
-
-  _timerId = startTimer(1000);
-  _startTime = QDateTime::currentDateTime();    
+  if (_timerId == -1)  {
+    _timerId = startTimer(1000);
+    _startTime = QDateTime::currentDateTime();
+  }
 }
 
 void ShipDataSource::finish() {
-  if (_timerId == -1)
-    return;
-
-  killTimer(_timerId);
-  _timerId = -1;
+  if (_timerId != -1) {
+    killTimer(_timerId);
+    _timerId = -1;
+  }
 }

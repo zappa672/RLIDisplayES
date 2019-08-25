@@ -3,17 +3,19 @@
 #include <QDebug>
 #include <QList>
 
+#include <algorithm>
+
 #include "../common/triangulate.h"
 #include "../common/rlimath.h"
 
 #include "s57condsymb.h"
 
 using namespace RLIMath;
+using namespace S52;
 
 #define EQUAL_EPS 0.00000001
 
-
-S52Chart::S52Chart(char* file_name, S52References* ref) {
+Chart::Chart(char* file_name, S52References* ref) {
   isOk = false;
   _ref = ref;
   sndg_layer = nullptr;
@@ -35,7 +37,7 @@ S52Chart::S52Chart(char* file_name, S52References* ref) {
   while ((feat = poLayer->GetNextFeature()) != nullptr)
     if (feat->GetFieldIndex("VALDCO") >= 0)
       valdcoVec << feat->GetFieldAsDouble("VALDCO");
-  qSort(valdcoVec);
+  std::sort(valdcoVec.begin(), valdcoVec.end());
   for (auto v: valdcoVec)
     if (v > CONST_SAFETY_DEPTH) {
       _m_next_safe_cnt = v;
@@ -49,9 +51,9 @@ S52Chart::S52Chart(char* file_name, S52References* ref) {
 
     //qDebug() << "Reading layer #" << i << layer_name;
 
-    QRectF fRect(QPointF(144.1, 13.7), QSizeF(3.0, 3.0));
-    poLayer->SetSpatialFilterRect(fRect.left(), fRect.top(), fRect.right(), fRect.bottom());
-    OGRGeometry* spatFilter = poLayer->GetSpatialFilter();
+    //QRectF fRect(QPointF(144.1, 13.7), QSizeF(20.0, 20.0));
+    //poLayer->SetSpatialFilterRect(fRect.left(), fRect.top(), fRect.right(), fRect.bottom());
+    OGRGeometry* spatFilter = nullptr; //poLayer->GetSpatialFilter();
 
     if (layer_name == "M_COVR") {
       OGREnvelope oExt;
@@ -94,16 +96,16 @@ S52Chart::S52Chart(char* file_name, S52References* ref) {
 }
 
 
-S52Chart::~S52Chart() {
+Chart::~Chart() {
   clear();
 }
 
-bool S52Chart::readTextLayer(OGRLayer* poLayer) {
+bool Chart::readTextLayer(OGRLayer* poLayer) {
   OGRFeature* poFeature = nullptr;
   QString name;
   OGRPoint centroid;
 
-  S52TextLayer* layer = new S52TextLayer();
+  TextLayer* layer = new TextLayer();
 
   while( (poFeature = poLayer->GetNextFeature()) != nullptr ) {
     QString name = poFeature->GetFieldAsString("OBJNAM");
@@ -124,13 +126,13 @@ bool S52Chart::readTextLayer(OGRLayer* poLayer) {
 }
 
 
-bool S52Chart::readSoundingLayer(OGRLayer* poLayer, const OGRGeometry* spatFilter) {
+bool Chart::readSoundingLayer(OGRLayer* poLayer, const OGRGeometry* spatFilter) {
   OGRFeature* poFeature = nullptr;
 
   if (sndg_layer != nullptr)
     return false;
 
-  sndg_layer = new S52SndgLayer();
+  sndg_layer = new SndgLayer();
 
   while( (poFeature = poLayer->GetNextFeature()) != nullptr ) {
     for (int i = 0; i < poFeature->GetGeomFieldCount(); i++) {
@@ -143,7 +145,7 @@ bool S52Chart::readSoundingLayer(OGRLayer* poLayer, const OGRGeometry* spatFilte
         for (int j = 0; j < mp->getNumGeometries(); j++) {
           OGRPoint* p = static_cast<OGRPoint*>(mp->getGeometryRef(j));
 
-          if (spatFilter->Contains(p)) {
+          if (spatFilter == nullptr || spatFilter->Contains(p)) {
             sndg_layer->points.push_back(static_cast<float>(p->getY()));
             sndg_layer->points.push_back(static_cast<float>(p->getX()));
             sndg_layer->depths.push_back(p->getZ());
@@ -158,7 +160,7 @@ bool S52Chart::readSoundingLayer(OGRLayer* poLayer, const OGRGeometry* spatFilte
   return true;
 }
 
-void S52Chart::clear() {
+void Chart::clear() {
   for (int i = 0; i < area_layers.keys().size(); i++)
     delete area_layers[area_layers.keys()[i]];
 
@@ -172,7 +174,7 @@ void S52Chart::clear() {
 }
 
 
-QMap<QString, QVariant> S52Chart::getOGRFeatureAttributes(OGRFeature* obj, const QMap<QString, std::pair<int, OGRFieldType>>& fields) {
+QMap<QString, QVariant> Chart::getOGRFeatureAttributes(OGRFeature* obj, const QMap<QString, std::pair<int, OGRFieldType>>& fields) {
   QMap<QString, QVariant> featAttrs;
 
   int fldListCount;
@@ -222,16 +224,16 @@ QMap<QString, QVariant> S52Chart::getOGRFeatureAttributes(OGRFeature* obj, const
 extern
 
 
-bool S52Chart::readLayer(OGRLayer* poLayer, S52References* ref, OGRDataSource* ds) {
+bool Chart::readLayer(OGRLayer* poLayer, S52References* ref, OGRDataSource* ds) {
   QString layer_name = QString(poLayer->GetName());
   qDebug() << "Reading" << layer_name << QDateTime::currentDateTime();
   QSet<QString> debugFinalRastRules;
 
   OGRFeature* poFeature = nullptr;
 
-  S52AreaLayer* area_layer = new S52AreaLayer();
-  S52LineLayer* line_layer = new S52LineLayer();
-  S52MarkLayer* mark_layer = new S52MarkLayer();
+  AreaLayer* area_layer = new AreaLayer();
+  LineLayer* line_layer = new LineLayer();
+  MarkLayer* mark_layer = new MarkLayer();
 
 
   QMap<QString, std::pair<int, OGRFieldType>> fields;
@@ -429,7 +431,7 @@ bool S52Chart::readLayer(OGRLayer* poLayer, S52References* ref, OGRDataSource* d
 }
 
 
-bool S52Chart::addLineToLayer(S52LineLayer* layer, const QString& ptrn_ref, const QString& col_ref, ChartDispPrio dpri, OGRLineString* line) {
+bool Chart::addLineToLayer(LineLayer* layer, const QString& ptrn_ref, const QString& col_ref, ChartDispPrio dpri, OGRLineString* line) {
   layer->pattern_refs.push_back(ptrn_ref);
   layer->color_inds.push_back(_ref->getColorIndex(col_ref));
   layer->disp_prio.push_back(static_cast<int>(dpri));
@@ -438,18 +440,18 @@ bool S52Chart::addLineToLayer(S52LineLayer* layer, const QString& ptrn_ref, cons
   return readOGRLine(line, layer->points, layer->distances);
 }
 
-bool S52Chart::addAreaToLayer(S52AreaLayer* layer, const QString& ptrn_ref, const QString& col_ref, ChartDispPrio dpri, OGRPolygon* poly) {
+bool Chart::addAreaToLayer(AreaLayer* layer, const QString& ptrn_ref, const QString& col_ref, ChartDispPrio dpri, OGRPolygon* poly) {
   layer->pattern_refs.push_back(ptrn_ref);
   layer->disp_prio.push_back(static_cast<int>(dpri));
   layer->color_inds.push_back(_ref->getColorIndex(col_ref));
+  layer->disp_prio.push_back(static_cast<float>(dpri));
   layer->start_inds.push_back(layer->triangles.size());
 
-  if (!readOGRPolygon(poly, layer->triangles))
-    return false;
+  return readOGRPolygon(poly, layer->triangles);
 }
 
 
-bool S52Chart::readOGRPolygon(OGRPolygon* poGeom, std::vector<float> &triangles) {
+bool Chart::readOGRPolygon(OGRPolygon* poGeom, std::vector<float> &triangles) {
   // Make a quick sanity check of the polygon coherence
   // ----------------------------------------------------------------
   bool b_ok = true;
@@ -608,8 +610,8 @@ bool S52Chart::readOGRPolygon(OGRPolygon* poGeom, std::vector<float> &triangles)
 
       for(int i = 0 ; i < 3 ; i++) {
         int ivp = ivs[i];
-        triangles.push_back(geoPt[ivp].y);
-        triangles.push_back(geoPt[ivp].x);
+        triangles.push_back(static_cast<float>(geoPt[ivp].y));
+        triangles.push_back(static_cast<float>(geoPt[ivp].x));
       }
     }
 
@@ -620,7 +622,7 @@ bool S52Chart::readOGRPolygon(OGRPolygon* poGeom, std::vector<float> &triangles)
   return true;
 }
 
-bool S52Chart::readOGRLine(OGRLineString* poGeom, std::vector<float> &ps, std::vector<double> &distances) {
+bool Chart::readOGRLine(OGRLineString* poGeom, std::vector<float> &ps, std::vector<double> &distances) {
   int point_count = poGeom->getNumPoints();
 
   if(point_count < 2)
@@ -634,7 +636,10 @@ bool S52Chart::readOGRLine(OGRLineString* poGeom, std::vector<float> &ps, std::v
     ps.push_back(static_cast<float>(p.getX()));
 
     if (i != 0)
-      distances.push_back(GCDistance(ps[ps.size() - 4], ps[ps.size() - 3], ps[ps.size() - 2], ps[ps.size() - 1]));
+      distances.push_back( GCDistance( static_cast<double>(ps[ps.size() - 4])
+                                     , static_cast<double>(ps[ps.size() - 3])
+                                     , static_cast<double>(ps[ps.size() - 2])
+                                     , static_cast<double>(ps[ps.size() - 1]) ) );
     else
       distances.push_back(0);
   }

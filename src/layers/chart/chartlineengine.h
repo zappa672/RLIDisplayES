@@ -18,13 +18,13 @@ public:
   virtual ~ChartLineEngine();
 
   void clearData();
-  void setData(S52LineLayer* layer, S52Assets* assets, S52References* ref, int display_order);
+  void setData(S52::LineLayer* layer, S52Assets* assets, S52References* ref, int display_order);
 
   void draw(ChartShaders* shaders);
   inline int displayOrder() { return _display_order; }
 
 private:
-  GLuint  vbo_ids[LINE_ATTRIBUTES_COUNT];
+  GLuint  vbo_ids[LINE_ATTR_COUNT];
   GLuint _ind_vbo_id;
 
   GLuint point_count;

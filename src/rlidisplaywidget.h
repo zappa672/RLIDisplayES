@@ -112,8 +112,8 @@ private:
   enum { UNIF_TEXTURE = 0, UNIF_MVPMATRIX = 1, UNIF_COUNT = 2 } ;
 
   GLuint _vbo_ids[ATTR_COUNT];
-  GLuint _unif_locs[UNIF_COUNT];
-  GLuint _attr_locs[ATTR_COUNT];  
+  int _unif_locs[UNIF_COUNT];
+  int _attr_locs[ATTR_COUNT];
 
   QMatrix4x4 _projection;
 };
