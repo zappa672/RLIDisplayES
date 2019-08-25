@@ -15,7 +15,6 @@
 #include "../../s52/s52chart.h"
 #include "../../s52/s52references.h"
 
-#include "chartsettingsmodel.h"
 #include "chartareaengine.h"
 #include "chartlineengine.h"
 #include "charttextengine.h"
@@ -47,14 +46,13 @@ private:
   QOpenGLContext* _context;
 
   ChartShaders* shaders;
-  ChartSettingsModel* settings;
 
   int    _radius;
 
-  QPoint _center_shift { 0, 0 };
-  GeoPos _center { 0, 0 };
-  double _scale { 10 };
-  double _angle { 0 };
+  QPoint _center_shift  { 0, 0 };
+  GeoPos _center        { 0, 0 };
+  double _scale         { 10 };
+  double _angle         { 0 };
 
   S52Assets* assets;  
   QOpenGLFramebufferObject* _fbo = nullptr;
@@ -72,10 +70,10 @@ private:
   void setMarkLayers(S52Chart* chrt, S52References* ref);
   void setSndgLayer(S52Chart* chrt, S52References* ref);
 
-  QMap<QString, ChartAreaEngine*>  area_engines;
-  QMap<QString, ChartLineEngine*>  line_engines;
-  QMap<QString, ChartTextEngine*>  text_engines;
-  QMap<QString, ChartMarkEngine*>  mark_engines;
+  QVector<ChartAreaEngine*>  area_engines;
+  QVector<ChartLineEngine*>  line_engines;
+  QVector<ChartTextEngine*>  text_engines;
+  QVector<ChartMarkEngine*>  mark_engines;
 };
 
 #endif // CHARTENGINE_H

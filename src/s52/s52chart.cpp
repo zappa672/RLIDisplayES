@@ -432,7 +432,7 @@ bool S52Chart::readLayer(OGRLayer* poLayer, S52References* ref, OGRDataSource* d
 bool S52Chart::addLineToLayer(S52LineLayer* layer, const QString& ptrn_ref, const QString& col_ref, ChartDispPrio dpri, OGRLineString* line) {
   layer->pattern_refs.push_back(ptrn_ref);
   layer->color_inds.push_back(_ref->getColorIndex(col_ref));
-  layer->disp_prio.push_back(static_cast<float>(dpri));
+  layer->disp_prio.push_back(static_cast<int>(dpri));
   layer->start_inds.push_back(layer->points.size());
 
   return readOGRLine(line, layer->points, layer->distances);
@@ -440,6 +440,7 @@ bool S52Chart::addLineToLayer(S52LineLayer* layer, const QString& ptrn_ref, cons
 
 bool S52Chart::addAreaToLayer(S52AreaLayer* layer, const QString& ptrn_ref, const QString& col_ref, ChartDispPrio dpri, OGRPolygon* poly) {
   layer->pattern_refs.push_back(ptrn_ref);
+  layer->disp_prio.push_back(static_cast<int>(dpri));
   layer->color_inds.push_back(_ref->getColorIndex(col_ref));
   layer->start_inds.push_back(layer->triangles.size());
 

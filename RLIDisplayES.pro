@@ -57,7 +57,6 @@ SOURCES     += \
     src/layers/info/menuengine.cpp \
     src/layers/radar/radarengine.cpp \
     src/layers/radar/radarpalette.cpp \
-    src/layers/chart/chartsettingsmodel.cpp \
     src/layers/chart/chartengine.cpp \
     src/layers/chart/chartshaders.cpp \
     src/layers/maskengine.cpp \
@@ -104,7 +103,6 @@ HEADERS     += \
     src/layers/radar/radarpalette.h \
     src/layers/chart/chartengine.h \
     src/layers/chart/chartshaders.h \
-    src/layers/chart/chartsettingsmodel.h \
     src/layers/maskengine.h \    
     src/layers/routeengine.h \
     src/layers/targetengine.h \    
@@ -125,6 +123,5 @@ OTHER_FILES += \
 
 DISTFILES += \
     layouts.xml \
-    chart_disp_conf.xml \
     res/s52/chartsymbols.xml
 

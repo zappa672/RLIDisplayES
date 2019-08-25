@@ -21,7 +21,7 @@ class OGRLineString;
 struct S52AreaLayer {  
   std::vector<QString>  pattern_refs;   // layer i-th area s52 pattern name
   std::vector<float>    color_inds;     // layer i-th area s52 color token
-  std::vector<float>    disp_prio;
+  std::vector<int>      disp_prio;
   std::vector<size_t>   start_inds;     // layer i-th area triangles start index
   std::vector<float>    triangles;      // sequence of coords representing triangulated polygon
 
@@ -30,7 +30,7 @@ struct S52AreaLayer {
 struct S52LineLayer {
   std::vector<QString>  pattern_refs;   // layer i-th line s52 pattern name
   std::vector<float>    color_inds;     // layer i-th line s52 color token
-  std::vector<float>    disp_prio;
+  std::vector<int>      disp_prio;
   std::vector<size_t>   start_inds;     // layer i-th line points start index
   std::vector<float>    points;         // sequence of coords representing polylines
   std::vector<double>   distances;      // length of the line up to current point
@@ -39,7 +39,7 @@ struct S52LineLayer {
 struct S52MarkLayer {  
   std::vector<QString>  symbol_refs;    // layer i-th point s52 symbol name
   std::vector<float>    points;         // sequence of point coords (lat, lon)
-  std::vector<float>    disp_prio;
+  std::vector<int>      disp_prio;
 };
 
 struct S52TextLayer {

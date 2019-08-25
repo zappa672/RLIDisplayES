@@ -14,7 +14,6 @@ ChartEngine::ChartEngine(int tex_radius, S52References* ref, QOpenGLContext* con
   _context = context;
 
   _fbo = nullptr;
-  settings = new ChartSettingsModel("chart_disp_conf.xml");
   assets = new S52Assets(context, ref);
   shaders = new ChartShaders(context);
 
@@ -22,13 +21,13 @@ ChartEngine::ChartEngine(int tex_radius, S52References* ref, QOpenGLContext* con
 }
 
 ChartEngine::~ChartEngine() {
-  for (ChartAreaEngine* engine : area_engines)
+  for (ChartAreaEngine* engine: area_engines)
     delete engine;
-  for (ChartLineEngine* engine : line_engines)
+  for (ChartLineEngine* engine: line_engines)
     delete engine;
-  for (ChartTextEngine* engine : text_engines)
+  for (ChartTextEngine* engine: text_engines)
     delete engine;
-  for (ChartMarkEngine* engine : mark_engines)
+  for (ChartMarkEngine* engine: mark_engines)
     delete engine;
 
   delete _fbo;
@@ -78,14 +77,19 @@ void ChartEngine::setChart(S52Chart* chrt, S52References* ref) {
 
 
 void ChartEngine::clearChartData() {
-  for (ChartAreaEngine* engine : area_engines)
-    engine->clearData();
-  for (ChartLineEngine* engine : line_engines)
-    engine->clearData();
-  for (ChartTextEngine* engine : text_engines)
-    engine->clearData();
-  for (ChartMarkEngine* engine : mark_engines)
-    engine->clearData();
+  for (auto engine: area_engines)
+    delete engine;
+  for (auto engine: line_engines)
+    delete engine;
+  for (auto engine: text_engines)
+    delete engine;
+  for (auto engine: mark_engines)
+    delete engine;
+
+  area_engines.clear();
+  line_engines.clear();
+  text_engines.clear();
+  mark_engines.clear();
 
   _force_update = true;
 }
@@ -94,30 +98,18 @@ void ChartEngine::clearChartData() {
 void ChartEngine::setAreaLayers(S52Chart* chrt, S52References* ref) {
   for (QString layer_name : chrt->areaLayerNames()) {
     S52AreaLayer* layer = chrt->areaLayer(layer_name);
-    ChartLayerDisplaySettings clds = settings->layerSettings(layer_name);
-
-    if (!clds.visible)
-      continue;
-
-    if (!area_engines.contains(layer_name))
-      area_engines[layer_name] = new ChartAreaEngine(_context);
-
-    area_engines[layer_name]->setData(layer, assets, ref, clds.order);
+    ChartAreaEngine* engine = new ChartAreaEngine(_context);
+    engine->setData(layer, assets, ref, layer->disp_prio[0]);
+    area_engines.push_back(engine);
   }
 }
 
 void ChartEngine::setLineLayers(S52Chart* chrt, S52References* ref) {
   for (QString layer_name : chrt->lineLayerNames()) {
     S52LineLayer* layer = chrt->lineLayer(layer_name);
-    ChartLayerDisplaySettings clds = settings->layerSettings(layer_name);
-
-    if (!clds.visible)
-      continue;
-
-    if (!line_engines.contains(layer_name))
-      line_engines[layer_name] = new ChartLineEngine(_context);
-
-    line_engines[layer_name]->setData(layer, assets, ref, clds.order);
+    ChartLineEngine* engine = new ChartLineEngine(_context);
+    engine->setData(layer, assets, ref, 10 + layer->disp_prio[0]);
+    line_engines.push_back(engine);
   }
 }
 
@@ -127,15 +119,9 @@ void ChartEngine::setTextLayers(S52Chart* chrt, S52References* ref) {
 
   for (QString layer_name : chrt->textLayerNames()) {
     S52TextLayer* layer = chrt->textLayer(layer_name);
-    ChartLayerDisplaySettings clds = settings->layerSettings(layer_name);
-
-    if (!clds.visible)
-      continue;
-
-    if (!text_engines.contains(layer_name))
-      text_engines[layer_name] = new ChartTextEngine(_context);
-
-    text_engines[layer_name]->setData(layer, clds.order);
+    ChartTextEngine* engine = new ChartTextEngine(_context);
+    engine->setData(layer, 30);
+    text_engines.push_back(engine);
   }
 }
 
@@ -143,23 +129,16 @@ void ChartEngine::setTextLayers(S52Chart* chrt, S52References* ref) {
 void ChartEngine::setMarkLayers(S52Chart* chrt, S52References* ref) {
   for (QString layer_name : chrt->markLayerNames()) {
     S52MarkLayer* layer = chrt->markLayer(layer_name);
-    ChartLayerDisplaySettings clds = settings->layerSettings(layer_name);
-
-    if (!clds.visible)
-      continue;
-
-    if (!mark_engines.contains(layer_name))
-      mark_engines[layer_name] = new ChartMarkEngine(_context);
-
-    mark_engines[layer_name]->setData(layer, ref, clds.order);
+    ChartMarkEngine* engine = new ChartMarkEngine(_context);
+    engine->setData(layer, ref, 20 + layer->disp_prio[0]);
+    mark_engines.push_back(engine);
   }
 }
 
 void ChartEngine::setSndgLayer(S52Chart* chrt, S52References* ref) {
-  if (!mark_engines.contains("SOUNDG"))
-    mark_engines["SOUNDG"] = new ChartMarkEngine(_context);
-
-  mark_engines["SOUNDG"]->setData(chrt->sndgLayer(), assets, ref, 1000);
+  ChartMarkEngine* engine = new ChartMarkEngine(_context);
+  engine->setData(chrt->sndgLayer(), assets, ref, 100);
+  mark_engines.push_back(engine);
 }
 
 
