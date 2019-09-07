@@ -35,3 +35,5 @@ Makefile*
 
 build/
 
+#LibreOffice temporary file
+.~lock.RLIDisplayESDesc.odt#

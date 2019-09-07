@@ -122,9 +122,6 @@ void RLIDisplayWidget::initializeGL() {
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_TEXTURE_2D);
 
-
-  _program = new QOpenGLShaderProgram(this);
-
   int peleng_size         = qApp->property(PROPERTY_PELENG_SIZE).toInt();
   int bearings_per_cycle  = qApp->property(PROPERTY_BEARINGS_PER_CYCLE).toInt();
 
@@ -183,13 +180,10 @@ void RLIDisplayWidget::initializeGL() {
   //-------------------------------------------------------------
 
   glGenBuffers(ATTR_COUNT, _vbo_ids);
+
+  _program = new QOpenGLShaderProgram(this);
   initShaders();
   initModeTextures(tr("data/textures/symbols/"));
-
-  emit initialized();
-  _initialized = true;
-
-  qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "GL init finish";
 
   connect( _menuEngine, SIGNAL(radarBrightnessChanged(int))
          , _radarEngine, SLOT(onBrightnessChanged(int)));
@@ -213,6 +207,11 @@ void RLIDisplayWidget::initializeGL() {
          , this, SLOT(onRouteEditionStarted()));
   connect( _menuEngine, SIGNAL(finishRouteEdit())
          , this, SLOT(onRouteEditionFinished()));
+
+  emit initialized();
+  _initialized = true;
+
+  qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "GL init finish";
 }
 
 void RLIDisplayWidget::initShaders() {
