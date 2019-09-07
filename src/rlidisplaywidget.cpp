@@ -189,8 +189,6 @@ void RLIDisplayWidget::initializeGL() {
   emit initialized();
   _initialized = true;
 
-  resizeGL(width(), height());
-
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "GL init finish";
 
   connect( _menuEngine, SIGNAL(radarBrightnessChanged(int))
@@ -253,6 +251,8 @@ void RLIDisplayWidget::initModeTextures(const QString& path) {
 
 
 void RLIDisplayWidget::resizeGL(int w, int h) {
+  qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "RLIDisplayWidget resizeGL" << QSize(w, h);
+
   _projection.setToIdentity();
   _projection.ortho(geometry());
 
@@ -291,6 +291,8 @@ void RLIDisplayWidget::resizeGL(int w, int h) {
   _infoEngine->updateRain(_state.rain);
   _infoEngine->updateApch(_state.apch);
   _infoEngine->updateEmission(_state.emission);
+
+  qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "RLIDisplayWidget resizeGL finish";
 }
 
 

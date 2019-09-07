@@ -7,6 +7,8 @@
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
   setGeometry(QGuiApplication::screens()[0]->geometry());
 
+  qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "MainWindow construction start";
+
   wgtRLI = new RLIDisplayWidget(this);
   wgtButtonPanel = new RLIControlWidget(wgtRLI, this);
 
@@ -22,8 +24,14 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
   _ship_ds = new ShipDataSource(this);
   _target_ds = new TargetDataSource(this);
 
+  _radar_ds->start();
+  _ship_ds->start();
+  _target_ds->start();
+
   wgtRLI->setFocusPolicy(Qt::StrongFocus);
   wgtRLI->setFocus();
+
+  qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "MainWindow construction finish";
 }
 
 MainWindow::~MainWindow() {
@@ -37,6 +45,8 @@ MainWindow::~MainWindow() {
 }
 
 void MainWindow::resizeEvent(QResizeEvent* e) {
+  qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "MainWindow resizeEvent" << e->size();
+
   bool showButtonPanel = qApp->property(PROPERTY_SHOW_BUTTON_PANEL).toBool();
 
   wgtButtonPanel->setVisible(showButtonPanel);
@@ -55,6 +65,8 @@ void MainWindow::resizeEvent(QResizeEvent* e) {
   }
 
   wgtRLI->setGeometry(QRect(QPoint(0, 0), availableSize));
+
+  qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "MainWindow resizeEvent finish";
 }
 
 void MainWindow::timerEvent(QTimerEvent* e) {
@@ -66,10 +78,6 @@ void MainWindow::onRLIWidgetInitialized() {
   wgtRLI->setupRadarDataSource(_radar_ds);
   wgtRLI->setupTargetDataSource(_target_ds);
   wgtRLI->setupShipDataSource(_ship_ds);
-
-  _radar_ds->start();
-  _ship_ds->start();
-  _target_ds->start();
 
   int frame = qApp->property(PROPERTY_FRAME_DELAY).toInt();
   startTimer(frame, Qt::CoarseTimer);

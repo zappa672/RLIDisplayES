@@ -2,21 +2,19 @@
 #define RLILAYOUT_H
 
 #include <QString>
-#include <QSize>
-#include <QPoint>
-#include <QRect>
 #include <QColor>
+
+#include <QPoint>
+#include <QSize>
+#include <QRect>
+
 #include <QVector>
 #include <QMap>
 
-class QXmlStreamReader;
+#include <QXmlStreamReader>
 
 
-typedef enum RLITextAllign {
-  RLI_ALLIGN_LEFT
-, RLI_ALLIGN_RIGHT
-, RLI_ALLIGN_CENTER
-} RLITextAllign;
+enum class RLITextAllign { LEFT, RIGHT, CENTER };
 
 
 struct RLIInfoRectLayout {

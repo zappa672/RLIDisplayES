@@ -226,7 +226,7 @@ extern
 
 bool Chart::readLayer(OGRLayer* poLayer, S52References* ref, OGRDataSource* ds) {
   QString layer_name = QString(poLayer->GetName());
-  qDebug() << "Reading" << layer_name << QDateTime::currentDateTime();
+  //qDebug() << "Reading" << layer_name << QDateTime::currentDateTime();
   QSet<QString> debugFinalRastRules;
 
   OGRFeature* poFeature = nullptr;
@@ -424,8 +424,8 @@ bool Chart::readLayer(OGRLayer* poLayer, S52References* ref, OGRDataSource* ds) 
   if (mark_layer->points.size() > 0)
     mark_layers[layer_name] = mark_layer;
 
-  for (QString rule: debugFinalRastRules)
-    qDebug() << rule;
+  //for (QString rule: debugFinalRastRules)
+    //qDebug() << rule;
 
   return true;
 }
@@ -444,7 +444,7 @@ bool Chart::addAreaToLayer(AreaLayer* layer, const QString& ptrn_ref, const QStr
   layer->pattern_refs.push_back(ptrn_ref);
   layer->disp_prio.push_back(static_cast<int>(dpri));
   layer->color_inds.push_back(_ref->getColorIndex(col_ref));
-  layer->disp_prio.push_back(static_cast<float>(dpri));
+  layer->disp_prio.push_back(static_cast<int>(dpri));
   layer->start_inds.push_back(layer->triangles.size());
 
   return readOGRPolygon(poly, layer->triangles);

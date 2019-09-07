@@ -16,12 +16,12 @@ typedef unsigned __int32 u_int32_t;
 #define APCTRL_SNDPULSE_LONG     1  // Index in scales table for long sounding pulse
 
 // Data types for managing scales
-enum SoundingPulses {
-  SNDPLS_NONE  = -1,
-  SNDPLS_FIRST =  0,
-  SNDPLS_SHORT =  0,
-  SNDPLS_LONG  =  1,
-  SNDPLS_LAST  =  1
+enum class SoundingPulses: int {
+  NONE  = -1,
+  FIRST =  0,
+  SHORT =  0,
+  LONG  =  1,
+  LAST  =  1
 };
 
 struct RLIScale {

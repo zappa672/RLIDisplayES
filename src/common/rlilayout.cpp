@@ -2,7 +2,6 @@
 
 #include <QFile>
 #include <QDebug>
-#include <QXmlStreamReader>
 #include <QStringList>
 #include <QRegExp>
 
@@ -89,12 +88,12 @@ QRect RLILayoutManager::parseRect(const QString& text) const {
 
 RLITextAllign RLILayoutManager::parseAllign(const QString& txt) const {
   if (txt == "left")
-    return RLI_ALLIGN_LEFT;
+    return RLITextAllign::LEFT;
 
   if (txt == "right")
-    return RLI_ALLIGN_RIGHT;
+    return RLITextAllign::RIGHT;
 
-  return RLI_ALLIGN_CENTER;
+  return RLITextAllign::CENTER;
 }
 
 

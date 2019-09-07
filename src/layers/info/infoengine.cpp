@@ -409,17 +409,14 @@ void InfoEngine::drawText(const InfoText& text, InfoFonts* fonts) {
 
   QPoint anchor;
   switch (text.allign) {
-    case RLI_ALLIGN_LEFT:
+    case RLITextAllign::LEFT:
       anchor = text.geometry.topLeft();
       break;
-    case RLI_ALLIGN_RIGHT:
+    case RLITextAllign::RIGHT:
       anchor = text.geometry.topRight() - QPoint(font_size.width()*str.size(), 0);
       break;
-    case RLI_ALLIGN_CENTER:
+    case RLITextAllign::CENTER:
       anchor = text.geometry.center() - QPoint((font_size.width()*str.size()) / 2 - 1, font_size.height() / 2 - 1);
-      break;
-    default:
-      anchor = text.geometry.topLeft();
       break;
   }
 

@@ -30,7 +30,7 @@ struct InfoText {
 
   InfoText() {
     string = RLI_STR_NONE;
-    allign = RLI_ALLIGN_CENTER;
+    allign = RLITextAllign::CENTER;
   }
 };
 
