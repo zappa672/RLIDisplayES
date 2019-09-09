@@ -98,14 +98,15 @@ public:
    RLILayoutManager(const QString& filename);
   ~RLILayoutManager(void);
 
+  QSize size();
   QSize currentSize();
   void resize(const QSize& size);
 
-  inline RLILayout* layout() { return &_layouts[_currentSize]; }
+  inline RLILayout* layout() { return &_layouts[_currentSize == "0x0" ? _layouts.keys()[0] : _currentSize]; }
 
 private:
   QMap<QString, RLILayout> _layouts;
-  QString _currentSize, _defaultSize;
+  QString _currentSize;
 
   QMap<QString, QString> readXMLAttributes(QXmlStreamReader* xml);
 

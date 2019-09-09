@@ -11,16 +11,13 @@ RLILayoutManager:: RLILayoutManager(const QString& filename) {
   QFile file(filename);
   file.open(QFile::ReadOnly);
 
+  _currentSize = "0x0";
+
   QXmlStreamReader* xml = new QXmlStreamReader(&file);
 
   while (!xml->atEnd()) {
     if (xml->readNext() == QXmlStreamReader::StartElement) {
       QMap<QString, QString> attrs = readXMLAttributes(xml);
-
-      if (xml->name() == "layouts") {
-        _defaultSize = attrs["default"];
-        _currentSize = _defaultSize;
-      }
 
       if (xml->name() == "layout") {
         QString size_tag = attrs["size"];
@@ -35,13 +32,22 @@ RLILayoutManager:: RLILayoutManager(const QString& filename) {
 RLILayoutManager::~RLILayoutManager() {
 }
 
+QSize RLILayoutManager::size() {
+  QSize sz = currentSize();
+  if ( currentSize().width() == 0
+    || currentSize().height() == 0 ) {
+    sz = parseSize(_layouts.keys()[0]);
+  }
+  return sz;
+}
+
 QSize RLILayoutManager::currentSize() {
   return parseSize(_currentSize);
 }
 
 void RLILayoutManager::resize(const QSize& size) {
   int maxArea = 0;
-  QString best = _defaultSize;
+  QString best = "0x0";
 
   for (auto size_tag : _layouts.keys()) {
     QSize sz = parseSize(size_tag);

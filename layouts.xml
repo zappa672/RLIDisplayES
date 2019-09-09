@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<layouts default="1280x1024" >
+<layouts>
 
   <layout size="1280x1024" >
     <circle     center="512,512"  radius="480"    font="F8X8B" mode_symb_shift="120" />

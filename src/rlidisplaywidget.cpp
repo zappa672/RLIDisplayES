@@ -143,7 +143,9 @@ void RLIDisplayWidget::initializeGL() {
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Tails engine init finish";
 
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Mask engine init start";
-  _maskEngine = new MaskEngine(size(), _layout_manager.layout()->circle, _infoFonts, context(), _state, this);
+  qDebug() << _layout_manager.size();
+  qDebug() << _layout_manager.layout()->circle.radius;
+  _maskEngine = new MaskEngine(_layout_manager.size(), _layout_manager.layout()->circle, _infoFonts, context(), _state, this);
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Mask engine init finish";
 
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Chart engine init start";
@@ -252,9 +254,6 @@ void RLIDisplayWidget::initModeTextures(const QString& path) {
 void RLIDisplayWidget::resizeGL(int w, int h) {
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "RLIDisplayWidget resizeGL" << QSize(w, h);
 
-  _projection.setToIdentity();
-  _projection.ortho(geometry());
-
   if (!_initialized)
     return;
 
@@ -262,8 +261,18 @@ void RLIDisplayWidget::resizeGL(int w, int h) {
   _layout_manager.resize(QSize(w, h));
   QSize new_size = _layout_manager.currentSize();
 
+  if (new_size.width() <= 0 || new_size.height() <= 0) {
+    qDebug() << "Can not find suitable size for RLIDisplayWidget";
+    return;
+  }
+
   if (curr_size == new_size)
     return;
+
+  setGeometry(QRect(geometry().topLeft(), new_size));
+
+  _projection.setToIdentity();
+  _projection.ortho(geometry());
 
   int circle_radius = _layout_manager.layout()->circle.radius;
 
