@@ -51,9 +51,9 @@ Chart::Chart(char* file_name, S52References* ref) {
 
     //qDebug() << "Reading layer #" << i << layer_name;
 
-    //QRectF fRect(QPointF(144.1, 13.7), QSizeF(20.0, 20.0));
-    //poLayer->SetSpatialFilterRect(fRect.left(), fRect.top(), fRect.right(), fRect.bottom());
-    OGRGeometry* spatFilter = nullptr; //poLayer->GetSpatialFilter();
+    QRectF fRect(QPointF(144.1, 13.7), QSizeF(20.0, 20.0));
+    poLayer->SetSpatialFilterRect(fRect.left(), fRect.top(), fRect.right(), fRect.bottom());
+    OGRGeometry* spatFilter = poLayer->GetSpatialFilter();
 
     if (layer_name == "M_COVR") {
       OGREnvelope oExt;
@@ -219,10 +219,6 @@ QMap<QString, QVariant> Chart::getOGRFeatureAttributes(OGRFeature* obj, const QM
 
   return featAttrs;
 }
-
-
-extern
-
 
 bool Chart::readLayer(OGRLayer* poLayer, S52References* ref, OGRDataSource* ds) {
   QString layer_name = QString(poLayer->GetName());

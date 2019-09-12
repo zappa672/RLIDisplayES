@@ -4,6 +4,8 @@
 #include <QMap>
 #include <QVariant>
 
+#include <cmath>
+
 #include "s57condsymb.h"
 #include "../common/rlistate.h"
 
