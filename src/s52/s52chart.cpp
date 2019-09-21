@@ -317,7 +317,7 @@ bool Chart::readLayer(OGRLayer* poLayer, S52References* ref, OGRDataSource* ds) 
             if (geom_type == wkbPoint) {
               OGRPoint* p = static_cast<OGRPoint*>(geom);
               mark_layer->symbol_refs.push_back(instr.split("(")[1].split(")")[0]);
-              mark_layer->disp_prio.push_back(static_cast<float>(lp.DPRI));
+              mark_layer->disp_prio.push_back(static_cast<int>(lp.DPRI));
               mark_layer->points.push_back(static_cast<float>(p->getY()));
               mark_layer->points.push_back(static_cast<float>(p->getX()));
               //qDebug() << "add mark" << instr.split("(")[1].split(")")[0] << p->getX() << p->getY();
