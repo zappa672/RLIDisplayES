@@ -48,36 +48,13 @@ void parseArgs(QApplication* a) {
     exit(0);
   }
 
-  if (args.contains("-bp"))
-    a->setProperty(PROPERTY_SHOW_BUTTON_PANEL, true);
-  else
-    a->setProperty(PROPERTY_SHOW_BUTTON_PANEL, false);
+  a->setProperty(PROPERTY_SHOW_BUTTON_PANEL, args.contains("-bp"));
 
-
-  if (args.contains("-p"))
-    a->setProperty(PROPERTY_PELENG_SIZE, args[args.indexOf("-p") + 1].toInt());
-  else
-    a->setProperty(PROPERTY_PELENG_SIZE, 800);
-
-  if (args.contains("-b"))
-    a->setProperty(PROPERTY_BEARINGS_PER_CYCLE, args[args.indexOf("-b") + 1].toInt());
-  else
-    a->setProperty(PROPERTY_BEARINGS_PER_CYCLE, 4096);
-
-  if (args.contains("-f"))
-    a->setProperty(PROPERTY_FRAME_DELAY, args[args.indexOf("-f") + 1].toInt());
-  else
-    a->setProperty(PROPERTY_FRAME_DELAY, 25);
-
-  if (args.contains("-d"))
-    a->setProperty(PROPERTY_DATA_DELAY, args[args.indexOf("-d") + 1].toInt());
-  else
-    a->setProperty(PROPERTY_DATA_DELAY, 30);
-
-  if (args.contains("-s"))
-    a->setProperty(PROPERTY_BLOCK_SIZE, args[args.indexOf("-s") + 1].toInt());
-  else
-    a->setProperty(PROPERTY_BLOCK_SIZE, 128);
+  a->setProperty(PROPERTY_PELENG_SIZE, args.contains("-p") ? args[args.indexOf("-p") + 1].toInt() : 800);
+  a->setProperty(PROPERTY_BEARINGS_PER_CYCLE, args.contains("-b") ? args[args.indexOf("-b") + 1].toInt() : 4096);
+  a->setProperty(PROPERTY_FRAME_DELAY, args.contains("-f") ? args[args.indexOf("-f") + 1].toInt() : 25);
+  a->setProperty(PROPERTY_DATA_DELAY, args.contains("-d") ? args[args.indexOf("-d") + 1].toInt() : 30);
+  a->setProperty(PROPERTY_BLOCK_SIZE, args.contains("-s") ? args[args.indexOf("-s") + 1].toInt() : 128);
 
   if (args.contains("-w"))
     a->setProperty(PROPERTY_RLI_WIDGET_SIZE, args[args.indexOf("-w") + 1]);
