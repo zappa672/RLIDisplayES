@@ -21,8 +21,8 @@ RLIDisplayWidget::RLIDisplayWidget(QWidget *parent) : QOpenGLWidget(parent) {
   qRegisterMetaType<RLIShipState>("RLIShipState");
   qRegisterMetaType<RLIString>("RLIString");
 
-  _chart_mngr.loadCharts();
-  connect( &_chart_mngr, SIGNAL(newChartAvailable(QString)), SLOT(onNewChartAvailable(QString)));
+  //_chart_mngr.loadCharts();
+  //connect( &_chart_mngr, SIGNAL(newChartAvailable(QString)), SLOT(onNewChartAvailable(QString)));
 
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "RLIDisplayWidget construction finish";
 }
@@ -31,16 +31,16 @@ RLIDisplayWidget::~RLIDisplayWidget() {
   if (!_initialized)
     return;
 
-  delete _infoFonts;
+  //delete _infoFonts;
   delete _radarEngine;
   delete _tailsEngine;
-  delete _maskEngine;
-  delete _chartEngine;
-  delete _menuEngine;
+  //delete _maskEngine;
+  //delete _chartEngine;
+  //delete _menuEngine;
   delete _magnEngine;
-  delete _trgtEngine;
-  delete _routeEngine;
-  delete _ctrlEngine;
+  //delete _trgtEngine;
+  //delete _routeEngine;
+  //delete _ctrlEngine;
 
   delete _program;
 
@@ -60,8 +60,8 @@ void RLIDisplayWidget::setupRadarDataSource(RadarDataSource* rds) {
 }
 
 void RLIDisplayWidget::setupTargetDataSource(TargetDataSource* tds) {
-  connect( tds, SIGNAL(updateTarget(QString,RadarTarget))
-         , _trgtEngine, SLOT(updateTarget(QString,RadarTarget)));
+  //connect( tds, SIGNAL(updateTarget(QString,RadarTarget))
+  //       , _trgtEngine, SLOT(updateTarget(QString,RadarTarget)));
 }
 
 void RLIDisplayWidget::setupShipDataSource(ShipDataSource* sds) {
@@ -79,9 +79,8 @@ void RLIDisplayWidget::onNewChartAvailable(const QString& name) {
     return;
 
   if (name == "US2SP01M.000") {
-  //if (name == "CO200008.000") {
     qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Setting up chart " << name;
-    _chartEngine->setChart(_chart_mngr.getChart(name), _chart_mngr.refs());
+    //_chartEngine->setChart(_chart_mngr.getChart(name), _chart_mngr.refs());
     qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Setting up chart finished";
   }
 }
@@ -130,9 +129,9 @@ void RLIDisplayWidget::initializeGL() {
   // Layers initialization
   //-------------------------------------------------------------
 
-  qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Fonts init start";
-  _infoFonts = new InfoFonts(context(), "data/textures/fonts");
-  qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Fonts init finish";
+  //qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Fonts init start";
+  //_infoFonts = new InfoFonts(context(), "data/textures/fonts");
+  //qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Fonts init finish";
 
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Radar engine init start";
   _radarEngine = new RadarEngine(bearings_per_cycle, peleng_size, circle_radius, context(), this);  
@@ -142,24 +141,22 @@ void RLIDisplayWidget::initializeGL() {
   _tailsEngine = new RadarEngine(bearings_per_cycle, peleng_size, circle_radius, context(), this);
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Tails engine init finish";
 
-  qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Mask engine init start";
-  qDebug() << _layout_manager.size();
-  qDebug() << _layout_manager.layout()->circle.radius;
-  _maskEngine = new MaskEngine(_layout_manager.size(), _layout_manager.layout()->circle, _infoFonts, context(), _state, this);
-  qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Mask engine init finish";
-
-  qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Chart engine init start";
-  _chartEngine = new ChartEngine(circle_radius, _chart_mngr.refs(), context(), this);
-  qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Chart engine init finish";
-
-  qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Info engine init start";
-  _infoEngine = new InfoEngine(_layout_manager.layout(), context(), this);
-  qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Info engine init finish";
-
-  qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Menu engine init start";
-  _menuEngine = new MenuEngine(_layout_manager.layout()->menu, context(), this);
-  _menuEngine->setFonts(_infoFonts);
-  qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Menu engine init finish";
+  //qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Mask engine init start";
+  //_maskEngine = new MaskEngine(_layout_manager.size(), _layout_manager.layout()->circle, _infoFonts, context(), _state, this);
+  //qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Mask engine init finish";
+  //
+  //qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Chart engine init start";
+  //_chartEngine = new ChartEngine(circle_radius, _chart_mngr.refs(), context(), this);
+  //qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Chart engine init finish";
+  //
+  //qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Info engine init start";
+  //_infoEngine = new InfoEngine(_layout_manager.layout(), context(), this);
+  //qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Info engine init finish";
+  //
+  //qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Menu engine init start";
+  //_menuEngine = new MenuEngine(_layout_manager.layout()->menu, context(), this);
+  //_menuEngine->setFonts(_infoFonts);
+  //qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Menu engine init finish";
 
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Magnifier engine init start";
   _magnEngine = new MagnifierEngine(_layout_manager.layout()->magnifier, context(), this);
@@ -167,17 +164,17 @@ void RLIDisplayWidget::initializeGL() {
   _magnEngine->setPalletteTextureId(_radarEngine->paletteTexId());
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Magnifier engine init finish";
 
-  qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Target engine init start";
-  _trgtEngine = new TargetEngine(context(), this);
-  qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Target engine init finish";
-
-  qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Route engine init start";
-  _routeEngine = new RouteEngine(context(), this);
-  qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Route engine init finish";
-
-  qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Controls engine init start";
-  _ctrlEngine = new ControlsEngine(context(), this);
-  qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Controls engine init finish";
+  //qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Target engine init start";
+  //_trgtEngine = new TargetEngine(context(), this);
+  //qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Target engine init finish";
+  //
+  //qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Route engine init start";
+  //_routeEngine = new RouteEngine(context(), this);
+  //qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Route engine init finish";
+  //
+  //qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Controls engine init start";
+  //_ctrlEngine = new ControlsEngine(context(), this);
+  //qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "Controls engine init finish";
 
   //-------------------------------------------------------------
 
@@ -187,28 +184,28 @@ void RLIDisplayWidget::initializeGL() {
   initShaders();
   initModeTextures(tr("data/textures/symbols/"));
 
-  connect( _menuEngine, SIGNAL(radarBrightnessChanged(int))
-         , _radarEngine, SLOT(onBrightnessChanged(int)));
-
-  connect( _menuEngine, SIGNAL(languageChanged(RLIString))
-         , _menuEngine, SLOT(onLanguageChanged(RLIString)));
-  connect( _menuEngine, SIGNAL(languageChanged(RLIString))
-         , _infoEngine, SLOT(onLanguageChanged(RLIString)));
-
-  connect( _trgtEngine, SIGNAL(targetCountChanged(int))
-         , _infoEngine, SLOT(onTargetCountChanged(int)));
-  connect( _trgtEngine, SIGNAL(selectedTargetUpdated(QString,RadarTarget))
-         , _infoEngine, SLOT(onSelectedTargetUpdated(QString,RadarTarget)));
-
-  connect ( _menuEngine, SIGNAL(saveRoute(int))
-          , _routeEngine, SLOT(saveTo(int)));
-  connect ( _menuEngine, SIGNAL(loadRoute(int))
-          , _routeEngine, SLOT(loadFrom(int)));
-
-  connect( _menuEngine, SIGNAL(startRouteEdit())
-         , this, SLOT(onRouteEditionStarted()));
-  connect( _menuEngine, SIGNAL(finishRouteEdit())
-         , this, SLOT(onRouteEditionFinished()));
+  //connect( _menuEngine, SIGNAL(radarBrightnessChanged(int))
+  //       , _radarEngine, SLOT(onBrightnessChanged(int)));
+  //
+  //connect( _menuEngine, SIGNAL(languageChanged(RLIString))
+  //       , _menuEngine, SLOT(onLanguageChanged(RLIString)));
+  //connect( _menuEngine, SIGNAL(languageChanged(RLIString))
+  //       , _infoEngine, SLOT(onLanguageChanged(RLIString)));
+  //
+  //connect( _trgtEngine, SIGNAL(targetCountChanged(int))
+  //       , _infoEngine, SLOT(onTargetCountChanged(int)));
+  //connect( _trgtEngine, SIGNAL(selectedTargetUpdated(QString,RadarTarget))
+  //       , _infoEngine, SLOT(onSelectedTargetUpdated(QString,RadarTarget)));
+  //
+  //connect ( _menuEngine, SIGNAL(saveRoute(int))
+  //        , _routeEngine, SLOT(saveTo(int)));
+  //connect ( _menuEngine, SIGNAL(loadRoute(int))
+  //        , _routeEngine, SLOT(loadFrom(int)));
+  //
+  //connect( _menuEngine, SIGNAL(startRouteEdit())
+  //       , this, SLOT(onRouteEditionStarted()));
+  //connect( _menuEngine, SIGNAL(finishRouteEdit())
+  //       , this, SLOT(onRouteEditionFinished()));
 
   emit initialized();
   _initialized = true;
@@ -278,27 +275,27 @@ void RLIDisplayWidget::resizeGL(int w, int h) {
 
   _radarEngine->resizeTexture(circle_radius);
   _tailsEngine->resizeTexture(circle_radius);
-  _chartEngine->resize(circle_radius);
-
-  _maskEngine->resize(QSize(w, h), _layout_manager.layout()->circle, _state);
-  _menuEngine->resize(_layout_manager.layout()->menu);
+  //_chartEngine->resize(circle_radius);
+  //
+  //_maskEngine->resize(QSize(w, h), _layout_manager.layout()->circle, _state);
+  //_menuEngine->resize(_layout_manager.layout()->menu);
   _magnEngine->resize(_layout_manager.layout()->magnifier);
-  _infoEngine->resize(_layout_manager.layout());
+  //_infoEngine->resize(_layout_manager.layout());
 
-  _infoEngine->secondChanged();
-  _infoEngine->setFps(static_cast<int>(frameRate()));
-  _infoEngine->onPositionChanged(_state.ship_position);
-  _infoEngine->onTargetCountChanged(_trgtEngine->targetCount());
-  _infoEngine->onSelectedTargetUpdated(_trgtEngine->selectedTag(), _trgtEngine->selectedTrgt());
-
-  _infoEngine->onScaleChanged(_state.radar_scale.getCurScale());
+  //_infoEngine->secondChanged();
+  //_infoEngine->setFps(static_cast<int>(frameRate()));
+  //_infoEngine->onPositionChanged(_state.ship_position);
+  //_infoEngine->onTargetCountChanged(_trgtEngine->targetCount());
+  //_infoEngine->onSelectedTargetUpdated(_trgtEngine->selectedTag(), _trgtEngine->selectedTrgt());
+  //
+  //_infoEngine->onScaleChanged(_state.radar_scale.getCurScale());
   _state.chart_scale = (_state.radar_scale.getCurScale()->len * RLIMath::MILE2METER) / _layout_manager.layout()->circle.radius;
 
-  _infoEngine->updateGain(_state.gain);
-  _infoEngine->updateWater(_state.water);
-  _infoEngine->updateRain(_state.rain);
-  _infoEngine->updateApch(_state.apch);
-  _infoEngine->updateEmission(_state.emission);
+  //_infoEngine->updateGain(_state.gain);
+  //_infoEngine->updateWater(_state.water);
+  //_infoEngine->updateRain(_state.rain);
+  //_infoEngine->updateApch(_state.apch);
+  //_infoEngine->updateEmission(_state.emission);
 
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "RLIDisplayWidget resizeGL finish";
 }
@@ -319,22 +316,20 @@ float RLIDisplayWidget::frameRate() {
 void RLIDisplayWidget::paintGL() {
   QDateTime time = QDateTime::currentDateTime();
 
-  if (frameTimes.size() == 0 || frameTimes.last().time().second() != time.time().second())
-    _infoEngine->secondChanged();
+  //if (frameTimes.size() == 0 || frameTimes.last().time().second() != time.time().second())
+  //  _infoEngine->secondChanged();
 
   frameTimes.push_back(time);
   while (frameTimes.size() > 20)
     frameTimes.removeFirst();
 
-  _infoEngine->setFps(static_cast<int>(frameRate()));
+  //_infoEngine->setFps(static_cast<int>(frameRate()));
 
 
   if (!_initialized)
     return;
 
   updateLayers();
-  glFlush();
-
   paintLayers();
   glFlush();
 }
@@ -358,8 +353,8 @@ void RLIDisplayWidget::paintLayers() {
   QPoint topLeft = layout->circle.bounding_rect.topLeft();
 
 
-  if (_state.orientation == RLIOrientation::NORTH)
-    drawRect(QRect(topLeft, _chartEngine->size()), _chartEngine->textureId());
+  //if (_state.orientation == RLIOrientation::NORTH)
+  //  drawRect(QRect(topLeft, _chartEngine->size()), _chartEngine->textureId());
 
   drawRect(QRect(topLeft, _radarEngine->size()), _radarEngine->textureId());
   drawRect(QRect(topLeft, _tailsEngine->size()), _tailsEngine->textureId());
@@ -377,16 +372,16 @@ void RLIDisplayWidget::paintLayers() {
                      , static_cast<float>(center.y() + _state.center_shift.y())
                      , 0.f);
 
-  _trgtEngine->draw(projection*transform, _state);
-  _ctrlEngine->draw(projection*transform, _state, layout->circle);
-  _routeEngine->draw(projection*transform, _state);
+  //_trgtEngine->draw(projection*transform, _state);
+  //_ctrlEngine->draw(projection*transform, _state, layout->circle);
+  //_routeEngine->draw(projection*transform, _state);
+  //
+  //drawRect(rect(), _maskEngine->textureId());
+  //
+  //for (InfoBlock* block: _infoEngine->blocks())
+  //  drawRect(block->geometry(), block->fbo()->texture());
 
-  drawRect(rect(), _maskEngine->textureId());
-
-  for (InfoBlock* block: _infoEngine->blocks())
-    drawRect(block->geometry(), block->fbo()->texture());
-
-  drawRect(_menuEngine->geometry(), _menuEngine->texture());
+  //drawRect(_menuEngine->geometry(), _menuEngine->texture());
 
   if (_state.state == RLIWidgetState::MAGNIFIER)
     drawRect(_magnEngine->geometry(), _magnEngine->texture());
@@ -402,11 +397,11 @@ void RLIDisplayWidget::updateLayers() {
   _radarEngine->updateTexture(_state);
   _tailsEngine->updateTexture(_state);
 
-  QString colorScheme = _chart_mngr.refs()->getColorScheme();
-  _chartEngine->update(_state, colorScheme);
-  _infoEngine->update(_infoFonts);
-  _menuEngine->update();
-  _maskEngine->update(_state, _layout_manager.layout()->circle, false);
+  //QString colorScheme = _chart_mngr.refs()->getColorScheme();
+  //_chartEngine->update(_state, colorScheme);
+  //_infoEngine->update(_infoFonts);
+  //_menuEngine->update();
+  //_maskEngine->update(_state, _layout_manager.layout()->circle, false);
 
   if (_state.state == RLIWidgetState::MAGNIFIER)
     _magnEngine->update(_state);
@@ -464,9 +459,9 @@ void RLIDisplayWidget::onShipStateChanged(const RLIShipState& sst) {
   _state.north_shift    = sst.course;
   _state.vn_cu          = sst.course;
 
-  _infoEngine->onPositionChanged(sst.position);
-  _infoEngine->onCourseChanged(sst.course);
-  _infoEngine->onVnChanged(_state);
+  //_infoEngine->onPositionChanged(sst.position);
+  //_infoEngine->onCourseChanged(sst.course);
+  //_infoEngine->onVnChanged(_state);
 }
 
 
@@ -481,7 +476,7 @@ void RLIDisplayWidget::mouseMoveEvent(QMouseEvent* event) {
   if (bearing < 0 && _state.orientation == RLIOrientation::NORTH)
     bearing = 360 + bearing;
 
-  _infoEngine->onCursorPosChanged( static_cast<double>(diffV.length()), bearing );
+  //_infoEngine->onCursorPosChanged( static_cast<double>(diffV.length()), bearing );
 }
 
 void RLIDisplayWidget::mousePressEvent(QMouseEvent* event) {
@@ -489,35 +484,35 @@ void RLIDisplayWidget::mousePressEvent(QMouseEvent* event) {
                                       , _layout_manager.layout()->circle.center
                                       , event->pos()
                                       , _state.chart_scale );
-  _trgtEngine->select(coords, _state.chart_scale);
+  //_trgtEngine->select(coords, _state.chart_scale);
 }
 
 
 
 void RLIDisplayWidget::onGainChanged(float value) {
-  _infoEngine->updateGain(_state.gain = value);
+  //_infoEngine->updateGain(_state.gain = value);
 }
 
 void RLIDisplayWidget::onWaterChanged(float value) {
-  _infoEngine->updateWater(_state.water = value);
+  //_infoEngine->updateWater(_state.water = value);
 }
 
 void RLIDisplayWidget::onRainChanged(float value) {
-  _infoEngine->updateRain(_state.rain = value);
+  //_infoEngine->updateRain(_state.rain = value);
 }
 
 void RLIDisplayWidget::onApchChanged(float value) {
-  _infoEngine->updateApch(_state.apch = value);
+  //_infoEngine->updateApch(_state.apch = value);
 }
 
 void RLIDisplayWidget::onEmissionChanged(float value) {
-  _infoEngine->updateEmission(_state.emission = value);
+  //_infoEngine->updateEmission(_state.emission = value);
 }
 
 
 void RLIDisplayWidget::onRouteEditionStarted() {
-  _routeEngine->clearCurrentRoute();
-  _routeEngine->addPointToCurrent(_state.ship_position);
+  //_routeEngine->clearCurrentRoute();
+  //_routeEngine->addPointToCurrent(_state.ship_position);
   _state.visir_center_pos = _state.ship_position;
   _state.state = RLIWidgetState::ROUTE_EDITION;
 }
@@ -537,33 +532,33 @@ void RLIDisplayWidget::keyPressEvent(QKeyEvent* event) {
   pressedKeys.insert(event->key());
   auto mod_keys = event->modifiers();
 
-  if (   _state.state == RLIWidgetState::MAIN_MENU
-      || _state.state == RLIWidgetState::CONFIG_MENU
-      || _state.state == RLIWidgetState::ROUTE_EDITION )
-    _menuEngine->onKeyPressed(event);
+  //if (   _state.state == RLIWidgetState::MAIN_MENU
+  //    || _state.state == RLIWidgetState::CONFIG_MENU
+  //    || _state.state == RLIWidgetState::ROUTE_EDITION )
+  //  _menuEngine->onKeyPressed(event);
 
   switch(event->key()) {
   case Qt::Key_PageUp:
-    if (mod_keys & Qt::ControlModifier)
-      emit _infoEngine->updateGain( _state.gain = qMin(_state.gain + 5.0f, 255.0f) );
-
-    if (mod_keys & Qt::AltModifier)
-      emit _infoEngine->updateWater( _state.water = qMin(_state.water + 5.0f, 255.0f) );
-
-    if (mod_keys & Qt::ShiftModifier)
-      emit _infoEngine->updateRain(  _state.rain = qMin(_state.rain + 5.0f, 255.0f) );
+    //if (mod_keys & Qt::ControlModifier)
+    //  emit _infoEngine->updateGain( _state.gain = qMin(_state.gain + 5.0f, 255.0f) );
+    //
+    //if (mod_keys & Qt::AltModifier)
+    //  emit _infoEngine->updateWater( _state.water = qMin(_state.water + 5.0f, 255.0f) );
+    //
+    //if (mod_keys & Qt::ShiftModifier)
+    //  emit _infoEngine->updateRain(  _state.rain = qMin(_state.rain + 5.0f, 255.0f) );
 
     break;
 
   case Qt::Key_PageDown:
-    if (mod_keys & Qt::ControlModifier)
-      emit _infoEngine->updateGain( _state.gain = qMax(_state.gain - 5.0f, 0.0f) );
-
-    if (mod_keys & Qt::AltModifier)
-      emit _infoEngine->updateWater( _state.water = qMax(_state.water - 5.0f, 0.0f) );
-
-    if (mod_keys & Qt::ShiftModifier)
-      emit _infoEngine->updateRain( _state.rain = qMax(_state.rain - 5.0f, 0.0f) );
+    //if (mod_keys & Qt::ControlModifier)
+    //  emit _infoEngine->updateGain( _state.gain = qMax(_state.gain - 5.0f, 0.0f) );
+    //
+    //if (mod_keys & Qt::AltModifier)
+    //  emit _infoEngine->updateWater( _state.water = qMax(_state.water - 5.0f, 0.0f) );
+    //
+    //if (mod_keys & Qt::ShiftModifier)
+    //  emit _infoEngine->updateRain( _state.rain = qMax(_state.rain - 5.0f, 0.0f) );
 
     break;
 
@@ -586,7 +581,7 @@ void RLIDisplayWidget::keyPressEvent(QKeyEvent* event) {
         _state.state = RLIWidgetState::MAIN_MENU;
     }
 
-    _menuEngine->onStateChanged(_state.state);
+    //_menuEngine->onStateChanged(_state.state);
     break;
 
   // Шкала +
@@ -595,29 +590,29 @@ void RLIDisplayWidget::keyPressEvent(QKeyEvent* event) {
       QPointF pos = QPointF( sin(RLIMath::rads(_state.vn_p)) * _state.vd
                            ,-cos(RLIMath::rads(_state.vn_p)) * _state.vd );
       //float scale = (_rli_scale.len*RLIMath::MILE2METER) / _maskEngine->getRadius();
-      GeoPos last_route_point = _routeEngine->getLastPoint();
-      GeoPos cursor_coords = RLIMath::pos_to_coords( last_route_point, QPoint(0, 0), pos, _state.chart_scale);
-      _state.visir_center_pos = cursor_coords;
-      _routeEngine->addPointToCurrent(cursor_coords);
+      //GeoPos last_route_point = _routeEngine->getLastPoint();
+      //GeoPos cursor_coords = RLIMath::pos_to_coords( last_route_point, QPoint(0, 0), pos, _state.chart_scale);
+      //_state.visir_center_pos = cursor_coords;
+      //_routeEngine->addPointToCurrent(cursor_coords);
 
       break;
     }
 
     _state.radar_scale.prevScale();
-    _infoEngine->onScaleChanged(_state.radar_scale.getCurScale());
+    //_infoEngine->onScaleChanged(_state.radar_scale.getCurScale());
     _state.chart_scale = (_state.radar_scale.getCurScale()->len * RLIMath::MILE2METER) / _layout_manager.layout()->circle.radius;
     break;
 
   // Шкала -
   case Qt::Key_Minus:
     if (_state.state == RLIWidgetState::ROUTE_EDITION) {
-      _routeEngine->removePointFromCurrent();
-      _state.visir_center_pos = _routeEngine->getLastPoint();
+      //_routeEngine->removePointFromCurrent();
+      //_state.visir_center_pos = _routeEngine->getLastPoint();
       break;
     }
 
     _state.radar_scale.nextScale();
-    _infoEngine->onScaleChanged(_state.radar_scale.getCurScale());
+    //_infoEngine->onScaleChanged(_state.radar_scale.getCurScale());
     _state.chart_scale = (_state.radar_scale.getCurScale()->len * RLIMath::MILE2METER) / _layout_manager.layout()->circle.radius;
     break;
 
@@ -643,7 +638,7 @@ void RLIDisplayWidget::keyPressEvent(QKeyEvent* event) {
       }
     } else {
       _state.vd += 1.0;
-      _infoEngine->onVdChanged(_state);
+      //_infoEngine->onVdChanged(_state);
     }
     break;
 
@@ -656,7 +651,7 @@ void RLIDisplayWidget::keyPressEvent(QKeyEvent* event) {
       }
     } else {
       _state.vd = qMax(0.0, _state.vd - 1.0);
-      _infoEngine->onVdChanged(_state);
+      //_infoEngine->onVdChanged(_state);
     }
     break;
 
@@ -670,7 +665,7 @@ void RLIDisplayWidget::keyPressEvent(QKeyEvent* event) {
       _state.course_mark_angle = fmod(_state.course_mark_angle - 1.0, 360.0);
     } else {
       _state.vn_p = fmod(_state.vn_p - 1.0, 360.0);
-      _infoEngine->onVnChanged(_state);
+      //_infoEngine->onVnChanged(_state);
     }
     break;
 
@@ -684,7 +679,7 @@ void RLIDisplayWidget::keyPressEvent(QKeyEvent* event) {
       _state.course_mark_angle = fmod(_state.course_mark_angle + 1.0, 360.0);
     } else {
       _state.vn_p = fmod(_state.vn_p + 1.0, 360.0);
-      _infoEngine->onVnChanged(_state);
+      //_infoEngine->onVnChanged(_state);
     }
     break;
 
@@ -746,7 +741,7 @@ void RLIDisplayWidget::keyPressEvent(QKeyEvent* event) {
         _state.mode = RLIMode::T;
         break;
     }
-    _infoEngine->onOrientationChanged(_state.orientation);
+    //_infoEngine->onOrientationChanged(_state.orientation);
     break;
 
   //ИД / ОД

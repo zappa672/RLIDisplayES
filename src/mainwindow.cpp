@@ -21,12 +21,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
   connect(wgtRLI, SIGNAL(initialized()), SLOT(onRLIWidgetInitialized()));
 
   _radar_ds = new RadarDataSource(this);
-  _ship_ds = new ShipDataSource(this);
-  _target_ds = new TargetDataSource(this);
+  //_ship_ds = new ShipDataSource(this);
+  //_target_ds = new TargetDataSource(this);
 
   _radar_ds->start();
-  _ship_ds->start();
-  _target_ds->start();
+  //_ship_ds->start();
+  //_target_ds->start();
 
   wgtRLI->setFocusPolicy(Qt::StrongFocus);
   wgtRLI->setFocus();
@@ -36,12 +36,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 
 MainWindow::~MainWindow() {
   _radar_ds->finish();
-  _ship_ds->finish();
-  _target_ds->finish();
+  //_ship_ds->finish();
+  //_target_ds->finish();
 
   delete _radar_ds;
-  delete _ship_ds;
-  delete _target_ds;
+  //delete _ship_ds;
+  //delete _target_ds;
 }
 
 void MainWindow::resizeEvent(QResizeEvent* e) {
@@ -64,7 +64,7 @@ void MainWindow::resizeEvent(QResizeEvent* e) {
     availableSize = QSize(availableWidth, s.height() );
   }
 
-  wgtRLI->setGeometry(QRect(QPoint(0, 0), availableSize));
+  wgtRLI->setGeometry(geometry());
 
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "MainWindow resizeEvent finish";
 }
@@ -76,8 +76,8 @@ void MainWindow::timerEvent(QTimerEvent* e) {
 
 void MainWindow::onRLIWidgetInitialized() {
   wgtRLI->setupRadarDataSource(_radar_ds);
-  wgtRLI->setupTargetDataSource(_target_ds);
-  wgtRLI->setupShipDataSource(_ship_ds);
+  //wgtRLI->setupTargetDataSource(_target_ds);
+  //wgtRLI->setupShipDataSource(_ship_ds);
 
   int frame = qApp->property(PROPERTY_FRAME_DELAY).toInt();
   startTimer(frame, Qt::CoarseTimer);

@@ -88,20 +88,24 @@ private:
 
   RLIState _state;
 
-  ChartManager     _chart_mngr      { this };
+  //ChartManager     _chart_mngr      { this };
   RLILayoutManager _layout_manager  { "layouts.xml" };
 
+  /*
   InfoFonts*        _infoFonts;
 
   MaskEngine*       _maskEngine;
+  */
   RadarEngine*      _radarEngine;
   RadarEngine*      _tailsEngine;
+  /*
   ChartEngine*      _chartEngine;
   InfoEngine*       _infoEngine;
   MenuEngine*       _menuEngine;
   TargetEngine*     _trgtEngine;
   RouteEngine*      _routeEngine;
   ControlsEngine*   _ctrlEngine;
+  */
   MagnifierEngine*  _magnEngine;
 
   QMap<char, QOpenGLTexture*> _mode_textures;
