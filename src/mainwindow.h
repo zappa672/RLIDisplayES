@@ -36,7 +36,7 @@ private:
   */
 
   RLIDisplayWidget*   wgtRLI;
-  RLIControlWidget*   wgtButtonPanel;
+  //RLIControlWidget*   wgtButtonPanel;
 };
 
 #endif // MAINWINDOW_H

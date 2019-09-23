@@ -10,6 +10,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "MainWindow construction start";
 
   wgtRLI = new RLIDisplayWidget(this);
+
+  /*
   wgtButtonPanel = new RLIControlWidget(wgtRLI, this);
 
   connect(wgtButtonPanel, SIGNAL(closeApp()), SLOT(close()));
@@ -17,6 +19,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
   connect(wgtButtonPanel, SIGNAL(gainChanged(float)), wgtRLI, SLOT(onGainChanged(float)));
   connect(wgtButtonPanel, SIGNAL(waterChanged(float)), wgtRLI, SLOT(onWaterChanged(float)));
   connect(wgtButtonPanel, SIGNAL(rainChanged(float)), wgtRLI, SLOT(onRainChanged(float)));
+  */
 
   connect(wgtRLI, SIGNAL(initialized()), SLOT(onRLIWidgetInitialized()));
 
@@ -47,6 +50,7 @@ MainWindow::~MainWindow() {
 void MainWindow::resizeEvent(QResizeEvent* e) {
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "MainWindow resizeEvent" << e->size();
 
+  /*
   bool showButtonPanel = qApp->property(PROPERTY_SHOW_BUTTON_PANEL).toBool();
 
   wgtButtonPanel->setVisible(showButtonPanel);
@@ -63,6 +67,7 @@ void MainWindow::resizeEvent(QResizeEvent* e) {
     availableWidth = showButtonPanel ? s.width() - wgtButtonPanel->width() : s.width();
     availableSize = QSize(availableWidth, s.height() );
   }
+  */
 
   wgtRLI->setGeometry(geometry());
 
