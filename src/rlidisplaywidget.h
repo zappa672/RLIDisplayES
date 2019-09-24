@@ -35,15 +35,6 @@ public:
   explicit RLIDisplayWidget(QWidget *parent = nullptr);
   ~RLIDisplayWidget() override;
 
-  float frameRate();
-
-  void setupRadarDataSource(RadarDataSource* rds);
-  void setupTargetDataSource(TargetDataSource* tds);
-  void setupShipDataSource(ShipDataSource* sds);
-
-signals:
-  void initialized();
-
 public slots:  
   void keyReleaseEvent(QKeyEvent* event) override;
   void keyPressEvent(QKeyEvent* event) override;
@@ -61,6 +52,8 @@ protected slots:
   void resizeGL(int w, int h) override;
   void paintGL() override;
 
+  void timerEvent(QTimerEvent* e) override;
+
 private slots:
   void onNewChartAvailable(const QString& name);
 
@@ -70,6 +63,8 @@ private slots:
   void onRouteEditionFinished();
 
 private:
+  float frameRate();
+
   QSet<int> pressedKeys;
 
   bool _initialized = false;
@@ -120,6 +115,12 @@ private:
   int _attr_locs[ATTR_COUNT];
 
   QMatrix4x4 _projection;
+
+  RadarDataSource*    _radar_ds;
+  /*
+  ShipDataSource*     _ship_ds;
+  TargetDataSource*   _target_ds;
+  */
 };
 
 #endif // RLIDISPLAYWIDGET_H

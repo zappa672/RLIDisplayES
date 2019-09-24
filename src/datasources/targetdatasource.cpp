@@ -7,39 +7,39 @@ TargetDataSource::TargetDataSource(QObject *parent) : QObject(parent) {
   RLITarget trgt;
 
   trgt.lost = false;
-  trgt.latitude = 15.4200f;
-  trgt.longtitude = 145.7600f;
-  trgt.heading = 37.f;
-  trgt.rotation = 20.f;
-  trgt.course_grnd = 37.f;
-  trgt.speed_grnd = 180.f;
+  trgt.latitude = 15.42;
+  trgt.longtitude = 145.76;
+  trgt.heading = 37.0;
+  trgt.rotation = 20.0;
+  trgt.course_grnd = 37.0;
+  trgt.speed_grnd = 180.0;
 
   _targets.push_back(trgt);
 
-  trgt.latitude = 15.1500f;
-  trgt.longtitude = 145.8600f;
-  trgt.heading = 123.f;
-  trgt.rotation = -20.f;
-  trgt.course_grnd = 123.f;
-  trgt.speed_grnd = 80.f;
+  trgt.latitude = 15.15;
+  trgt.longtitude = 145.86;
+  trgt.heading = 123.0;
+  trgt.rotation = -20.0;
+  trgt.course_grnd = 123.0;
+  trgt.speed_grnd = 80.0;
 
   _targets.push_back(trgt);
 
-  trgt.latitude = 15.3500f;
-  trgt.longtitude = 145.5600f;
-  trgt.heading = 286.f;
-  trgt.rotation = 0.f;
-  trgt.course_grnd = 286.f;
-  trgt.speed_grnd = 140.f;
+  trgt.latitude = 15.35;
+  trgt.longtitude = 145.56;
+  trgt.heading = 286.0;
+  trgt.rotation = 0.0;
+  trgt.course_grnd = 286.0;
+  trgt.speed_grnd = 140.0;
 
   _targets.push_back(trgt);
 
-  trgt.latitude = 15.3000f;
-  trgt.longtitude = 144.9300f;
-  trgt.heading = -1.f;
-  trgt.rotation = 0.f;
-  trgt.course_grnd = 286.f;
-  trgt.speed_grnd = 140.f;
+  trgt.latitude = 15.30;
+  trgt.longtitude = 144.93;
+  trgt.heading = -1.0;
+  trgt.rotation = 0.0;
+  trgt.course_grnd = 286.0;
+  trgt.speed_grnd = 140.0;
 
   _targets.push_back(trgt);
 }

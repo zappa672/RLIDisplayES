@@ -1,5 +1,3 @@
-#include "mainwindow.h"
-
 #include <QApplication>
 #include <QThreadPool>
 #include <QGLFormat>
@@ -8,6 +6,8 @@
 
 #include "common/rlilayout.h"
 #include "common/properties.h"
+
+#include "rlidisplaywidget.h"
 
 #define RLI_THREADS_NUM 6 // Required number of threads in global QThreadPool
 
@@ -28,7 +28,8 @@ int main(int argc, char *argv[]) {
   format.setSamples(1);
   QGLFormat::setDefaultFormat(format);
 
-  MainWindow w;
+  RLIDisplayWidget w;
+  w.setGeometry(QGuiApplication::screens()[0]->geometry());
   w.showFullScreen();
 
   return a.exec();

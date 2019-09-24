@@ -31,8 +31,6 @@ SOURCES     += \
     src/layers/chart/chartmarkengine.cpp \
     src/layers/chart/charttextengine.cpp \
     src/main.cpp \
-    src/mainwindow.cpp \
-    src/rlicontrolwidget.cpp \
     src/rlidisplaywidget.cpp \
     \
     src/common/triangulate.cpp \
@@ -73,8 +71,6 @@ HEADERS     += \
     src/layers/chart/chartlineengine.h \
     src/layers/chart/chartmarkengine.h \
     src/layers/chart/charttextengine.h \
-    src/mainwindow.h \
-    src/rlicontrolwidget.h \
     src/rlidisplaywidget.h \
     \
     src/common/properties.h \

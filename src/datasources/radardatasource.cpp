@@ -1,5 +1,4 @@
 #include "radardatasource.h"
-#include "../mainwindow.h"
 
 #include "../common/properties.h"
 

@@ -1,5 +1,4 @@
 #include "rlidisplaywidget.h"
-#include "mainwindow.h"
 
 #include <QtMath>
 
@@ -24,10 +23,26 @@ RLIDisplayWidget::RLIDisplayWidget(QWidget *parent) : QOpenGLWidget(parent) {
   //_chart_mngr.loadCharts();
   //connect( &_chart_mngr, SIGNAL(newChartAvailable(QString)), SLOT(onNewChartAvailable(QString)));
 
+  _radar_ds = new RadarDataSource(this);
+  //_ship_ds = new ShipDataSource(this);
+  //_target_ds = new TargetDataSource(this);
+
+  _radar_ds->start();
+  //_ship_ds->start();
+  //_target_ds->start();
+
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "RLIDisplayWidget construction finish";
 }
 
 RLIDisplayWidget::~RLIDisplayWidget() {
+  _radar_ds->finish();
+  //_ship_ds->finish();
+  //_target_ds->finish();
+
+  delete _radar_ds;
+  //delete _ship_ds;
+  //delete _target_ds;
+
   if (!_initialized)
     return;
 
@@ -47,32 +62,6 @@ RLIDisplayWidget::~RLIDisplayWidget() {
   //for (auto tex : _mode_textures)
   //  tex->destroy();
 }
-
-
-void RLIDisplayWidget::setupRadarDataSource(RadarDataSource* rds) {
-  connect( rds, SIGNAL(updateRadarData(int, int, GLfloat*))
-         , _radarEngine, SLOT(updateData(int, int, GLfloat*))
-         , Qt::QueuedConnection );
-
-  connect( rds, SIGNAL(updateTrailData(int, int, GLfloat*))
-         , _tailsEngine, SLOT(updateData(int, int, GLfloat*))
-         , Qt::QueuedConnection );
-}
-
-void RLIDisplayWidget::setupTargetDataSource(TargetDataSource* tds) {
-  //connect( tds, SIGNAL(updateTarget(QString,RadarTarget))
-  //       , _trgtEngine, SLOT(updateTarget(QString,RadarTarget)));
-}
-
-void RLIDisplayWidget::setupShipDataSource(ShipDataSource* sds) {
-  onShipStateChanged(sds->shipState());
-
-  connect( sds, SIGNAL(shipStateChanged(RLIShipState))
-         , this, SLOT(onShipStateChanged(RLIShipState)));
-}
-
-
-
 
 void RLIDisplayWidget::onNewChartAvailable(const QString& name) {
   if (!_initialized)
@@ -207,11 +196,34 @@ void RLIDisplayWidget::initializeGL() {
   //connect( _menuEngine, SIGNAL(finishRouteEdit())
   //       , this, SLOT(onRouteEditionFinished()));
 
-  emit initialized();
   _initialized = true;
+
+  connect( _radar_ds, SIGNAL(updateRadarData(int, int, GLfloat*))
+         , _radarEngine, SLOT(updateData(int, int, GLfloat*))
+         , Qt::QueuedConnection );
+
+  connect( _radar_ds, SIGNAL(updateTrailData(int, int, GLfloat*))
+         , _tailsEngine, SLOT(updateData(int, int, GLfloat*))
+         , Qt::QueuedConnection );
+
+  //connect( _target_ds, SIGNAL(updateTarget(QString,RadarTarget))
+  //       , _trgtEngine, SLOT(updateTarget(QString,RadarTarget))
+  //       , Qt::QueuedConnection );
+
+  //onShipStateChanged(_ship_ds->shipState());
+  //
+  //connect( _ship_ds, SIGNAL(shipStateChanged(RLIShipState))
+  //       , this, SLOT(onShipStateChanged(RLIShipState)));
+
+  startTimer(qApp->property(PROPERTY_FRAME_DELAY).toInt(), Qt::CoarseTimer);
 
   qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss zzz") << ": " << "GL init finish";
 }
+
+void RLIDisplayWidget::timerEvent(QTimerEvent*) {
+  update();
+}
+
 
 void RLIDisplayWidget::initShaders() {
   _program->addShaderFromSourceFile(QOpenGLShader::Vertex, SHADERS_PATH + "main.vert.glsl");
