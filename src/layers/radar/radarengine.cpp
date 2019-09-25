@@ -13,27 +13,28 @@ RadarEngine::RadarEngine(int pel_count, int pel_len, int tex_radius, QOpenGLCont
   : QObject(parent), QOpenGLFunctions(context) {
   initializeOpenGLFunctions();
 
-  glGenBuffers(ATTR_COUNT, _vbo_ids);
-  glGenBuffers(1, &_ind_vbo_id);
-
-  _palette = new RadarPalette(context, this);
-
-  initShader();
-
-  resizeData(pel_count, pel_len);
+  //glGenBuffers(ATTR_COUNT, _vbo_ids);
+  //glGenBuffers(1, &_ind_vbo_id);
+  //
+  //_palette = new RadarPalette(context, this);
+  //
+  //initShader();
+  //
+  //resizeData(pel_count, pel_len);
   resizeTexture(tex_radius);
 }
 
 RadarEngine::~RadarEngine() {
   delete _fbo;
-  delete _program;
-
-  glDeleteBuffers(ATTR_COUNT, _vbo_ids);
-  glDeleteBuffers(1, &_ind_vbo_id);
-
-  delete _palette;
+  //delete _program;
+  //
+  //glDeleteBuffers(ATTR_COUNT, _vbo_ids);
+  //glDeleteBuffers(1, &_ind_vbo_id);
+  //
+  //delete _palette;
 }
 
+/*
 void RadarEngine::onBrightnessChanged(int br) {
   _palette->setBrightness(br);
 }
@@ -93,6 +94,7 @@ void RadarEngine::fillCoordTable() {
     _draw_indices.push_back((last+1)%total);
   }
 }
+*/
 
 void RadarEngine::resizeTexture(int radius) {
   if (_fbo != nullptr && _fbo->width() == static_cast<int>(2*radius+1))
@@ -108,7 +110,7 @@ void RadarEngine::resizeTexture(int radius) {
   clearTexture();
 }
 
-
+/*
 void RadarEngine::clearData() {
   glBindBuffer(GL_ARRAY_BUFFER, _vbo_ids[ATTR_POSITION]);
   glBufferData(GL_ARRAY_BUFFER, _peleng_count*_peleng_len*sizeof(GLfloat), _positions.data(), GL_STATIC_DRAW);
@@ -146,7 +148,7 @@ void RadarEngine::updateData(int offset, int count, GLfloat* amps) {
     _has_data = true;
   }
 }
-
+*/
 
 void RadarEngine::clearTexture() {
   glDisable(GL_BLEND);
@@ -156,7 +158,7 @@ void RadarEngine::clearTexture() {
   _fbo->bind();
 
   glClearDepthf(0.f);
-  glClearColor(1.f, 1.f, 1.f, 0.f);  
+  glClearColor(1.f, 1.f, 1.f, 1.f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   _fbo->release();
@@ -164,6 +166,9 @@ void RadarEngine::clearTexture() {
 
 
 void RadarEngine::updateTexture(const RLIState& _rli_state) {
+  clearTexture();
+
+  /*
   if (!_has_data) {
     clearTexture();
     return;
@@ -236,8 +241,10 @@ void RadarEngine::updateTexture(const RLIState& _rli_state) {
 
   _last_drawn_peleng = last_peleng_to_draw;
   _draw_circle = false;
+  */
 }
 
+/*
 void RadarEngine::drawPelengs(int first, int last) {
   // Clear depth when the new cycle begins to avoid the previous circle data
   if (first == 0) {
@@ -263,3 +270,4 @@ void RadarEngine::drawPelengs(int first, int last) {
 
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
+*/

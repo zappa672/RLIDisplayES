@@ -69,7 +69,6 @@ private:
 
   bool _initialized = false;
 
-  QMutex frameRateMutex;
   QQueue<QDateTime> frameTimes;
 
   void debugInfo();
@@ -92,7 +91,7 @@ private:
   MaskEngine*       _maskEngine;
   */
   RadarEngine*      _radarEngine;
-  RadarEngine*      _tailsEngine;
+  //RadarEngine*      _tailsEngine;
   /*
   ChartEngine*      _chartEngine;
   InfoEngine*       _infoEngine;
@@ -101,9 +100,9 @@ private:
   RouteEngine*      _routeEngine;
   ControlsEngine*   _ctrlEngine;
   */
-  MagnifierEngine*  _magnEngine;
+  //MagnifierEngine*  _magnEngine;
 
-  QMap<char, QOpenGLTexture*> _mode_textures;
+  //QMap<char, QOpenGLTexture*> _mode_textures;
 
   QOpenGLShaderProgram* _program;
 
@@ -116,7 +115,7 @@ private:
 
   QMatrix4x4 _projection;
 
-  RadarDataSource*    _radar_ds;
+  //RadarDataSource*    _radar_ds;
   /*
   ShipDataSource*     _ship_ds;
   TargetDataSource*   _target_ds;
