@@ -314,14 +314,15 @@ void RLIDisplayWidget::resizeGL(int w, int h) {
 
 
 float RLIDisplayWidget::frameRate() {
-  if (frameTimes.size() < 2)
+  /*if (frameTimes.size() < 2)
     return 0.f;
 
   QDateTime f = frameTimes.first();
   QDateTime l = frameTimes.last();
   int count = frameTimes.size() - 1;
 
-  return 1000.f / (f.msecsTo(l) / count);
+  return 1000.f / (f.msecsTo(l) / count);*/
+  return 0.f;
 }
 
 
@@ -331,9 +332,9 @@ void RLIDisplayWidget::paintGL() {
   //if (frameTimes.size() == 0 || frameTimes.last().time().second() != time.time().second())
   //  _infoEngine->secondChanged();
 
-  frameTimes.push_back(time);
-  while (frameTimes.size() > 20)
-    frameTimes.removeFirst();
+  //frameTimes.push_back(time);
+  //while (frameTimes.size() > 20)
+  //  frameTimes.removeFirst();
 
   //_infoEngine->setFps(static_cast<int>(frameRate()));
 

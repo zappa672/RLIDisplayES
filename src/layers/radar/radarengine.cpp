@@ -11,6 +11,7 @@ static double const PI = acos(-1);
 
 RadarEngine::RadarEngine(int pel_count, int pel_len, int tex_radius, QOpenGLContext* context, QObject* parent)
   : QObject(parent), QOpenGLFunctions(context) {
+
   initializeOpenGLFunctions();
 
   //glGenBuffers(ATTR_COUNT, _vbo_ids);
@@ -25,8 +26,12 @@ RadarEngine::RadarEngine(int pel_count, int pel_len, int tex_radius, QOpenGLCont
 }
 
 RadarEngine::~RadarEngine() {
-  delete _fbo;
+  glDeleteFramebuffers(1, &_fbo_id);
+  glDeleteRenderbuffers(1, &_depth_rbo_id);
+  glDeleteTextures(1, &_fbo_tex_id);
+
   //delete _program;
+
   //
   //glDeleteBuffers(ATTR_COUNT, _vbo_ids);
   //glDeleteBuffers(1, &_ind_vbo_id);
@@ -97,15 +102,44 @@ void RadarEngine::fillCoordTable() {
 */
 
 void RadarEngine::resizeTexture(int radius) {
-  if (_fbo != nullptr && _fbo->width() == static_cast<int>(2*radius+1))
+  if (radius <= 0)
     return;
 
-  delete _fbo;
+  if (_fbo_tex_radius > 0) {
+    glDeleteFramebuffers(1, &_fbo_id);
+    glDeleteRenderbuffers(1, &_depth_rbo_id);
+    glDeleteTextures(1, &_fbo_tex_id);
+  }
 
-  QOpenGLFramebufferObjectFormat format;
-  format.setAttachment(QOpenGLFramebufferObject::Depth);
+  glGenFramebuffers(1, &_fbo_id);
+  glGenRenderbuffers(1, &_depth_rbo_id);
+  glGenTextures(1, &_fbo_tex_id);
 
-  _fbo = new QOpenGLFramebufferObject(2*radius+1, 2*radius+1, format);
+  _fbo_tex_radius = radius;
+  int width = 2*radius+1;
+  int height = 2*radius+1;
+
+  glBindTexture(GL_TEXTURE_2D, _fbo_tex_id);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glBindTexture(GL_TEXTURE_2D, 0);
+
+  glBindRenderbuffer(GL_RENDERBUFFER, _depth_rbo_id);
+  glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, width, height);
+  glBindRenderbuffer(GL_RENDERBUFFER, 0);
+
+  glBindFramebuffer(GL_FRAMEBUFFER, _fbo_id);
+  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _fbo_tex_id, 0);
+  glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, _depth_rbo_id);
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+  _fbo_tex_radius = radius;
+  _fbo_tex_width = width;
+  _fbo_tex_height = height;
 
   clearTexture();
 }
@@ -155,13 +189,13 @@ void RadarEngine::clearTexture() {
   glEnable(GL_DEPTH_TEST);
   glDepthFunc(GL_ALWAYS);
 
-  _fbo->bind();
+  glBindFramebuffer(GL_FRAMEBUFFER, _fbo_id);
 
   glClearDepthf(0.f);
-  glClearColor(1.f, 1.f, 1.f, 1.f);
+  glClearColor(1.f, 0.f, 1.f, 1.f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  _fbo->release();
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 

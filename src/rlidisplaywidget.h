@@ -69,7 +69,7 @@ private:
 
   bool _initialized = false;
 
-  QQueue<QDateTime> frameTimes;
+  //QQueue<QDateTime> frameTimes;
 
   void debugInfo();
   void initShaders();

@@ -1,6 +1,8 @@
 #ifndef RADARENGINE_H
 #define RADARENGINE_H
 
+#include <climits>
+
 #include <QTime>
 #include <QColor>
 #include <QVector2D>
@@ -20,8 +22,8 @@ public:
   RadarEngine  (int pel_count, int pel_len, int tex_radius, QOpenGLContext* context, QObject* parent = nullptr);
   virtual ~RadarEngine  ();
 
-  inline QSize size()           const { return _fbo->size(); }
-  inline GLuint textureId()     const { return _fbo->texture(); }
+  inline QSize size()           const { return QSize(2*_fbo_tex_radius + 1, 2*_fbo_tex_radius+1); }
+  inline GLuint textureId()     const { return _fbo_tex_id; }
 
   //inline GLuint ampsVboId()     const { return _vbo_ids[ATTR_AMPLITUDE]; }
   //inline GLuint paletteTexId()  const { return _palette->texture(); }
@@ -42,7 +44,12 @@ public slots:
   //void updateData(int offset, int count, GLfloat* amps);
 
 private:
-  QOpenGLFramebufferObject* _fbo = nullptr;
+  GLuint _fbo_id;
+  GLuint _fbo_tex_id;
+  GLuint _depth_rbo_id;
+  int _fbo_tex_radius = -1;
+  int _fbo_tex_width;
+  int _fbo_tex_height;
 
   //void initShader();
   //
