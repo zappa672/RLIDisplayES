@@ -14,14 +14,14 @@ RadarEngine::RadarEngine(int pel_count, int pel_len, int tex_radius, QOpenGLCont
 
   initializeOpenGLFunctions();
 
-  //glGenBuffers(ATTR_COUNT, _vbo_ids);
-  //glGenBuffers(1, &_ind_vbo_id);
-  //
-  //_palette = new RadarPalette(context, this);
-  //
-  //initShader();
-  //
-  //resizeData(pel_count, pel_len);
+  glGenBuffers(ATTR_COUNT, _vbo_ids);
+  glGenBuffers(1, &_ind_vbo_id);
+
+  _palette = new RadarPalette(context, this);
+
+  initShader();
+
+  resizeData(pel_count, pel_len);
   resizeTexture(tex_radius);
 }
 
@@ -30,16 +30,15 @@ RadarEngine::~RadarEngine() {
   glDeleteRenderbuffers(1, &_depth_rbo_id);
   glDeleteTextures(1, &_fbo_tex_id);
 
-  //delete _program;
+  delete _program;
 
-  //
-  //glDeleteBuffers(ATTR_COUNT, _vbo_ids);
-  //glDeleteBuffers(1, &_ind_vbo_id);
-  //
-  //delete _palette;
+  glDeleteBuffers(ATTR_COUNT, _vbo_ids);
+  glDeleteBuffers(1, &_ind_vbo_id);
+
+  delete _palette;
 }
 
-/*
+
 void RadarEngine::onBrightnessChanged(int br) {
   _palette->setBrightness(br);
 }
@@ -99,7 +98,7 @@ void RadarEngine::fillCoordTable() {
     _draw_indices.push_back((last+1)%total);
   }
 }
-*/
+
 
 void RadarEngine::resizeTexture(int radius) {
   if (radius <= 0)
@@ -144,7 +143,7 @@ void RadarEngine::resizeTexture(int radius) {
   clearTexture();
 }
 
-/*
+
 void RadarEngine::clearData() {
   glBindBuffer(GL_ARRAY_BUFFER, _vbo_ids[ATTR_POSITION]);
   glBufferData(GL_ARRAY_BUFFER, _peleng_count*_peleng_len*sizeof(GLfloat), _positions.data(), GL_STATIC_DRAW);
@@ -182,7 +181,7 @@ void RadarEngine::updateData(int offset, int count, GLfloat* amps) {
     _has_data = true;
   }
 }
-*/
+
 
 void RadarEngine::clearTexture() {
   glDisable(GL_BLEND);
@@ -192,7 +191,7 @@ void RadarEngine::clearTexture() {
   glBindFramebuffer(GL_FRAMEBUFFER, _fbo_id);
 
   glClearDepthf(0.f);
-  glClearColor(1.f, 0.f, 1.f, 1.f);
+  glClearColor(1.f, 1.f, 1.f, 0.f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -200,9 +199,6 @@ void RadarEngine::clearTexture() {
 
 
 void RadarEngine::updateTexture(const RLIState& _rli_state) {
-  clearTexture();
-
-  /*
   if (!_has_data) {
     clearTexture();
     return;
@@ -232,18 +228,18 @@ void RadarEngine::updateTexture(const RLIState& _rli_state) {
   glEnable(GL_DEPTH_TEST);
   glDepthFunc(GL_LESS);
 
-  glViewport(0.f, 0.f, _fbo->width(), _fbo->height());
+  glViewport(0.f, 0.f, _fbo_tex_width, _fbo_tex_height);
 
-  _fbo->bind();
+  glBindFramebuffer(GL_FRAMEBUFFER, _fbo_id);
 
   QMatrix4x4 projection;
   projection.setToIdentity();
-  projection.ortho(0.f, _fbo->width(), 0.f, _fbo->height(), -255.f, 255.f);
+  projection.ortho(0.f, _fbo_tex_width, 0.f, _fbo_tex_height, -255.f, 255.f);
 
   QMatrix4x4 transform;
   transform.setToIdentity();
-  transform.translate( _fbo->width() / 2.f + static_cast<float>(_center_shift.x())
-                     , _fbo->height() / 2.f + static_cast<float>(_center_shift.y())
+  transform.translate( _fbo_tex_width / 2.f + static_cast<float>(_center_shift.x())
+                     , _fbo_tex_height / 2.f + static_cast<float>(_center_shift.y())
                      , 0.f);
 
   _program->bind();
@@ -257,7 +253,7 @@ void RadarEngine::updateTexture(const RLIState& _rli_state) {
 
   glUniform1f(_unif_locs[UNIF_PELENG_LENGTH], _peleng_len);
   glUniform1f(_unif_locs[UNIF_PELENG_COUNT], _peleng_count);
-  glUniform1f(_unif_locs[UNIF_FBO_RADIUS], _fbo->width() / 2.f);
+  glUniform1f(_unif_locs[UNIF_FBO_RADIUS], _fbo_tex_width / 2.f);
   glUniform1f(_unif_locs[UNIF_NORTH_SHIFT], static_cast<float>(_rli_state.north_shift));
 
   if (first_peleng_to_draw <= last_peleng_to_draw) {
@@ -270,15 +266,13 @@ void RadarEngine::updateTexture(const RLIState& _rli_state) {
   glBindTexture(GL_TEXTURE_2D, 0);
   _program->release();
 
-  _fbo->release();
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
   // --------------------------------------
 
   _last_drawn_peleng = last_peleng_to_draw;
   _draw_circle = false;
-  */
 }
 
-/*
 void RadarEngine::drawPelengs(int first, int last) {
   // Clear depth when the new cycle begins to avoid the previous circle data
   if (first == 0) {
@@ -304,4 +298,3 @@ void RadarEngine::drawPelengs(int first, int last) {
 
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
-*/

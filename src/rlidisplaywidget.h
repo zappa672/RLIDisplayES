@@ -115,7 +115,7 @@ private:
 
   QMatrix4x4 _projection;
 
-  //RadarDataSource*    _radar_ds;
+  RadarDataSource*    _radar_ds;
   /*
   ShipDataSource*     _ship_ds;
   TargetDataSource*   _target_ds;

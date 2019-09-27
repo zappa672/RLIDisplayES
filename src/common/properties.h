@@ -1,8 +1,6 @@
 #ifndef PROPERTIES_H
 #define PROPERTIES_H
 
-#include <QOpenGLFunctions>
-#include <QObject>
 #include <QString>
 
 #if defined(GL_ES_VERSION_3_0) && GL_ES_VERSION_3_0

@@ -23,11 +23,11 @@ RLIDisplayWidget::RLIDisplayWidget(QWidget *parent) : QOpenGLWidget(parent) {
   //_chart_mngr.loadCharts();
   //connect( &_chart_mngr, SIGNAL(newChartAvailable(QString)), SLOT(onNewChartAvailable(QString)));
 
-  //_radar_ds = new RadarDataSource(this);
+  _radar_ds = new RadarDataSource(this);
   //_ship_ds = new ShipDataSource(this);
   //_target_ds = new TargetDataSource(this);
 
-  //_radar_ds->start();
+  _radar_ds->start();
   //_ship_ds->start();
   //_target_ds->start();
 
@@ -35,11 +35,11 @@ RLIDisplayWidget::RLIDisplayWidget(QWidget *parent) : QOpenGLWidget(parent) {
 }
 
 RLIDisplayWidget::~RLIDisplayWidget() {
-  //_radar_ds->finish();
+  _radar_ds->finish();
   //_ship_ds->finish();
   //_target_ds->finish();
 
-  //delete _radar_ds;
+  delete _radar_ds;
   //delete _ship_ds;
   //delete _target_ds;
 
@@ -198,10 +198,10 @@ void RLIDisplayWidget::initializeGL() {
 
   _initialized = true;
 
-  //connect( _radar_ds, SIGNAL(updateRadarData(int, int, GLfloat*))
-  //       , _radarEngine, SLOT(updateData(int, int, GLfloat*))
-  //       , Qt::QueuedConnection );
-  //
+  connect( _radar_ds, SIGNAL(updateRadarData(int, int, GLfloat*))
+         , _radarEngine, SLOT(updateData(int, int, GLfloat*))
+         , Qt::QueuedConnection );
+
   //connect( _radar_ds, SIGNAL(updateTrailData(int, int, GLfloat*))
   //       , _tailsEngine, SLOT(updateData(int, int, GLfloat*))
   //       , Qt::QueuedConnection );
